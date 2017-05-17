@@ -69,10 +69,12 @@ You may get in touch with the maintainer team through any of the following metho
 
   * Through email:
     * [email@alexvan.camp](mailto:email@alexvan.camp) (Alex Van Camp)
+    * [chrishanel@gmail.com](mailto:chrishanel@gmail.com) (Chris Hanel)
 
   * Through Twitter:
     * [@vancamp](https://twitter.com/vancamp) (Alex Van Camp)
     * [@ProbablePrime](https://twitter.com/ProbablePrime) (Richard Fox)
+    * [@chrishanel](https://twitter.com/chrishanel) (Chris Hanel)
 
 ### Further Enforcement
 

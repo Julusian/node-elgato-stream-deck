@@ -42,6 +42,12 @@
     {
       "name": "Richard Fox",
       "twitter": "ProbablePrime"
+    },
+    {
+      "name": "Chris Hanel",
+      "twitter": "chrishanel",
+      "email": "chrishanel@gmail.com",
+      "url": "http://www.chrishanel.com/"
     }
   ],
   "license": "MIT",
