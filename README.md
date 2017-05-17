@@ -1,4 +1,4 @@
-# elgato-stream-deck [![npm version](https://img.shields.io/npm/v/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck) [![license](https://img.shields.io/npm/l/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck) [![Travis](https://img.shields.io/travis/lange/elgato-stream-deck.svg)](https://travis-ci.org/lange/elgato-stream-deck)
+# elgato-stream-deck [![npm version](https://img.shields.io/npm/v/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck) [![license](https://img.shields.io/npm/l/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck) [![Travis](https://img.shields.io/travis/lange/elgato-stream-deck.svg)](https://travis-ci.org/Lange/node-elgato-stream-deck)
 
 [`elgato-stream-deck`](https://github.com/lange/elgato-stream-deck) is a Node.js library for interfacing
 with the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
