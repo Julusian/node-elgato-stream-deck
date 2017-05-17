@@ -1,0 +1,52 @@
+{
+  "name": "elgato-stream-deck",
+  "version": "1.0.0",
+  "description": "A npm module for interfacing with the Elgato Stream Deck",
+  "main": "index.js",
+  "dependencies": {
+    "node-hid": "^0.5.4"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-xo": "^0.18.2",
+    "weallbehave": "^1.2.0",
+    "weallcontribute": "^1.0.8"
+  },
+  "scripts": {
+    "test": "npm run static",
+    "static": "eslint .",
+    "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
+    "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lange/node-elgato-stream-deck.git"
+  },
+  "keywords": [
+    "elgato",
+    "stream",
+    "deck",
+    "hid",
+    "usb",
+    "hardware",
+    "interface",
+    "controller"
+  ],
+  "author": {
+    "name": "Alex Van Camp",
+    "email": "email@alexvan.camp",
+    "url": "https://alexvan.camp/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Lange/node-elgato-stream-deck/issues"
+  },
+  "homepage": "https://github.com/Lange/node-elgato-stream-deck#readme",
+  "eslintConfig": {
+    "extends": "xo/esnext"
+  },
+  "files": [
+    "*.js",
+    "lib"
+  ]
+}
