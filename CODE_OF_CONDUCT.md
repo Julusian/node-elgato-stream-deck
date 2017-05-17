@@ -70,6 +70,10 @@ You may get in touch with the maintainer team through any of the following metho
   * Through email:
     * [email@alexvan.camp](mailto:email@alexvan.camp) (Alex Van Camp)
 
+  * Through Twitter:
+    * [@vancamp](https://twitter.com/vancamp) (Alex Van Camp)
+    * [@ProbablePrime](https://twitter.com/ProbablePrime) (Richard Fox)
+
 ### Further Enforcement
 
 If you've already followed the [initial enforcement steps](#enforcement), these are the steps maintainers will take for further enforcement, as needed:
