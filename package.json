@@ -35,8 +35,15 @@
   "author": {
     "name": "Alex Van Camp",
     "email": "email@alexvan.camp",
-    "url": "https://alexvan.camp/"
+    "url": "https://alexvan.camp/",
+    "twitter": "vancamp"
   },
+  "contributors": [
+    {
+      "name": "Richard Fox",
+      "twitter": "ProbablePrime"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Lange/node-elgato-stream-deck/issues"
