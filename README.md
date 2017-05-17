@@ -11,7 +11,7 @@ with the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
 
 * [Example](#example)
 * [Features](#features)
-* [PLanned Features](#planned-features)
+* [Planned Features](#planned-features)
 * [Contributing](#contributing)
 * [Events](#events)
   * [`down`](#down)
