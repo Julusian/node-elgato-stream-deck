@@ -59,7 +59,7 @@ Please refer to the [Changelog](CHANGELOG.md) for project history details, too.
 
 #### <a name="down"></a> `> down`
 
-Fired whenever a key is pressed. `keyIndex` is the 0-15 numerical index of that key.
+Fired whenever a key is pressed. `keyIndex` is the 0-14 numerical index of that key.
 
 ##### Example
 
@@ -71,7 +71,7 @@ streamDeck.on('down', keyIndex => {
 
 #### <a name="up"></a> `> up`
 
-Fired whenever a key is released. `keyIndex` is the 0-15 numerical index of that key.
+Fired whenever a key is released. `keyIndex` is the 0-14 numerical index of that key.
 
 ##### Example
 
