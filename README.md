@@ -175,7 +175,7 @@ Fired whenever an error is detected by the `node-hid` library.
 ##### Example
 
 ```javascript
-streamDeck.on('error', keyIndex => {
-    console.log('key %d error', keyIndex);
+streamDeck.on('error', error => {
+    console.error(error);
 });
 ```
