@@ -61,9 +61,10 @@ console.log('Successfully wrote a red square to key 4.');
 
 ### Planned Features
 
-* Key combinations
+* [Key combinations](https://github.com/Lange/node-elgato-stream-deck/issues/9)
 * Support "pages" feature from the official Elgato Stream Deck software
 * [Text labels](https://github.com/Lange/node-elgato-stream-deck/issues/6)
+* [Typescript typings](https://github.com/Lange/node-elgato-stream-deck/issues/8)
 
 ### Contributing
 
