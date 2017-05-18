@@ -9,11 +9,11 @@ const HID = require('node-hid');
 const NUM_KEYS = 15;
 const keyState = new Array(NUM_KEYS).fill(false);
 const devices = HID.devices();
-const streamDecks = devices.filter(device => {
+const connectedStreamDecks = devices.filter(device => {
 	return device.product === 'Stream Deck' && device.manufacturer === 'Elgato Systems';
 });
 
-if (streamDecks.length > 1) {
+if (connectedStreamDecks.length > 1) {
 	throw new Error('More than one Stream Deck is connected. This is unsupported at this time.');
 }
 
@@ -47,4 +47,4 @@ class StreamDeck extends EventEmitter {
 	}
 }
 
-module.exports = new StreamDeck(new HID.HID(streamDecks[0].path));
+module.exports = new StreamDeck(new HID.HID(connectedStreamDecks[0].path));
