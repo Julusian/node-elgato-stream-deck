@@ -28,6 +28,8 @@ with the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
 
 ### Example
 
+#### JavaScript
+
 ```javascript
 const path = require('path');
 const streamDeck = require('elgato-stream-deck')
@@ -55,17 +57,35 @@ streamDeck.fillColor(4, 255, 0, 0);
 console.log('Successfully wrote a red square to key 4.');
 ```
 
+#### TypeScript
+
+```typescript
+import streamDeck = require('elgato-stream-deck');
+
+streamDeck.on('down', keyIndex => {
+    console.log('key %d down', keyIndex);
+});
+
+streamDeck.on('up', keyIndex => {
+    console.log('key %d up', keyIndex);
+});
+
+streamDeck.on('error', error => {
+    console.error(error);
+});
+```
+
 ### Features
 
 * Key `down` and key `up` events
 * Fill keys with images or solid RGB colors
+* Typescript support
 
 ### Planned Features
 
 * [Key combinations](https://github.com/Lange/node-elgato-stream-deck/issues/9)
 * Support "pages" feature from the official Elgato Stream Deck software
 * [Text labels](https://github.com/Lange/node-elgato-stream-deck/issues/6)
-* [Typescript typings](https://github.com/Lange/node-elgato-stream-deck/issues/8)
 * [Changing the standby image](https://github.com/Lange/node-elgato-stream-deck/issues/11)
 
 ### Contributing
