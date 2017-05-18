@@ -9,6 +9,7 @@
   "devDependencies": {
     "eslint": "^3.19.0",
     "eslint-config-xo": "^0.18.2",
+    "sharp": "^0.17.3",
     "weallbehave": "^1.2.0",
     "weallcontribute": "^1.0.8"
   },
