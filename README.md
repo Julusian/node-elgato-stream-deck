@@ -1,4 +1,4 @@
-# elgato-stream-deck [![npm version](https://img.shields.io/npm/v/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck) [![license](https://img.shields.io/npm/l/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck) [![Travis](https://img.shields.io/travis/lange/elgato-stream-deck.svg)](https://travis-ci.org/Lange/node-elgato-stream-deck)
+# elgato-stream-deck [![npm version](https://img.shields.io/npm/v/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck) [![license](https://img.shields.io/npm/l/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck) [![Travis](https://travis-ci.org/Lange/node-elgato-stream-deck.svg?branch=master)](https://travis-ci.org/Lange/node-elgato-stream-deck)
 
 ![alt text](media/streamdeck_ui.png "elgato-stream-deck")
 
