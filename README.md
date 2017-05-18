@@ -17,6 +17,9 @@ with the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
 * [Contributing](#contributing)
 * [API](#api)
   * [`write`](#write)
+  * [`fillColor`](#fill-color)
+  * [`fillImageFromFile`](#fill-image-from-file)
+  * [`fillImage`](#fill-image)
 * [Events](#events)
   * [`down`](#down)
   * [`up`](#up)
@@ -25,7 +28,9 @@ with the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
 ### Example
 
 ```javascript
+const path = require('path');
 const streamDeck = require('elgato-stream-deck')
+
 streamDeck.on('down', keyIndex => {
     console.log('key %d down', keyIndex);
 });
@@ -37,16 +42,26 @@ streamDeck.on('up', keyIndex => {
 streamDeck.on('error', error => {
     console.error(error);
 });
+
+// Fill the second button from the left in the first row with an image of the GitHub logo.
+// This is asynchronous and returns a promise.
+streamDeck.fillImageFromFile(3, path.resolve(__dirname, 'github_logo.png')).then(() => {
+	console.log('Successfully wrote a GitHub logo to key 3.');
+});
+
+// Fill the first button form the left in the first row with a solid red color. This is synchronous.
+streamDeck.fillColor(4, 255, 0, 0);
+console.log('Successfully wrote a red square to key 4.');
 ```
 
 ### Features
 
 * Key `down` and key `up` events
+* Fill keys with images or solid RGB colors
 
 ### Planned Features
 
 * Key combinations
-* Send new images to keys
 * Support "pages" feature from the official Elgato Stream Deck software
 
 ### Contributing
@@ -61,15 +76,67 @@ Please refer to the [Changelog](CHANGELOG.md) for project history details, too.
 
 #### <a name="write"></a> `> streamDeck.write(buffer) -> undefined`
 
-Synchronsously writes an arbitrary [`Buffer`](https://nodejs.org/api/buffer.html) instance to the Stream Deck.
+Synchronously writes an arbitrary [`Buffer`](https://nodejs.org/api/buffer.html) instance to the Stream Deck.
 Throws if an error is encountered during the write operation.
 
 ##### Example
 
 ```javascript
-streamDeck.on('down', keyIndex => {
-    console.log('key %d down', keyIndex);
-});
+// Writes 16 bytes of zero to the Stream Deck.
+streamDeck.write(Buffer.alloc(16));
+```
+
+#### <a name="fill-color"></a> `> streamDeck.fillColor(keyIndex, r, g, b) -> undefined`
+
+Synchronously sets the given `keyIndex`'s screen to a solid RGB color.
+
+##### Example
+
+```javascript
+// Turn key 4 (the top left key) solid red.
+streamDeck.fillColor(4, 255, 0, 0);
+```
+
+#### <a name="fill-image-from-file"></a> `> streamDeck.fillImageFromFile(keyIndex, filePath) -> Promise`
+
+Asynchronously reads an image from `filePath` and sets the given `keyIndex`'s screen to that image.
+Automatically scales the image to 72x72 and strips out the alpha channel.
+If necessary, the image will be center-cropped to fit into a square.
+
+##### Example
+
+```javascript
+// Fill the second button from the left in the first row with an image of the GitHub logo.
+streamDeck.fillImageFromFile(3, path.resolve(__dirname, 'github_logo.png'))
+	.then(() => {
+		console.log('Successfully wrote a GitHub logo to key 3.');
+	})
+	.catch(err => {
+		console.error(err);
+	});
+```
+
+#### <a name="fill-image"></a> `> streamDeck.fillImage(keyIndex, buffer) -> undefined`
+
+Synchronously writes a buffer of 72x72 RGB image data to the given `keyIndex`'s screen.
+The buffer must be exactly 15552 bytes in length. Any other length will result in an error being thrown.
+
+##### Example
+
+```javascript
+// Fill the third button from the left in the first row with an image of the GitHub logo.
+const sharp = require('sharp'); // See http://sharp.dimens.io/en/stable/ for full docs on this great library!
+sharp(path.resolve(__dirname, 'github_logo.png'))
+	.flatten() // Eliminate alpha channel, if any.
+	.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE) // Scale down to the right size, cropping if necessary.
+	.raw() // Give us uncompressed RGB
+	.toBuffer()
+	.then(buffer => {
+		return streamDeck.fillImage(2, buffer);
+	})
+	.catch(err => {
+		console.error(err);
+	});
 ```
 
 ### Events
