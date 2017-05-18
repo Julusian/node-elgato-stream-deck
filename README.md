@@ -66,6 +66,7 @@ console.log('Successfully wrote a red square to key 4.');
 * Support "pages" feature from the official Elgato Stream Deck software
 * [Text labels](https://github.com/Lange/node-elgato-stream-deck/issues/6)
 * [Typescript typings](https://github.com/Lange/node-elgato-stream-deck/issues/8)
+* [Changing the standby image](https://github.com/Lange/node-elgato-stream-deck/issues/11)
 
 ### Contributing
 
