@@ -15,6 +15,8 @@ with the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
 * [Features](#features)
 * [Planned Features](#planned-features)
 * [Contributing](#contributing)
+* [API](#api)
+  * [`write`](#write)
 * [Events](#events)
   * [`down`](#down)
   * [`up`](#up)
@@ -54,6 +56,21 @@ The elgato-stream-deck team enthusiastically welcomes contributions and project 
 All participants and maintainers in this project are expected to follow [Code of Conduct](CODE_OF_CONDUCT.md), and just generally be kind to each other.
 
 Please refer to the [Changelog](CHANGELOG.md) for project history details, too.
+
+### API
+
+#### <a name="write"></a> `> streamDeck.write(buffer) -> undefined`
+
+Synchronsously writes an arbitrary [`Buffer`](https://nodejs.org/api/buffer.html) instance to the Stream Deck.
+Throws if an error is encountered during the write operation.
+
+##### Example
+
+```javascript
+streamDeck.on('down', keyIndex => {
+    console.log('key %d down', keyIndex);
+});
+```
 
 ### Events
 

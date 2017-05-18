@@ -45,6 +45,18 @@ class StreamDeck extends EventEmitter {
 			this.emit('error', err);
 		});
 	}
+
+	write(buffer) {
+		return this.device.write(StreamDeck.bufferToIntArray(buffer));
+	}
+
+	static bufferToIntArray(buffer) {
+		const array = [];
+		for (const pair of buffer.entries()) {
+			array.push(pair[1]);
+		}
+		return array;
+	}
 }
 
 module.exports = new StreamDeck(new HID.HID(connectedStreamDecks[0].path));
