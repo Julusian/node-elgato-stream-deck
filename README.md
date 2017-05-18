@@ -20,6 +20,7 @@ with the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
   * [`fillColor`](#fill-color)
   * [`fillImageFromFile`](#fill-image-from-file)
   * [`fillImage`](#fill-image)
+  * [`clearKey`](#clear-key)
 * [Events](#events)
   * [`down`](#down)
   * [`up`](#up)
@@ -139,6 +140,17 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 	.catch(err => {
 		console.error(err);
 	});
+```
+
+#### <a name="clear-key"></a> `> streamDeck.clearKey(keyIndex) -> undefined`
+
+Synchronously clears the given `keyIndex`'s screen.
+
+##### Example
+
+```javascript
+// Clear the third button from the left in the first row.
+streamDeck.clearKey(2);
 ```
 
 ### Events

@@ -12,8 +12,8 @@ streamDeck.on('down', keyIndex => {
 });
 
 streamDeck.on('up', keyIndex => {
-	// Clear the key by writing a solid black square to it.
-	streamDeck.fillColor(keyIndex, 0, 0, 0);
+	// Clear the key when it is released.
+	streamDeck.clearKey(keyIndex);
 });
 
 streamDeck.on('error', error => {
