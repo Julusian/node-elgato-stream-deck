@@ -9,6 +9,37 @@ with the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
 
 `$ npm install --save elgato-stream-deck`
 
+If that fails (**or if you are on a Raspberry Pi**), you will need to install a compiler toolchain to enable npm to build
+some of `node-elgato-stream-deck`'s dependencies from source. 
+
+* Windows
+  * Install [`windows-build-tools`](https://github.com/felixrieseberg/windows-build-tools):
+  ```bash
+  npm install --global windows-build-tools
+  ```
+* MacOS
+  * Install [Xcode](https://developer.apple.com/xcode/download/), then:
+  ```bash
+  xcode-select --install
+  ```
+* Linux (**including Raspberry Pi**)
+  * Follow the instructions for Linux in the ["Compiling from source"](https://github.com/node-hid/node-hid#compiling-from-source) steps for `node-hid`:
+    ```bash
+    sudo apt-get install build-essential git
+    sudo apt-get install gcc-4.8 g++-4.8 && export CXX=g++-4.8
+    sudo apt-get install sudo apt install libusb-1.0-0 libusb-1.0-0-dev
+    ```
+  * Install a recent version of Node.js. We've had success with v7:
+    ```bash
+    curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+    sudo apt-get install -y nodejs 
+    ```
+  * Try installing `node-elgato-stream-deck`
+  * If you still have issues, ensure everything is updated and try again:
+	```bash
+	sudo apt-get update && sudo apt-get upgrade
+	```
+
 ## Table of Contents
 
 * [Example](#example)
@@ -77,6 +108,7 @@ streamDeck.on('error', error => {
 
 ### Features
 
+* Miltiplatform support: Windows 7-10, MacOS, Linux, and even Raspberry Pi!
 * Key `down` and key `up` events
 * Fill keys with images or solid RGB colors
 * Typescript support
