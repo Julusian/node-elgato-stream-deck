@@ -8,16 +8,25 @@
     "node-hid": "^0.5.4"
   },
   "devDependencies": {
+    "ava": "^0.19.1",
+    "coveralls": "^2.13.1",
     "eslint": "^3.19.0",
     "eslint-config-xo": "^0.18.2",
-    "sharp": "^0.17.3",
-    "stream-buffers": "^3.0.1",
+    "eslint-plugin-ava": "^4.2.0",
+    "mockery": "^2.0.0",
+    "nyc": "^10.3.2",
     "pureimage": "0.0.21",
+    "sharp": "^0.17.3",
+    "sinon": "^2.2.0",
+    "stream-buffers": "^3.0.1",
     "weallbehave": "^1.2.0",
     "weallcontribute": "^1.0.8"
   },
   "scripts": {
-    "test": "npm run static",
+    "pretest": "npm run static",
+    "test": "nyc ava",
+    "report": "nyc report --reporter=html",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "static": "eslint .",
     "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
     "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'"
@@ -30,7 +39,7 @@
     "elgato",
     "stream",
     "deck",
-    "streamdeck"
+    "streamdeck",
     "hid",
     "usb",
     "hardware",
