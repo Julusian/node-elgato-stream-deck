@@ -23,6 +23,10 @@ if (connectedStreamDecks.length > 1) {
 	throw new Error('More than one Stream Deck is connected. This is unsupported at this time.');
 }
 
+if (connectedStreamDecks.length < 1) {
+	throw new Error('No Stream Decks are connected.');
+}
+
 class StreamDeck extends EventEmitter {
 	constructor(device) {
 		super();
