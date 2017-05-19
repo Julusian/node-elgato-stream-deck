@@ -56,6 +56,7 @@ some of `node-elgato-stream-deck`'s dependencies from source.
   * [`down`](#down)
   * [`up`](#up)
   * [`error`](#error)
+* [Protocol Notes][#protocol-notes]
 
 ### Example
 
@@ -245,3 +246,7 @@ streamDeck.on('error', error => {
     console.error(error);
 });
 ```
+
+### Protocol Notes
+
+Raw protocol notes can be found in [NOTES.md](NOTES.md). These detail the protocol and method for interacting with the Stream Deck which this module implements.
