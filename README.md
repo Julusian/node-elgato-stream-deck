@@ -63,7 +63,7 @@ some of `node-elgato-stream-deck`'s dependencies from source.
 
 ```javascript
 const path = require('path');
-const streamDeck = require('elgato-stream-deck')
+const streamDeck = require('elgato-stream-deck');
 
 streamDeck.on('down', keyIndex => {
     console.log('key %d down', keyIndex);
