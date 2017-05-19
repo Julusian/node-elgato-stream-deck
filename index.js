@@ -13,6 +13,7 @@ const NUM_FIRST_PAGE_PIXELS = 2583;
 const NUM_SECOND_PAGE_PIXELS = 2601;
 const ICON_SIZE = 72;
 const NUM_TOTAL_PIXELS = NUM_FIRST_PAGE_PIXELS + NUM_SECOND_PAGE_PIXELS;
+
 const keyState = new Array(NUM_KEYS).fill(false);
 const devices = HID.devices();
 const connectedStreamDecks = devices.filter(device => {
@@ -118,22 +119,22 @@ class StreamDeck extends EventEmitter {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		]);
 
-		const packetWithHeader = Buffer.concat([header, buffer]);
-		const numZeroesToFill = PAGE_PACKET_SIZE - packetWithHeader.length;
-		const packet = Buffer.concat([packetWithHeader, Buffer.alloc(numZeroesToFill)]);
+		const packet = this._padToLength(Buffer.concat([header, buffer]), PAGE_PACKET_SIZE);
 		return this.write(packet);
 	}
 
 	_writePage2(keyIndex, buffer) {
-		const header = Buffer.from([
-			0x02, 0x01, 0x02, 0x00, 0x01, keyIndex + 1, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		]);
-
-		const packetWithHeader = Buffer.concat([header, buffer]);
-		const numZeroesToFill = PAGE_PACKET_SIZE - packetWithHeader.length;
-		const packet = Buffer.concat([packetWithHeader, Buffer.alloc(numZeroesToFill)]);
+		const header = Buffer.from([0x02, 0x01, 0x02, 0x00, 0x01, keyIndex + 1]);
+		const packet = this._padToLength(Buffer.concat([header, this._pad(10), buffer]), PAGE_PACKET_SIZE);
 		return this.write(packet);
+	}
+
+	_padToLength(buffer, padLength) {
+		return Buffer.concat([buffer, this._pad(padLength - buffer.length)]);
+	}
+
+	_pad(padLength) {
+		return Buffer.alloc(padLength);
 	}
 
 	get ICON_SIZE() {
