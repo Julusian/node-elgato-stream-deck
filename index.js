@@ -14,7 +14,6 @@ const NUM_SECOND_PAGE_PIXELS = 2601;
 const ICON_SIZE = 72;
 const NUM_TOTAL_PIXELS = NUM_FIRST_PAGE_PIXELS + NUM_SECOND_PAGE_PIXELS;
 
-const keyState = new Array(NUM_KEYS).fill(false);
 const devices = HID.devices();
 const connectedStreamDecks = devices.filter(device => {
 	return device.vendorId === 0x0fd9 && device.productId === 0x0060;
@@ -32,6 +31,7 @@ class StreamDeck extends EventEmitter {
 	constructor(device) {
 		super();
 		this.device = device;
+		this.keyState = new Array(NUM_KEYS).fill(false);
 
 		this.device.on('data', data => {
 			// The first byte is a report ID, the last byte appears to be padding
@@ -40,7 +40,7 @@ class StreamDeck extends EventEmitter {
 
 			for (let i = 0; i < NUM_KEYS; i++) {
 				const keyPressed = Boolean(data[i]);
-				if (keyPressed !== keyState[i]) {
+				if (keyPressed !== this.keyState[i]) {
 					if (keyPressed) {
 						this.emit('down', i);
 					} else {
@@ -48,7 +48,7 @@ class StreamDeck extends EventEmitter {
 					}
 				}
 
-				keyState[i] = keyPressed;
+				this.keyState[i] = keyPressed;
 			}
 		});
 
