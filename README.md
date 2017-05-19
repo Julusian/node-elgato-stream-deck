@@ -115,6 +115,7 @@ streamDeck.on('error', error => {
 
 ### Planned Features
 
+* [Hotplugging](https://github.com/Lange/node-elgato-stream-deck/issues/14)
 * [Key combinations](https://github.com/Lange/node-elgato-stream-deck/issues/9)
 * Support "pages" feature from the official Elgato Stream Deck software
 * [Text labels](https://github.com/Lange/node-elgato-stream-deck/issues/6)
