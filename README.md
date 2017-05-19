@@ -185,7 +185,7 @@ The buffer must be exactly 15552 bytes in length. Any other length will result i
 const sharp = require('sharp'); // See http://sharp.dimens.io/en/stable/ for full docs on this great library!
 sharp(path.resolve(__dirname, 'github_logo.png'))
 	.flatten() // Eliminate alpha channel, if any.
-	.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE) // Scale down to the right size, cropping if necessary.
+	.resize(streamDeck.ICON_SIZE) // Scale down to the right size, cropping if necessary.
 	.raw() // Give us uncompressed RGB
 	.toBuffer()
 	.then(buffer => {

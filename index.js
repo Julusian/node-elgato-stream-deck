@@ -93,7 +93,7 @@ class StreamDeck extends EventEmitter {
 	fillImageFromFile(keyIndex, filePath) {
 		return sharp(filePath)
 			.flatten() // Eliminate alpha channel, if any.
-			.resize(this.ICON_SIZE, this.ICON_SIZE)
+			.resize(this.ICON_SIZE)
 			.raw()
 			.toBuffer()
 			.then(buffer => {
