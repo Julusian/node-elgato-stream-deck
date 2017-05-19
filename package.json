@@ -63,5 +63,8 @@
   "files": [
     "*.js",
     "lib"
-  ]
+  ],
+  "engines" : {
+    "node" : ">=4"
+  }
 }
