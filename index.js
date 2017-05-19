@@ -16,7 +16,7 @@ const NUM_TOTAL_PIXELS = NUM_FIRST_PAGE_PIXELS + NUM_SECOND_PAGE_PIXELS;
 const keyState = new Array(NUM_KEYS).fill(false);
 const devices = HID.devices();
 const connectedStreamDecks = devices.filter(device => {
-	return device.product === 'Stream Deck' && device.manufacturer === 'Elgato Systems';
+	return device.vendorId === 0x0fd9 && device.productId === 0x0060;
 });
 
 if (connectedStreamDecks.length > 1) {
