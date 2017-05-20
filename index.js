@@ -59,19 +59,71 @@ class StreamDeck extends EventEmitter {
 		});
 	}
 
+	/**
+	 * Writes a Buffer to the Stream Deck.
+	 *
+	 * @param {Buffer} buffer The buffer written to the Stream Deck
+	 * @returns undefined
+	 */
 	write(buffer) {
 		return this.device.write(StreamDeck.bufferToIntArray(buffer));
 	}
 
+	/**
+	 * Fills the given key with a solid color.
+	 *
+	 * @param {number} keyIndex The key to fill 0 - 14
+	 * @param {number} r The color's red value. 0 - 255
+	 * @param {number} g The color's green value. 0 - 255
+	 * @param {number} b The color's blue value. 0 -255
+	 */
 	fillColor(keyIndex, r, g, b) {
+		StreamDeck.checkValidKeyIndex(keyIndex);
+
+		StreamDeck.checkRGBValue(r);
+		StreamDeck.checkRGBValue(g);
+		StreamDeck.checkRGBValue(b);
+
 		const pixel = Buffer.from([b, g, r]);
 		this._writePage1(keyIndex, Buffer.alloc(NUM_FIRST_PAGE_PIXELS * 3, pixel));
 		this._writePage2(keyIndex, Buffer.alloc(NUM_SECOND_PAGE_PIXELS * 3, pixel));
 	}
 
+	/**
+	 * Checks a value is a valid RGB value. A number between 0 and 255.
+	 *
+	 * @static
+	 * @param {number} value The number to check
+	 */
+	static checkRGBValue(value) {
+		if (value < 0 || value > 255) {
+			throw new TypeError('Expected a valid color RGB value 0 - 255');
+		}
+	}
+
+	/**
+	 * Checks a keyIndex is a valid key for a stream deck. A number between 0 and 14.
+	 *
+	 * @static
+	 * @param {number} keyIndex The keyIndex to check
+	 */
+	static checkValidKeyIndex(keyIndex) {
+		if (keyIndex < 0 || keyIndex > 14) {
+			throw new TypeError('Expected a valid keyIndex 0 - 14');
+		}
+	}
+
+	/**
+	 * Fills the given key with an image in a Buffer.
+	 *
+	 * @param {number} keyIndex The key to fill 0 - 14
+	 * @param {Buffer} imageBuffer
+	 */
 	fillImage(keyIndex, imageBuffer) {
+		StreamDeck.checkValidKeyIndex(keyIndex);
+
 		if (imageBuffer.length !== 15552) {
-			throw new Error(`Expected image buffer of length 15552, got length ${imageBuffer.length}`);
+			throw new RangeError(`Expected image buffer of length 15552, got length ${imageBuffer.length}`);
 		}
 
 		let pixels = [];
@@ -93,7 +145,16 @@ class StreamDeck extends EventEmitter {
 		this._writePage2(keyIndex, Buffer.from(secondPagePixels));
 	}
 
+	/**
+	 * Fill's the given key with an image from a file.
+	 *
+	 * @param {number} keyIndex The key to fill 0 - 14
+	 * @param {String} filePath A file path to an image file
+	 * @returns {Promise<void>} Resolves when the file has been written
+	 */
 	fillImageFromFile(keyIndex, filePath) {
+		StreamDeck.checkValidKeyIndex(keyIndex);
+
 		return sharp(filePath)
 			.flatten() // Eliminate alpha channel, if any.
 			.resize(this.ICON_SIZE)
@@ -104,10 +165,26 @@ class StreamDeck extends EventEmitter {
 			});
 	}
 
+	/**
+	 * Clears the given key.
+	 *
+	 * @param {number} keyIndex The key to clear 0 - 14
+	 * @returns {undefined}
+	 */
 	clearKey(keyIndex) {
+		StreamDeck.checkValidKeyIndex(keyIndex);
+
 		return this.fillColor(keyIndex, 0, 0, 0);
 	}
 
+	/**
+	 * Writes a Stream Deck's page 1 headers and image data to the Stream Deck.
+	 *
+	 * @private
+	 * @param {number} keyIndex The key to write to 0 - 14
+	 * @param {Buffer} buffer Image data for page 1
+	 * @returns {undefined}
+	 */
 	_writePage1(keyIndex, buffer) {
 		const header = Buffer.from([
 			0x02, 0x01, 0x01, 0x00, 0x00, keyIndex + 1, 0x00, 0x00,
@@ -125,24 +202,60 @@ class StreamDeck extends EventEmitter {
 		return this.write(packet);
 	}
 
+	/**
+	 * Writes a Stream Deck's page 2 headers and image data to the Stream Deck.
+	 *
+	 * @private
+	 * @param {number} keyIndex The key to write to 0 - 14
+	 * @param {Buffer} buffer Image data for page 2
+	 * @returns {undefined}
+	 */
 	_writePage2(keyIndex, buffer) {
 		const header = Buffer.from([0x02, 0x01, 0x02, 0x00, 0x01, keyIndex + 1]);
 		const packet = this._padToLength(Buffer.concat([header, this._pad(10), buffer]), PAGE_PACKET_SIZE);
 		return this.write(packet);
 	}
 
+	/**
+	 * Pads a given buffer till padLength with 0s.
+	 *
+	 * @private
+	 * @param {Buffer} buffer Buffer to pad
+	 * @param {number} padLength The length to pad to
+	 * @returns {Buffer} The Buffer padded to the length requested
+	 */
 	_padToLength(buffer, padLength) {
 		return Buffer.concat([buffer, this._pad(padLength - buffer.length)]);
 	}
 
+	/**
+	 * Returns an empty buffer (filled with zeroes) of the given length
+	 *
+	 * @private
+	 * @param {number} padLength Length of the buffer
+	 * @returns {Buffer}
+	 */
 	_pad(padLength) {
 		return Buffer.alloc(padLength);
 	}
 
+	/**
+	 * The pixel size of an icon written to the Stream Deck key.
+	 *
+	 * @readonly
+	 */
 	get ICON_SIZE() {
 		return ICON_SIZE;
 	}
 
+	/**
+	 * Converts a buffer into an number[]. Used to supply the underlying
+	 * node-hid device with the format it accepts.
+	 *
+	 * @static
+	 * @param {Buffer} buffer Buffer to convert
+	 * @returns {number[]} the converted buffer
+	 */
 	static bufferToIntArray(buffer) {
 		const array = [];
 		for (const pair of buffer.entries()) {

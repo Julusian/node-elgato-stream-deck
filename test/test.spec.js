@@ -51,6 +51,23 @@ test('fillColor', t => {
 	);
 });
 
+test('checkRGBValue', t => {
+	t.plan(4);
+
+	t.throws(() => streamDeck.fillColor(0, 256, 0, 0));
+	t.throws(() => streamDeck.fillColor(0, 0, 256, 0));
+	t.throws(() => streamDeck.fillColor(0, 0, 0, 256));
+
+	t.throws(() => streamDeck.fillColor(0, -1, 0, 0));
+});
+
+test('checkValidKeyIndex', t => {
+	t.plan(2);
+
+	t.throws(() => streamDeck.clearKey(-1));
+	t.throws(() => streamDeck.clearKey(15));
+});
+
 test('clearKey', t => {
 	t.plan(2);
 
