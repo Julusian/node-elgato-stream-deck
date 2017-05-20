@@ -56,7 +56,7 @@ some of `node-elgato-stream-deck`'s dependencies from source.
   * [`down`](#down)
   * [`up`](#up)
   * [`error`](#error)
-* [Protocol Notes][#protocol-notes]
+* [Protocol Notes](#protocol-notes)
 
 ### Example
 
