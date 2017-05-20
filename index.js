@@ -19,10 +19,12 @@ const connectedStreamDecks = devices.filter(device => {
 	return device.vendorId === 0x0fd9 && device.productId === 0x0060;
 });
 
+/* istanbul ignore if  */
 if (connectedStreamDecks.length > 1) {
 	throw new Error('More than one Stream Deck is connected. This is unsupported at this time.');
 }
 
+/* istanbul ignore if  */
 if (connectedStreamDecks.length < 1) {
 	throw new Error('No Stream Decks are connected.');
 }
