@@ -70,6 +70,16 @@ class StreamDeck extends EventEmitter {
 	}
 
 	/**
+	 * Sends a HID feature report to the Stream Deck.
+	 *
+	 * @param {Buffer} buffer The buffer send to the Stream Deck.
+	 * @returns undefined
+	 */
+	sendFeatureReport(buffer) {
+		return this.device.sendFeatureReport(StreamDeck.bufferToIntArray(buffer));
+	}
+
+	/**
 	 * Fills the given key with a solid color.
 	 *
 	 * @param {number} keyIndex The key to fill 0 - 14
@@ -175,6 +185,18 @@ class StreamDeck extends EventEmitter {
 		StreamDeck.checkValidKeyIndex(keyIndex);
 
 		return this.fillColor(keyIndex, 0, 0, 0);
+	}
+
+	/**
+	 * Sets the brightness of the keys on the Stream Deck
+	 *
+	 * @param {number} percentage The percentage brightness
+	 */
+	setBrightness(percentage) {
+		if (percentage < 0 || percentage > 100) {
+			throw new RangeError('Expected brightness percentage to be between 0 and 100');
+		}
+		this.sendFeatureReport(this._padToLength(Buffer.from([0x05, 0x55, 0xaa, 0xd1, 0x01, percentage]), 17));
 	}
 
 	/**

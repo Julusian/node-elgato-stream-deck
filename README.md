@@ -52,6 +52,7 @@ some of `node-elgato-stream-deck`'s dependencies from source.
   * [`fillImageFromFile`](#fill-image-from-file)
   * [`fillImage`](#fill-image)
   * [`clearKey`](#clear-key)
+  * [`setBrightness`](#set-brightness)
 * [Events](#events)
   * [`down`](#down)
   * [`up`](#up)
@@ -113,6 +114,7 @@ streamDeck.on('error', error => {
 * Key `down` and key `up` events
 * Fill keys with images or solid RGB colors
 * Typescript support
+* Set the Stream Deck brightness
 
 ### Planned Features
 
@@ -206,6 +208,17 @@ Synchronously clears the given `keyIndex`'s screen.
 ```javascript
 // Clear the third button from the left in the first row.
 streamDeck.clearKey(2);
+```
+
+#### <a name="set-brightness"></a> `> streamDeck.setBrightness(percentage) -> undefined`
+
+Synchronously set the brightness of the Stream Deck.
+
+##### Example
+
+```javascript
+// Set the Stream Deck to maximum brightness
+streamDeck.setBrightness(100);
 ```
 
 ### Events

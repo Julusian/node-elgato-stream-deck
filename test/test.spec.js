@@ -22,6 +22,7 @@ mockery.registerMock('node-hid', {
 		constructor() {
 			super();
 			this.write = sinon.spy();
+			this.sendFeatureReport = sinon.spy();
 		}
 	}
 });
@@ -137,6 +138,17 @@ test.cb('forwards error events from the device', t => {
 test('fillImage undersized buffer', t => {
 	const largeBuffer = Buffer.alloc(1);
 	t.throws(() => streamDeck.fillImage(0, largeBuffer));
+});
+
+test('setBrightness', t => {
+	streamDeck.setBrightness(100);
+	streamDeck.setBrightness(0);
+
+	t.deepEqual(streamDeck.device.sendFeatureReport.getCall(1).args[0], [0x05, 0x55, 0xaa, 0xd1, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+	t.deepEqual(streamDeck.device.sendFeatureReport.getCall(0).args[0], [0x05, 0x55, 0xaa, 0xd1, 0x01, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+
+	t.throws(() => streamDeck.setBrightness(101));
+	t.throws(() => streamDeck.setBrightness(-1));
 });
 
 function readFixtureJSON(fileName) {

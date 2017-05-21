@@ -1,6 +1,10 @@
 interface IStreamDeck {
 	readonly ICON_SIZE: number;
-	write(buffer: Buffer): any;
+	write(buffer: Buffer): void;
+	sendFeatureReport(buffer: Buffer): void;
+
+	setBrightness(percentage: number): void;
+
 	clearKey(keyIndex: number): void;
 	fillColor(keyIndex: number, r: number, g: number, b: number): void;
 	fillImage(keyIndex: number, imageBuffer: Buffer): void;
