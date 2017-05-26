@@ -144,7 +144,7 @@ class StreamDeck extends EventEmitter {
 				const r = imageBuffer.readUInt8(i);
 				const g = imageBuffer.readUInt8(i + 1);
 				const b = imageBuffer.readUInt8(i + 2);
-				row.push(b, g, r);
+				row.push(r, g, b);
 			}
 			pixels = pixels.concat(row.reverse());
 		}

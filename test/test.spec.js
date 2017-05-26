@@ -89,14 +89,14 @@ test('clearKey', t => {
 
 test.cb('fillImageFromFile', t => {
 	t.plan(2);
-	streamDeck.fillImageFromFile(0, path.resolve(__dirname, 'fixtures', 'red_square.png'))
+	streamDeck.fillImageFromFile(0, path.resolve(__dirname, 'fixtures', 'nodecg_logo.png'))
 	.then(() => {
 		validateWriteCall(
 			t,
 			streamDeck.device.write,
 			[
-				'fillImageFromFile-red_square-page1.json',
-				'fillImageFromFile-red_square-page2.json'
+				'fillImageFromFile-nodecg_logo-page1.json',
+				'fillImageFromFile-nodecg_logo-page2.json'
 			]
 		);
 		t.end();
