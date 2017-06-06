@@ -16,7 +16,7 @@ On startup the Stream Deck sends the current state as a Report, with id 2. Its t
 
 After sending the initial state, the Stream Deck software sends this report: `[0x05, 0x55, 0xAA, 0xD1, 0x01, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]`
 
-It is unknown what this does.
+This sets the Stream Deck brightness to 99% (0x63)
 
 ## Writing an Image
 
