@@ -18,22 +18,22 @@ some of `node-elgato-stream-deck`'s dependencies from source.
   npm install --global windows-build-tools
   ```
 * MacOS
-  * Install [Xcode](https://developer.apple.com/xcode/download/), then:
+  * Install the Xcode Command Line Tools:
   ```bash
   xcode-select --install
   ```
 * Linux (**including Raspberry Pi**)
   * Follow the instructions for Linux in the ["Compiling from source"](https://github.com/node-hid/node-hid#compiling-from-source) steps for `node-hid`:
-    ```bash
-    sudo apt-get install build-essential git
-    sudo apt-get install gcc-4.8 g++-4.8 && export CXX=g++-4.8
-    sudo apt-get install sudo apt install libusb-1.0-0 libusb-1.0-0-dev
-    ```
-  * Install a recent version of Node.js. We've had success with v7:
-    ```bash
-    curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
-    sudo apt-get install -y nodejs 
-    ```
+	```bash
+	sudo apt-get install build-essential git
+	sudo apt-get install gcc-4.8 g++-4.8 && export CXX=g++-4.8
+	sudo apt-get install sudo apt install libusb-1.0-0 libusb-1.0-0-dev
+	```
+  * Install a recent version of Node.js.:
+	```bash
+	curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+	sudo apt-get install -y nodejs 
+	```
   * Try installing `node-elgato-stream-deck`
   * If you still have issues, ensure everything is updated and try again:
 	```bash
@@ -51,7 +51,9 @@ some of `node-elgato-stream-deck`'s dependencies from source.
   * [`fillColor`](#fill-color)
   * [`fillImageFromFile`](#fill-image-from-file)
   * [`fillImage`](#fill-image)
+  * [`fillPanel`](#fill-panel)
   * [`clearKey`](#clear-key)
+  * [`clearAllKeys`](#clear-all-keys)
   * [`setBrightness`](#set-brightness)
 * [Events](#events)
   * [`down`](#down)
@@ -65,56 +67,65 @@ some of `node-elgato-stream-deck`'s dependencies from source.
 
 ```javascript
 const path = require('path');
-const streamDeck = require('elgato-stream-deck');
+const StreamDeck = require('elgato-stream-deck');
 
-streamDeck.on('down', keyIndex => {
-    console.log('key %d down', keyIndex);
+// Automatically discovers connected Stream Decks, and attaches to the first one.
+// Throws if there are no connected stream decks.
+// You also have the option of providing the devicePath yourself as the first argument to the constructor.
+// For example: const myStreamDeck = new StreamDeck('\\\\?\\hid#vid_05f3&pid_0405&mi_00#7&56cf813&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}')
+// Device paths can be obtained via node-hid: https://github.com/node-hid/node-hid
+const myStreamDeck = new StreamDeck();
+
+myStreamDeck.on('down', keyIndex => {
+	console.log('key %d down', keyIndex);
 });
 
-streamDeck.on('up', keyIndex => {
-    console.log('key %d up', keyIndex);
+myStreamDeck.on('up', keyIndex => {
+	console.log('key %d up', keyIndex);
 });
 
-streamDeck.on('error', error => {
-    console.error(error);
+myStreamDeck.on('error', error => {
+	console.error(error);
 });
 
 // Fill the second button from the left in the first row with an image of the GitHub logo.
 // This is asynchronous and returns a promise.
-streamDeck.fillImageFromFile(3, path.resolve(__dirname, 'github_logo.png')).then(() => {
+myStreamDeck.fillImageFromFile(3, path.resolve(__dirname, 'github_logo.png')).then(() => {
 	console.log('Successfully wrote a GitHub logo to key 3.');
 });
 
 // Fill the first button form the left in the first row with a solid red color. This is synchronous.
-streamDeck.fillColor(4, 255, 0, 0);
+myStreamDeck.fillColor(4, 255, 0, 0);
 console.log('Successfully wrote a red square to key 4.');
 ```
 
 #### TypeScript
 
 ```typescript
-import streamDeck = require('elgato-stream-deck');
+import StreamDeck = require('elgato-stream-deck');
+const myStreamDeck = new StreamDeck(); // Will throw an error if no Stream Decks are connected.
 
-streamDeck.on('down', keyIndex => {
-    console.log('key %d down', keyIndex);
+myStreamDeck.on('down', keyIndex => {
+	console.log('key %d down', keyIndex);
 });
 
-streamDeck.on('up', keyIndex => {
-    console.log('key %d up', keyIndex);
+myStreamDeck.on('up', keyIndex => {
+	console.log('key %d up', keyIndex);
 });
 
-streamDeck.on('error', error => {
-    console.error(error);
+myStreamDeck.on('error', error => {
+	console.error(error);
 });
 ```
 
 ### Features
 
-* Miltiplatform support: Windows 7-10, MacOS, Linux, and even Raspberry Pi!
+* Multiplatform support: Windows 7-10, MacOS, Linux, and even Raspberry Pi!
 * Key `down` and key `up` events
 * Fill keys with images or solid RGB colors
-* Typescript support
+* Fill the entire panel with a single image, spread across all keys
 * Set the Stream Deck brightness
+* TypeScript support
 
 ### Planned Features
 
@@ -188,11 +199,30 @@ The buffer must be exactly 15552 bytes in length. Any other length will result i
 const sharp = require('sharp'); // See http://sharp.dimens.io/en/stable/ for full docs on this great library!
 sharp(path.resolve(__dirname, 'github_logo.png'))
 	.flatten() // Eliminate alpha channel, if any.
-	.resize(streamDeck.ICON_SIZE) // Scale down to the right size, cropping if necessary.
-	.raw() // Give us uncompressed RGB
+	.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE) // Scale up/down to the right size, cropping if necessary.
+	.raw() // Give us uncompressed RGB.
 	.toBuffer()
 	.then(buffer => {
 		return streamDeck.fillImage(2, buffer);
+	})
+	.catch(err => {
+		console.error(err);
+	});
+```
+
+#### <a name="fill-panel"></a> `> streamDeck.fillPanel(imagePathOrBuffer[, sharpOptions]) -> Promise`
+
+Asynchronously applies an image to the entire panel, spreading it over all keys. The image is scaled down and center-cropped to fit. This method does not currently account for the gaps between keys, and behaves as if each key was directly connected to its neighbors. If you wish to account for the gaps between keys, you'll need to do so via other means, and bake that into the image you provide to `fillPanel`.
+
+This method accepts either a path to an image on the disk, or a buffer. The image or path or buffer is passed directly to [`sharp`](https://github.com/lovell/sharp). Therefore, this method accepts all images and buffers which `sharp` can accept.
+
+##### Example
+
+```javascript
+// Fill the second button from the left in the first row with an image of the GitHub logo.
+streamDeck.fillImageFromFile(3, path.resolve(__dirname, 'github_logo.png'))
+	.then(() => {
+		console.log('Successfully wrote a GitHub logo to key 3.');
 	})
 	.catch(err => {
 		console.error(err);
@@ -203,6 +233,10 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 
 Synchronously clears the given `keyIndex`'s screen.
 
+#### <a name="clear-all-keys"></a> `> streamDeck.clearAllKeys() -> undefined`
+
+Synchronously clears all keys on the device.
+
 ##### Example
 
 ```javascript
@@ -212,7 +246,7 @@ streamDeck.clearKey(2);
 
 #### <a name="set-brightness"></a> `> streamDeck.setBrightness(percentage) -> undefined`
 
-Synchronously set the brightness of the Stream Deck.
+Synchronously set the brightness of the Stream Deck. This affects all keys at once. The brightness of individual keys cannot be controlled.
 
 ##### Example
 
@@ -231,7 +265,7 @@ Fired whenever a key is pressed. `keyIndex` is the 0-14 numerical index of that 
 
 ```javascript
 streamDeck.on('down', keyIndex => {
-    console.log('key %d down', keyIndex);
+	console.log('key %d down', keyIndex);
 });
 ```
 
@@ -243,7 +277,7 @@ Fired whenever a key is released. `keyIndex` is the 0-14 numerical index of that
 
 ```javascript
 streamDeck.on('up', keyIndex => {
-    console.log('key %d up', keyIndex);
+	console.log('key %d up', keyIndex);
 });
 ```
 
@@ -256,7 +290,7 @@ Fired whenever an error is detected by the `node-hid` library.
 
 ```javascript
 streamDeck.on('error', error => {
-    console.error(error);
+	console.error(error);
 });
 ```
 

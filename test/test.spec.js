@@ -2,15 +2,27 @@
 
 // Native
 const EventEmitter = require('events');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 
 // Packages
 const mockery = require('mockery');
 const sinon = require('sinon');
 const test = require('ava');
 
-mockery.registerMock('node-hid', {
+// Ours
+const {validateWriteCall} = require('./helpers');
+
+class DummyHID extends EventEmitter {
+	constructor(devicePath) {
+		super();
+		this.write = sinon.spy();
+		this.sendFeatureReport = sinon.spy();
+		this.path = devicePath;
+	}
+}
+
+const mockNodeHID = {
 	devices() {
 		return [{
 			vendorId: 0x0fd9,
@@ -18,30 +30,39 @@ mockery.registerMock('node-hid', {
 			path: 'foo'
 		}];
 	},
-	HID: class extends EventEmitter {
-		constructor() {
-			super();
-			this.write = sinon.spy();
-			this.sendFeatureReport = sinon.spy();
-		}
-	}
-});
+	HID: DummyHID
+};
+mockery.registerMock('node-hid', mockNodeHID);
+
 mockery.enable({
 	warnOnUnregistered: false
 });
 
 // Must be required after we register a mock for `node-hid`.
-const streamDeck = require('../');
+const StreamDeck = require('../');
 
-test.afterEach(() => {
-	streamDeck.device.write.reset();
+test.beforeEach(t => {
+	t.context.streamDeck = new StreamDeck();
+});
+
+test('constructor uses the provided devicePath', t => {
+	const devicePath = 'some_random_path_here';
+	const streamDeck = new StreamDeck(devicePath);
+	t.is(streamDeck.device.path, devicePath);
+});
+
+test('errors if no devicePath is provided and there are no connected Stream Decks', t => {
+	const devicesStub = sinon.stub(mockNodeHID, 'devices');
+	devicesStub.returns([]);
+	t.throws(() => {
+		new StreamDeck(); // eslint-disable-line no-new
+	}, /No Stream Decks are connected./);
+	devicesStub.restore();
 });
 
 test('fillColor', t => {
-	t.plan(2);
-
+	const streamDeck = t.context.streamDeck;
 	streamDeck.fillColor(0, 255, 0, 0);
-
 	validateWriteCall(
 		t,
 		streamDeck.device.write,
@@ -53,70 +74,82 @@ test('fillColor', t => {
 });
 
 test('checkRGBValue', t => {
-	t.plan(4);
-
+	const streamDeck = t.context.streamDeck;
 	t.throws(() => streamDeck.fillColor(0, 256, 0, 0));
 	t.throws(() => streamDeck.fillColor(0, 0, 256, 0));
 	t.throws(() => streamDeck.fillColor(0, 0, 0, 256));
-
 	t.throws(() => streamDeck.fillColor(0, -1, 0, 0));
 });
 
 test('checkValidKeyIndex', t => {
-	t.plan(2);
-
+	const streamDeck = t.context.streamDeck;
 	t.throws(() => streamDeck.clearKey(-1));
 	t.throws(() => streamDeck.clearKey(15));
 });
 
 test('clearKey', t => {
-	t.plan(2);
-
+	const streamDeck = t.context.streamDeck;
+	const fillColorSpy = sinon.spy(streamDeck, 'fillColor');
 	streamDeck.clearKey(0);
+	t.true(fillColorSpy.calledOnce);
+	t.deepEqual(fillColorSpy.firstCall.args, [0, 0, 0, 0]);
+});
 
+test('clearAllKeys', t => {
+	const streamDeck = t.context.streamDeck;
+	const clearKeySpy = sinon.spy(streamDeck, 'clearKey');
+	streamDeck.clearAllKeys();
+	t.is(clearKeySpy.callCount, 15);
+	for (let i = 0; i < 15; i++) {
+		t.true(clearKeySpy.calledWithExactly(i));
+	}
+});
+
+test('fillImageFromFile', async t => {
+	const streamDeck = t.context.streamDeck;
+	await streamDeck.fillImageFromFile(0, path.resolve(__dirname, 'fixtures/nodecg_logo.png'));
 	validateWriteCall(
 		t,
 		streamDeck.device.write,
 		[
-			'fillColor-red-page1.json',
-			'fillColor-red-page2.json'
-		],
-		data => {
-			return data.map(value => (value === 255) ? 0 : value);
-		}
+			'fillImageFromFile-nodecg_logo-page1.json',
+			'fillImageFromFile-nodecg_logo-page2.json'
+		]
 	);
 });
 
-test.cb('fillImageFromFile', t => {
-	t.plan(2);
-	streamDeck
-		.fillImageFromFile(0, path.resolve(__dirname, 'fixtures', 'nodecg_logo.png'))
-		.then(() => {
-			validateWriteCall(
-				t,
-				streamDeck.device.write,
-				[
-					'fillImageFromFile-nodecg_logo-page1.json',
-					'fillImageFromFile-nodecg_logo-page2.json'
-				]
-			);
-			t.end();
-		});
+test('fillPanel', async t => {
+	const streamDeck = t.context.streamDeck;
+	const fillImageSpy = sinon.spy(streamDeck, 'fillImage');
+	await streamDeck.fillPanel(path.resolve(__dirname, 'fixtures/mosaic.png'));
+
+	/* eslint-disable function-paren-newline */
+	const expectedWriteValues = JSON.parse(
+		fs.readFileSync(
+			path.resolve(__dirname, 'fixtures/expectedMosaicBuffers.json'),
+			'utf-8'
+		)
+	);
+	/* eslint-enable function-paren-newline */
+
+	t.is(fillImageSpy.callCount, 15);
+
+	const spyCalls = fillImageSpy.getCalls();
+	expectedWriteValues.forEach((entry, index) => {
+		const callForThisButton = spyCalls.find(call => call.args[0] === index);
+		if (!callForThisButton) {
+			t.fail(`Could not find the fillImage call for button #${index}`);
+			return;
+		}
+
+		const suppliedBuffer = callForThisButton.args[1];
+		const expectedBuffer = Buffer.from(entry.data);
+		t.true(suppliedBuffer.equals(expectedBuffer));
+	});
 });
 
-function validateWriteCall(t, spy, files, filter) {
-	const callCount = spy.callCount;
-	for (let i = 0; i < callCount; i++) {
-		let data = readFixtureJSON(files[i]);
-		if (filter) {
-			data = filter(data);
-		}
-		t.deepEqual(spy.getCall(i).args[0], data);
-	}
-}
-
 test('down and up events', t => {
-	t.plan(2);
+	const streamDeck = t.context.streamDeck;
 	const downSpy = sinon.spy();
 	const upSpy = sinon.spy();
 	streamDeck.on('down', key => downSpy(key));
@@ -129,6 +162,7 @@ test('down and up events', t => {
 });
 
 test.cb('forwards error events from the device', t => {
+	const streamDeck = t.context.streamDeck;
 	streamDeck.on('error', () => {
 		t.pass();
 		t.end();
@@ -136,12 +170,14 @@ test.cb('forwards error events from the device', t => {
 	streamDeck.device.emit('error', new Error('Test'));
 });
 
-test('fillImage undersized buffer', t => {
-	const largeBuffer = Buffer.alloc(1);
-	t.throws(() => streamDeck.fillImage(0, largeBuffer));
+test('fillImage throws on undersized buffers', t => {
+	const streamDeck = t.context.streamDeck;
+	const smallBuffer = Buffer.alloc(1);
+	t.throws(() => streamDeck.fillImage(0, smallBuffer));
 });
 
 test('setBrightness', t => {
+	const streamDeck = t.context.streamDeck;
 	streamDeck.setBrightness(100);
 	streamDeck.setBrightness(0);
 
@@ -151,9 +187,3 @@ test('setBrightness', t => {
 	t.throws(() => streamDeck.setBrightness(101));
 	t.throws(() => streamDeck.setBrightness(-1));
 });
-
-function readFixtureJSON(fileName) {
-	const filePath = path.resolve(__dirname, 'fixtures', fileName);
-	const fileData = fs.readFileSync(filePath);
-	return JSON.parse(fileData);
-}
