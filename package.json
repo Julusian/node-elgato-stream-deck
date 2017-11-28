@@ -1,6 +1,6 @@
 {
   "name": "elgato-stream-deck",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "An npm module for interfacing with the Elgato Stream Deck",
   "main": "index.js",
   "typings": "typings.d.ts",
@@ -18,11 +18,15 @@
     "nyc": "^11.3.0",
     "pureimage": "0.1.3",
     "sinon": "^4.1.2",
+    "standard-version": "^4.2.0",
     "stream-buffers": "^3.0.1",
     "weallbehave": "^1.2.0",
     "weallcontribute": "^1.0.8"
   },
   "scripts": {
+    "prerelease": "npm t",
+    "release": "standard-version",
+    "postrelease": "npm publish && git push --follow-tags",
     "pretest": "npm run static",
     "test": "nyc ava",
     "report": "nyc report --reporter=html",

@@ -1,3 +1,44 @@
+# Change Log
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+<a name="2.0.0"></a>
+# [2.0.0](https://github.com/Lange/node-elgato-stream-deck/compare/v1.2.0...v2.0.0) (2017-11-28)
+
+### Features
+
+* add `fillPanel` method
+* add `clearAllKeys` method
+* return the `StreamDeck` constructor instead of automatically instantiating it
+* allow providing a `devicePath` to the constructor
+  * if no device path is provided, will attempt to use the first found Stream Deck. Errors if no Stream Decks are connected.
+* update `this.keyState` *before* emitting `down` and `up` events
+  * this is technically a *breaking change*, but is very unlikely to affect any production code
+
+### Bug Fixes
+
+* fix center-cropping in `fillImageFromFile`
+* fix `sharp` only being a `devDependency`, and not a production `dependency`
+
+### Code Refactoring
+* refactor `StreamDeck` class to move as much as possible to static methods and static getters
+* refactor code to use `async`/`await`
+  * this is a *breaking change*, because we now only support Node.js v7.6 or newer
+
+### Documentation
+
+* update all examples
+* add `fillPanel` example
+
+### BREAKING CHANGES
+
+* `this.keyState` is now updated **before** `down` and `up` events are emitted.
+* Support for versions of Node.js earlier than 7.6 has been dropped.
+* The `StreamDeck` constructor is now required when `require`ing this library, instead of an instance of the class.
+	* See the docs for updated examples.
+
+
+
 <a name="1.2.0"></a>
 # [1.2.0](https://github.com/Lange/node-elgato-stream-deck/compare/v1.1.0...v1.2.0) (2017-06-23)
 
