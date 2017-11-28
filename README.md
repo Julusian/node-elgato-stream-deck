@@ -220,9 +220,9 @@ This method accepts either a path to an image on the disk, or a buffer. The imag
 
 ```javascript
 // Fill the second button from the left in the first row with an image of the GitHub logo.
-streamDeck.fillImageFromFile(3, path.resolve(__dirname, 'github_logo.png'))
+streamDeck.fillPanel(path.resolve(__dirname, 'examples/fixtures/sunny_field.png'))
 	.then(() => {
-		console.log('Successfully wrote a GitHub logo to key 3.');
+		console.log('Successfully filled the panel with an image.');
 	})
 	.catch(err => {
 		console.error(err);
