@@ -2,17 +2,6 @@ sudo: false
 language: node_js
 node_js:
 - v8
-env:
-  - CXX=g++-4.8
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - build-essential
-      - g++-4.8
-      - libusb-1.0-0
-      - libusb-1.0-0-dev
 cache:
   directories:
   - node_modules
