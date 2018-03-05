@@ -9,9 +9,13 @@ with the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
 
 `$ npm install --save elgato-stream-deck`
 
-If that fails (**or if you are on a Raspberry Pi**), you will need to install a compiler toolchain to enable npm to build
-some of `node-elgato-stream-deck`'s dependencies from source. 
+All of this library's native dependencies ship with prebuilt binaries, so having a full compiler toolchain should not be necessary to install `node-elgato-stream-deck`.
 
+However, in the event that installation _does_ fail (**or if you are on a platform that our dependencies don't provide prebuilt binaries for, such as a Raspberry Pi**), you will need to install a compiler toolchain to enable npm to build some of `node-elgato-stream-deck`'s dependencies from source. Expand the details block below for full instructions on how to do so.
+
+<details>
+	<summary>Compiling dependencies from source</summary>
+	
 * Windows
   * Install [`windows-build-tools`](https://github.com/felixrieseberg/windows-build-tools):
   ```bash
@@ -39,6 +43,7 @@ some of `node-elgato-stream-deck`'s dependencies from source.
 	```bash
 	sudo apt-get update && sudo apt-get upgrade
 	```
+</details>
 
 ## Table of Contents
 

@@ -5,8 +5,8 @@
   "main": "index.js",
   "typings": "typings.d.ts",
   "dependencies": {
-    "node-hid": "^0.5.7",
-    "sharp": "^0.18.4"
+    "node-hid": "^0.7.2",
+    "sharp": "^0.20.0"
   },
   "devDependencies": {
     "ava": "^0.23.0",
