@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.1.1"></a>
+## [2.1.1](https://github.com/Lange/node-elgato-stream-deck/compare/v2.1.0...v2.1.1) (2018-04-05)
+
+
+### Bug Fixes
+
+* **package:** pin node-hid to 0.6.0 ([de5186a](https://github.com/Lange/node-elgato-stream-deck/commit/de5186a)), closes [#46](https://github.com/Lange/node-elgato-stream-deck/issues/46)
+
+
+
 <a name="2.1.0"></a>
 # [2.1.0](https://github.com/Lange/node-elgato-stream-deck/compare/v2.0.0...v2.1.0) (2018-03-05)
 
