@@ -221,12 +221,12 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 
 Asynchronously applies an image to the entire panel, spreading it over all keys. The image is scaled down and center-cropped to fit. This method does not currently account for the gaps between keys, and behaves as if each key was directly connected to its neighbors. If you wish to account for the gaps between keys, you'll need to do so via other means, and bake that into the image you provide to `fillPanel`.
 
-This method accepts either a path to an image on the disk, or a buffer. The image or path or buffer is passed directly to [`sharp`](https://github.com/lovell/sharp). Therefore, this method accepts all images and buffers which `sharp` can accept.
+This method accepts either a path to an image on the disk, or a buffer. The image path or buffer is passed directly to [`sharp`](https://github.com/lovell/sharp). Therefore, this method accepts all images and buffers which `sharp` can accept.
 
 ##### Example
 
 ```javascript
-// Fill the second button from the left in the first row with an image of the GitHub logo.
+// Fill the entire panel with a photo of a sunny field.
 streamDeck.fillPanel(path.resolve(__dirname, 'examples/fixtures/sunny_field.png'))
 	.then(() => {
 		console.log('Successfully filled the panel with an image.');
