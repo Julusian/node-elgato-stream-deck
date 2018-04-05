@@ -240,6 +240,13 @@ streamDeck.fillPanel(path.resolve(__dirname, 'examples/fixtures/sunny_field.png'
 
 Synchronously clears the given `keyIndex`'s screen.
 
+##### Example
+
+```javascript
+// Clear the third button from the left in the first row.
+streamDeck.clearKey(2);
+```
+
 #### <a name="clear-all-keys"></a> `> streamDeck.clearAllKeys() -> undefined`
 
 Synchronously clears all keys on the device.
@@ -247,8 +254,8 @@ Synchronously clears all keys on the device.
 ##### Example
 
 ```javascript
-// Clear the third button from the left in the first row.
-streamDeck.clearKey(2);
+// Clear all keys.
+streamDeck.clearAllKeys();
 ```
 
 #### <a name="set-brightness"></a> `> streamDeck.setBrightness(percentage) -> undefined`
