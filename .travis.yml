@@ -1,5 +1,9 @@
 sudo: false
 language: node_js
+addons:
+  apt:
+    packages:
+    - libusb-1.0-0-dev
 node_js:
 - v8
 cache:
