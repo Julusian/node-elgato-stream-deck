@@ -8,11 +8,11 @@ The Stream Deck uses Hex HID values to map to its buttons. Their Hex values rang
 
 ## Startup
 
-## The Current State
+### The Current State
 
 On startup the Stream Deck sends the current state as a Report, with id 2. Its the exact same format as the write operation.
 
-## Report ID 5
+### Report ID 5
 
 After sending the initial state, the Stream Deck software sends this report: `[0x05, 0x55, 0xAA, 0xD1, 0x01, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]`
 
