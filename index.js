@@ -205,7 +205,7 @@ class StreamDeck extends EventEmitter {
 	}
 
 	/**
-	 * Fill's the given key with an image from a file.
+	 * Fills the given key with an image from a file.
 	 *
 	 * @param {number} keyIndex The key to fill 0 - 14
 	 * @param {String} filePath A file path to an image file
