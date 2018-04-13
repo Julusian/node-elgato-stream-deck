@@ -78,6 +78,7 @@
   },
   "files": [
     "*.js",
+    "typings.d.ts",
     "lib"
   ],
   "engines": {
