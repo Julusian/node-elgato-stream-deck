@@ -5,7 +5,11 @@
 [`elgato-stream-deck`](https://github.com/lange/elgato-stream-deck) is a Node.js library for interfacing
 with the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
 
-> ❗ Please note that `node-elgato-stream-deck` is NOT a standalone application. It is not something you download and run on its own. It is not an alternative to the [official Stream Deck program provided by Elgato](https://www.elgato.com/en/gaming/downloads). Instead, `node-elgato-stream-deck` is a code library, which developers can use to make their own applications which interface with the Stream Deck.
+> ❗ Please note that `node-elgato-stream-deck` is **NOT a standalone application**. It is not something you download and run on its own. It is not an alternative to the [official Stream Deck program provided by Elgato](https://www.elgato.com/en/gaming/downloads). Instead, `node-elgato-stream-deck` is a code library, which developers can use to make their own applications which interface with the Stream Deck.
+>
+> To further clarify: **this is not an installable program**. There is no user interface, and you cannot do anything with this library on its own. Out of the box, this library does nothing. It's purpose is to provide tools for programmers to **build** programs from the ground up which interact with a Stream Deck.
+>
+> This is a tool for developers to use. It is not a program for end users. It cannot and will not replace the official Stream Deck program. That is not its goal. However, it does enable someone to more easily write a program which *does* do that.
 
 ## Install
 
