@@ -5,7 +5,6 @@ const PAGE_PACKET_SIZE = 8191
 const ICON_SIZE = 72
 const NUM_TOTAL_PIXELS = ICON_SIZE * ICON_SIZE
 const NUM_FIRST_PAGE_PIXELS = 2583
-const NUM_SECOND_PAGE_PIXELS = NUM_TOTAL_PIXELS - NUM_FIRST_PAGE_PIXELS
 const BYTES_PER_ICON = NUM_TOTAL_PIXELS * 3 // RGB
 
 const NUM_BUTTON_COLUMNS = 5
@@ -43,48 +42,9 @@ class StreamDeck extends EventEmitter {
 	 * @param {number} keyIndex The keyIndex to check
 	 */
 	static checkValidKeyIndex (keyIndex: KeyIndex) {
-		if (keyIndex < 0 || keyIndex > 14) {
-			throw new TypeError('Expected a valid keyIndex 0 - 14')
+		if (keyIndex < 0 || keyIndex >= NUM_KEYS) {
+			throw new TypeError(`Expected a valid keyIndex 0 - ${NUM_KEYS - 1}`)
 		}
-	}
-
-	/**
-	 * Pads a given buffer till padLength with 0s.
-	 *
-	 * @private
-	 * @param {Buffer} buffer Buffer to pad
-	 * @param {number} padLength The length to pad to
-	 * @returns {Buffer} The Buffer padded to the length requested
-	 */
-	static padBufferToLength (buffer: Buffer, padLength: number) {
-		return Buffer.concat([buffer, StreamDeck.createPadBuffer(padLength - buffer.length)])
-	}
-
-	/**
-	 * Returns an empty buffer (filled with zeroes) of the given length
-	 *
-	 * @private
-	 * @param {number} padLength Length of the buffer
-	 * @returns {Buffer}
-	 */
-	static createPadBuffer (padLength: number) {
-		return Buffer.alloc(padLength)
-	}
-
-	/**
-	 * Converts a buffer into an number[]. Used to supply the underlying
-	 * node-hid device with the format it accepts.
-	 *
-	 * @static
-	 * @param {Buffer} buffer Buffer to convert
-	 * @returns {number[]} the converted buffer
-	 */
-	static bufferToIntArray (buffer: Buffer): number[] {
-		const array: number[] = []
-		for (const pair of buffer.entries()) {
-			array.push(pair[1])
-		}
-		return array
 	}
 
 	private device: HID
@@ -137,25 +97,6 @@ class StreamDeck extends EventEmitter {
 	}
 
 	/**
-	 * Writes a Buffer to the Stream Deck.
-	 *
-	 * @param {Buffer} buffer The buffer written to the Stream Deck
-	 * @returns undefined
-	 */
-	write (buffer: Buffer) {
-		return this.device.write(StreamDeck.bufferToIntArray(buffer))
-	}
-
-	/**
-	 * Sends a HID feature report to the Stream Deck.
-	 *
-	 * @param {Buffer} buffer The buffer send to the Stream Deck.
-	 */
-	sendFeatureReport (buffer: Buffer) {
-		return this.device.sendFeatureReport(StreamDeck.bufferToIntArray(buffer))
-	}
-
-	/**
 	 * Fills the given key with a solid color.
 	 *
 	 * @param {number} keyIndex The key to fill 0 - 14
@@ -170,9 +111,8 @@ class StreamDeck extends EventEmitter {
 		StreamDeck.checkRGBValue(g)
 		StreamDeck.checkRGBValue(b)
 
-		const pixel = Buffer.from([b, g, r])
-		this._writePage1(keyIndex, Buffer.alloc(NUM_FIRST_PAGE_PIXELS * 3, pixel))
-		this._writePage2(keyIndex, Buffer.alloc(NUM_SECOND_PAGE_PIXELS * 3, pixel))
+		const pixels = Buffer.alloc(NUM_TOTAL_PIXELS * 3, Buffer.from([b, g, r]))
+		this.fillImageRange(keyIndex, pixels, 0, ICON_SIZE * 3)
 	}
 
 	/**
@@ -243,16 +183,16 @@ class StreamDeck extends EventEmitter {
 			throw new RangeError('Expected brightness percentage to be between 0 and 100')
 		}
 
-		const brightnessCommandBuffer = Buffer.from([0x05, 0x55, 0xaa, 0xd1, 0x01, percentage])
-		this.sendFeatureReport(StreamDeck.padBufferToLength(brightnessCommandBuffer, 17))
+		const brightnessCommandBuffer = [0x05, 0x55, 0xaa, 0xd1, 0x01, percentage]
+		this.sendFeatureReport(StreamDeck.padArrayToLength(brightnessCommandBuffer, 17))
 	}
 
 	/**
 	 * Resets the display to the startup logo
 	 */
 	resetToLogo () {
-		const brightnessCommandBuffer = Buffer.from([0x0B, 0x63])
-		this.sendFeatureReport(StreamDeck.padBufferToLength(brightnessCommandBuffer, 17))
+		const resetCommandBuffer = [0x0B, 0x63]
+		this.sendFeatureReport(StreamDeck.padArrayToLength(resetCommandBuffer, 17))
 	}
 
 	/**
@@ -285,53 +225,70 @@ class StreamDeck extends EventEmitter {
 			pixels = pixels.concat(row.reverse())
 		}
 
-		const firstPagePixels = pixels.slice(0, NUM_FIRST_PAGE_PIXELS * 3)
-		const secondPagePixels = pixels.slice(NUM_FIRST_PAGE_PIXELS * 3, NUM_TOTAL_PIXELS * 3)
-		this._writePage1(keyIndex, Buffer.from(firstPagePixels))
-		this._writePage2(keyIndex, Buffer.from(secondPagePixels))
+		const packet1 = StreamDeck.padArrayToLength([
+			...this.buildFillImageCommandHeader(keyIndex, 0x01, false),
+			...this.buildBMPHeader(),
+			...pixels.slice(0, NUM_FIRST_PAGE_PIXELS * 3)
+		], PAGE_PACKET_SIZE)
+
+		const packet2 = StreamDeck.padArrayToLength([
+			...this.buildFillImageCommandHeader(keyIndex, 0x02, true),
+			...pixels.slice(NUM_FIRST_PAGE_PIXELS * 3, NUM_TOTAL_PIXELS * 3)
+		], PAGE_PACKET_SIZE)
+
+		this.write(packet1)
+		this.write(packet2)
 	}
 
 	/**
-	 * Writes a Stream Deck's page 1 headers and image data to the Stream Deck.
+	 * Writes a Buffer to the Stream Deck.
 	 *
-	 * @private
-	 * @param {number} keyIndex The key to write to 0 - 14
-	 * @param {Buffer} buffer Image data for page 1
-	 * @returns {undefined}
+	 * @param {Buffer} buffer The buffer written to the Stream Deck
+	 * @returns undefined
 	 */
-	private _writePage1 (keyIndex: KeyIndex, buffer: Buffer) {
-		const header = Buffer.from([
-			0x02, 0x01, 0x01, 0x00, 0x00, keyIndex + 1, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x42, 0x4d, 0xf6, 0x3c, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00,
+	private write (buffer: number[]) {
+		return this.device.write(buffer)
+	}
+
+	/**
+	 * Sends a HID feature report to the Stream Deck.
+	 *
+	 * @param {Buffer} buffer The buffer send to the Stream Deck.
+	 */
+	private sendFeatureReport (buffer: number[]) {
+		return this.device.sendFeatureReport(buffer)
+	}
+
+	private buildBMPHeader () {
+		return [
+			0x42, 0x4d, /* BMP */
+			0xf6, 0x3c, /* Bytes */
+			0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00,
+			0x36, 0x00, 0x00, 0x00,  /* Header size */
+			0x28, 0x00,
 			0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00,
 			0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0xc0, 0x3c, 0x00, 0x00, 0xc4, 0x0e,
 			0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		])
-
-		const packet = StreamDeck.padBufferToLength(Buffer.concat([header, buffer]), PAGE_PACKET_SIZE)
-		this.write(packet)
+		]
 	}
 
-	/**
-	 * Writes a Stream Deck's page 2 headers and image data to the Stream Deck.
-	 *
-	 * @private
-	 * @param {number} keyIndex The key to write to 0 - 14
-	 * @param {Buffer} buffer Image data for page 2
-	 * @returns {undefined}
-	 */
-	private _writePage2 (keyIndex: KeyIndex, buffer: Buffer) {
-		const header = Buffer.from([
-			0x02, 0x01, 0x02, 0x00, 0x01, keyIndex + 1, 0x00, 0x00,
+	private buildFillImageCommandHeader (keyIndex: number, partIndex: number, isLast: boolean) {
+		return [
+			0x02, 0x01, partIndex, 0x00, isLast ? 0x01 : 0x00, keyIndex + 1, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		])
+		]
+	}
 
-		const packet = StreamDeck.padBufferToLength(Buffer.concat([header, buffer]), PAGE_PACKET_SIZE)
-		this.write(packet)
+	private static padArrayToLength (buffer: number[], targetLength: number) {
+		if (targetLength > buffer.length) {
+			const pad = new Array(targetLength - buffer.length)
+			return [...buffer, ...pad]
+		} else {
+			return buffer
+		}
 	}
 }
 

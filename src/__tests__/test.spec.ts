@@ -137,8 +137,8 @@ describe('StreamDeck', () => {
 	test('down and up events', () => {
 		const downSpy = jest.fn()
 		const upSpy = jest.fn()
-		streamDeck.on('down', key => downSpy(key))
-		streamDeck.on('up', key => upSpy(key))
+		streamDeck.on('down', downSpy)
+		streamDeck.on('up', upSpy)
 
 		const device = getDevice()
 		device.emit('data', Buffer.from([0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
@@ -152,7 +152,7 @@ describe('StreamDeck', () => {
 
 	test('forwards error events from the device', () => {
 		const errorSpy = jest.fn()
-		streamDeck.on('error', (e) => errorSpy(e))
+		streamDeck.on('error', errorSpy)
 
 		const device = getDevice()
 		device.emit('error', new Error('Test'))
