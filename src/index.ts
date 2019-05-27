@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events'
 import { HID, devices as HIDdevices } from 'node-hid'
+
 import { DeviceModel, DeviceModels } from './models'
 
 export type KeyIndex = number
@@ -200,16 +201,24 @@ class StreamDeck extends EventEmitter {
 			throw new RangeError('Expected brightness percentage to be between 0 and 100')
 		}
 
-		const brightnessCommandBuffer = [0x05, 0x55, 0xaa, 0xd1, 0x01, percentage]
-		this.device.sendFeatureReport(StreamDeck.padArrayToLength(brightnessCommandBuffer, 17))
+		const brightnessCommandBuffer = [
+			0x05, 0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00
+		]
+		this.device.sendFeatureReport(brightnessCommandBuffer)
 	}
 
 	/**
 	 * Resets the display to the startup logo
 	 */
 	resetToLogo () {
-		const resetCommandBuffer = [0x0B, 0x63]
-		this.device.sendFeatureReport(StreamDeck.padArrayToLength(resetCommandBuffer, 17))
+		const resetCommandBuffer = [
+			0x0B, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00
+		]
+		this.device.sendFeatureReport(resetCommandBuffer)
 	}
 
 	/**
@@ -229,13 +238,11 @@ class StreamDeck extends EventEmitter {
 	private fillImageRange (keyIndex: KeyIndex, imageBuffer: Buffer, offset: number, stride: number) {
 		this.checkValidKeyIndex(keyIndex)
 
-		let pixels: number[] = []
-		for (let i = 0; i < this.deviceModel.ImageBorder; i++) {
-			pixels.push(...new Array(this.PADDED_ICON_SIZE * 3).fill(0))
-		}
+		const byteBuffer = Buffer.alloc(this.PADDED_ICON_BYTES)
 
+		const rowBytes = this.PADDED_ICON_SIZE * 3
 		for (let r = 0; r < this.ICON_SIZE; r++) {
-			const row: number[] = new Array(this.deviceModel.ImageBorder * 3).fill(0)
+			const row: number[] = []
 			const start = r * stride + offset
 			for (let i = start; i < start + (this.ICON_SIZE * 3); i += 3) {
 				// TODO - the mini code does something different with coordinates. what?
@@ -245,11 +252,7 @@ class StreamDeck extends EventEmitter {
 				row.push(r, g, b)
 			}
 			row.push(...new Array(this.deviceModel.ImageBorder * 3).fill(0))
-			pixels = pixels.concat(row.reverse())
-		}
-
-		for (let i = 0; i < this.deviceModel.ImageBorder; i++) {
-			pixels.push(...new Array(this.PADDED_ICON_SIZE * 3).fill(0))
+			byteBuffer.set(row.reverse(), rowBytes * r + this.deviceModel.ImageBorder * 2 * 3)
 		}
 
 		// Send the packets
@@ -258,41 +261,55 @@ class StreamDeck extends EventEmitter {
 			const bytesCount = this.PADDED_ICON_BYTES + bmpHeader.length
 			const frame1Bytes = (bytesCount / 2) - bmpHeader.length
 
-			this.device.write(StreamDeck.padArrayToLength([
-				...this.buildFillImageCommandHeader(keyIndex, 0x01, false),
-				...bmpHeader,
-				...pixels.slice(0, frame1Bytes)
-			], this.deviceModel.MaxPacketSize))
+			const packet1 = Buffer.alloc(this.deviceModel.MaxPacketSize)
+			const packet1Header = this.buildFillImageCommandHeader(keyIndex, 0x01, false)
+			packet1.set(packet1Header, 0)
+			packet1.set(bmpHeader, packet1Header.length)
+			byteBuffer.copy(packet1, packet1Header.length + bmpHeader.length, 0, frame1Bytes)
+			this.device.write(this.bufferToIntArray(packet1))
 
-			this.device.write(StreamDeck.padArrayToLength([
-				...this.buildFillImageCommandHeader(keyIndex, 0x02, true),
-				...pixels.slice(frame1Bytes)
-			], this.deviceModel.MaxPacketSize))
+			const packet2 = Buffer.alloc(this.deviceModel.MaxPacketSize)
+			const packet2Header = this.buildFillImageCommandHeader(keyIndex, 0x02, true)
+			packet2.set(packet2Header, 0)
+			byteBuffer.copy(packet2, packet2Header.length, frame1Bytes)
+			this.device.write(this.bufferToIntArray(packet2))
 
 		} else {
 			let byteOffset = 0
 			const firstPart = 0
 			for (let part = firstPart; byteOffset < this.PADDED_ICON_BYTES; part++) {
-				let header = this.buildFillImageCommandHeader(keyIndex, part, false) // isLast gets set later if needed
+				const packet = Buffer.alloc(this.deviceModel.MaxPacketSize)
+				const header = this.buildFillImageCommandHeader(keyIndex, part, false) // isLast gets set later if needed
+				packet.set(header, 0)
+				let nextPosition = header.length
 				if (part === firstPart) {
-					header.push(...this.buildBMPHeader())
+					const bmpHeader = this.buildBMPHeader()
+					packet.set(bmpHeader, nextPosition)
+					nextPosition += bmpHeader.length
 				}
 
-				const byteCount = this.deviceModel.MaxPacketSize - header.length
-				const payload = pixels.slice(byteOffset, byteOffset + byteCount)
+				const byteCount = this.deviceModel.MaxPacketSize - nextPosition
+				byteBuffer.copy(packet, nextPosition, byteOffset, byteOffset + byteCount)
 				byteOffset += byteCount
 
-				if (payload.length !== byteCount) {
+				if (byteOffset >= this.PADDED_ICON_BYTES) {
 					// Reached the end of the payload
-					header = this.buildFillImageCommandHeader(keyIndex, part, true)
+					packet.set(this.buildFillImageCommandHeader(keyIndex, part, true), 0)
 				}
 
-				this.device.write(StreamDeck.padArrayToLength([...header, ...payload], this.deviceModel.MaxPacketSize))
+				this.device.write(this.bufferToIntArray(packet))
 			}
 		}
 	}
 
-	private buildBMPHeader (): number[] {
+	private buildFillImageCommandHeader (keyIndex: number, partIndex: number, isLast: boolean) {
+		return [
+			0x02, 0x01, partIndex, 0x00, isLast ? 0x01 : 0x00, keyIndex + 1, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+		]
+	}
+
+	private buildBMPHeader (): Buffer {
 		// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
 
 		let buf = Buffer.alloc(54)
@@ -317,31 +334,15 @@ class StreamDeck extends EventEmitter {
 		buf.writeInt32LE(0, 46) // Colour pallette size
 		buf.writeInt32LE(0, 50) // 'Important' Colour count
 
-		return this.bufferToIntArray(buf)
+		return buf
 	}
 
-	bufferToIntArray (buffer: Buffer) {
+	private bufferToIntArray (buffer: Buffer): number[] {
 		const array: number[] = []
 		for (const pair of buffer.entries()) {
 			array.push(pair[1])
 		}
 		return array
-	}
-
-	private buildFillImageCommandHeader (keyIndex: number, partIndex: number, isLast: boolean) {
-		return [
-			0x02, 0x01, partIndex, 0x00, isLast ? 0x01 : 0x00, keyIndex + 1, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		]
-	}
-
-	private static padArrayToLength (buffer: number[], targetLength: number) {
-		if (targetLength > buffer.length) {
-			const pad = new Array(targetLength - buffer.length).fill(0)
-			return [...buffer, ...pad]
-		} else {
-			return buffer
-		}
 	}
 }
 
