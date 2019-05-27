@@ -1,48 +1,61 @@
 'use strict';
 
 const path = require('path');
-const StreamDeck = require('../index');
-const streamDeck = new StreamDeck();
+const sharp = require('sharp');
+const StreamDeck = require('../dist/index');
 
 console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the second image.');
 
-let filled = false;
-streamDeck.on('down', keyIndex => {
-	if (filled) {
-		return;
-	}
+(async () => {
+	const imgField = await sharp(path.resolve(__dirname, 'fixtures/sunny_field.png'))
+		.flatten()
+		.resize(StreamDeck.ICON_SIZE * 5, StreamDeck.ICON_SIZE * 3)
+		.raw()
+		.toBuffer()
+	const imgMosaic = await sharp(path.resolve(__dirname, '../src/__tests__/fixtures/mosaic.png'))
+		.flatten()
+		.resize(StreamDeck.ICON_SIZE * 5, StreamDeck.ICON_SIZE * 3)
+		.raw()
+		.toBuffer()
 
-	filled = true;
+	const streamDeck = new StreamDeck();
 
-	let imagePath;
-	if (keyIndex > 7) {
-		console.log('Filling entire panel with an image of a sunny field.');
-		imagePath = path.resolve(__dirname, 'fixtures/sunny_field.png');
-	} else {
-		console.log('Filling entire panel with a mosaic which will show each key as a different color.');
-		imagePath = path.resolve(__dirname, '../test/fixtures/mosaic.png');
-	}
+	let filled = false;
+	streamDeck.on('down', keyIndex => {
+		if (filled) {
+			return;
+		}
 
-	streamDeck.fillPanel(imagePath)
-		.catch(error => {
+		filled = true;
+
+		let image;
+		if (keyIndex > 7) {
+			console.log('Filling entire panel with an image of a sunny field.');
+			image = imgField
+		} else {
+			console.log('Filling entire panel with a mosaic which will show each key as a different color.');
+			image = imgMosaic
+		}
+
+		streamDeck.fillPanel(image);
+	});
+
+	streamDeck.on('up', () => {
+		if (!filled) {
+			return;
+		}
+
+		// Clear the key when all keys are released.
+		if (streamDeck.keyState.every(pressed => !pressed)) {
+			console.log('Clearing all buttons');
+			streamDeck.clearAllKeys();
 			filled = false;
-			console.error(error);
-		});
-});
+		}
+	});
 
-streamDeck.on('up', () => {
-	if (!filled) {
-		return;
-	}
+	streamDeck.on('error', error => {
+		console.error(error);
+	});
 
-	// Clear the key when all keys are released.
-	if (streamDeck.keyState.every(pressed => !pressed)) {
-		console.log('Clearing all buttons');
-		streamDeck.clearAllKeys();
-		filled = false;
-	}
-});
+})()
 
-streamDeck.on('error', error => {
-	console.error(error);
-});

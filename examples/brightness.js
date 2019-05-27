@@ -1,6 +1,6 @@
 'use strict';
 
-const StreamDeck = require('../index');
+const StreamDeck = require('../dist/index');
 const streamDeck = new StreamDeck();
 
 // Fill it white so we can see the brightness changes
