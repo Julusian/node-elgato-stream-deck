@@ -258,18 +258,14 @@ class StreamDeck extends EventEmitter {
 	 * Get firmware version from Stream Deck
 	 */
 	getFirmwareVersion () {
-		return this.device.getFeatureReport(4, 17).slice(5).map(function(val){
-			return String.fromCharCode(val)
-		}).join('')
+		return this.device.getFeatureReport(4, 17).slice(5).map((val) => String.fromCharCode(val)).join('')
 	}
 
 	/**
 	 * Get serial number from Stream Deck
 	 */
 	getSerialNumber () {
-		return this.device.getFeatureReport(3, 17).slice(5).map(function(val){
-			return String.fromCharCode(val)
-		}).join('')
+		return this.device.getFeatureReport(3, 17).slice(5).map((val) => String.fromCharCode(val)).join('')
 	}
 
 	private fillImageRange (keyIndex: KeyIndex, imageBuffer: Buffer, offset: number, stride: number) {
