@@ -149,7 +149,6 @@ class StreamDeck extends EventEmitter {
 	 * Sends a HID feature report to the Stream Deck.
 	 *
 	 * @param {Buffer} buffer The buffer send to the Stream Deck.
-	 * @returns undefined
 	 */
 	sendFeatureReport (buffer: Buffer) {
 		return this.device.sendFeatureReport(StreamDeck.bufferToIntArray(buffer))
@@ -218,7 +217,6 @@ class StreamDeck extends EventEmitter {
 	 * Clears the given key.
 	 *
 	 * @param {number} keyIndex The key to clear 0 - 14
-	 * @returns {undefined}
 	 */
 	clearKey (keyIndex: KeyIndex) {
 		StreamDeck.checkValidKeyIndex(keyIndex)
@@ -227,8 +225,6 @@ class StreamDeck extends EventEmitter {
 
 	/**
 	 * Clears all keys.
-	 *
-	 * returns {undefined}
 	 */
 	clearAllKeys () {
 		for (let keyIndex = 0; keyIndex < NUM_KEYS; keyIndex++) {
@@ -247,6 +243,14 @@ class StreamDeck extends EventEmitter {
 		}
 
 		const brightnessCommandBuffer = Buffer.from([0x05, 0x55, 0xaa, 0xd1, 0x01, percentage])
+		this.sendFeatureReport(StreamDeck.padBufferToLength(brightnessCommandBuffer, 17))
+	}
+
+	/**
+	 * Resets the display to the startup logo
+	 */
+	resetToLogo () {
+		const brightnessCommandBuffer = Buffer.from([0x0B, 0x63])
 		this.sendFeatureReport(StreamDeck.padBufferToLength(brightnessCommandBuffer, 17))
 	}
 
