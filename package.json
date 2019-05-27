@@ -49,9 +49,7 @@
   "scripts": {
     "build": "trash dist && yarn build:main",
     "build:main": "tsc -p tsconfig.build.json",
-    "prerelease": "npm t",
     "release": "standard-version",
-    "postrelease": "npm publish && git push --follow-tags",
     "test": "yarn lint && yarn build && yarn unit",
     "watch": "jest --watch",
     "cov": "jest --coverage; opn coverage/lcov-report/index.html",
@@ -62,7 +60,7 @@
     "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
     "lint": "tslint --project tsconfig.json --config tslint.json",
     "validate:dependencies": "yarn audit && yarn license-validate",
-    "license-validate": "node-license-validator -p -d --allow-licenses MIT BSD BSD-3-Clause ISC Apache Unlicense"
+    "license-validate": "node-license-validator -p -d --allow-licenses MIT BSD BSD-3-Clause ISC Apache Unlicense WTFPL"
   },
   "files": [
     "dist"
@@ -81,12 +79,12 @@
     "jest-haste-map": "^24.7.1",
     "jest-resolve": "^24.7.1",
     "node-license-validator": "^1.3.0",
-    "opn-cli": "^4.1.0",
+    "open-cli": "^5.0.0",
     "pureimage": "^0.1.3",
     "sharp": "^0.20.0",
-    "standard-version": "^4.2.0",
+    "standard-version": "^6.0.1",
     "stream-buffers": "^3.0.1",
-    "trash-cli": "^1.4.0",
+    "trash-cli": "^2.0.0",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.0",
     "ts-node": "^8.1.0",
