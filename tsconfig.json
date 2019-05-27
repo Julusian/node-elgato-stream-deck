@@ -1,0 +1,41 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es6",
+		"strictNullChecks": true,
+		"forceConsistentCasingInFileNames": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitAny" : true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"moduleResolution": "node",
+		"sourceMap": false,
+		"outDir": "dist",
+		"baseUrl": "./",
+		"paths": {
+			"*": [
+				"node_modules/*"
+			]
+		},
+		"declaration": true,
+		"importHelpers": true,
+		"listFiles": false,
+		"traceResolution": false,
+		"pretty": true,
+		"lib": [
+			"es6"
+		],
+		"types": [
+			"node"
+		]
+	},
+	"include": [
+		"src/**/*.ts"
+	],
+	"compileOnSave": false,
+	"exclude": [
+		"node_modules/**"
+	]
+}

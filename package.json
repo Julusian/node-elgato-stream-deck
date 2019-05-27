@@ -8,36 +8,46 @@
     "node-hid": "^0.6.0"
   },
   "devDependencies": {
+    "@types/node": "^8.0.4",
+    "@types/node-hid": "^0.7.0",
     "ava": "^0.23.0",
     "coveralls": "^3.0.0",
-    "eslint": "^4.11.0",
-    "eslint-config-xo": "^0.19.0",
-    "eslint-plugin-ava": "^4.2.2",
     "mockery": "^2.1.0",
+    "node-license-validator": "^1.3.0",
     "nyc": "^11.3.0",
     "pureimage": "0.1.3",
     "sharp": "^0.20.0",
     "sinon": "^4.1.2",
     "standard-version": "^4.2.0",
     "stream-buffers": "^3.0.1",
+    "trash-cli": "^1.4.0",
+    "ts-loader": "^6.0.0",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "tslint-config-standard": "^8.0.1",
+    "typescript": "^3.4.2",
     "weallbehave": "^1.2.0",
     "weallcontribute": "^1.0.8"
   },
   "scripts": {
+    "build": "trash dist && yarn build:main",
+    "build:main": "tsc -p tsconfig.json",
     "prerelease": "npm t",
     "release": "standard-version",
     "postrelease": "npm publish && git push --follow-tags",
-    "pretest": "npm run static",
+    "pretest": "npm run lint",
     "test": "nyc ava",
     "report": "nyc report --reporter=html",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "static": "eslint .",
     "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
-    "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'"
+    "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
+    "lint": "tslint --project tsconfig.json --config tslint.json",
+    "validate:dependencies": "yarn audit && yarn license-validate",
+    "license-validate": "node-license-validator -p -d --allow-licenses MIT BSD BSD-3-Clause ISC Apache Unlicense"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bitfocus/node-elgato-stream-deck.git"
+    "url": "git+https://github.com/lange/node-elgato-stream-deck.git"
   },
   "keywords": [
     "elgato",
@@ -74,12 +84,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bitfocus/node-elgato-stream-deck/issues"
+    "url": "https://github.com/lange/node-elgato-stream-deck/issues"
   },
-  "homepage": "https://github.com/bitfocus/node-elgato-stream-deck#readme",
-  "eslintConfig": {
-    "extends": "xo/esnext"
-  },
+  "homepage": "https://github.com/lange/node-elgato-stream-deck#readme",
   "files": [
     "*.js",
     "typings.d.ts",

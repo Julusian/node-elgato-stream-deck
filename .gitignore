@@ -68,3 +68,4 @@ typings/
 /.idea/vcs.xml
 /.idea/codeSyles/codeStyleConfig.xml
 
+/dist
