@@ -2,8 +2,72 @@
   "name": "elgato-stream-deck",
   "version": "2.1.1",
   "description": "An npm module for interfacing with the Elgato Stream Deck",
-  "main": "index.js",
-  "typings": "typings.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "license": "MIT",
+  "homepage": "https://github.com/lange/node-elgato-stream-deck#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lange/node-elgato-stream-deck.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lange/node-elgato-stream-deck/issues"
+  },
+  "author": {
+    "name": "Alex Van Camp",
+    "email": "email@alexvan.camp",
+    "url": "https://alexvan.camp/",
+    "twitter": "vancamp"
+  },
+  "contributors": [
+    {
+      "name": "Håkon Nessjøen",
+      "email": "haakon@bitfocus.io"
+    },
+    {
+      "name": "Richard Fox",
+      "twitter": "ProbablePrime"
+    },
+    {
+      "name": "Chris Hanel",
+      "twitter": "chrishanel",
+      "email": "chrishanel@gmail.com",
+      "url": "http://www.chrishanel.com/"
+    }
+  ],
+  "keywords": [
+    "elgato",
+    "stream",
+    "deck",
+    "streamdeck",
+    "hid",
+    "usb",
+    "hardware",
+    "interface",
+    "controller"
+  ],
+  "scripts": {
+    "build": "trash dist && yarn build:main",
+    "build:main": "tsc -p tsconfig.json",
+    "prerelease": "npm t",
+    "release": "standard-version",
+    "postrelease": "npm publish && git push --follow-tags",
+    "pretest": "npm run lint",
+    "test": "nyc ava",
+    "report": "nyc report --reporter=html",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
+    "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
+    "lint": "tslint --project tsconfig.json --config tslint.json",
+    "validate:dependencies": "yarn audit && yarn license-validate",
+    "license-validate": "node-license-validator -p -d --allow-licenses MIT BSD BSD-3-Clause ISC Apache Unlicense"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=7.6"
+  },
   "dependencies": {
     "node-hid": "^0.6.0"
   },
@@ -29,70 +93,8 @@
     "weallbehave": "^1.2.0",
     "weallcontribute": "^1.0.8"
   },
-  "scripts": {
-    "build": "trash dist && yarn build:main",
-    "build:main": "tsc -p tsconfig.json",
-    "prerelease": "npm t",
-    "release": "standard-version",
-    "postrelease": "npm publish && git push --follow-tags",
-    "pretest": "npm run lint",
-    "test": "nyc ava",
-    "report": "nyc report --reporter=html",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
-    "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
-    "lint": "tslint --project tsconfig.json --config tslint.json",
-    "validate:dependencies": "yarn audit && yarn license-validate",
-    "license-validate": "node-license-validator -p -d --allow-licenses MIT BSD BSD-3-Clause ISC Apache Unlicense"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lange/node-elgato-stream-deck.git"
-  },
-  "keywords": [
-    "elgato",
-    "stream",
-    "deck",
-    "streamdeck",
-    "hid",
-    "usb",
-    "hardware",
-    "interface",
-    "controller"
-  ],
-  "author": {
-    "name": "Alex Van Camp",
-    "email": "email@alexvan.camp",
-    "url": "https://alexvan.camp/",
-    "twitter": "vancamp"
-  },
-  "contributors": [
-    {
-      "name": "Håkon Nessjøen",
-      "email": "haakon@bitfocus.io"
-    },
-    {
-      "name": "Richard Fox",
-      "twitter": "ProbablePrime"
-    },
-    {
-      "name": "Chris Hanel",
-      "twitter": "chrishanel",
-      "email": "chrishanel@gmail.com",
-      "url": "http://www.chrishanel.com/"
-    }
-  ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/lange/node-elgato-stream-deck/issues"
-  },
-  "homepage": "https://github.com/lange/node-elgato-stream-deck#readme",
-  "files": [
-    "*.js",
-    "typings.d.ts",
-    "lib"
-  ],
-  "engines": {
-    "node": ">=7.6"
+  "standard-version": {
+    "message": "chore(release): %s [skip ci]",
+    "tagPrefix": ""
   }
 }
