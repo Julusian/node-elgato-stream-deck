@@ -86,7 +86,7 @@ class StreamDeck extends EventEmitter {
 	private device: HID
 	private keyState: boolean[]
 
-	constructor (devicePath: string | undefined) {
+	constructor (devicePath?: string) {
 		super()
 
 		if (!devicePath) {

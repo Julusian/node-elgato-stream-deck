@@ -28,7 +28,8 @@
 			"es6"
 		],
 		"types": [
-			"node"
+			"node",
+			"jest"
 		]
 	},
 	"include": [
