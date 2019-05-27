@@ -60,9 +60,7 @@ However, in the event that installation _does_ fail (**or if you are on a platfo
 * [API](#api)
   * [`write`](#write)
   * [`fillColor`](#fill-color)
-  * [`fillImageFromFile`](#fill-image-from-file)
   * [`fillImage`](#fill-image)
-  * [`fillPanel`](#fill-panel)
   * [`clearKey`](#clear-key)
   * [`clearAllKeys`](#clear-all-keys)
   * [`setBrightness`](#set-brightness)
@@ -101,12 +99,6 @@ myStreamDeck.on('error', error => {
 	console.error(error);
 });
 
-// Fill the second button from the left in the first row with an image of the GitHub logo.
-// This is asynchronous and returns a promise.
-myStreamDeck.fillImageFromFile(3, path.resolve(__dirname, 'github_logo.png')).then(() => {
-	console.log('Successfully wrote a GitHub logo to key 3.');
-});
-
 // Fill the first button form the left in the first row with a solid red color. This is synchronous.
 myStreamDeck.fillColor(4, 255, 0, 0);
 console.log('Successfully wrote a red square to key 4.');
@@ -142,14 +134,6 @@ myStreamDeck.on('error', error => {
 * Set the Stream Deck brightness
 * TypeScript support
 
-### Planned Features
-
-* [Hotplugging](https://github.com/Lange/node-elgato-stream-deck/issues/14)
-* [Key combinations](https://github.com/Lange/node-elgato-stream-deck/issues/9)
-* Support "pages" feature from the official Elgato Stream Deck software
-* [Text labels](https://github.com/Lange/node-elgato-stream-deck/issues/6)
-* [Changing the standby image](https://github.com/Lange/node-elgato-stream-deck/issues/11)
-
 ### Contributing
 
 The elgato-stream-deck team enthusiastically welcomes contributions and project participation! There's a bunch of things you can do if you want to contribute! The [Contributor Guide](CONTRIBUTING.md) has all the information you need for everything from reporting bugs to contributing entire new features. Please don't hesitate to jump in if you'd like to, or even ask us questions if something isn't clear.
@@ -183,25 +167,6 @@ Synchronously sets the given `keyIndex`'s screen to a solid RGB color.
 streamDeck.fillColor(4, 255, 0, 0);
 ```
 
-#### <a name="fill-image-from-file"></a> `> streamDeck.fillImageFromFile(keyIndex, filePath) -> Promise`
-
-Asynchronously reads an image from `filePath` and sets the given `keyIndex`'s screen to that image.
-Automatically scales the image to 72x72 and strips out the alpha channel.
-If necessary, the image will be center-cropped to fit into a square.
-
-##### Example
-
-```javascript
-// Fill the second button from the left in the first row with an image of the GitHub logo.
-streamDeck.fillImageFromFile(3, path.resolve(__dirname, 'github_logo.png'))
-	.then(() => {
-		console.log('Successfully wrote a GitHub logo to key 3.');
-	})
-	.catch(err => {
-		console.error(err);
-	});
-```
-
 #### <a name="fill-image"></a> `> streamDeck.fillImage(keyIndex, buffer) -> undefined`
 
 Synchronously writes a buffer of 72x72 RGB image data to the given `keyIndex`'s screen.
@@ -219,25 +184,6 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 	.toBuffer()
 	.then(buffer => {
 		return streamDeck.fillImage(2, buffer);
-	})
-	.catch(err => {
-		console.error(err);
-	});
-```
-
-#### <a name="fill-panel"></a> `> streamDeck.fillPanel(imagePathOrBuffer[, sharpOptions]) -> Promise`
-
-Asynchronously applies an image to the entire panel, spreading it over all keys. The image is scaled down and center-cropped to fit. This method does not currently account for the gaps between keys, and behaves as if each key was directly connected to its neighbors. If you wish to account for the gaps between keys, you'll need to do so via other means, and bake that into the image you provide to `fillPanel`.
-
-This method accepts either a path to an image on the disk, or a buffer. The image path or buffer is passed directly to [`sharp`](https://github.com/lovell/sharp). Therefore, this method accepts all images and buffers which `sharp` can accept.
-
-##### Example
-
-```javascript
-// Fill the entire panel with a photo of a sunny field.
-streamDeck.fillPanel(path.resolve(__dirname, 'examples/fixtures/sunny_field.png'))
-	.then(() => {
-		console.log('Successfully filled the panel with an image.');
 	})
 	.catch(err => {
 		console.error(err);

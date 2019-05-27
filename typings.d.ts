@@ -1,19 +1,3 @@
-interface SharpOptions {
-  failOnError?: boolean;
-  density?: number;
-  raw?: {
-    width?: number,
-    height?: number,
-    channels?: number,
-  };
-  create?: {
-    width?: number,
-    height?: number,
-    channels?: number,
-    background?: string | any;
-  };
-}
-
 declare class StreamDeck {
 	readonly ICON_SIZE: number;
 
@@ -32,8 +16,6 @@ declare class StreamDeck {
 
 	fillColor(keyIndex: number, r: number, g: number, b: number): void;
 	fillImage(keyIndex: number, imageBuffer: Buffer): void;
-	fillImageFromFile(keyIndex: number, filePath: string): Promise<void>;
-	fillPanel(imagePathOrBuffer: string | Buffer, sharpOptions: SharpOptions): Promise<void>;
 
 	bufferToIntArray(buffer: Buffer): number[];
 

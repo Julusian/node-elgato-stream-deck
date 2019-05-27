@@ -2,8 +2,6 @@
 
 // Native
 const EventEmitter = require('events');
-const path = require('path');
-const fs = require('fs');
 
 // Packages
 const mockery = require('mockery');
@@ -103,49 +101,6 @@ test('clearAllKeys', t => {
 	for (let i = 0; i < 15; i++) {
 		t.true(clearKeySpy.calledWithExactly(i));
 	}
-});
-
-test('fillImageFromFile', async t => {
-	const streamDeck = t.context.streamDeck;
-	await streamDeck.fillImageFromFile(0, path.resolve(__dirname, 'fixtures/nodecg_logo.png'));
-	validateWriteCall(
-		t,
-		streamDeck.device.write,
-		[
-			'fillImageFromFile-nodecg_logo-page1.json',
-			'fillImageFromFile-nodecg_logo-page2.json'
-		]
-	);
-});
-
-test('fillPanel', async t => {
-	const streamDeck = t.context.streamDeck;
-	const fillImageSpy = sinon.spy(streamDeck, 'fillImage');
-	await streamDeck.fillPanel(path.resolve(__dirname, 'fixtures/mosaic.png'));
-
-	/* eslint-disable function-paren-newline */
-	const expectedWriteValues = JSON.parse(
-		fs.readFileSync(
-			path.resolve(__dirname, 'fixtures/expectedMosaicBuffers.json'),
-			'utf-8'
-		)
-	);
-	/* eslint-enable function-paren-newline */
-
-	t.is(fillImageSpy.callCount, 15);
-
-	const spyCalls = fillImageSpy.getCalls();
-	expectedWriteValues.forEach((entry, index) => {
-		const callForThisButton = spyCalls.find(call => call.args[0] === index);
-		if (!callForThisButton) {
-			t.fail(`Could not find the fillImage call for button #${index}`);
-			return;
-		}
-
-		const suppliedBuffer = callForThisButton.args[1];
-		const expectedBuffer = Buffer.from(entry.data);
-		t.true(suppliedBuffer.equals(expectedBuffer));
-	});
 });
 
 test('down and up events', t => {
