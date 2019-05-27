@@ -1,11 +1,6 @@
 import { EventEmitter } from 'events'
 import { mocked } from 'ts-jest/utils'
 
-// // Packages
-// const mockery = require('mockery');
-// const sinon = require('sinon');
-// const test = require('ava');
-
 import { validateWriteCall } from './helpers'
 
 // test.js
@@ -15,7 +10,7 @@ import { HID, devices } from 'node-hid'
 mocked(devices).mockImplementation(() => [{
 	vendorId: 0x0fd9,
 	productId: 0x0060,
-	path: 'foo',
+	path: 'some_random_path_here',
 	release: 0,
 	interface: 0
 }])
@@ -69,7 +64,8 @@ class DummyHID extends EventEmitter {
 mocked(HID).mockImplementation((path: any) => new DummyHID(path))
 
 // Must be required after we register a mock for `node-hid`.
-import StreamDeck from '../'
+// import StreamDeck from '../'
+const StreamDeck = require('../')
 
 describe('StreamDeck', () => {
 	let streamDeck: StreamDeck

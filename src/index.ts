@@ -129,7 +129,7 @@ class StreamDeck extends EventEmitter {
 		StreamDeck.checkRGBValue(g)
 		StreamDeck.checkRGBValue(b)
 
-		const pixels = Buffer.alloc(this.PADDED_ICON_BYTES, Buffer.from([b, g, r]))
+		const pixels = Buffer.alloc(this.PADDED_ICON_BYTES, Buffer.from([r, g, b]))
 		this.fillImageRange(keyIndex, pixels, 0, this.ICON_SIZE * 3)
 	}
 
@@ -311,12 +311,11 @@ class StreamDeck extends EventEmitter {
 
 	private buildBMPHeader (): Buffer {
 		// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
-
-		let buf = Buffer.alloc(54)
+		const buf = Buffer.alloc(54)
 
 		// Bitmap file header
 		buf.write('BM')
-		buf.writeUInt32LE(this.PADDED_ICON_BYTES, 2)
+		buf.writeUInt32LE(this.PADDED_ICON_BYTES + 54, 2)
 		buf.writeInt16LE(0, 6)
 		buf.writeInt16LE(0, 8)
 		buf.writeUInt32LE(54, 10) // Full header size
