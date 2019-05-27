@@ -1,28 +1,10 @@
 import { EventEmitter } from 'events'
 import { HID, devices as HIDdevices } from 'node-hid'
-
-const PAGE_PACKET_SIZE = 8191
-const ICON_SIZE = 72
-const NUM_TOTAL_PIXELS = ICON_SIZE * ICON_SIZE
-const NUM_FIRST_PAGE_PIXELS = 2583
-const BYTES_PER_ICON = NUM_TOTAL_PIXELS * 3 // RGB
-
-const NUM_BUTTON_COLUMNS = 5
-const NUM_BUTTON_ROWS = 3
-const NUM_KEYS = NUM_BUTTON_ROWS * NUM_BUTTON_COLUMNS
+import { DeviceModel, DeviceModels } from './models'
 
 export type KeyIndex = number
 
 class StreamDeck extends EventEmitter {
-	/**
-	 * The pixel size of an icon written to the Stream Deck key.
-	 *
-	 * @readonly
-	 */
-	static get ICON_SIZE () {
-		return ICON_SIZE
-	}
-
 	/**
 	 * Checks a value is a valid RGB value. A number between 0 and 255.
 	 *
@@ -41,43 +23,78 @@ class StreamDeck extends EventEmitter {
 	 * @static
 	 * @param {number} keyIndex The keyIndex to check
 	 */
-	static checkValidKeyIndex (keyIndex: KeyIndex) {
-		if (keyIndex < 0 || keyIndex >= NUM_KEYS) {
-			throw new TypeError(`Expected a valid keyIndex 0 - ${NUM_KEYS - 1}`)
+	checkValidKeyIndex (keyIndex: KeyIndex) {
+		if (keyIndex < 0 || keyIndex >= this.NUM_KEYS) {
+			throw new TypeError(`Expected a valid keyIndex 0 - ${this.NUM_KEYS - 1}`)
 		}
 	}
 
 	private device: HID
+	private deviceModel: DeviceModel
 	private keyState: boolean[]
+
+	get NUM_KEYS () {
+		return this.KEY_COLUMNS * this.KEY_ROWS
+	}
+	get KEY_COLUMNS () {
+		return this.deviceModel.KeyCols
+	}
+	get KEY_ROWS () {
+		return this.deviceModel.KeyRows
+	}
+
+	/**
+	 * The pixel size of an icon written to the Stream Deck key.
+	 *
+	 * @readonly
+	 */
+	get ICON_SIZE () {
+		return this.deviceModel.ImageSize
+	}
+	get ICON_BYTES () {
+		return this.ICON_SIZE * this.ICON_SIZE * 3
+	}
+	private get PADDED_ICON_SIZE () {
+		return this.ICON_SIZE + this.deviceModel.ImageBorder * 2
+	}
+	private get PADDED_ICON_BYTES () {
+		return this.PADDED_ICON_SIZE * this.PADDED_ICON_SIZE * 3
+	}
 
 	constructor (devicePath?: string) {
 		super()
 
-		if (!devicePath) {
-			// Device path not provided, will then select any connected device.
-			const devices = HIDdevices()
-			const connectedStreamDecks = devices.filter(device => {
-				return device.vendorId === 0x0fd9 && device.productId === 0x0060
-			})
-			if (!connectedStreamDecks[0]) {
+		const productIds = DeviceModels.map(m => m.ProductId)
+		const foundDevices = HIDdevices().filter(device => {
+			if (devicePath && device.path !== devicePath) {
+				return false
+			}
+			return device.vendorId === 0x0fd9 && productIds.indexOf(device.productId) !== -1
+		})
+
+		if (foundDevices.length === 0) {
+			if (devicePath) {
+				throw new Error(`Device "${devicePath}" was not found`)
+			} else {
 				throw new Error('No Stream Decks are connected.')
 			}
-			if (!connectedStreamDecks[0].path) {
-				throw new Error('Found device is missing path')
-			}
-			this.device = new HID(connectedStreamDecks[0].path)
-		} else {
-			this.device = new HID(devicePath)
 		}
 
-		this.keyState = new Array(NUM_KEYS).fill(false)
+		if (!foundDevices[0].path) {
+			throw new Error('Cannot open device. Path is missing')
+		}
+
+		this.deviceModel = DeviceModels.find(m => m.ProductId === foundDevices[0].productId) as DeviceModel
+		this.device = new HID(foundDevices[0].path)
+
+		this.keyState = new Array(this.NUM_KEYS).fill(false)
 
 		this.device.on('data', data => {
 			// The first byte is a report ID, the last byte appears to be padding.
 			// We strip these out for now.
 			data = data.slice(1, data.length - 1)
 
-			for (let i = 0; i < NUM_KEYS; i++) {
+			for (let i = 0; i < this.NUM_KEYS; i++) {
 				const keyPressed = Boolean(data[i])
 				const stateChanged = keyPressed !== this.keyState[i]
 				if (stateChanged) {
@@ -105,14 +122,14 @@ class StreamDeck extends EventEmitter {
 	 * @param {number} b The color's blue value. 0 -255
 	 */
 	fillColor (keyIndex: KeyIndex, r: number, g: number, b: number) {
-		StreamDeck.checkValidKeyIndex(keyIndex)
+		this.checkValidKeyIndex(keyIndex)
 
 		StreamDeck.checkRGBValue(r)
 		StreamDeck.checkRGBValue(g)
 		StreamDeck.checkRGBValue(b)
 
-		const pixels = Buffer.alloc(NUM_TOTAL_PIXELS * 3, Buffer.from([b, g, r]))
-		this.fillImageRange(keyIndex, pixels, 0, ICON_SIZE * 3)
+		const pixels = Buffer.alloc(this.PADDED_ICON_BYTES, Buffer.from([b, g, r]))
+		this.fillImageRange(keyIndex, pixels, 0, this.ICON_SIZE * 3)
 	}
 
 	/**
@@ -122,13 +139,13 @@ class StreamDeck extends EventEmitter {
 	 * @param {Buffer} imageBuffer
 	 */
 	fillImage (keyIndex: KeyIndex, imageBuffer: Buffer) {
-		StreamDeck.checkValidKeyIndex(keyIndex)
+		this.checkValidKeyIndex(keyIndex)
 
-		if (imageBuffer.length !== BYTES_PER_ICON) {
-			throw new RangeError(`Expected image buffer of length ${BYTES_PER_ICON}, got length ${imageBuffer.length}`)
+		if (imageBuffer.length !== this.ICON_BYTES) {
+			throw new RangeError(`Expected image buffer of length ${this.ICON_BYTES}, got length ${imageBuffer.length}`)
 		}
 
-		this.fillImageRange(keyIndex, imageBuffer, 0, ICON_SIZE * 3)
+		this.fillImageRange(keyIndex, imageBuffer, 0, this.ICON_SIZE * 3)
 	}
 
 	/**
@@ -137,17 +154,17 @@ class StreamDeck extends EventEmitter {
 	 * @param {Buffer} imageBuffer
 	 */
 	fillPanel (imageBuffer: Buffer) {
-		if (imageBuffer.length !== BYTES_PER_ICON * NUM_KEYS) {
-			throw new RangeError(`Expected image buffer of length ${BYTES_PER_ICON * NUM_KEYS}, got length ${imageBuffer.length}`)
+		if (imageBuffer.length !== this.ICON_BYTES * this.NUM_KEYS) {
+			throw new RangeError(`Expected image buffer of length ${this.ICON_BYTES * this.NUM_KEYS}, got length ${imageBuffer.length}`)
 		}
 
-		for (let row = 0; row < NUM_BUTTON_ROWS; row++) {
-			for (let column = 0; column < NUM_BUTTON_COLUMNS; column++) {
-				const index = (row * NUM_BUTTON_COLUMNS) + NUM_BUTTON_COLUMNS - column - 1
+		for (let row = 0; row < this.KEY_ROWS; row++) {
+			for (let column = 0; column < this.KEY_COLUMNS; column++) {
+				const index = (row * this.KEY_COLUMNS) + this.KEY_COLUMNS - column - 1
 
-				const stride = ICON_SIZE * 3 * NUM_BUTTON_COLUMNS
-				const rowOffset = stride * row * ICON_SIZE
-				const colOffset = column * ICON_SIZE * 3
+				const stride = this.ICON_SIZE * 3 * this.KEY_COLUMNS
+				const rowOffset = stride * row * this.ICON_SIZE
+				const colOffset = column * this.ICON_SIZE * 3
 
 				this.fillImageRange(index, imageBuffer, rowOffset + colOffset, stride)
 			}
@@ -160,7 +177,7 @@ class StreamDeck extends EventEmitter {
 	 * @param {number} keyIndex The key to clear 0 - 14
 	 */
 	clearKey (keyIndex: KeyIndex) {
-		StreamDeck.checkValidKeyIndex(keyIndex)
+		this.checkValidKeyIndex(keyIndex)
 		return this.fillColor(keyIndex, 0, 0, 0)
 	}
 
@@ -168,7 +185,7 @@ class StreamDeck extends EventEmitter {
 	 * Clears all keys.
 	 */
 	clearAllKeys () {
-		for (let keyIndex = 0; keyIndex < NUM_KEYS; keyIndex++) {
+		for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
 			this.clearKey(keyIndex)
 		}
 	}
@@ -184,7 +201,7 @@ class StreamDeck extends EventEmitter {
 		}
 
 		const brightnessCommandBuffer = [0x05, 0x55, 0xaa, 0xd1, 0x01, percentage]
-		this.sendFeatureReport(StreamDeck.padArrayToLength(brightnessCommandBuffer, 17))
+		this.device.sendFeatureReport(StreamDeck.padArrayToLength(brightnessCommandBuffer, 17))
 	}
 
 	/**
@@ -192,7 +209,7 @@ class StreamDeck extends EventEmitter {
 	 */
 	resetToLogo () {
 		const resetCommandBuffer = [0x0B, 0x63]
-		this.sendFeatureReport(StreamDeck.padArrayToLength(resetCommandBuffer, 17))
+		this.device.sendFeatureReport(StreamDeck.padArrayToLength(resetCommandBuffer, 17))
 	}
 
 	/**
@@ -210,69 +227,105 @@ class StreamDeck extends EventEmitter {
 	}
 
 	private fillImageRange (keyIndex: KeyIndex, imageBuffer: Buffer, offset: number, stride: number) {
-		StreamDeck.checkValidKeyIndex(keyIndex)
+		this.checkValidKeyIndex(keyIndex)
 
 		let pixels: number[] = []
-		for (let r = 0; r < ICON_SIZE; r++) {
-			const row = []
+		for (let i = 0; i < this.deviceModel.ImageBorder; i++) {
+			pixels.push(...new Array(this.PADDED_ICON_SIZE * 3).fill(0))
+		}
+
+		for (let r = 0; r < this.ICON_SIZE; r++) {
+			const row: number[] = new Array(this.deviceModel.ImageBorder * 3).fill(0)
 			const start = r * stride + offset
-			for (let i = start; i < start + (ICON_SIZE * 3); i += 3) {
+			for (let i = start; i < start + (this.ICON_SIZE * 3); i += 3) {
+				// TODO - the mini code does something different with coordinates. what?
 				const r = imageBuffer.readUInt8(i)
 				const g = imageBuffer.readUInt8(i + 1)
 				const b = imageBuffer.readUInt8(i + 2)
 				row.push(r, g, b)
 			}
+			row.push(...new Array(this.deviceModel.ImageBorder * 3).fill(0))
 			pixels = pixels.concat(row.reverse())
 		}
 
-		const packet1 = StreamDeck.padArrayToLength([
-			...this.buildFillImageCommandHeader(keyIndex, 0x01, false),
-			...this.buildBMPHeader(),
-			...pixels.slice(0, NUM_FIRST_PAGE_PIXELS * 3)
-		], PAGE_PACKET_SIZE)
+		for (let i = 0; i < this.deviceModel.ImageBorder; i++) {
+			pixels.push(...new Array(this.PADDED_ICON_SIZE * 3).fill(0))
+		}
 
-		const packet2 = StreamDeck.padArrayToLength([
-			...this.buildFillImageCommandHeader(keyIndex, 0x02, true),
-			...pixels.slice(NUM_FIRST_PAGE_PIXELS * 3, NUM_TOTAL_PIXELS * 3)
-		], PAGE_PACKET_SIZE)
+		// Send the packets
+		if (this.deviceModel.HalfImagePerPacket) {
+			const bmpHeader = this.buildBMPHeader()
+			const bytesCount = this.PADDED_ICON_BYTES + bmpHeader.length
+			const frame1Bytes = (bytesCount / 2) - bmpHeader.length
 
-		this.write(packet1)
-		this.write(packet2)
+			this.device.write(StreamDeck.padArrayToLength([
+				...this.buildFillImageCommandHeader(keyIndex, 0x01, false),
+				...bmpHeader,
+				...pixels.slice(0, frame1Bytes)
+			], this.deviceModel.MaxPacketSize))
+
+			this.device.write(StreamDeck.padArrayToLength([
+				...this.buildFillImageCommandHeader(keyIndex, 0x02, true),
+				...pixels.slice(frame1Bytes)
+			], this.deviceModel.MaxPacketSize))
+
+		} else {
+			let byteOffset = 0
+			const firstPart = 0
+			for (let part = firstPart; byteOffset < this.PADDED_ICON_BYTES; part++) {
+				let header = this.buildFillImageCommandHeader(keyIndex, part, false) // isLast gets set later if needed
+				if (part === firstPart) {
+					header.push(...this.buildBMPHeader())
+				}
+
+				const byteCount = this.deviceModel.MaxPacketSize - header.length
+				const payload = pixels.slice(byteOffset, byteOffset + byteCount)
+				byteOffset += byteCount
+
+				if (payload.length !== byteCount) {
+					// Reached the end of the payload
+					header = this.buildFillImageCommandHeader(keyIndex, part, true)
+				}
+
+				this.device.write(StreamDeck.padArrayToLength([...header, ...payload], this.deviceModel.MaxPacketSize))
+			}
+		}
 	}
 
-	/**
-	 * Writes a Buffer to the Stream Deck.
-	 *
-	 * @param {Buffer} buffer The buffer written to the Stream Deck
-	 * @returns undefined
-	 */
-	private write (buffer: number[]) {
-		return this.device.write(buffer)
+	private buildBMPHeader (): number[] {
+		// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
+
+		let buf = Buffer.alloc(54)
+
+		// Bitmap file header
+		buf.write('BM')
+		buf.writeUInt32LE(this.PADDED_ICON_BYTES, 2)
+		buf.writeInt16LE(0, 6)
+		buf.writeInt16LE(0, 8)
+		buf.writeUInt32LE(54, 10) // Full header size
+
+		// DIB header (BITMAPINFOHEADER)
+		buf.writeUInt32LE(40, 14) // DIB header size
+		buf.writeInt32LE(this.PADDED_ICON_SIZE, 18)
+		buf.writeInt32LE(this.PADDED_ICON_SIZE, 22)
+		buf.writeInt16LE(1, 26) // Color planes
+		buf.writeInt16LE(24, 28) // Bit depth
+		buf.writeInt32LE(0, 30) // Compression
+		buf.writeInt32LE(this.PADDED_ICON_BYTES, 34) // Image size
+		buf.writeInt32LE(this.deviceModel.ImagePPM, 38) // Horizontal resolution ppm
+		buf.writeInt32LE(this.deviceModel.ImagePPM, 42) // Vertical resolution ppm
+		buf.writeInt32LE(0, 46) // Colour pallette size
+		buf.writeInt32LE(0, 50) // 'Important' Colour count
+
+		return this.bufferToIntArray(buf)
 	}
 
-	/**
-	 * Sends a HID feature report to the Stream Deck.
-	 *
-	 * @param {Buffer} buffer The buffer send to the Stream Deck.
-	 */
-	private sendFeatureReport (buffer: number[]) {
-		return this.device.sendFeatureReport(buffer)
-	}
-
-	private buildBMPHeader () {
-		return [
-			0x42, 0x4d, /* BMP */
-			0xf6, 0x3c, /* Bytes */
-			0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00,
-			0x36, 0x00, 0x00, 0x00,  /* Header size */
-			0x28, 0x00,
-			0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00,
-			0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0xc0, 0x3c, 0x00, 0x00, 0xc4, 0x0e,
-			0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		]
+	bufferToIntArray (buffer: Buffer) {
+		const array: number[] = []
+		for (const pair of buffer.entries()) {
+			array.push(pair[1])
+		}
+		return array
 	}
 
 	private buildFillImageCommandHeader (keyIndex: number, partIndex: number, isLast: boolean) {
@@ -284,7 +337,7 @@ class StreamDeck extends EventEmitter {
 
 	private static padArrayToLength (buffer: number[], targetLength: number) {
 		if (targetLength > buffer.length) {
-			const pad = new Array(targetLength - buffer.length)
+			const pad = new Array(targetLength - buffer.length).fill(0)
 			return [...buffer, ...pad]
 		} else {
 			return buffer

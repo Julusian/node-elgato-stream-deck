@@ -5,13 +5,13 @@ const sharp = require('sharp');
 const StreamDeck = require('../dist/index');
 
 (async () => {
+	const streamDeck = new StreamDeck();
+
 	const img = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 	.flatten()
-	.resize(StreamDeck.ICON_SIZE, StreamDeck.ICON_SIZE)
+	.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
 	.raw()
 	.toBuffer()
-
-	const streamDeck = new StreamDeck();
 
 	streamDeck.on('down', keyIndex => {
 		// Fill the pressed key with an image of the GitHub logo.

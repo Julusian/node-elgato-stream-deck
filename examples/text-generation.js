@@ -13,9 +13,9 @@ font.load(() => {
 		console.log('Filling button #%d', keyIndex);
 
 		const textString = `FOO #${keyIndex}`;
-		const img = PImage.make(StreamDeck.ICON_SIZE, StreamDeck.ICON_SIZE);
+		const img = PImage.make(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE);
 		const ctx = img.getContext('2d');
-		ctx.clearRect(0, 0, StreamDeck.ICON_SIZE, StreamDeck.ICON_SIZE); // As of v0.1, pureimage fills the canvas with black by default.
+		ctx.clearRect(0, 0, streamDeck.ICON_SIZE, streamDeck.ICON_SIZE); // As of v0.1, pureimage fills the canvas with black by default.
 		ctx.font = '16pt "Source Sans Pro"';
 		ctx.USE_FONT_GLYPH_CACHING = false;
 		ctx.strokeStyle = 'black';
@@ -38,7 +38,7 @@ font.load(() => {
 			// then put that PNG back into Sharp, flatten it, and render raw.
 			// Seems like a bug in Sharp that we should make a test case for and report.
 			const pngBuffer = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
-				.resize(StreamDeck.ICON_SIZE, StreamDeck.ICON_SIZE)
+				.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
 				.overlayWith(writableStreamBuffer.getContents())
 				.png()
 				.toBuffer();

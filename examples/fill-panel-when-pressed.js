@@ -7,18 +7,18 @@ const StreamDeck = require('../dist/index');
 console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the second image.');
 
 (async () => {
+	const streamDeck = new StreamDeck();
+
 	const imgField = await sharp(path.resolve(__dirname, 'fixtures/sunny_field.png'))
 		.flatten()
-		.resize(StreamDeck.ICON_SIZE * 5, StreamDeck.ICON_SIZE * 3)
+		.resize(streamDeck.ICON_SIZE * 5, streamDeck.ICON_SIZE * 3)
 		.raw()
 		.toBuffer()
 	const imgMosaic = await sharp(path.resolve(__dirname, '../src/__tests__/fixtures/mosaic.png'))
 		.flatten()
-		.resize(StreamDeck.ICON_SIZE * 5, StreamDeck.ICON_SIZE * 3)
+		.resize(streamDeck.ICON_SIZE * 5, streamDeck.ICON_SIZE * 3)
 		.raw()
 		.toBuffer()
-
-	const streamDeck = new StreamDeck();
 
 	let filled = false;
 	streamDeck.on('down', keyIndex => {
