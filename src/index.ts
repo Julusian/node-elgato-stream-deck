@@ -1,11 +1,34 @@
 import { EventEmitter } from 'events'
 import { HID, devices as HIDdevices } from 'node-hid'
 
-import { DeviceModel, DeviceModels } from './models'
+import { DeviceModel, DeviceModels, DeviceModelId } from './models'
 
 export type KeyIndex = number
 
+export interface StreamDeckDeviceInfo {
+	model: DeviceModelId
+	path: string
+}
+
 class StreamDeck extends EventEmitter {
+	/**
+	 * List detected devices
+	 */
+	static listDevices (): StreamDeckDeviceInfo[] {
+		const devices: StreamDeckDeviceInfo[] = []
+		for (const dev of HIDdevices()) {
+			const model = DeviceModels.find(m => m.ProductId === dev.productId)
+
+			if (model && dev.vendorId === 0x0fd9 && dev.path) {
+				devices.push({
+					model: model.ModelId,
+					path: dev.path
+				})
+			}
+		}
+		return devices
+	}
+
 	/**
 	 * Checks a value is a valid RGB value. A number between 0 and 255.
 	 *
@@ -62,16 +85,17 @@ class StreamDeck extends EventEmitter {
 		return this.PADDED_ICON_SIZE * this.PADDED_ICON_SIZE * 3
 	}
 
+	get MODEL () {
+		return this.deviceModel.ModelId
+	}
+
 	constructor (devicePath?: string) {
 		super()
 
-		const productIds = DeviceModels.map(m => m.ProductId)
-		const foundDevices = HIDdevices().filter(device => {
-			if (devicePath && device.path !== devicePath) {
-				return false
-			}
-			return device.vendorId === 0x0fd9 && productIds.indexOf(device.productId) !== -1
-		})
+		let foundDevices = StreamDeck.listDevices()
+		if (devicePath) {
+			foundDevices = foundDevices.filter(d => d.path === devicePath)
+		}
 
 		if (foundDevices.length === 0) {
 			if (devicePath) {
@@ -81,11 +105,7 @@ class StreamDeck extends EventEmitter {
 			}
 		}
 
-		if (!foundDevices[0].path) {
-			throw new Error('Cannot open device. Path is missing')
-		}
-
-		this.deviceModel = DeviceModels.find(m => m.ProductId === foundDevices[0].productId) as DeviceModel
+		this.deviceModel = DeviceModels.find(m => m.ModelId === foundDevices[0].model) as DeviceModel
 		this.device = new HID(foundDevices[0].path)
 
 		this.keyState = new Array(this.NUM_KEYS).fill(false)

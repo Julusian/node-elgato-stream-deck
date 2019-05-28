@@ -1,4 +1,10 @@
+export enum DeviceModelId {
+	ORIGINAL,
+	MINI
+}
+
 export interface DeviceModel {
+	ModelId: DeviceModelId
 	ProductId: number
 	MaxPacketSize: number
 	HalfImagePerPacket: boolean
@@ -13,6 +19,7 @@ export interface DeviceModel {
 
 export const DeviceModels: DeviceModel[] = [
 	{ // Original
+		ModelId: DeviceModelId.ORIGINAL,
 		ProductId: 0x0060,
 		MaxPacketSize: 8191,
 		HalfImagePerPacket: true,
@@ -23,6 +30,7 @@ export const DeviceModels: DeviceModel[] = [
 		ImagePPM: 3780
 	},
 	{ // Mini
+		ModelId: DeviceModelId.MINI,
 		ProductId: 0x0063,
 		MaxPacketSize: 1024,
 		HalfImagePerPacket: false,
