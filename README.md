@@ -55,7 +55,6 @@ However, in the event that installation _does_ fail (**or if you are on a platfo
 
 * [Example](#example)
 * [Features](#features)
-* [Planned Features](#planned-features)
 * [Contributing](#contributing)
 * [API](#api)
   * [`write`](#write)
