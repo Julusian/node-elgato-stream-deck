@@ -1,13 +1,12 @@
 export enum DeviceModelId {
-	ORIGINAL,
-	MINI
+	ORIGINAL = 'original',
+	MINI = 'mini'
 }
 
 export interface DeviceModel {
 	ModelId: DeviceModelId
 	ProductId: number
 	MaxPacketSize: number
-	HalfImagePerPacket: boolean
 
 	KeyCols: number
 	KeyRows: number
@@ -22,7 +21,6 @@ export const DeviceModels: DeviceModel[] = [
 		ModelId: DeviceModelId.ORIGINAL,
 		ProductId: 0x0060,
 		MaxPacketSize: 8191,
-		HalfImagePerPacket: true,
 		KeyCols: 5,
 		KeyRows: 3,
 		ImageSize: 72,
@@ -33,7 +31,6 @@ export const DeviceModels: DeviceModel[] = [
 		ModelId: DeviceModelId.MINI,
 		ProductId: 0x0063,
 		MaxPacketSize: 1024,
-		HalfImagePerPacket: false,
 		KeyCols: 3,
 		KeyRows: 2,
 		ImageSize: 72,

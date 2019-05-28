@@ -275,8 +275,9 @@ class StreamDeck extends EventEmitter {
 			byteBuffer.set(row.reverse(), rowBytes * r + this.deviceModel.ImageBorder * 2 * 3)
 		}
 
-		// Send the packets
-		if (this.deviceModel.HalfImagePerPacket) {
+		if (this.deviceModel.ModelId === DeviceModelId.ORIGINAL) {
+			// The original uses larger packets, and splits the payload equally across 2
+
 			const bmpHeader = this.buildBMPHeader()
 			const bytesCount = this.PADDED_ICON_BYTES + bmpHeader.length
 			const frame1Bytes = (bytesCount / 2) - bmpHeader.length
@@ -295,6 +296,8 @@ class StreamDeck extends EventEmitter {
 			this.device.write(this.bufferToIntArray(packet2))
 
 		} else {
+			// Newer models use smaller packets and chunk to fill as few as possible
+
 			let byteOffset = 0
 			const firstPart = 0
 			for (let part = firstPart; byteOffset < this.PADDED_ICON_BYTES; part++) {
