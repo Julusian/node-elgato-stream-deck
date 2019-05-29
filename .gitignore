@@ -60,12 +60,8 @@ typings/
 .env
 
 # JetBrains IDEs (IntelliJ/WebStorm)
-/.idea/compiler.xml
-/.idea/encodings.xml
-/.idea/copyright/profiles_settings.xml
-/.idea/workspace.xml
-/.idea/shelf/
-/.idea/vcs.xml
-/.idea/codeSyles/codeStyleConfig.xml
+/.idea
+
+/.vscode
 
 /dist

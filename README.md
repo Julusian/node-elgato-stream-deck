@@ -55,6 +55,7 @@ However, in the event that installation _does_ fail (**or if you are on a platfo
 
 * [Example](#example)
 * [Features](#features)
+* [Installation](#installation)
 * [Contributing](#contributing)
 * [API](#api)
   * [`write`](#write)
@@ -133,6 +134,17 @@ myStreamDeck.on('error', error => {
 * Set the Stream Deck brightness
 * TypeScript support
 
+### Installation
+On linux, the udev subsystem blocks access to the StreamDeck without some special configuration.
+Save the following to `/etc/udev/rules.d/50-elgato.rules` and reload the rules with `sudo udevadm control --reload-rules`
+```
+SUBSYSTEM=="input", GROUP="input", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0060", MODE:="666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0063", MODE:="666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006c", MODE:="666", GROUP="plugdev"
+```
+Unplug and replug the device and it should be usable
+
 ### Contributing
 
 The elgato-stream-deck team enthusiastically welcomes contributions and project participation! There's a bunch of things you can do if you want to contribute! The [Contributor Guide](CONTRIBUTING.md) has all the information you need for everything from reporting bugs to contributing entire new features. Please don't hesitate to jump in if you'd like to, or even ask us questions if something isn't clear.
@@ -142,6 +154,10 @@ All participants and maintainers in this project are expected to follow [Code of
 Please refer to the [Changelog](CHANGELOG.md) for project history details, too.
 
 ### API
+
+#### <a name="listDevices"></a> `> StreamDeck.listDevices() -> Array`
+
+This will scan for and list all detected StreamDeck devices on the system along with their model. The path property can be passed into the constructor to open a specific device.
 
 #### <a name="write"></a> `> streamDeck.write(buffer) -> undefined`
 
@@ -183,6 +199,28 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 	.toBuffer()
 	.then(buffer => {
 		return streamDeck.fillImage(2, buffer);
+	})
+	.catch(err => {
+		console.error(err);
+	});
+```
+
+#### <a name="fill-panel"></a> `> streamDeck.fillPanel(buffer) -> undefined`
+
+Applies an image to the entire panel, spreading it over all keys. The image must be exactly the correct resolution for your device. Any other size will result in an error being thrown.
+
+##### Example
+
+```javascript
+// Fill the entire panel with a photo of a sunny field.
+const sharp = require('sharp'); // See http://sharp.dimens.io/en/stable/ for full docs on this great library!
+sharp(path.resolve(__dirname, 'github_logo.png'))
+	.flatten() // Eliminate alpha channel, if any.
+	.resize(streamDeck.ICON_SIZE * 5, streamDeck.ICON_SIZE * 3) // Scale up/down to the right size, cropping if necessary.
+	.raw() // Give us uncompressed RGB.
+	.toBuffer()
+	.then(buffer => {
+		return streamDeck.fillPanel(buffer);
 	})
 	.catch(err => {
 		console.error(err);
