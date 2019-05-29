@@ -8,6 +8,7 @@ export type KeyIndex = number
 export interface StreamDeckDeviceInfo {
 	model: DeviceModelId
 	path: string
+	serialNumber?: string
 }
 
 class StreamDeck extends EventEmitter {
@@ -22,11 +23,19 @@ class StreamDeck extends EventEmitter {
 			if (model && dev.vendorId === 0x0fd9 && dev.path) {
 				devices.push({
 					model: model.ModelId,
-					path: dev.path
+					path: dev.path,
+					serialNumber: dev.serialNumber
 				})
 			}
 		}
 		return devices
+	}
+
+	/**
+	 * Get the info of a device if the given path is a streamdeck
+	 */
+	static getDeviceInfo (path: string): StreamDeckDeviceInfo | undefined {
+		return this.listDevices().find(dev => dev.path === path)
 	}
 
 	/**
