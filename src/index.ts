@@ -2,6 +2,7 @@ import { EventEmitter } from 'events'
 import { devices as HIDdevices, HID } from 'node-hid'
 
 import { DEVICE_MODELS, DeviceModel, DeviceModelId } from './models'
+import { bufferToIntArray, numberArrayToString } from './util'
 
 export type KeyIndex = number
 
@@ -157,7 +158,7 @@ export class StreamDeck extends EventEmitter {
 		StreamDeck.checkRGBValue(g)
 		StreamDeck.checkRGBValue(b)
 
-		const pixels = Buffer.alloc(this.PADDED_ICON_BYTES, Buffer.from([r, g, b]))
+		const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]))
 		this.fillImageRange(keyIndex, pixels, 0, this.ICON_SIZE * 3)
 	}
 
@@ -257,22 +258,14 @@ export class StreamDeck extends EventEmitter {
 	 * Get firmware version from Stream Deck
 	 */
 	public getFirmwareVersion() {
-		return this.device
-			.getFeatureReport(4, 17)
-			.slice(5)
-			.map(val => String.fromCharCode(val))
-			.join('')
+		return numberArrayToString(this.device.getFeatureReport(4, 17).slice(5))
 	}
 
 	/**
 	 * Get serial number from Stream Deck
 	 */
 	public getSerialNumber() {
-		return this.device
-			.getFeatureReport(3, 17)
-			.slice(5)
-			.map(val => String.fromCharCode(val))
-			.join('')
+		return numberArrayToString(this.device.getFeatureReport(3, 17).slice(5))
 	}
 
 	private fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, offset: number, stride: number) {
@@ -307,13 +300,13 @@ export class StreamDeck extends EventEmitter {
 			packet1.set(packet1Header, 0)
 			packet1.set(bmpHeader, packet1Header.length)
 			byteBuffer.copy(packet1, packet1Header.length + bmpHeader.length, 0, frame1Bytes)
-			this.device.write(this.bufferToIntArray(packet1))
+			this.device.write(bufferToIntArray(packet1))
 
 			const packet2 = Buffer.alloc(this.deviceModel.MaxPacketSize)
 			const packet2Header = this.buildFillImageCommandHeader(keyIndex, 0x02, true)
 			packet2.set(packet2Header, 0)
 			byteBuffer.copy(packet2, packet2Header.length, frame1Bytes)
-			this.device.write(this.bufferToIntArray(packet2))
+			this.device.write(bufferToIntArray(packet2))
 		} else {
 			// Newer models use smaller packets and chunk to fill as few as possible
 
@@ -339,7 +332,7 @@ export class StreamDeck extends EventEmitter {
 					packet.set(this.buildFillImageCommandHeader(keyIndex, part, true), 0)
 				}
 
-				this.device.write(this.bufferToIntArray(packet))
+				this.device.write(bufferToIntArray(packet))
 			}
 		}
 	}
@@ -377,13 +370,5 @@ export class StreamDeck extends EventEmitter {
 		buf.writeInt32LE(0, 50) // 'Important' Colour count
 
 		return buf
-	}
-
-	private bufferToIntArray(buffer: Buffer): number[] {
-		const array: number[] = []
-		for (const pair of buffer.entries()) {
-			array.push(pair[1])
-		}
-		return array
 	}
 }

@@ -2,9 +2,10 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 export function validateWriteCall(fn: any, files: string[], filter?: (data: any) => any) {
-	expect(fn).toHaveBeenCalledTimes(2)
+	expect(fn).toHaveBeenCalledTimes(files.length)
 
 	for (let i = 0; i < files.length; i++) {
+		// console.log(JSON.stringify(fn.mock.calls[i][0]))
 		let data = readFixtureJSON(files[i])
 		if (filter) {
 			data = filter(data)
