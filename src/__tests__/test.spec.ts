@@ -1,7 +1,7 @@
-import { EventEmitter } from 'events'
 // tslint:disable-next-line: no-submodule-imports
 import { mocked } from 'ts-jest/utils'
 
+import { DummyHID } from '../__mocks__/hid'
 import { validateWriteCall } from './helpers'
 
 jest.mock('node-hid')
@@ -16,54 +16,12 @@ mocked(devices).mockImplementation(() => [
 	}
 ])
 
-class DummyHID extends EventEmitter {
-	public path: string
-
-	constructor(devicePath: string) {
-		super()
-		expect(typeof devicePath).toEqual('string')
-		this.path = devicePath
-	}
-
-	public close() {
-		throw new Error('Not implemented')
-	}
-	public pause() {
-		throw new Error('Not implemented')
-	}
-	public read(_callback: (err: any, data: number[]) => void) {
-		throw new Error('Not implemented')
-	}
-	public readSync(): number[] {
-		throw new Error('Not implemented')
-	}
-	public readTimeout(_timeOut: number): number[] {
-		throw new Error('Not implemented')
-	}
-	public sendFeatureReport(_data: number[]): number {
-		throw new Error('Not implemented')
-	}
-	public getFeatureReport(_reportId: number, _reportLength: number): number[] {
-		throw new Error('Not implemented')
-	}
-	public resume() {
-		throw new Error('Not implemented')
-	}
-	// on (event: string, handler: (value: any) => void) {
-	// 	throw new Error('Not implemented')
-	// }
-	public write(_values: number[]): number {
-		throw new Error('Not implemented')
-	}
-	public setDriverType(_type: string): void {
-		throw new Error('Not implemented')
-	}
-}
 // Forcing path to be string, as there are multiple constructor options, we require the string one
 mocked(HID).mockImplementation((path: any) => new DummyHID(path))
 
 // Must be required after we register a mock for `node-hid`.
 import { StreamDeck } from '../'
+import { DeviceModelId } from '../models'
 
 describe('StreamDeck', () => {
 	let streamDeck: StreamDeck
@@ -80,6 +38,7 @@ describe('StreamDeck', () => {
 		const streamDeck2 = new StreamDeck(devicePath)
 		const device = getDevice(streamDeck2)
 		expect(device.path).toEqual(devicePath)
+		expect(streamDeck2.MODEL).toEqual(DeviceModelId.ORIGINAL)
 	})
 
 	test('errors if no devicePath is provided and there are no connected Stream Decks', () => {
