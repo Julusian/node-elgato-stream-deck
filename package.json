@@ -19,8 +19,7 @@
     "url": "https://alexvan.camp/",
     "twitter": "vancamp"
   },
-  "contributors": [
-    {
+  "contributors": [{
       "name": "Håkon Nessjøen",
       "email": "haakon@bitfocus.io"
     },
@@ -58,11 +57,13 @@
     "watch": "jest --watch",
     "cov": "jest --coverage; opn coverage/lcov-report/index.html",
     "cov-open": "opn coverage/lcov-report/index.html",
-    "testci": "jest --coverage && cat ./coverage/lcov.info | coveralls",
+    "testci": "yarn lint && jest --coverage && cat ./coverage/lcov.info | coveralls",
     "unit": "jest",
     "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
     "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
-    "lint": "tslint --project tsconfig.json --config tslint.json",
+    "lint": "tslint --project tsconfig.json --config tslint.json && yarn prettier --check \"src/**/*.ts\"",
+    "lint-fix": "tslint --project tsconfig.json --config tslint.json --fix && yarn prettier --write \"src/**/*.ts\"",
+    "tslint-check": "tslint-config-prettier-check ./tslint.json",
     "validate:dependencies": "yarn audit && yarn license-validate",
     "license-validate": "node-license-validator -p -d --allow-licenses MIT BSD BSD-3-Clause ISC Apache Unlicense WTFPL"
   },
@@ -85,6 +86,7 @@
     "jest-resolve": "^24.7.1",
     "node-license-validator": "^1.3.0",
     "open-cli": "^5.0.0",
+    "prettier": "^1.17.1",
     "pureimage": "^0.1.3",
     "sharp": "^0.20.0",
     "standard-version": "^6.0.1",
@@ -94,7 +96,7 @@
     "ts-loader": "^6.0.0",
     "ts-node": "^8.1.0",
     "tslint": "^5.16.0",
-    "tslint-config-standard": "^8.0.1",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.4.2",
     "usb-detection": "^4.3.0",
     "weallbehave": "^1.2.0",

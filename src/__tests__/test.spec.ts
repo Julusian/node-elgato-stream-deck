@@ -1,62 +1,61 @@
 import { EventEmitter } from 'events'
+// tslint:disable-next-line: no-submodule-imports
 import { mocked } from 'ts-jest/utils'
 
 import { validateWriteCall } from './helpers'
 
-// test.js
 jest.mock('node-hid')
-// const HID = require('node-hid')
-import { HID, devices } from 'node-hid'
-mocked(devices).mockImplementation(() => [{
-	vendorId: 0x0fd9,
-	productId: 0x0060,
-	path: 'some_random_path_here',
-	release: 0,
-	interface: 0
-}])
+import { devices, HID } from 'node-hid'
+mocked(devices).mockImplementation(() => [
+	{
+		productId: 0x0060,
+		vendorId: 0x0fd9,
+		interface: 0,
+		path: 'some_random_path_here',
+		release: 0
+	}
+])
 
 class DummyHID extends EventEmitter {
-	path: string
+	public path: string
 
-	constructor (devicePath: string) {
+	constructor(devicePath: string) {
 		super()
 		expect(typeof devicePath).toEqual('string')
 		this.path = devicePath
-		// this.write = jest.fn()
-		// this.sendFeatureReport = jest.fn()
 	}
 
-	close () {
+	public close() {
 		throw new Error('Not implemented')
 	}
-	pause () {
+	public pause() {
 		throw new Error('Not implemented')
 	}
-	read (_callback: (err: any, data: number[]) => void) {
+	public read(_callback: (err: any, data: number[]) => void) {
 		throw new Error('Not implemented')
 	}
-	readSync (): number[] {
+	public readSync(): number[] {
 		throw new Error('Not implemented')
 	}
-	readTimeout (_timeOut: number): number[] {
+	public readTimeout(_timeOut: number): number[] {
 		throw new Error('Not implemented')
 	}
-	sendFeatureReport (_data: number[]): number {
+	public sendFeatureReport(_data: number[]): number {
 		throw new Error('Not implemented')
 	}
-	getFeatureReport (_reportId: number, _reportLength: number): number[] {
+	public getFeatureReport(_reportId: number, _reportLength: number): number[] {
 		throw new Error('Not implemented')
 	}
-	resume () {
+	public resume() {
 		throw new Error('Not implemented')
 	}
 	// on (event: string, handler: (value: any) => void) {
 	// 	throw new Error('Not implemented')
 	// }
-	write (_values: number[]): number {
+	public write(_values: number[]): number {
 		throw new Error('Not implemented')
 	}
-	setDriverType (_type: string): void {
+	public setDriverType(_type: string): void {
 		throw new Error('Not implemented')
 	}
 }
@@ -64,13 +63,12 @@ class DummyHID extends EventEmitter {
 mocked(HID).mockImplementation((path: any) => new DummyHID(path))
 
 // Must be required after we register a mock for `node-hid`.
-// import StreamDeck from '../'
-const StreamDeck = require('../')
+import { StreamDeck } from '../'
 
 describe('StreamDeck', () => {
 	let streamDeck: StreamDeck
-	function getDevice (sd?: StreamDeck): DummyHID {
-		return (sd || streamDeck as any).device
+	function getDevice(sd?: StreamDeck): DummyHID {
+		return (sd || (streamDeck as any)).device
 	}
 
 	beforeEach(() => {
@@ -79,8 +77,8 @@ describe('StreamDeck', () => {
 
 	test('constructor uses the provided devicePath', () => {
 		const devicePath = 'some_random_path_here'
-		const streamDeck = new StreamDeck(devicePath)
-		const device = getDevice(streamDeck)
+		const streamDeck2 = new StreamDeck(devicePath)
+		const device = getDevice(streamDeck2)
 		expect(device.path).toEqual(devicePath)
 	})
 
@@ -95,10 +93,7 @@ describe('StreamDeck', () => {
 		expect(device.write).toHaveBeenCalledTimes(0)
 		streamDeck.fillColor(0, 255, 0, 0)
 
-		validateWriteCall(device.write, [
-			'fillColor-red-page1.json',
-			'fillColor-red-page2.json'
-		])
+		validateWriteCall(device.write, ['fillColor-red-page1.json', 'fillColor-red-page2.json'])
 	})
 
 	test('checkRGBValue', () => {
@@ -137,7 +132,9 @@ describe('StreamDeck', () => {
 		streamDeck.on('up', upSpy)
 
 		const device = getDevice()
+		// prettier-ignore
 		device.emit('data', Buffer.from([0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
+		// prettier-ignore
 		device.emit('data', Buffer.from([0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
 
 		expect(downSpy).toHaveBeenCalledTimes(1)
@@ -171,7 +168,9 @@ describe('StreamDeck', () => {
 		streamDeck.setBrightness(0)
 
 		expect(device.sendFeatureReport).toHaveBeenCalledTimes(2)
+		// prettier-ignore
 		expect(device.sendFeatureReport).toHaveBeenNthCalledWith(1, [0x05, 0x55, 0xaa, 0xd1, 0x01, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+		// prettier-ignore
 		expect(device.sendFeatureReport).toHaveBeenNthCalledWith(2, [0x05, 0x55, 0xaa, 0xd1, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
 
 		expect(() => streamDeck.setBrightness(101)).toThrow()

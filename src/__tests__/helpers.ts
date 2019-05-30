@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
-export function validateWriteCall (fn: any, files: string[], filter?: (data: any) => any) {
+export function validateWriteCall(fn: any, files: string[], filter?: (data: any) => any) {
 	expect(fn).toHaveBeenCalledTimes(2)
 
 	for (let i = 0; i < files.length; i++) {
@@ -13,7 +13,7 @@ export function validateWriteCall (fn: any, files: string[], filter?: (data: any
 	}
 }
 
-export function readFixtureJSON (fileName: string) {
+export function readFixtureJSON(fileName: string) {
 	const filePath = path.resolve(__dirname, 'fixtures', fileName)
 	const fileData = fs.readFileSync(filePath)
 	return JSON.parse(fileData as any)

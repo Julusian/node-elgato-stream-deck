@@ -1,9 +1,12 @@
 {
-	"extends": "tslint-config-standard",
+	"extends": [
+		"tslint:latest",
+		"tslint-config-prettier"
+	],
 	"rules": {
-	  "indent": [true, "tabs", 4],
-	  "ter-indent": [true, "tab",{
-			  "SwitchCase": 1
-	  }]
+		"interface-name": false,
+		"object-literal-sort-keys": false,
+		"no-implicit-dependencies": [true, ["ts-jest"]],
+		"variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "require-const-for-all-caps"]
 	}
-  }
+}

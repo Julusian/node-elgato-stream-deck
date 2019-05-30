@@ -16,8 +16,9 @@ export interface DeviceModel {
 	ImagePPM: number
 }
 
-export const DeviceModels: DeviceModel[] = [
-	{ // Original
+export const DEVICE_MODELS: DeviceModel[] = [
+	{
+		// Original
 		ModelId: DeviceModelId.ORIGINAL,
 		ProductId: 0x0060,
 		MaxPacketSize: 8191,
@@ -27,7 +28,8 @@ export const DeviceModels: DeviceModel[] = [
 		ImageBorder: 0,
 		ImagePPM: 3780
 	},
-	{ // Mini
+	{
+		// Mini
 		ModelId: DeviceModelId.MINI,
 		ProductId: 0x0063,
 		MaxPacketSize: 1024,
