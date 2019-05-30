@@ -11,6 +11,32 @@ export interface StreamDeckDeviceInfo {
 	serialNumber?: string
 }
 
+/**
+ * List detected devices
+ */
+export function listStreamDecks(): StreamDeckDeviceInfo[] {
+	const devices: StreamDeckDeviceInfo[] = []
+	for (const dev of HIDdevices()) {
+		const model = DEVICE_MODELS.find(m => m.ProductId === dev.productId)
+
+		if (model && dev.vendorId === 0x0fd9 && dev.path) {
+			devices.push({
+				model: model.ModelId,
+				path: dev.path,
+				serialNumber: dev.serialNumber
+			})
+		}
+	}
+	return devices
+}
+
+/**
+ * Get the info of a device if the given path is a streamdeck
+ */
+export function getStreamDeckInfo(path: string): StreamDeckDeviceInfo | undefined {
+	return listStreamDecks().find(dev => dev.path === path)
+}
+
 export class StreamDeck extends EventEmitter {
 	get NUM_KEYS() {
 		return this.KEY_COLUMNS * this.KEY_ROWS
@@ -43,31 +69,6 @@ export class StreamDeck extends EventEmitter {
 	get MODEL() {
 		return this.deviceModel.ModelId
 	}
-	/**
-	 * List detected devices
-	 */
-	public static listDevices(): StreamDeckDeviceInfo[] {
-		const devices: StreamDeckDeviceInfo[] = []
-		for (const dev of HIDdevices()) {
-			const model = DEVICE_MODELS.find(m => m.ProductId === dev.productId)
-
-			if (model && dev.vendorId === 0x0fd9 && dev.path) {
-				devices.push({
-					model: model.ModelId,
-					path: dev.path,
-					serialNumber: dev.serialNumber
-				})
-			}
-		}
-		return devices
-	}
-
-	/**
-	 * Get the info of a device if the given path is a streamdeck
-	 */
-	public static getDeviceInfo(path: string): StreamDeckDeviceInfo | undefined {
-		return this.listDevices().find(dev => dev.path === path)
-	}
 
 	/**
 	 * Checks a value is a valid RGB value. A number between 0 and 255.
@@ -88,7 +89,7 @@ export class StreamDeck extends EventEmitter {
 	constructor(devicePath?: string) {
 		super()
 
-		let foundDevices = StreamDeck.listDevices()
+		let foundDevices = listStreamDecks()
 		if (devicePath) {
 			foundDevices = foundDevices.filter(d => d.path === devicePath)
 		}
@@ -133,7 +134,6 @@ export class StreamDeck extends EventEmitter {
 	/**
 	 * Checks a keyIndex is a valid key for a stream deck. A number between 0 and 14.
 	 *
-	 * @static
 	 * @param {number} keyIndex The keyIndex to check
 	 */
 	public checkValidKeyIndex(keyIndex: KeyIndex) {
@@ -387,5 +387,3 @@ export class StreamDeck extends EventEmitter {
 		return array
 	}
 }
-
-module.exports = StreamDeck

@@ -1,24 +1,22 @@
-'use strict';
-
-const StreamDeck = require('../dist/index');
-const streamDeck = new StreamDeck();
+const { StreamDeck } = require('../dist/index')
+const streamDeck = new StreamDeck()
 
 streamDeck.on('error', error => {
-	console.error(error);
-});
+	console.error(error)
+})
 
 setInterval(() => {
-	const r = getRandomIntInclusive(0, 255);
-	const g = getRandomIntInclusive(0, 255);
-	const b = getRandomIntInclusive(0, 255);
-	console.log('Filling with rgb(%d, %d, %d)', r, g, b);
+	const r = getRandomIntInclusive(0, 255)
+	const g = getRandomIntInclusive(0, 255)
+	const b = getRandomIntInclusive(0, 255)
+	console.log('Filling with rgb(%d, %d, %d)', r, g, b)
 	for (let i = 0; i < 15; i++) {
-		streamDeck.fillColor(i, r, g, b);
+		streamDeck.fillColor(i, r, g, b)
 	}
-}, 1000 / 5);
+}, 1000 / 5)
 
 function getRandomIntInclusive(min, max) {
-	min = Math.ceil(min);
-	max = Math.floor(max);
-	return Math.floor(Math.random() * (max - min + 1)) + min;
+	min = Math.ceil(min)
+	max = Math.floor(max)
+	return Math.floor(Math.random() * (max - min + 1)) + min
 }

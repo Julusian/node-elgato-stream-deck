@@ -1,13 +1,11 @@
-'use strict';
+const path = require('path')
+const sharp = require('sharp')
+const { StreamDeck } = require('../dist/index')
 
-const path = require('path');
-const sharp = require('sharp');
-const StreamDeck = require('../dist/index');
-
-console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the second image.');
-
-(async () => {
-	const streamDeck = new StreamDeck();
+console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the second image.')
+;(async () => {
+	const streamDeck = new StreamDeck()
+	streamDeck.clearAllKeys()
 
 	const imgField = await sharp(path.resolve(__dirname, 'fixtures/sunny_field.png'))
 		.flatten()
@@ -20,42 +18,40 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 		.raw()
 		.toBuffer()
 
-	let filled = false;
+	let filled = false
 	streamDeck.on('down', keyIndex => {
 		if (filled) {
-			return;
+			return
 		}
 
-		filled = true;
+		filled = true
 
-		let image;
+		let image
 		if (keyIndex > 7) {
-			console.log('Filling entire panel with an image of a sunny field.');
+			console.log('Filling entire panel with an image of a sunny field.')
 			image = imgField
 		} else {
-			console.log('Filling entire panel with a mosaic which will show each key as a different color.');
+			console.log('Filling entire panel with a mosaic which will show each key as a different color.')
 			image = imgMosaic
 		}
 
-		streamDeck.fillPanel(image);
-	});
+		streamDeck.fillPanel(image)
+	})
 
 	streamDeck.on('up', () => {
 		if (!filled) {
-			return;
+			return
 		}
 
 		// Clear the key when all keys are released.
 		if (streamDeck.keyState.every(pressed => !pressed)) {
-			console.log('Clearing all buttons');
-			streamDeck.clearAllKeys();
-			filled = false;
+			console.log('Clearing all buttons')
+			streamDeck.clearAllKeys()
+			filled = false
 		}
-	});
+	})
 
 	streamDeck.on('error', error => {
-		console.error(error);
-	});
-
+		console.error(error)
+	})
 })()
-
