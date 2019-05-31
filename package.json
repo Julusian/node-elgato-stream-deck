@@ -19,7 +19,8 @@
     "url": "https://alexvan.camp/",
     "twitter": "vancamp"
   },
-  "contributors": [{
+  "contributors": [
+    {
       "name": "Håkon Nessjøen",
       "email": "haakon@bitfocus.io"
     },
@@ -78,7 +79,7 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.11",
-    "@types/node": "^8.0.4",
+    "@types/node": "^12.0.4",
     "@types/node-hid": "^0.7.0",
     "coveralls": "^3.0.3",
     "jest": "^24.7.1",
@@ -88,10 +89,10 @@
     "open-cli": "^5.0.0",
     "prettier": "^1.17.1",
     "pureimage": "^0.1.3",
-    "sharp": "^0.20.0",
+    "sharp": "^0.22.1",
     "standard-version": "^6.0.1",
     "stream-buffers": "^3.0.1",
-    "trash-cli": "^2.0.0",
+    "trash-cli": "^3.0.0",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.0",
     "ts-node": "^8.1.0",
