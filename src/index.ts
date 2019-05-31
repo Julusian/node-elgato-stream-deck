@@ -2,7 +2,7 @@ import { EventEmitter } from 'events'
 import { devices as HIDdevices, HID, setDriverType as HIDsetDriverType } from 'node-hid'
 
 import { DEVICE_MODELS, DeviceModel, DeviceModelId } from './models'
-import { bufferToIntArray, numberArrayToString } from './util'
+import { numberArrayToString } from './util'
 
 export type KeyIndex = number
 
@@ -24,11 +24,11 @@ HIDsetDriverType('libusb')
 export function listStreamDecks(): StreamDeckDeviceInfo[] {
 	const devices: StreamDeckDeviceInfo[] = []
 	for (const dev of HIDdevices()) {
-		const model = DEVICE_MODELS.find(m => m.ProductId === dev.productId)
+		const model = DEVICE_MODELS.find(m => m.PRODUCT_ID === dev.productId)
 
 		if (model && dev.vendorId === 0x0fd9 && dev.path) {
 			devices.push({
-				model: model.ModelId,
+				model: model.MODEL_ID,
 				path: dev.path,
 				serialNumber: dev.serialNumber
 			})
@@ -46,13 +46,13 @@ export function getStreamDeckInfo(path: string): StreamDeckDeviceInfo | undefine
 
 export class StreamDeck extends EventEmitter {
 	get NUM_KEYS() {
-		return this.KEY_COLUMNS * this.KEY_ROWS
+		return this.deviceModel.NUM_KEYS
 	}
 	get KEY_COLUMNS() {
-		return this.deviceModel.KeyCols
+		return this.deviceModel.KEY_COLS
 	}
 	get KEY_ROWS() {
-		return this.deviceModel.KeyRows
+		return this.deviceModel.KEY_ROWS
 	}
 
 	/**
@@ -61,20 +61,14 @@ export class StreamDeck extends EventEmitter {
 	 * @readonly
 	 */
 	get ICON_SIZE() {
-		return this.deviceModel.ImageSize
+		return this.deviceModel.IMAGE_SIZE
 	}
 	get ICON_BYTES() {
-		return this.ICON_SIZE * this.ICON_SIZE * 3
-	}
-	private get PADDED_ICON_SIZE() {
-		return this.ICON_SIZE + this.deviceModel.ImageBorder * 2
-	}
-	private get PADDED_ICON_BYTES() {
-		return this.PADDED_ICON_SIZE * this.PADDED_ICON_SIZE * 3
+		return this.deviceModel.IMAGE_BYTES
 	}
 
 	get MODEL() {
-		return this.deviceModel.ModelId
+		return this.deviceModel.MODEL_ID
 	}
 
 	/**
@@ -109,7 +103,7 @@ export class StreamDeck extends EventEmitter {
 			}
 		}
 
-		this.deviceModel = DEVICE_MODELS.find(m => m.ModelId === foundDevices[0].model) as DeviceModel
+		this.deviceModel = DEVICE_MODELS.find(m => m.MODEL_ID === foundDevices[0].model) as DeviceModel
 		this.device = new HID(foundDevices[0].path)
 
 		this.keyState = new Array(this.NUM_KEYS).fill(false)
@@ -274,107 +268,12 @@ export class StreamDeck extends EventEmitter {
 		return numberArrayToString(this.device.getFeatureReport(3, 17).slice(5))
 	}
 
-	private fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, offset: number, stride: number) {
+	private fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOffset: number, sourceStride: number) {
 		this.checkValidKeyIndex(keyIndex)
 
-		const byteBuffer = Buffer.alloc(this.PADDED_ICON_BYTES)
-
-		const rowBytes = this.PADDED_ICON_SIZE * 3
-		for (let r = 0; r < this.ICON_SIZE; r++) {
-			const row: number[] = []
-			const start = r * stride + offset
-			for (let i = start; i < start + this.ICON_SIZE * 3; i += 3) {
-				// TODO - the mini code does something different with coordinates. what?
-				const red = imageBuffer.readUInt8(i)
-				const green = imageBuffer.readUInt8(i + 1)
-				const blue = imageBuffer.readUInt8(i + 2)
-				row.push(red, green, blue)
-			}
-			row.push(...new Array(this.deviceModel.ImageBorder * 3).fill(0))
-			byteBuffer.set(row.reverse(), rowBytes * r + this.deviceModel.ImageBorder * 2 * 3)
+		const packets = this.deviceModel.generateFillImageWrites(keyIndex, imageBuffer, sourceOffset, sourceStride)
+		for (const packet of packets) {
+			this.device.write(packet)
 		}
-
-		if (this.deviceModel.ModelId === DeviceModelId.ORIGINAL) {
-			// The original uses larger packets, and splits the payload equally across 2
-
-			const bmpHeader = this.buildBMPHeader()
-			const bytesCount = this.PADDED_ICON_BYTES + bmpHeader.length
-			const frame1Bytes = bytesCount / 2 - bmpHeader.length
-
-			const packet1 = Buffer.alloc(this.deviceModel.MaxPacketSize)
-			const packet1Header = this.buildFillImageCommandHeader(keyIndex, 0x01, false)
-			packet1.set(packet1Header, 0)
-			packet1.set(bmpHeader, packet1Header.length)
-			byteBuffer.copy(packet1, packet1Header.length + bmpHeader.length, 0, frame1Bytes)
-			this.device.write(bufferToIntArray(packet1))
-
-			const packet2 = Buffer.alloc(this.deviceModel.MaxPacketSize)
-			const packet2Header = this.buildFillImageCommandHeader(keyIndex, 0x02, true)
-			packet2.set(packet2Header, 0)
-			byteBuffer.copy(packet2, packet2Header.length, frame1Bytes)
-			this.device.write(bufferToIntArray(packet2))
-		} else {
-			// Newer models use smaller packets and chunk to fill as few as possible
-
-			let byteOffset = 0
-			const firstPart = 0
-			for (let part = firstPart; byteOffset < this.PADDED_ICON_BYTES; part++) {
-				const packet = Buffer.alloc(this.deviceModel.MaxPacketSize)
-				const header = this.buildFillImageCommandHeader(keyIndex, part, false) // isLast gets set later if needed
-				packet.set(header, 0)
-				let nextPosition = header.length
-				if (part === firstPart) {
-					const bmpHeader = this.buildBMPHeader()
-					packet.set(bmpHeader, nextPosition)
-					nextPosition += bmpHeader.length
-				}
-
-				const byteCount = this.deviceModel.MaxPacketSize - nextPosition
-				byteBuffer.copy(packet, nextPosition, byteOffset, byteOffset + byteCount)
-				byteOffset += byteCount
-
-				if (byteOffset >= this.PADDED_ICON_BYTES) {
-					// Reached the end of the payload
-					packet.set(this.buildFillImageCommandHeader(keyIndex, part, true), 0)
-				}
-
-				this.device.write(bufferToIntArray(packet))
-			}
-		}
-	}
-
-	private buildFillImageCommandHeader(keyIndex: number, partIndex: number, isLast: boolean) {
-		// prettier-ignore
-		return [
-			0x02, 0x01, partIndex, 0x00, isLast ? 0x01 : 0x00, keyIndex + 1, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		]
-	}
-
-	private buildBMPHeader(): Buffer {
-		// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
-		const buf = Buffer.alloc(54)
-
-		// Bitmap file header
-		buf.write('BM')
-		buf.writeUInt32LE(this.PADDED_ICON_BYTES + 54, 2)
-		buf.writeInt16LE(0, 6)
-		buf.writeInt16LE(0, 8)
-		buf.writeUInt32LE(54, 10) // Full header size
-
-		// DIB header (BITMAPINFOHEADER)
-		buf.writeUInt32LE(40, 14) // DIB header size
-		buf.writeInt32LE(this.PADDED_ICON_SIZE, 18)
-		buf.writeInt32LE(this.PADDED_ICON_SIZE, 22)
-		buf.writeInt16LE(1, 26) // Color planes
-		buf.writeInt16LE(24, 28) // Bit depth
-		buf.writeInt32LE(0, 30) // Compression
-		buf.writeInt32LE(this.PADDED_ICON_BYTES, 34) // Image size
-		buf.writeInt32LE(this.deviceModel.ImagePPM, 38) // Horizontal resolution ppm
-		buf.writeInt32LE(this.deviceModel.ImagePPM, 42) // Vertical resolution ppm
-		buf.writeInt32LE(0, 46) // Colour pallette size
-		buf.writeInt32LE(0, 50) // 'Important' Colour count
-
-		return buf
 	}
 }

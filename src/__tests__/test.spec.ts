@@ -34,7 +34,7 @@ import { DEVICE_MODELS, DeviceModel, DeviceModelId } from '../models'
 import { bufferToIntArray } from '../util'
 
 function getDeviceModelInfo(model: DeviceModelId) {
-	const info = DEVICE_MODELS.find(d => d.ModelId === model)
+	const info = DEVICE_MODELS.find(d => d.MODEL_ID === model)
 	expect(info).toBeTruthy()
 	return info as DeviceModel
 }
@@ -71,7 +71,7 @@ function runForDevice(modelId: DeviceModelId, path: string) {
 		streamDeck.clearKey = jest.fn()
 		streamDeck.clearAllKeys()
 
-		const keyCount = modelInfo.KeyCols * modelInfo.KeyRows
+		const keyCount = modelInfo.KEY_COLS * modelInfo.KEY_ROWS
 		expect(streamDeck.clearKey).toHaveBeenCalledTimes(keyCount)
 		for (let i = 0; i < keyCount; i++) {
 			expect(streamDeck.clearKey).toHaveBeenNthCalledWith(i + 1, i)
@@ -178,7 +178,7 @@ function runForDevice(modelId: DeviceModelId, path: string) {
 		streamDeck.fillImage(2, buffer)
 
 		expect(fillImageMock).toHaveBeenCalledTimes(1)
-		expect(fillImageMock).toHaveBeenCalledWith(2, expect.any(Buffer), 0, modelInfo.ImageSize * 3)
+		expect(fillImageMock).toHaveBeenCalledWith(2, expect.any(Buffer), 0, modelInfo.IMAGE_SIZE * 3)
 		// Buffer has to be seperately as a deep equality check is really slow
 		expect(fillImageMock.mock.calls[0][1]).toBe(buffer)
 	})
@@ -210,7 +210,7 @@ function runForDevice(modelId: DeviceModelId, path: string) {
 		streamDeck.fillColor(4, 123, 255, 86)
 
 		expect(fillImageMock).toHaveBeenCalledTimes(1)
-		expect(fillImageMock).toHaveBeenCalledWith(4, expect.any(Buffer), 0, modelInfo.ImageSize * 3)
+		expect(fillImageMock).toHaveBeenCalledWith(4, expect.any(Buffer), 0, modelInfo.IMAGE_SIZE * 3)
 		// console.log(JSON.stringify(bufferToIntArray(fillImageMock.mock.calls[0][1])))
 		expect(bufferToIntArray(fillImageMock.mock.calls[0][1])).toEqual(readFixtureJSON('fillColor-buffer.json'))
 	})
