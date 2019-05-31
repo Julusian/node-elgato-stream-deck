@@ -1,13 +1,18 @@
 sudo: false
 language: node_js
+os:
+  - linux
+  - osx
 addons:
   apt:
     packages:
-    - libusb-1.0-0-dev
+      - libusb-1.0-0-dev
 node_js:
-- v8
+  - v8
+  - v10
+  - v12
 cache:
   directories:
-  - node_modules
-  - "$HOME/.npm"
+    - node_modules
+    - '$HOME/.npm'
 after_success: yarn testci
