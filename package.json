@@ -74,7 +74,7 @@
     "node": ">=7.6"
   },
   "dependencies": {
-    "node-hid": "^0.6.0"
+    "node-hid": "^0.7.9"
   },
   "devDependencies": {
     "@types/jest": "^24.0.11",

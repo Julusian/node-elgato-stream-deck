@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events'
-import { devices as HIDdevices, HID } from 'node-hid'
+import { devices as HIDdevices, HID, setDriverType as HIDsetDriverType } from 'node-hid'
 
 import { DEVICE_MODELS, DeviceModel, DeviceModelId } from './models'
 import { bufferToIntArray, numberArrayToString } from './util'
@@ -11,6 +11,12 @@ export interface StreamDeckDeviceInfo {
 	path: string
 	serialNumber?: string
 }
+
+/*
+ * The original StreamDeck uses packet sizes too larged for the hidraw driver which is
+ * the default on linux. https://github.com/node-hid/node-hid/issues/249
+ */
+HIDsetDriverType('libusb')
 
 /**
  * List detected devices
