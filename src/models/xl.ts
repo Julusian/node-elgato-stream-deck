@@ -51,7 +51,7 @@ export class StreamDeckXL extends StreamDeckBase {
 			sourceBuffer,
 			sourceOffset,
 			sourceStride,
-			this.rotateCoordinates.bind(this),
+			this.transformCoordinates.bind(this),
 			'rgba',
 			this.ICON_SIZE,
 			0
@@ -61,22 +61,16 @@ export class StreamDeckXL extends StreamDeckBase {
 
 		const result: number[][] = []
 
-		let byteOffset = 0
-		const firstPart = 0
-		for (let part = firstPart; byteOffset < jpegBuffer.length; part++) {
-			const remainingBytes = jpegBuffer.length - byteOffset
+		let remainingBytes = jpegBuffer.length
+		for (let part = 0; remainingBytes > 0; part++) {
 			const packet = Buffer.alloc(MAX_PACKET_SIZE)
 
 			const byteCount = Math.min(remainingBytes, MAX_PACKET_SIZE - 8)
-			this.writeFillImageCommandHeader(packet, keyIndex, part, false, byteCount) // isLast gets set later if needed
+			this.writeFillImageCommandHeader(packet, keyIndex, part, remainingBytes <= MAX_PACKET_SIZE - 8, byteCount)
 
+			const byteOffset = jpegBuffer.length - remainingBytes
+			remainingBytes -= byteCount
 			jpegBuffer.copy(packet, 8, byteOffset, byteOffset + byteCount)
-			byteOffset += byteCount
-
-			if (byteOffset >= jpegBuffer.length) {
-				// Reached the end of the payload
-				this.writeFillImageCommandHeader(packet, keyIndex, part, true, byteCount)
-			}
 
 			result.push(bufferToIntArray(packet))
 		}
@@ -99,7 +93,7 @@ export class StreamDeckXL extends StreamDeckBase {
 		buffer.writeUInt16LE(partIndex++, 6)
 	}
 
-	private rotateCoordinates(x: number, y: number): { x: number; y: number } {
+	private transformCoordinates(x: number, y: number): { x: number; y: number } {
 		return { x: this.ICON_SIZE - x - 1, y: this.ICON_SIZE - y - 1 }
 	}
 }

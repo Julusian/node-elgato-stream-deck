@@ -6,7 +6,7 @@
 	"rules": {
 		"interface-name": false,
 		"object-literal-sort-keys": false,
-		"no-implicit-dependencies": [true, "optional", ["ts-jest"]],
+		"no-implicit-dependencies": [false, "optional", ["ts-jest"]],
 		"variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "require-const-for-all-caps"],
 		"max-classes-per-file": [true, 1, "exclude-class-expressions"]
 	}
