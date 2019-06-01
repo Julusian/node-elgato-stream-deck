@@ -22,10 +22,11 @@ export function imageToByteArray(
 	imageBuffer: Buffer,
 	sourceOffset: number,
 	sourceStride: number,
-	transformCoordinates: (x: number, y: number) => { x: number; y: number }
+	transformCoordinates: (x: number, y: number) => { x: number; y: number },
+	colorMode: 'bgr' | 'rgba'
 ) {
 	const paddedImageSize = model.IMAGE_SIZE + model.IMAGE_BORDER * 2
-	const byteBuffer = Buffer.alloc(paddedImageSize * paddedImageSize * 3)
+	const byteBuffer = Buffer.alloc(paddedImageSize * paddedImageSize * colorMode.length)
 
 	for (let y = 0; y < model.IMAGE_SIZE; y++) {
 		const rowBytes: number[] = []
@@ -36,11 +37,16 @@ export function imageToByteArray(
 			const red = imageBuffer.readUInt8(i)
 			const green = imageBuffer.readUInt8(i + 1)
 			const blue = imageBuffer.readUInt8(i + 2)
-			rowBytes.push(blue, green, red)
+
+			if (colorMode === 'bgr') {
+				rowBytes.push(blue, green, red)
+			} else {
+				rowBytes.push(red, green, blue, 255)
+			}
 		}
 
-		const rowOffset = paddedImageSize * 3 * (y + model.IMAGE_BORDER)
-		const destOffset = rowOffset + model.IMAGE_BORDER * 3
+		const rowOffset = paddedImageSize * colorMode.length * (y + model.IMAGE_BORDER)
+		const destOffset = rowOffset + model.IMAGE_BORDER * colorMode.length
 		byteBuffer.set(rowBytes, destOffset)
 	}
 

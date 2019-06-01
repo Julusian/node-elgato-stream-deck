@@ -113,7 +113,8 @@ export class StreamDeck extends EventEmitter {
 		this.device.on('data', data => {
 			// The first byte is a report ID, the last byte appears to be padding.
 			// We strip these out for now.
-			data = data.slice(1, data.length - 1)
+			const offset = this.deviceModel.MODEL_ID === DeviceModelId.XL ? 4 : 1
+			data = data.slice(offset, data.length - 1)
 
 			for (let i = 0; i < this.NUM_KEYS; i++) {
 				const keyPressed = Boolean(data[i])
@@ -237,19 +238,31 @@ export class StreamDeck extends EventEmitter {
 			throw new RangeError('Expected brightness percentage to be between 0 and 100')
 		}
 
-		// prettier-ignore
-		const brightnessCommandBuffer = [
-			0x05, 0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00
-		]
-		this.device.sendFeatureReport(brightnessCommandBuffer)
+		if (this.deviceModel.MODEL_ID === DeviceModelId.XL) {
+			// prettier-ignore
+			const brightnessCommandBuffer = [
+				0x03, 0x08, percentage, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+			]
+			this.device.sendFeatureReport(brightnessCommandBuffer)
+		} else {
+			// prettier-ignore
+			const brightnessCommandBuffer = [
+				0x05, 0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00
+			]
+			this.device.sendFeatureReport(brightnessCommandBuffer)
+		}
 	}
 
 	/**
 	 * Resets the display to the startup logo
 	 */
 	public resetToLogo() {
+		// TODO - test for XL
 		// prettier-ignore
 		const resetCommandBuffer = [
 			0x0B, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -263,6 +276,7 @@ export class StreamDeck extends EventEmitter {
 	 * Get firmware version from Stream Deck
 	 */
 	public getFirmwareVersion() {
+		// TODO - fix for XL
 		return numberArrayToString(this.device.getFeatureReport(4, 17).slice(5))
 	}
 
@@ -270,6 +284,7 @@ export class StreamDeck extends EventEmitter {
 	 * Get serial number from Stream Deck
 	 */
 	public getSerialNumber() {
+		// TODO - fix for XL
 		return numberArrayToString(this.device.getFeatureReport(3, 17).slice(5))
 	}
 

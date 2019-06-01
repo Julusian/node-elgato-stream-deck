@@ -8,6 +8,9 @@ function addDevice(info) {
 	const path = info.path
 	streamDecks[path] = new StreamDeck(path)
 
+	console.log('Serial:', streamDecks[path].getSerialNumber())
+	console.log('Firmware:', streamDecks[path].getFirmwareVersion())
+
 	// Clear all keys
 	streamDecks[path].clearAllKeys()
 	// Fill one key in red

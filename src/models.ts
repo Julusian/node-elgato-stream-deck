@@ -1,9 +1,12 @@
 import { KeyIndex } from '.'
+
+import { encode as encodeJPEG } from 'jpeg-js'
 import { bufferToIntArray, buildBMPHeader, buildFillImageCommandHeader, imageToByteArray } from './util'
 
 export enum DeviceModelId {
 	ORIGINAL = 'original',
-	MINI = 'mini'
+	MINI = 'mini',
+	XL = 'xl'
 }
 
 export abstract class DeviceModel {
@@ -66,7 +69,8 @@ export const DEVICE_MODELS: DeviceModel[] = [
 				sourceBuffer,
 				sourceOffset,
 				sourceStride,
-				this.flipCoordinates.bind(this)
+				this.flipCoordinates.bind(this),
+				'bgr'
 			)
 
 			// The original uses larger packets, and splits the payload equally across 2
@@ -116,7 +120,8 @@ export const DEVICE_MODELS: DeviceModel[] = [
 				sourceBuffer,
 				sourceOffset,
 				sourceStride,
-				this.rotateCoordinates.bind(this)
+				this.rotateCoordinates.bind(this),
+				'bgr'
 			)
 
 			// The mini use smaller packets and chunk to fill as few as possible
@@ -153,6 +158,88 @@ export const DEVICE_MODELS: DeviceModel[] = [
 
 		private rotateCoordinates(x: number, y: number): { x: number; y: number } {
 			return { x: y, y: x }
+		}
+	})(),
+	new (class extends DeviceModel {
+		// XL
+		public readonly MODEL_ID = DeviceModelId.XL
+		public readonly PRODUCT_ID = 0x006c
+		public readonly MAX_PACKET_SIZE = 1024
+		public readonly KEY_COLS = 8
+		public readonly KEY_ROWS = 4
+		public readonly IMAGE_SIZE = 72
+		public readonly IMAGE_BORDER = 12
+		// public readonly IMAGE_PPM = 2835 // Unused
+		public readonly KEY_DIRECTION = 'ltr'
+
+		public generateFillImageWrites(
+			keyIndex: KeyIndex,
+			sourceBuffer: Buffer,
+			sourceOffset: number,
+			sourceStride: number
+		): number[][] {
+			const byteBuffer2 = imageToByteArray(
+				this,
+				sourceBuffer,
+				sourceOffset,
+				sourceStride,
+				this.rotateCoordinates.bind(this),
+				'rgba'
+			)
+
+			const jpegBuffer = encodeJPEG(
+				{
+					width: this.PADDED_ICON_SIZE,
+					height: this.PADDED_ICON_SIZE,
+					data: byteBuffer2
+				},
+				80
+			)
+
+			// The xl use smaller packets and chunk to fill as few as possible
+
+			const result: number[][] = []
+
+			let byteOffset = 0
+			const firstPart = 0
+			for (let part = firstPart; byteOffset < jpegBuffer.data.length; part++) {
+				const remainingBytes = jpegBuffer.data.length - byteOffset
+				const packet = Buffer.alloc(this.MAX_PACKET_SIZE)
+
+				const byteCount = Math.min(remainingBytes, this.MAX_PACKET_SIZE - 8)
+				this.writeFillImageCommandHeader(packet, keyIndex, part, false, byteCount) // isLast gets set later if needed
+
+				jpegBuffer.data.copy(packet, 8, byteOffset, byteOffset + byteCount)
+				byteOffset += byteCount
+
+				if (byteOffset >= jpegBuffer.data.length) {
+					// Reached the end of the payload
+					this.writeFillImageCommandHeader(packet, keyIndex, part, true, byteCount)
+				}
+
+				result.push(bufferToIntArray(packet))
+			}
+
+			return result
+		}
+
+		private writeFillImageCommandHeader(
+			buffer: Buffer,
+			keyIndex: number,
+			partIndex: number,
+			isLast: boolean,
+			bodyLength: number
+		) {
+			buffer.writeUInt8(0x02, 0)
+			buffer.writeUInt8(0x07, 1)
+			buffer.writeUInt8(keyIndex, 2)
+			buffer.writeUInt8(isLast ? 1 : 0, 3)
+			buffer.writeUInt16LE(bodyLength, 4)
+			buffer.writeUInt16LE(partIndex++, 6)
+		}
+
+		private rotateCoordinates(x: number, y: number): { x: number; y: number } {
+			return { x, y: this.IMAGE_SIZE - y - 1 }
 		}
 	})()
 ]

@@ -374,15 +374,29 @@
   dependencies:
     "@types/jest-diff" "*"
 
+"@types/jpeg-js@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@types/jpeg-js/-/jpeg-js-0.3.0.tgz#5971f0aa50900194e9565711c265c10027385e89"
+  integrity sha512-S6bajx+UpnHzh/nFgGOJ8uvDCElV+eGvljDpJKHK2FW53erZxhX+CitbUFbrsmZi1h/I+DzvGp0MWyKl3dF1yw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/node-hid@^0.7.0":
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@types/node-hid/-/node-hid-0.7.0.tgz#f696f39c528059116236e41df90c8fcba077d711"
   integrity sha512-P46Ed7R+/3peWShb7hNGD/ajvpMiY1tWKG35aQ3oPOxV2Nls6porDqXPvZT4qnx5T8hb6Ot5juxfQS87Tpjk4w==
 
-"@types/node@^12.0.4":
+"@types/node@*", "@types/node@^12.0.4":
   version "12.0.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.0.4.tgz#46832183115c904410c275e34cf9403992999c32"
   integrity sha512-j8YL2C0fXq7IONwl/Ud5Kt0PeXw22zGERt+HSSnwbKOJVsAGkEz3sFCYwaF9IOuoG1HOtE0vKCj6sXF7Q0+Vaw==
+
+"@types/sharp@^0.22.2":
+  version "0.22.2"
+  resolved "https://registry.yarnpkg.com/@types/sharp/-/sharp-0.22.2.tgz#c9b613816ec000d94f153259b25ae41f874a75f5"
+  integrity sha512-oH49f42h3nf/qys0weYsaTGiMv67wPB769ynCoPfBAVwjjxFF3QtIPEe3MfhwyNjQAhQhTEfnmMKvVZfcFkhIw==
+  dependencies:
+    "@types/node" "*"
 
 "@types/stack-utils@^1.0.1":
   version "1.0.1"
@@ -2944,7 +2958,7 @@ jest@^24.7.1:
     import-local "^2.0.0"
     jest-cli "^24.8.0"
 
-jpeg-js@^0.3.3:
+jpeg-js@^0.3.3, jpeg-js@^0.3.5:
   version "0.3.5"
   resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.3.5.tgz#6fbd6cd0e49627c5a0341796c9e50c70a2aa3673"
   integrity sha512-hvaExqwmQDS8O9qnZAVDXGWU43Tbu1V0wMZmjROjT11jloSgGICZpscG+P6Nyi1BVAvyu2ARRx8qmEW30sxgdQ==
