@@ -47,7 +47,7 @@ function runForDevice(modelId: DeviceModelId, path: string) {
 	}
 
 	beforeEach(() => {
-		streamDeck = new StreamDeck(path)
+		streamDeck = new StreamDeck(path, true)
 	})
 
 	test('errors if no devicePath is provided and there are no connected Stream Decks', () => {
@@ -235,8 +235,10 @@ describe('StreamDeck', () => {
 		return (sd || (streamDeck as any)).device
 	}
 
+	// TODO - check keys are mapped correctly when flipped
+
 	beforeEach(() => {
-		streamDeck = new StreamDeck(devicePath)
+		streamDeck = new StreamDeck(devicePath, true)
 	})
 
 	test('constructor uses the provided devicePath', () => {
@@ -278,6 +280,58 @@ describe('StreamDeck', () => {
 		expect(upSpy).toHaveBeenNthCalledWith(1, 0)
 	})
 })
+
+// describe('StreamDeck (Flipped keymap)', () => {
+// 	const devicePath = 'some_random_path_here'
+// 	let streamDeck: StreamDeck
+// 	function getDevice(sd?: StreamDeck): DummyHID {
+// 		return (sd || (streamDeck as any)).device
+// 	}
+// 	function getDeviceModel(sd?: StreamDeck): DeviceModel {
+// 		return (sd || (streamDeck as any)).DeviceModel
+// 	}
+
+// 	// TODO - check keys are mapped correctly when flipped
+
+// 	beforeEach(() => {
+// 		streamDeck = new StreamDeck(devicePath, false)
+// 	})
+
+// 	test('fillColor', () => {
+// 		const model = getDeviceModel()
+
+// 		const fillImageMock = jest.fn()
+// 		;(streamDeck as any).fillImageRange = fillImageMock
+// 		streamDeck.fillColor(0, 1, 2, 3)
+// 		streamDeck.fillColor(4, 1, 2, 3)
+// 		streamDeck.fillColor(7, 1, 2, 3)
+// 		streamDeck.fillColor(14, 1, 2, 3)
+
+// 		expect(fillImageMock).toHaveBeenCalledTimes(4)
+// 		expect(fillImageMock).toHaveBeenNthCalledWith(1, 4, expect.any(Buffer), 0, streamDeck.ICON_SIZE * 3)
+// 		expect(fillImageMock).toHaveBeenNthCalledWith(2, 0, expect.any(Buffer), 0, streamDeck.ICON_SIZE * 3)
+// 		expect(fillImageMock).toHaveBeenNthCalledWith(3, 6, expect.any(Buffer), 0, streamDeck.ICON_SIZE * 3)
+// 		expect(fillImageMock).toHaveBeenNthCalledWith(4, 11, expect.any(Buffer), 0, streamDeck.ICON_SIZE * 3)
+// 	})
+
+// 	test('down and up events', () => {
+// 		const downSpy = jest.fn()
+// 		const upSpy = jest.fn()
+// 		streamDeck.on('down', downSpy)
+// 		streamDeck.on('up', upSpy)
+
+// 		const device = getDevice()
+// 		// prettier-ignore
+// 		device.emit('data', Buffer.from([0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
+// 		// prettier-ignore
+// 		device.emit('data', Buffer.from([0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
+
+// 		expect(downSpy).toHaveBeenCalledTimes(1)
+// 		expect(upSpy).toHaveBeenCalledTimes(1)
+// 		expect(downSpy).toHaveBeenNthCalledWith(1, 0)
+// 		expect(upSpy).toHaveBeenNthCalledWith(1, 0)
+// 	})
+// })
 
 describe('StreamDeck Mini', () => {
 	const devicePath = 'some_path_for_mini'

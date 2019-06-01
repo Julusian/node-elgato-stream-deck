@@ -86,8 +86,9 @@ export class StreamDeck extends EventEmitter {
 	private device: HID
 	private deviceModel: DeviceModel
 	private keyState: boolean[]
+	private useOriginalKeyOrder: boolean
 
-	constructor(devicePath?: string) {
+	constructor(devicePath?: string, useOriginalKeyOrder?: boolean) {
 		super()
 
 		let foundDevices = listStreamDecks()
@@ -105,6 +106,7 @@ export class StreamDeck extends EventEmitter {
 
 		this.deviceModel = DEVICE_MODELS.find(m => m.MODEL_ID === foundDevices[0].model) as DeviceModel
 		this.device = new HID(foundDevices[0].path)
+		this.useOriginalKeyOrder = !!useOriginalKeyOrder
 
 		this.keyState = new Array(this.NUM_KEYS).fill(false)
 
@@ -115,13 +117,14 @@ export class StreamDeck extends EventEmitter {
 
 			for (let i = 0; i < this.NUM_KEYS; i++) {
 				const keyPressed = Boolean(data[i])
-				const stateChanged = keyPressed !== this.keyState[i]
+				const keyIndex = this.horizontalFlipKeyIndex(i)
+				const stateChanged = keyPressed !== this.keyState[keyIndex]
 				if (stateChanged) {
-					this.keyState[i] = keyPressed
+					this.keyState[keyIndex] = keyPressed
 					if (keyPressed) {
-						this.emit('down', i)
+						this.emit('down', keyIndex)
 					} else {
-						this.emit('up', i)
+						this.emit('up', keyIndex)
 					}
 				}
 			}
@@ -159,7 +162,8 @@ export class StreamDeck extends EventEmitter {
 		StreamDeck.checkRGBValue(b)
 
 		const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]))
-		this.fillImageRange(keyIndex, pixels, 0, this.ICON_SIZE * 3)
+		const keyIndex2 = this.horizontalFlipKeyIndex(keyIndex)
+		this.fillImageRange(keyIndex2, pixels, 0, this.ICON_SIZE * 3)
 	}
 
 	/**
@@ -175,7 +179,8 @@ export class StreamDeck extends EventEmitter {
 			throw new RangeError(`Expected image buffer of length ${this.ICON_BYTES}, got length ${imageBuffer.length}`)
 		}
 
-		this.fillImageRange(keyIndex, imageBuffer, 0, this.ICON_SIZE * 3)
+		const keyIndex2 = this.horizontalFlipKeyIndex(keyIndex)
+		this.fillImageRange(keyIndex2, imageBuffer, 0, this.ICON_SIZE * 3)
 	}
 
 	/**
@@ -266,6 +271,17 @@ export class StreamDeck extends EventEmitter {
 	 */
 	public getSerialNumber() {
 		return numberArrayToString(this.device.getFeatureReport(3, 17).slice(5))
+	}
+
+	private horizontalFlipKeyIndex(keyIndex: KeyIndex): KeyIndex {
+		if (!this.useOriginalKeyOrder && this.deviceModel.KEY_DIRECTION === 'rtl') {
+			// Horizontal flip
+			const half = (this.KEY_COLUMNS - 1) / 2
+			const diff = ((keyIndex % this.KEY_COLUMNS) - half) * -half
+			return keyIndex + diff
+		} else {
+			return keyIndex
+		}
 	}
 
 	private fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOffset: number, sourceStride: number) {

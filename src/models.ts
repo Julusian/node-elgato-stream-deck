@@ -13,6 +13,7 @@ export abstract class DeviceModel {
 
 	public readonly KEY_COLS: number
 	public readonly KEY_ROWS: number
+	public readonly KEY_DIRECTION: 'ltr' | 'rtl'
 
 	get NUM_KEYS() {
 		return this.KEY_COLS * this.KEY_ROWS
@@ -52,6 +53,7 @@ export const DEVICE_MODELS: DeviceModel[] = [
 		public readonly IMAGE_SIZE = 72
 		public readonly IMAGE_BORDER = 0
 		public readonly IMAGE_PPM = 3780
+		public readonly KEY_DIRECTION = 'rtl'
 
 		public generateFillImageWrites(
 			keyIndex: KeyIndex,
@@ -101,6 +103,7 @@ export const DEVICE_MODELS: DeviceModel[] = [
 		public readonly IMAGE_SIZE = 72
 		public readonly IMAGE_BORDER = 4
 		public readonly IMAGE_PPM = 2835
+		public readonly KEY_DIRECTION = 'ltr'
 
 		public generateFillImageWrites(
 			keyIndex: KeyIndex,
