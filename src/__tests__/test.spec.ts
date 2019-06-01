@@ -212,7 +212,9 @@ function runForDevice(modelId: DeviceModelId, path: string) {
 		expect(fillImageMock).toHaveBeenCalledTimes(1)
 		expect(fillImageMock).toHaveBeenCalledWith(4, expect.any(Buffer), 0, modelInfo.IMAGE_SIZE * 3)
 		// console.log(JSON.stringify(bufferToIntArray(fillImageMock.mock.calls[0][1])))
-		expect(bufferToIntArray(fillImageMock.mock.calls[0][1])).toEqual(readFixtureJSON('fillColor-buffer.json'))
+		expect(bufferToIntArray(fillImageMock.mock.calls[0][1])).toEqual(
+			readFixtureJSON(`fillColor-buffer-${modelInfo.IMAGE_SIZE}.json`)
+		)
 	})
 
 	test('fillColor bad rgb', () => {
@@ -303,7 +305,7 @@ describe('StreamDeck Mini', () => {
 		const device = getDevice()
 		device.write = jest.fn()
 		expect(device.write).toHaveBeenCalledTimes(0)
-		streamDeck.fillImage(0, Buffer.from(readFixtureJSON('fillImage-sample-icon.json')))
+		streamDeck.fillImage(0, Buffer.from(readFixtureJSON('fillImage-sample-icon-80.json')))
 
 		// TODO - generate json files once this code has been tested with the mini
 		// validateWriteCall(device.write, [

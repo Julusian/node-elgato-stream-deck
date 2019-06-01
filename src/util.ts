@@ -24,8 +24,7 @@ export function imageToByteArray(
 	sourceStride: number,
 	transformCoordinates: (x: number, y: number) => { x: number; y: number }
 ) {
-	const paddedImageSize = model.IMAGE_SIZE + model.IMAGE_BORDER * 2
-	const byteBuffer = Buffer.alloc(paddedImageSize * paddedImageSize * 3)
+	const byteBuffer = Buffer.alloc(model.IMAGE_BYTES)
 
 	for (let y = 0; y < model.IMAGE_SIZE; y++) {
 		const rowBytes: number[] = []
@@ -39,9 +38,7 @@ export function imageToByteArray(
 			rowBytes.push(blue, green, red)
 		}
 
-		const rowOffset = paddedImageSize * 3 * (y + model.IMAGE_BORDER)
-		const destOffset = rowOffset + model.IMAGE_BORDER * 3
-		byteBuffer.set(rowBytes, destOffset)
+		byteBuffer.set(rowBytes, model.IMAGE_SIZE * 3 * y)
 	}
 
 	return byteBuffer
@@ -53,19 +50,19 @@ export function buildBMPHeader(model: DeviceModel): Buffer {
 
 	// Bitmap file header
 	buf.write('BM')
-	buf.writeUInt32LE(model.PADDED_ICON_BYTES + 54, 2)
+	buf.writeUInt32LE(model.IMAGE_BYTES + 54, 2)
 	buf.writeInt16LE(0, 6)
 	buf.writeInt16LE(0, 8)
 	buf.writeUInt32LE(54, 10) // Full header size
 
 	// DIB header (BITMAPINFOHEADER)
 	buf.writeUInt32LE(40, 14) // DIB header size
-	buf.writeInt32LE(model.PADDED_ICON_SIZE, 18)
-	buf.writeInt32LE(model.PADDED_ICON_SIZE, 22)
+	buf.writeInt32LE(model.IMAGE_SIZE, 18)
+	buf.writeInt32LE(model.IMAGE_SIZE, 22)
 	buf.writeInt16LE(1, 26) // Color planes
 	buf.writeInt16LE(24, 28) // Bit depth
 	buf.writeInt32LE(0, 30) // Compression
-	buf.writeInt32LE(model.PADDED_ICON_BYTES, 34) // Image size
+	buf.writeInt32LE(model.IMAGE_BYTES, 34) // Image size
 	buf.writeInt32LE(model.IMAGE_PPM, 38) // Horizontal resolution ppm
 	buf.writeInt32LE(model.IMAGE_PPM, 42) // Vertical resolution ppm
 	buf.writeInt32LE(0, 46) // Colour pallette size

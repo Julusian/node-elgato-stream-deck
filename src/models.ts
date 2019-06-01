@@ -19,18 +19,10 @@ export abstract class DeviceModel {
 	}
 
 	public readonly IMAGE_SIZE: number
-	public readonly IMAGE_BORDER: number
 	public readonly IMAGE_PPM: number
 
 	get IMAGE_BYTES() {
 		return this.IMAGE_SIZE * this.IMAGE_SIZE * 3
-	}
-
-	get PADDED_ICON_SIZE() {
-		return this.IMAGE_SIZE + this.IMAGE_BORDER * 2
-	}
-	get PADDED_ICON_BYTES() {
-		return this.PADDED_ICON_SIZE * this.PADDED_ICON_SIZE * 3
 	}
 
 	public abstract generateFillImageWrites(
@@ -50,7 +42,6 @@ export const DEVICE_MODELS: DeviceModel[] = [
 		public readonly KEY_COLS = 5
 		public readonly KEY_ROWS = 3
 		public readonly IMAGE_SIZE = 72
-		public readonly IMAGE_BORDER = 0
 		public readonly IMAGE_PPM = 3780
 
 		public generateFillImageWrites(
@@ -70,7 +61,7 @@ export const DEVICE_MODELS: DeviceModel[] = [
 			// The original uses larger packets, and splits the payload equally across 2
 
 			const bmpHeader = buildBMPHeader(this)
-			const bytesCount = this.PADDED_ICON_BYTES + bmpHeader.length
+			const bytesCount = this.IMAGE_BYTES + bmpHeader.length
 			const frame1Bytes = bytesCount / 2 - bmpHeader.length
 
 			const packet1 = Buffer.alloc(this.MAX_PACKET_SIZE)
@@ -98,8 +89,7 @@ export const DEVICE_MODELS: DeviceModel[] = [
 		public readonly MAX_PACKET_SIZE = 1024
 		public readonly KEY_COLS = 3
 		public readonly KEY_ROWS = 2
-		public readonly IMAGE_SIZE = 72
-		public readonly IMAGE_BORDER = 4
+		public readonly IMAGE_SIZE = 80
 		public readonly IMAGE_PPM = 2835
 
 		public generateFillImageWrites(
@@ -122,7 +112,7 @@ export const DEVICE_MODELS: DeviceModel[] = [
 
 			let byteOffset = 0
 			const firstPart = 0
-			for (let part = firstPart; byteOffset < this.PADDED_ICON_BYTES; part++) {
+			for (let part = firstPart; byteOffset < this.IMAGE_BYTES; part++) {
 				const packet = Buffer.alloc(this.MAX_PACKET_SIZE)
 				const header = buildFillImageCommandHeader(keyIndex, part, false) // isLast gets set later if needed
 				packet.set(header, 0)
@@ -137,7 +127,7 @@ export const DEVICE_MODELS: DeviceModel[] = [
 				byteBuffer.copy(packet, nextPosition, byteOffset, byteOffset + byteCount)
 				byteOffset += byteCount
 
-				if (byteOffset >= this.PADDED_ICON_BYTES) {
+				if (byteOffset >= this.IMAGE_BYTES) {
 					// Reached the end of the payload
 					packet.set(buildFillImageCommandHeader(keyIndex, part, true), 0)
 				}
