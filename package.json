@@ -19,8 +19,7 @@
     "url": "https://alexvan.camp/",
     "twitter": "vancamp"
   },
-  "contributors": [
-    {
+  "contributors": [{
       "name": "Håkon Nessjøen",
       "email": "haakon@bitfocus.io"
     },
@@ -88,6 +87,7 @@
     "jest": "^24.7.1",
     "jest-haste-map": "^24.7.1",
     "jest-resolve": "^24.7.1",
+    "jpeg-turbo": "^0.4.0",
     "node-license-validator": "^1.3.0",
     "open-cli": "^5.0.0",
     "prettier": "^1.17.1",
