@@ -1,9 +1,7 @@
 import { KeyIndex } from '.'
 
-import { encode as encodeJPEG } from 'jpeg-js'
+import { encodeJPEG } from './jpeg'
 import { bufferToIntArray, buildBMPHeader, buildFillImageCommandHeader, imageToByteArray } from './util'
-
-import * as jpegTurbo from 'jpeg-turbo'
 
 export enum DeviceModelId {
 	ORIGINAL = 'original',
@@ -189,35 +187,7 @@ export const DEVICE_MODELS: DeviceModel[] = [
 				'rgba'
 			)
 
-			let jpegBuffer: Buffer | undefined
-			try {
-				if (jpegTurbo) {
-					const options: jpegTurbo.EncodeOptions = {
-						format: jpegTurbo.FORMAT_RGBA,
-						width: this.PADDED_ICON_SIZE,
-						height: this.PADDED_ICON_SIZE,
-						quality: 95
-					}
-					const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(options))
-					jpegBuffer = jpegTurbo.compressSync(byteBuffer, tmpBuffer, options)
-				}
-			} catch (e) {
-				// TODO - log?
-				// jpegTurbo = undefined
-				jpegBuffer = undefined
-			}
-
-			if (!jpegBuffer) {
-				const jpegBuffer2 = encodeJPEG(
-					{
-						width: this.PADDED_ICON_SIZE,
-						height: this.PADDED_ICON_SIZE,
-						data: byteBuffer
-					},
-					95
-				)
-				jpegBuffer = jpegBuffer2.data
-			}
+			const jpegBuffer = encodeJPEG(byteBuffer, this.PADDED_ICON_SIZE, this.PADDED_ICON_SIZE)
 
 			const result: number[][] = []
 
