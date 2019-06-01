@@ -9,6 +9,10 @@ addons:
     packages:
       - libusb-1.0-0-dev
       - libudev-dev
+      - yasm
+  homebrew:
+    packages:
+      - yasm
 node_js:
   - v8
   - v10
