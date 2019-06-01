@@ -3,6 +3,8 @@ import { KeyIndex } from '.'
 import { encode as encodeJPEG } from 'jpeg-js'
 import { bufferToIntArray, buildBMPHeader, buildFillImageCommandHeader, imageToByteArray } from './util'
 
+import * as jpegTurbo from 'jpeg-turbo'
+
 export enum DeviceModelId {
 	ORIGINAL = 'original',
 	MINI = 'mini',
@@ -178,7 +180,7 @@ export const DEVICE_MODELS: DeviceModel[] = [
 			sourceOffset: number,
 			sourceStride: number
 		): number[][] {
-			const byteBuffer2 = imageToByteArray(
+			const byteBuffer = imageToByteArray(
 				this,
 				sourceBuffer,
 				sourceOffset,
@@ -187,14 +189,35 @@ export const DEVICE_MODELS: DeviceModel[] = [
 				'rgba'
 			)
 
-			const jpegBuffer = encodeJPEG(
-				{
-					width: this.PADDED_ICON_SIZE,
-					height: this.PADDED_ICON_SIZE,
-					data: byteBuffer2
-				},
-				80
-			)
+			let jpegBuffer: Buffer | undefined
+			try {
+				if (jpegTurbo) {
+					const options: jpegTurbo.EncodeOptions = {
+						format: jpegTurbo.FORMAT_RGBA,
+						width: this.PADDED_ICON_SIZE,
+						height: this.PADDED_ICON_SIZE,
+						quality: 80
+					}
+					const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(options))
+					jpegBuffer = jpegTurbo.compressSync(byteBuffer, tmpBuffer, options)
+				}
+			} catch (e) {
+				// TODO - log?
+				// jpegTurbo = undefined
+				jpegBuffer = undefined
+			}
+
+			if (!jpegBuffer) {
+				const jpegBuffer2 = encodeJPEG(
+					{
+						width: this.PADDED_ICON_SIZE,
+						height: this.PADDED_ICON_SIZE,
+						data: byteBuffer
+					},
+					80
+				)
+				jpegBuffer = jpegBuffer2.data
+			}
 
 			// The xl use smaller packets and chunk to fill as few as possible
 
@@ -202,17 +225,17 @@ export const DEVICE_MODELS: DeviceModel[] = [
 
 			let byteOffset = 0
 			const firstPart = 0
-			for (let part = firstPart; byteOffset < jpegBuffer.data.length; part++) {
-				const remainingBytes = jpegBuffer.data.length - byteOffset
+			for (let part = firstPart; byteOffset < jpegBuffer.length; part++) {
+				const remainingBytes = jpegBuffer.length - byteOffset
 				const packet = Buffer.alloc(this.MAX_PACKET_SIZE)
 
 				const byteCount = Math.min(remainingBytes, this.MAX_PACKET_SIZE - 8)
 				this.writeFillImageCommandHeader(packet, keyIndex, part, false, byteCount) // isLast gets set later if needed
 
-				jpegBuffer.data.copy(packet, 8, byteOffset, byteOffset + byteCount)
+				jpegBuffer.copy(packet, 8, byteOffset, byteOffset + byteCount)
 				byteOffset += byteCount
 
-				if (byteOffset >= jpegBuffer.data.length) {
+				if (byteOffset >= jpegBuffer.length) {
 					// Reached the end of the payload
 					this.writeFillImageCommandHeader(packet, keyIndex, part, true, byteCount)
 				}

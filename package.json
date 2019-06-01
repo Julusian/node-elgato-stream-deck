@@ -109,5 +109,8 @@
   "standard-version": {
     "message": "chore(release): %s [skip ci]",
     "tagPrefix": ""
+  },
+  "optionalDependencies": {
+    "jpeg-turbo": "^0.4.0"
   }
 }

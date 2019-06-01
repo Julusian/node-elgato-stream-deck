@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events'
-import { devices as HIDdevices, HID, setDriverType as HIDsetDriverType } from 'node-hid'
+import * as HID from 'node-hid'
 
 import { DEVICE_MODELS, DeviceModel, DeviceModelId } from './models'
 import { numberArrayToString } from './util'
@@ -16,14 +16,14 @@ export interface StreamDeckDeviceInfo {
  * The original StreamDeck uses packet sizes too larged for the hidraw driver which is
  * the default on linux. https://github.com/node-hid/node-hid/issues/249
  */
-HIDsetDriverType('libusb')
+HID.setDriverType('libusb')
 
 /**
  * List detected devices
  */
 export function listStreamDecks(): StreamDeckDeviceInfo[] {
 	const devices: StreamDeckDeviceInfo[] = []
-	for (const dev of HIDdevices()) {
+	for (const dev of HID.devices()) {
 		const model = DEVICE_MODELS.find(m => m.PRODUCT_ID === dev.productId)
 
 		if (model && dev.vendorId === 0x0fd9 && dev.path) {
@@ -83,7 +83,7 @@ export class StreamDeck extends EventEmitter {
 		}
 	}
 
-	private device: HID
+	private device: HID.HID
 	private deviceModel: DeviceModel
 	private keyState: boolean[]
 	private useOriginalKeyOrder: boolean
@@ -105,7 +105,7 @@ export class StreamDeck extends EventEmitter {
 		}
 
 		this.deviceModel = DEVICE_MODELS.find(m => m.MODEL_ID === foundDevices[0].model) as DeviceModel
-		this.device = new HID(foundDevices[0].path)
+		this.device = new HID.HID(foundDevices[0].path)
 		this.useOriginalKeyOrder = !!useOriginalKeyOrder
 
 		this.keyState = new Array(this.NUM_KEYS).fill(false)
