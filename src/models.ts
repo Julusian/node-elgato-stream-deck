@@ -121,7 +121,7 @@ export const DEVICE_MODELS: DeviceModel[] = [
 			const result: number[][] = []
 
 			let byteOffset = 0
-			const firstPart = 1
+			const firstPart = 0
 			for (let part = firstPart; byteOffset < this.PADDED_ICON_BYTES; part++) {
 				const packet = Buffer.alloc(this.MAX_PACKET_SIZE)
 				const header = buildFillImageCommandHeader(keyIndex, part, false) // isLast gets set later if needed
@@ -149,7 +149,7 @@ export const DEVICE_MODELS: DeviceModel[] = [
 		}
 
 		private rotateCoordinates(x: number, y: number): { x: number; y: number } {
-			return { x: y, y: x }
+			return { x: this.IMAGE_SIZE - y - 1, y: x }
 		}
 	})()
 ]
