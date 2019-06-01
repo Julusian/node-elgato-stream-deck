@@ -169,8 +169,8 @@ export const DEVICE_MODELS: DeviceModel[] = [
 		public readonly MAX_PACKET_SIZE = 1024
 		public readonly KEY_COLS = 8
 		public readonly KEY_ROWS = 4
-		public readonly IMAGE_SIZE = 72
-		public readonly IMAGE_BORDER = 12
+		public readonly IMAGE_SIZE = 96
+		public readonly IMAGE_BORDER = 0
 		// public readonly IMAGE_PPM = 2835 // Unused
 		public readonly KEY_DIRECTION = 'ltr'
 
@@ -196,7 +196,7 @@ export const DEVICE_MODELS: DeviceModel[] = [
 						format: jpegTurbo.FORMAT_RGBA,
 						width: this.PADDED_ICON_SIZE,
 						height: this.PADDED_ICON_SIZE,
-						quality: 80
+						quality: 95
 					}
 					const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(options))
 					jpegBuffer = jpegTurbo.compressSync(byteBuffer, tmpBuffer, options)
@@ -214,12 +214,10 @@ export const DEVICE_MODELS: DeviceModel[] = [
 						height: this.PADDED_ICON_SIZE,
 						data: byteBuffer
 					},
-					80
+					95
 				)
 				jpegBuffer = jpegBuffer2.data
 			}
-
-			// The xl use smaller packets and chunk to fill as few as possible
 
 			const result: number[][] = []
 
@@ -262,7 +260,7 @@ export const DEVICE_MODELS: DeviceModel[] = [
 		}
 
 		private rotateCoordinates(x: number, y: number): { x: number; y: number } {
-			return { x, y: this.IMAGE_SIZE - y - 1 }
+			return { x: this.IMAGE_SIZE - x - 1, y: this.IMAGE_SIZE - y - 1 }
 		}
 	})()
 ]

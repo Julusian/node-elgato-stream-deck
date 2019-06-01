@@ -198,7 +198,12 @@ export class StreamDeck extends EventEmitter {
 
 		for (let row = 0; row < this.KEY_ROWS; row++) {
 			for (let column = 0; column < this.KEY_COLUMNS; column++) {
-				const index = row * this.KEY_COLUMNS + this.KEY_COLUMNS - column - 1
+				let index = row * this.KEY_COLUMNS
+				if (this.deviceModel.KEY_DIRECTION === 'ltr') {
+					index += column
+				} else {
+					index += this.KEY_COLUMNS - column - 1
+				}
 
 				const stride = this.ICON_SIZE * 3 * this.KEY_COLUMNS
 				const rowOffset = stride * row * this.ICON_SIZE
