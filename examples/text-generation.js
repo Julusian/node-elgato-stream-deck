@@ -2,9 +2,9 @@ const sharp = require('sharp')
 const path = require('path')
 const PImage = require('pureimage')
 const streamBuffers = require('stream-buffers')
-const { StreamDeck } = require('../dist/index')
+const { openStreamDeck } = require('../dist/index')
 
-const streamDeck = new StreamDeck()
+const streamDeck = openStreamDeck()
 streamDeck.clearAllKeys()
 
 const font = PImage.registerFont(path.resolve(__dirname, 'fixtures/SourceSansPro-Regular.ttf'), 'Source Sans Pro')

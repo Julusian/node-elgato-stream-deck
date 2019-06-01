@@ -1,6 +1,6 @@
-const { StreamDeck } = require('../dist/index')
+const { openStreamDeck } = require('../dist/index')
 
-const streamDeck = new StreamDeck()
+const streamDeck = openStreamDeck()
 streamDeck.clearAllKeys()
 
 streamDeck.on('down', keyIndex => {

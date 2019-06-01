@@ -1,5 +1,5 @@
-const { StreamDeck } = require('../dist/index')
-const streamDeck = new StreamDeck()
+const { openStreamDeck } = require('../dist/index')
+const streamDeck = openStreamDeck()
 
 streamDeck.on('error', error => {
 	console.error(error)

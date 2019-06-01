@@ -9,7 +9,7 @@ import { devices, HID } from 'node-hid'
 mocked(HID).mockImplementation((path: any) => new DummyHID(path))
 
 // Must be required after we register a mock for `node-hid`.
-import { getStreamDeckInfo, listStreamDecks, StreamDeck } from '../'
+import { getStreamDeckInfo, listStreamDecks, openStreamDeck } from '../'
 
 describe('StreamDeck Devices', () => {
 	test('no devices', () => {
@@ -147,11 +147,11 @@ describe('StreamDeck Devices', () => {
 			}
 		])
 
-		expect(() => new StreamDeck('not-a-real-path')).toThrowError(
+		expect(() => openStreamDeck('not-a-real-path')).toThrowError(
 			new Error(`Device "not-a-real-path" was not found`)
 		)
 
-		expect(() => new StreamDeck('path-bad-product')).toThrowError(
+		expect(() => openStreamDeck('path-bad-product')).toThrowError(
 			new Error(`Device "path-bad-product" was not found`)
 		)
 	})

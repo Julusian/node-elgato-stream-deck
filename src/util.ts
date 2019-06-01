@@ -1,5 +1,3 @@
-import { DeviceModel } from './models'
-
 export function bufferToIntArray(buffer: Buffer): number[] {
 	const array: number[] = []
 	for (const pair of buffer.entries()) {
@@ -18,19 +16,20 @@ export function numberArrayToString(array: number[]): string {
 }
 
 export function imageToByteArray(
-	model: DeviceModel,
 	imageBuffer: Buffer,
 	sourceOffset: number,
 	sourceStride: number,
 	transformCoordinates: (x: number, y: number) => { x: number; y: number },
-	colorMode: 'bgr' | 'rgba'
+	colorMode: 'bgr' | 'rgba',
+	imageSize: number,
+	imagePadding: number
 ) {
-	const paddedImageSize = model.IMAGE_SIZE + model.IMAGE_BORDER * 2
+	const paddedImageSize = imageSize + imagePadding * 2
 	const byteBuffer = Buffer.alloc(paddedImageSize * paddedImageSize * colorMode.length)
 
-	for (let y = 0; y < model.IMAGE_SIZE; y++) {
+	for (let y = 0; y < imageSize; y++) {
 		const rowBytes: number[] = []
-		for (let x = 0; x < model.IMAGE_SIZE; x++) {
+		for (let x = 0; x < imageSize; x++) {
 			const { x: x2, y: y2 } = transformCoordinates(x, y)
 			const i = y2 * sourceStride + sourceOffset + x2 * 3
 
@@ -45,35 +44,35 @@ export function imageToByteArray(
 			}
 		}
 
-		const rowOffset = paddedImageSize * colorMode.length * (y + model.IMAGE_BORDER)
-		const destOffset = rowOffset + model.IMAGE_BORDER * colorMode.length
+		const rowOffset = paddedImageSize * colorMode.length * (y + imagePadding)
+		const destOffset = rowOffset + imagePadding * colorMode.length
 		byteBuffer.set(rowBytes, destOffset)
 	}
 
 	return byteBuffer
 }
 
-export function buildBMPHeader(model: DeviceModel): Buffer {
+export function buildBMPHeader(iconSize: number, iconBytes: number, imagePPM: number): Buffer {
 	// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
 	const buf = Buffer.alloc(54)
 
 	// Bitmap file header
 	buf.write('BM')
-	buf.writeUInt32LE(model.PADDED_ICON_BYTES + 54, 2)
+	buf.writeUInt32LE(iconBytes + 54, 2)
 	buf.writeInt16LE(0, 6)
 	buf.writeInt16LE(0, 8)
 	buf.writeUInt32LE(54, 10) // Full header size
 
 	// DIB header (BITMAPINFOHEADER)
 	buf.writeUInt32LE(40, 14) // DIB header size
-	buf.writeInt32LE(model.PADDED_ICON_SIZE, 18)
-	buf.writeInt32LE(model.PADDED_ICON_SIZE, 22)
+	buf.writeInt32LE(iconSize, 18)
+	buf.writeInt32LE(iconSize, 22)
 	buf.writeInt16LE(1, 26) // Color planes
 	buf.writeInt16LE(24, 28) // Bit depth
 	buf.writeInt32LE(0, 30) // Compression
-	buf.writeInt32LE(model.PADDED_ICON_BYTES, 34) // Image size
-	buf.writeInt32LE(model.IMAGE_PPM, 38) // Horizontal resolution ppm
-	buf.writeInt32LE(model.IMAGE_PPM, 42) // Vertical resolution ppm
+	buf.writeInt32LE(iconBytes, 34) // Image size
+	buf.writeInt32LE(imagePPM, 38) // Horizontal resolution ppm
+	buf.writeInt32LE(imagePPM, 42) // Vertical resolution ppm
 	buf.writeInt32LE(0, 46) // Colour pallette size
 	buf.writeInt32LE(0, 50) // 'Important' Colour count
 

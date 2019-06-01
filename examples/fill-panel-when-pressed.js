@@ -1,10 +1,10 @@
 const path = require('path')
 const sharp = require('sharp')
-const { StreamDeck } = require('../dist/index')
+const { openStreamDeck } = require('../dist/index')
 
 console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the second image.')
 ;(async () => {
-	const streamDeck = new StreamDeck()
+	const streamDeck = openStreamDeck()
 	streamDeck.clearAllKeys()
 
 	const imgField = await sharp(path.resolve(__dirname, 'fixtures/sunny_field.png'))

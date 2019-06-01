@@ -1,9 +1,9 @@
 const path = require('path')
 const sharp = require('sharp')
-const { StreamDeck } = require('../dist/index')
+const { openStreamDeck } = require('../dist/index')
 
 ;(async () => {
-	const streamDeck = new StreamDeck()
+	const streamDeck = openStreamDeck()
 	streamDeck.clearAllKeys()
 
 	const img = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
