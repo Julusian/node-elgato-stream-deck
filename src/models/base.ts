@@ -224,7 +224,6 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 	}
 
 	public resetToLogo() {
-		// TODO - test for XL
 		// prettier-ignore
 		const resetCommandBuffer = [
 			0x0B, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -235,12 +234,10 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 	}
 
 	public getFirmwareVersion() {
-		// TODO - fix for XL
 		return numberArrayToString(this.device.getFeatureReport(4, 17).slice(5))
 	}
 
 	public getSerialNumber() {
-		// TODO - fix for XL
 		return numberArrayToString(this.device.getFeatureReport(3, 17).slice(5))
 	}
 

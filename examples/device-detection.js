@@ -16,6 +16,8 @@ function addDevice(info) {
 	// Fill one key in red
 	streamDecks[path].fillColor(0, 255, 0, 0)
 
+	streamDecks[path].resetToLogo()
+
 	streamDecks[path].on('error', e => {
 		console.log(e)
 		// assuming any error means we lost connection

@@ -45,7 +45,7 @@ import { openStreamDeck, StreamDeck } from '../'
 import { DeviceModelId } from '../models'
 import { bufferToIntArray } from '../util'
 
-function runForDevice(path: string, brightness: boolean) {
+function runForDevice(path: string, model: DeviceModelId) {
 	let streamDeck: StreamDeck
 	function getDevice(sd?: StreamDeck): DummyHID {
 		return (sd || (streamDeck as any)).device
@@ -100,7 +100,7 @@ function runForDevice(path: string, brightness: boolean) {
 		expect(errorSpy).toHaveBeenNthCalledWith(1, new Error('Test'))
 	})
 
-	if (brightness) {
+	if (model !== DeviceModelId.XL) {
 		test('setBrightness', () => {
 			const device = getDevice()
 			device.sendFeatureReport = jest.fn()
@@ -117,38 +117,38 @@ function runForDevice(path: string, brightness: boolean) {
 			expect(() => streamDeck.setBrightness(101)).toThrow()
 			expect(() => streamDeck.setBrightness(-1)).toThrow()
 		})
+
+		test('resetToLogo', () => {
+			const device = getDevice()
+			device.sendFeatureReport = jest.fn()
+
+			streamDeck.resetToLogo()
+
+			expect(device.sendFeatureReport).toHaveBeenCalledTimes(1)
+			// prettier-ignore
+			expect(device.sendFeatureReport).toHaveBeenNthCalledWith(1, [0x0B, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+		})
+
+		test('firmwareVersion', () => {
+			const device = getDevice()
+			device.getFeatureReport = () => {
+				return [4, 85, 170, 212, 4, 49, 46, 48, 46, 49, 55, 48, 49, 51, 51, 0, 0]
+			}
+
+			const firmware = streamDeck.getFirmwareVersion()
+			expect(firmware).toEqual('1.0.170133')
+		})
+
+		test('serialNumber', () => {
+			const device = getDevice()
+			device.getFeatureReport = () => {
+				return [3, 85, 170, 211, 3, 65, 76, 51, 55, 71, 49, 65, 48, 50, 56, 52, 48]
+			}
+
+			const firmware = streamDeck.getSerialNumber()
+			expect(firmware).toEqual('AL37G1A02840')
+		})
 	}
-
-	test('resetToLogo', () => {
-		const device = getDevice()
-		device.sendFeatureReport = jest.fn()
-
-		streamDeck.resetToLogo()
-
-		expect(device.sendFeatureReport).toHaveBeenCalledTimes(1)
-		// prettier-ignore
-		expect(device.sendFeatureReport).toHaveBeenNthCalledWith(1, [0x0B, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
-	})
-
-	test('firmwareVersion', () => {
-		const device = getDevice()
-		device.getFeatureReport = () => {
-			return [4, 85, 170, 212, 4, 49, 46, 48, 46, 49, 55, 48, 49, 51, 51, 0, 0]
-		}
-
-		const firmware = streamDeck.getFirmwareVersion()
-		expect(firmware).toEqual('1.0.170133')
-	})
-
-	test('serialNumber', () => {
-		const device = getDevice()
-		device.getFeatureReport = () => {
-			return [3, 85, 170, 211, 3, 65, 76, 51, 55, 71, 49, 65, 48, 50, 56, 52, 48]
-		}
-
-		const firmware = streamDeck.getSerialNumber()
-		expect(firmware).toEqual('AL37G1A02840')
-	})
 
 	test('fillPanel', () => {
 		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.ICON_BYTES)
@@ -255,7 +255,7 @@ describe('StreamDeck', () => {
 		expect(streamDeck2.MODEL).toEqual(DeviceModelId.ORIGINAL)
 	})
 
-	runForDevice(devicePath, true)
+	runForDevice(devicePath, DeviceModelId.ORIGINAL)
 
 	test('fillImage', () => {
 		const device = getDevice()
@@ -387,7 +387,7 @@ describe('StreamDeck Mini', () => {
 		expect(streamDeck2.MODEL).toEqual(DeviceModelId.MINI)
 	})
 
-	runForDevice(devicePath, true)
+	runForDevice(devicePath, DeviceModelId.MINI)
 
 	test('fillImage', () => {
 		const device = getDevice()
@@ -456,7 +456,7 @@ describe('StreamDeck XL', () => {
 		expect(streamDeck2.MODEL).toEqual(DeviceModelId.XL)
 	})
 
-	runForDevice(devicePath, false)
+	runForDevice(devicePath, DeviceModelId.XL)
 
 	test('setBrightness', () => {
 		const device = getDevice()
@@ -477,6 +477,38 @@ describe('StreamDeck XL', () => {
 
 		expect(() => streamDeck.setBrightness(101)).toThrow()
 		expect(() => streamDeck.setBrightness(-1)).toThrow()
+	})
+
+	test('resetToLogo', () => {
+		const device = getDevice()
+		device.sendFeatureReport = jest.fn()
+
+		streamDeck.resetToLogo()
+
+		expect(device.sendFeatureReport).toHaveBeenCalledTimes(1)
+		expect(device.sendFeatureReport).toHaveBeenNthCalledWith(1, [0x03, 0x02])
+	})
+
+	test('firmwareVersion', () => {
+		const device = getDevice()
+		device.getFeatureReport = () => {
+			// prettier-ignore
+			return [ 5, 12, 254, 90, 239, 250, 49, 46, 48, 48, 46, 48, 48, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+		}
+
+		const firmware = streamDeck.getFirmwareVersion()
+		expect(firmware).toEqual('1.00.004')
+	})
+
+	test('serialNumber', () => {
+		const device = getDevice()
+		device.getFeatureReport = () => {
+			// prettier-ignore
+			return [ 6, 12, 67, 76, 49, 56, 73, 49, 65, 48, 48, 57, 49, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+		}
+
+		const firmware = streamDeck.getSerialNumber()
+		expect(firmware).toEqual('CL18I1A00913')
 	})
 
 	test('fillImage', () => {

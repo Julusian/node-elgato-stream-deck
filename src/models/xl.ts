@@ -1,5 +1,5 @@
 import { encodeJPEG } from '../jpeg'
-import { imageToByteArray } from '../util'
+import { imageToByteArray, numberArrayToString } from '../util'
 import { StreamDeckBase, StreamDeckProperties } from './base'
 import { DeviceModelId, KeyIndex, StreamDeckDeviceInfo } from './id'
 
@@ -33,6 +33,22 @@ export class StreamDeckXL extends StreamDeckBase {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		]
 		this.device.sendFeatureReport(brightnessCommandBuffer)
+	}
+
+	public resetToLogo() {
+		// prettier-ignore
+		const resetCommandBuffer = [
+			0x03, 0x02
+		]
+		this.device.sendFeatureReport(resetCommandBuffer)
+	}
+
+	public getFirmwareVersion() {
+		return numberArrayToString(this.device.getFeatureReport(5, 32).slice(6))
+	}
+
+	public getSerialNumber() {
+		return numberArrayToString(this.device.getFeatureReport(6, 32).slice(2))
 	}
 
 	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {
