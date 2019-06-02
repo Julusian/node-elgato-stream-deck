@@ -13,8 +13,8 @@ describe('jpeg-library', () => {
 		const img = Buffer.from(readFixtureJSON('fillImage-sample-icon-96.json'))
 
 		// Mock jpeg-turbo so that we can make it crash
-		jest.mock('jpeg-turbo')
-		const jpegTurbo = require('jpeg-turbo')
+		jest.mock('@julusian/jpeg-turbo')
+		const jpegTurbo = require('@julusian/jpeg-turbo')
 		mocked(jpegTurbo.bufferSize).mockImplementation(() => 1000)
 		mocked(jpegTurbo.compressSync).mockImplementation(() => {
 			throw new Error('something failed')
@@ -36,7 +36,7 @@ describe('jpeg-library', () => {
 		const img = Buffer.from(readFixtureJSON('fillImage-sample-icon-96.json'))
 
 		// Mock jpeg-turbo so that we can make it appear not installed
-		jest.doMock('jpeg-turbo', null)
+		jest.doMock('@julusian/jpeg-turbo', null)
 
 		// Mock jpeg-js so we can see that it got used instead of jpeg-turbo
 		jest.doMock('jpeg-js')

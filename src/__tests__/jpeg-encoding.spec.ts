@@ -30,7 +30,7 @@ describe('jpeg-encoding', () => {
 	test('jpeg-js: encoded successfully', async () => {
 		const img = Buffer.from(readFixtureJSON('fillImage-sample-icon-96.json'))
 
-		jest.doMock('jpeg-turbo', null)
+		jest.doMock('@julusian/jpeg-turbo', null)
 		const { encodeJPEG } = require('../jpeg')
 
 		const encoded = encodeJPEG(img, iconSize, iconSize)

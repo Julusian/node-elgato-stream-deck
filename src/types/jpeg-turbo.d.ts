@@ -1,4 +1,4 @@
-declare module 'jpeg-turbo' {
+declare module '@julusian/jpeg-turbo' {
 	export type Format = number
 	export const FORMAT_RGB: Format
 	export const FORMAT_BGR: Format
