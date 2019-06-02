@@ -261,11 +261,11 @@ describe('StreamDeck', () => {
 		const device = getDevice()
 		device.write = jest.fn()
 		expect(device.write).toHaveBeenCalledTimes(0)
-		streamDeck.fillImage(0, Buffer.from(readFixtureJSON('fillImage-sample-icon.json')))
+		streamDeck.fillImage(0, Buffer.from(readFixtureJSON('fillImage-sample-icon-72.json')))
 
 		validateWriteCall(device.write, [
-			'fillImage-sample-icon-original-page1.json',
-			'fillImage-sample-icon-original-page2.json'
+			'fillImage-sample-icon-original/page1.json',
+			'fillImage-sample-icon-original/page2.json'
 		])
 	})
 
