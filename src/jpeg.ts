@@ -18,8 +18,10 @@ export function encodeJPEG(buffer: Buffer, width: number, height: number) {
 				height,
 				quality: 95
 			}
-			const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(options))
-			return jpegTurbo.compressSync(buffer, tmpBuffer, options)
+			if (buffer.length === width * height * 4) {
+				const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(options))
+				return jpegTurbo.compressSync(buffer, tmpBuffer, options)
+			}
 		}
 	} catch (e) {
 		// TODO - log error
