@@ -393,7 +393,7 @@ describe('StreamDeck Mini', () => {
 		const device = getDevice()
 		device.write = jest.fn()
 		expect(device.write).toHaveBeenCalledTimes(0)
-		streamDeck.fillImage(0, Buffer.from(readFixtureJSON('fillImage-sample-icon.json')))
+		streamDeck.fillImage(0, Buffer.from(readFixtureJSON('fillImage-sample-icon-80.json')))
 
 		// TODO - generate json files once this code has been tested with the mini
 		// validateWriteCall(device.write, [

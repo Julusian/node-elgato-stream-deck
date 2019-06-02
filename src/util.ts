@@ -21,11 +21,9 @@ export function imageToByteArray(
 	sourceStride: number,
 	transformCoordinates: (x: number, y: number) => { x: number; y: number },
 	colorMode: 'bgr' | 'rgba',
-	imageSize: number,
-	imagePadding: number
+	imageSize: number
 ) {
-	const paddedImageSize = imageSize + imagePadding * 2
-	const byteBuffer = Buffer.alloc(paddedImageSize * paddedImageSize * colorMode.length)
+	const byteBuffer = Buffer.alloc(imageSize * imageSize * colorMode.length)
 
 	for (let y = 0; y < imageSize; y++) {
 		const rowBytes: number[] = []
@@ -44,9 +42,7 @@ export function imageToByteArray(
 			}
 		}
 
-		const rowOffset = paddedImageSize * colorMode.length * (y + imagePadding)
-		const destOffset = rowOffset + imagePadding * colorMode.length
-		byteBuffer.set(rowBytes, destOffset)
+		byteBuffer.set(rowBytes, imageSize * colorMode.length * y)
 	}
 
 	return byteBuffer
