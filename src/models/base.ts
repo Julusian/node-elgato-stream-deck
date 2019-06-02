@@ -2,7 +2,7 @@ import { EventEmitter } from 'events'
 import * as HID from 'node-hid'
 
 import { DeviceModelId } from '../models'
-import { numberArrayToString } from '../util'
+import { bufferToIntArray, numberArrayToString } from '../util'
 import { KeyIndex, StreamDeckDeviceInfo } from './id'
 
 export interface OpenStreamDeckOptions {
@@ -246,17 +246,59 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 	protected abstract transformKeyIndex(keyIndex: KeyIndex): KeyIndex
 
-	protected abstract generateFillImageWrites(
-		keyIndex: KeyIndex,
-		imageBuffer: Buffer,
-		sourceOffset: number,
-		sourceStride: number
-	): number[][]
+	protected abstract convertFillImage(imageBuffer: Buffer, sourceOffset: number, sourceStride: number): Buffer
+
+	protected getFillImageCommandHeaderLength() {
+		return 16
+	}
+
+	protected writeFillImageCommandHeader(
+		buffer: Buffer,
+		keyIndex: number,
+		partIndex: number,
+		isLast: boolean,
+		_bodyLength: number
+	) {
+		buffer.writeUInt8(0x02, 0)
+		buffer.writeUInt8(0x01, 1)
+		buffer.writeUInt16LE(partIndex, 2)
+		// 3 = 0x00
+		buffer.writeUInt8(isLast ? 1 : 0, 4)
+		buffer.writeUInt8(keyIndex + 1, 5)
+	}
+
+	protected abstract getFillImagePacketLength(): number
+
+	protected generateFillImageWrites(keyIndex: KeyIndex, byteBuffer: Buffer): number[][] {
+		const MAX_PACKET_SIZE = this.getFillImagePacketLength()
+		const PACKET_HEADER_LENGTH = this.getFillImageCommandHeaderLength()
+		const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH
+
+		const result: number[][] = []
+
+		let remainingBytes = byteBuffer.length
+		for (let part = 0; remainingBytes > 0; part++) {
+			const packet = Buffer.alloc(MAX_PACKET_SIZE)
+
+			const byteCount = Math.min(remainingBytes, MAX_PAYLOAD_SIZE)
+			this.writeFillImageCommandHeader(packet, keyIndex, part, remainingBytes <= MAX_PAYLOAD_SIZE, byteCount)
+
+			const byteOffset = byteBuffer.length - remainingBytes
+			remainingBytes -= byteCount
+			byteBuffer.copy(packet, PACKET_HEADER_LENGTH, byteOffset, byteOffset + byteCount)
+
+			result.push(bufferToIntArray(packet))
+		}
+
+		return result
+	}
 
 	private fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOffset: number, sourceStride: number) {
 		this.checkValidKeyIndex(keyIndex)
 
-		const packets = this.generateFillImageWrites(keyIndex, imageBuffer, sourceOffset, sourceStride)
+		const byteBuffer = this.convertFillImage(imageBuffer, sourceOffset, sourceStride)
+
+		const packets = this.generateFillImageWrites(keyIndex, byteBuffer)
 		for (const packet of packets) {
 			this.device.write(packet)
 		}

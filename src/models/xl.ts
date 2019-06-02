@@ -1,5 +1,5 @@
 import { encodeJPEG } from '../jpeg'
-import { bufferToIntArray, imageToByteArray } from '../util'
+import { imageToByteArray } from '../util'
 import { StreamDeckBase, StreamDeckProperties } from './base'
 import { DeviceModelId, KeyIndex, StreamDeckDeviceInfo } from './id'
 
@@ -39,46 +39,11 @@ export class StreamDeckXL extends StreamDeckBase {
 		return keyIndex
 	}
 
-	protected generateFillImageWrites(
-		keyIndex: KeyIndex,
-		sourceBuffer: Buffer,
-		sourceOffset: number,
-		sourceStride: number
-	): number[][] {
-		const MAX_PACKET_SIZE = 1024
-
-		const byteBuffer = imageToByteArray(
-			sourceBuffer,
-			sourceOffset,
-			sourceStride,
-			this.transformCoordinates.bind(this),
-			'rgba',
-			this.ICON_SIZE,
-			0
-		)
-
-		const jpegBuffer = encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE)
-
-		const result: number[][] = []
-
-		let remainingBytes = jpegBuffer.length
-		for (let part = 0; remainingBytes > 0; part++) {
-			const packet = Buffer.alloc(MAX_PACKET_SIZE)
-
-			const byteCount = Math.min(remainingBytes, MAX_PACKET_SIZE - 8)
-			this.writeFillImageCommandHeader(packet, keyIndex, part, remainingBytes <= MAX_PACKET_SIZE - 8, byteCount)
-
-			const byteOffset = jpegBuffer.length - remainingBytes
-			remainingBytes -= byteCount
-			jpegBuffer.copy(packet, 8, byteOffset, byteOffset + byteCount)
-
-			result.push(bufferToIntArray(packet))
-		}
-
-		return result
+	protected getFillImageCommandHeaderLength() {
+		return 8
 	}
 
-	private writeFillImageCommandHeader(
+	protected writeFillImageCommandHeader(
 		buffer: Buffer,
 		keyIndex: number,
 		partIndex: number,
@@ -91,6 +56,24 @@ export class StreamDeckXL extends StreamDeckBase {
 		buffer.writeUInt8(isLast ? 1 : 0, 3)
 		buffer.writeUInt16LE(bodyLength, 4)
 		buffer.writeUInt16LE(partIndex++, 6)
+	}
+
+	protected getFillImagePacketLength() {
+		return 1024
+	}
+
+	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number): Buffer {
+		const byteBuffer = imageToByteArray(
+			sourceBuffer,
+			sourceOffset,
+			sourceStride,
+			0,
+			this.transformCoordinates.bind(this),
+			'rgba',
+			this.ICON_SIZE
+		)
+
+		return encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE)
 	}
 
 	private transformCoordinates(x: number, y: number): { x: number; y: number } {

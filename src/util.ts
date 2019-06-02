@@ -19,11 +19,12 @@ export function imageToByteArray(
 	imageBuffer: Buffer,
 	sourceOffset: number,
 	sourceStride: number,
+	destOffset: number,
 	transformCoordinates: (x: number, y: number) => { x: number; y: number },
 	colorMode: 'bgr' | 'rgba',
 	imageSize: number
 ) {
-	const byteBuffer = Buffer.alloc(imageSize * imageSize * colorMode.length)
+	const byteBuffer = Buffer.alloc(destOffset + imageSize * imageSize * colorMode.length)
 
 	for (let y = 0; y < imageSize; y++) {
 		const rowBytes: number[] = []
@@ -42,15 +43,15 @@ export function imageToByteArray(
 			}
 		}
 
-		byteBuffer.set(rowBytes, imageSize * colorMode.length * y)
+		byteBuffer.set(rowBytes, destOffset + imageSize * colorMode.length * y)
 	}
 
 	return byteBuffer
 }
 
-export function buildBMPHeader(iconSize: number, iconBytes: number, imagePPM: number): Buffer {
+export const BMP_HEADER_LENGTH = 54
+export function writeBMPHeader(buf: Buffer, iconSize: number, iconBytes: number, imagePPM: number) {
 	// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
-	const buf = Buffer.alloc(54)
 
 	// Bitmap file header
 	buf.write('BM')
@@ -71,14 +72,4 @@ export function buildBMPHeader(iconSize: number, iconBytes: number, imagePPM: nu
 	buf.writeInt32LE(imagePPM, 42) // Vertical resolution ppm
 	buf.writeInt32LE(0, 46) // Colour pallette size
 	buf.writeInt32LE(0, 50) // 'Important' Colour count
-
-	return buf
-}
-
-export function buildFillImageCommandHeader(keyIndex: number, partIndex: number, isLast: boolean) {
-	// prettier-ignore
-	return [
-		0x02, 0x01, partIndex, 0x00, isLast ? 0x01 : 0x00, keyIndex + 1, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-	]
 }
