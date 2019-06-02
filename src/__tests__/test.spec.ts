@@ -395,12 +395,28 @@ describe('StreamDeck Mini', () => {
 		expect(device.write).toHaveBeenCalledTimes(0)
 		streamDeck.fillImage(0, Buffer.from(readFixtureJSON('fillImage-sample-icon-80.json')))
 
-		// TODO - generate json files once this code has been tested with the mini
-		// validateWriteCall(device.write, [
-		// 	'fillImage-sample-icon-mini-page1.json',
-		// 	'fillImage-sample-icon-mini-page2.json'
-		// 	// etc
-		// ])
+		validateWriteCall(device.write, [
+			'fillImage-sample-icon-mini/page1.json',
+			'fillImage-sample-icon-mini/page2.json',
+			'fillImage-sample-icon-mini/page3.json',
+			'fillImage-sample-icon-mini/page4.json',
+			'fillImage-sample-icon-mini/page5.json',
+			'fillImage-sample-icon-mini/page6.json',
+			'fillImage-sample-icon-mini/page7.json',
+			'fillImage-sample-icon-mini/page8.json',
+			'fillImage-sample-icon-mini/page9.json',
+			'fillImage-sample-icon-mini/page10.json',
+			'fillImage-sample-icon-mini/page11.json',
+			'fillImage-sample-icon-mini/page12.json',
+			'fillImage-sample-icon-mini/page13.json',
+			'fillImage-sample-icon-mini/page14.json',
+			'fillImage-sample-icon-mini/page15.json',
+			'fillImage-sample-icon-mini/page16.json',
+			'fillImage-sample-icon-mini/page17.json',
+			'fillImage-sample-icon-mini/page18.json',
+			'fillImage-sample-icon-mini/page19.json',
+			'fillImage-sample-icon-mini/page20.json'
+		])
 	})
 
 	test('down and up events', () => {
