@@ -1,20 +1,20 @@
 const path = require('path')
 const sharp = require('sharp')
-const { StreamDeck } = require('../dist/index')
+const { openStreamDeck } = require('../dist/index')
 
 console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the second image.')
 ;(async () => {
-	const streamDeck = new StreamDeck()
+	const streamDeck = openStreamDeck()
 	streamDeck.clearAllKeys()
 
 	const imgField = await sharp(path.resolve(__dirname, 'fixtures/sunny_field.png'))
 		.flatten()
-		.resize(streamDeck.ICON_SIZE * 5, streamDeck.ICON_SIZE * 3)
+		.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
 		.raw()
 		.toBuffer()
 	const imgMosaic = await sharp(path.resolve(__dirname, '../src/__tests__/fixtures/mosaic.png'))
 		.flatten()
-		.resize(streamDeck.ICON_SIZE * 5, streamDeck.ICON_SIZE * 3)
+		.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
 		.raw()
 		.toBuffer()
 
@@ -27,7 +27,7 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 		filled = true
 
 		let image
-		if (keyIndex > 7) {
+		if (keyIndex > streamDeck.NUM_KEYS / 2) {
 			console.log('Filling entire panel with an image of a sunny field.')
 			image = imgField
 		} else {

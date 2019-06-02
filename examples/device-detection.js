@@ -1,17 +1,22 @@
 const usbDetect = require('usb-detection')
-const { listStreamDecks, StreamDeck } = require('../dist/index')
+const { listStreamDecks, openStreamDeck } = require('../dist/index')
 const streamDecks = {}
 
 function addDevice(info) {
 	console.log(info)
 
 	const path = info.path
-	streamDecks[path] = new StreamDeck(path)
+	streamDecks[path] = openStreamDeck(path)
+
+	console.log('Serial:', streamDecks[path].getSerialNumber())
+	console.log('Firmware:', streamDecks[path].getFirmwareVersion())
 
 	// Clear all keys
 	streamDecks[path].clearAllKeys()
 	// Fill one key in red
 	streamDecks[path].fillColor(0, 255, 0, 0)
+
+	streamDecks[path].resetToLogo()
 
 	streamDecks[path].on('error', e => {
 		console.log(e)

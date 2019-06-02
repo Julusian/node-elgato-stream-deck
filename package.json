@@ -75,12 +75,16 @@
     "node": ">=7.6"
   },
   "dependencies": {
+    "jpeg-js": "^0.3.5",
     "node-hid": "^0.7.9"
   },
   "devDependencies": {
+    "@julusian/jpeg-turbo": "^0.5.1",
     "@types/jest": "^24.0.11",
+    "@types/jpeg-js": "^0.3.0",
     "@types/node": "^12.0.4",
     "@types/node-hid": "^0.7.0",
+    "@types/sharp": "^0.22.2",
     "coveralls": "^3.0.3",
     "jest": "^24.7.1",
     "jest-haste-map": "^24.7.1",

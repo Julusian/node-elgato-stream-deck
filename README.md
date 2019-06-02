@@ -1,6 +1,6 @@
 # elgato-stream-deck [![npm version](https://img.shields.io/npm/v/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck) [![license](https://img.shields.io/npm/l/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck) [![Travis](https://travis-ci.org/Lange/node-elgato-stream-deck.svg?branch=master)](https://travis-ci.org/Lange/node-elgato-stream-deck) [![Coverage Status](https://coveralls.io/repos/github/Lange/node-elgato-stream-deck/badge.svg?branch=master)](https://coveralls.io/github/Lange/node-elgato-stream-deck?branch=master) [![Join the chat at https://gitter.im/node-elgato-stream-deck/Lobby](https://badges.gitter.im/node-elgato-stream-deck/Lobby.svg)](https://gitter.im/node-elgato-stream-deck/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-![alt text](media/streamdeck_ui.png "elgato-stream-deck")
+![alt text](media/streamdeck_ui.png 'elgato-stream-deck')
 
 [`elgato-stream-deck`](https://github.com/lange/elgato-stream-deck) is a Node.js library for interfacing
 with the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
@@ -9,11 +9,31 @@ with the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
 >
 > To further clarify: **this is not an installable program**. There is no user interface, and you cannot do anything with this library on its own. Out of the box, this library does nothing. It's purpose is to provide tools for programmers to **build** programs from the ground up which interact with a Stream Deck.
 >
-> This is a tool for developers to use. It is not a program for end users. It cannot and will not replace the official Stream Deck program. That is not its goal. However, it does enable someone to more easily write a program which *does* do that.
+> This is a tool for developers to use. It is not a program for end users. It cannot and will not replace the official Stream Deck program. That is not its goal. However, it does enable someone to more easily write a program which _does_ do that.
 
 ## Install
 
 `$ npm install --save elgato-stream-deck`
+
+`$ npm install --save @julusian/jpeg-turbo@^0.5.1` (Optional)
+
+It is recommended to install `@julusian/jpeg-turbo@^0.5.1` to greatly improve performance for writing images to the StreamDeck XL. Without doing so `jpeg-js` will be used instead, but image transfers will be noticably more cpu intensive and slower. `jpeg-turbo` has prebuilt binaries, but is not installed by default to ensure installation time is kept to a minimum for users who do not need the performance or the XL.
+
+### Linux
+
+On linux, the udev subsystem blocks access to the StreamDeck without some special configuration.
+Save the following to `/etc/udev/rules.d/50-elgato.rules` and reload the rules with `sudo udevadm control --reload-rules`
+
+```
+SUBSYSTEM=="input", GROUP="input", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0060", MODE:="666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0063", MODE:="666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006c", MODE:="666", GROUP="plugdev"
+```
+
+Unplug and replug the device and it should be usable
+
+### Native dependencies
 
 All of this library's native dependencies ship with prebuilt binaries, so having a full compiler toolchain should not be necessary to install `node-elgato-stream-deck`.
 
@@ -53,156 +73,198 @@ However, in the event that installation _does_ fail (**or if you are on a platfo
 
 ## Table of Contents
 
-* [Example](#example)
-* [Features](#features)
-* [Installation](#installation)
-* [Contributing](#contributing)
-* [API](#api)
-  * [`write`](#write)
-  * [`fillColor`](#fill-color)
-  * [`fillImage`](#fill-image)
-  * [`clearKey`](#clear-key)
-  * [`clearAllKeys`](#clear-all-keys)
-  * [`setBrightness`](#set-brightness)
-* [Events](#events)
-  * [`down`](#down)
-  * [`up`](#up)
-  * [`error`](#error)
-* [Protocol Notes](#protocol-notes)
+-   [Features](#features)
+-   [Example](#example)
+-   [API](#api)
+    -   [`openStreamDeck`](#open-streamdeck)
+    -   [`listDevices`](#list-devices)
+    -   [`getStreamDeckInfo`](#get-streamdeck-info)
+    -   [`fillColor`](#fill-color)
+    -   [`fillImage`](#fill-image)
+    -   [`fillPanel`](#fill-panel)
+    -   [`clearKey`](#clear-key)
+    -   [`clearAllKeys`](#clear-all-keys)
+    -   [`setBrightness`](#set-brightness)
+    -   [`resetToLogo`](#reset-to-logo)
+    -   [`getFirmwareVersion`](#get-firmware-version)
+    -   [`getSerialNumber`](#get-serial-number)
+-   [Events](#events)
+    -   [`down`](#down)
+    -   [`up`](#up)
+    -   [`error`](#error)
+-   [Contributing](#contributing)
+-   [Protocol Notes](#protocol-notes)
+
+### Features
+
+-   Multiplatform support: Windows 7-10, MacOS, Linux, and even Raspberry Pi!
+-   Support for every StreamDeck model (Original, Mini & XL)
+-   Key `down` and key `up` events
+-   Fill keys with images or solid RGB colors
+-   Fill the entire panel with a single image, spread across all keys
+-   Set the Stream Deck brightness
+-   TypeScript support
 
 ### Example
 
 #### JavaScript
 
 ```javascript
-const path = require('path');
-const StreamDeck = require('elgato-stream-deck');
+const path = require('path')
+const { openStreamDeck } = require('elgato-stream-deck')
 
 // Automatically discovers connected Stream Decks, and attaches to the first one.
 // Throws if there are no connected stream decks.
 // You also have the option of providing the devicePath yourself as the first argument to the constructor.
 // For example: const myStreamDeck = new StreamDeck('\\\\?\\hid#vid_05f3&pid_0405&mi_00#7&56cf813&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}')
-// Device paths can be obtained via node-hid: https://github.com/node-hid/node-hid
-const myStreamDeck = new StreamDeck();
+// On linux the equivalent would be: const myStreamDeck = new StreamDeck('0001:0021:00')
+// Available devices can be found with listStreamDecks()
+const myStreamDeck = openStreamDeck()
 
 myStreamDeck.on('down', keyIndex => {
-	console.log('key %d down', keyIndex);
-});
+	console.log('key %d down', keyIndex)
+})
 
 myStreamDeck.on('up', keyIndex => {
-	console.log('key %d up', keyIndex);
-});
+	console.log('key %d up', keyIndex)
+})
 
 // Fired whenever an error is detected by the `node-hid` library.
 // Always add a listener for this event! If you don't, errors will be silently dropped.
 myStreamDeck.on('error', error => {
-	console.error(error);
-});
+	console.error(error)
+})
 
 // Fill the first button form the left in the first row with a solid red color. This is synchronous.
-myStreamDeck.fillColor(4, 255, 0, 0);
-console.log('Successfully wrote a red square to key 4.');
+myStreamDeck.fillColor(4, 255, 0, 0)
+console.log('Successfully wrote a red square to key 4.')
 ```
 
 #### TypeScript
 
 ```typescript
-import StreamDeck = require('elgato-stream-deck');
-const myStreamDeck = new StreamDeck(); // Will throw an error if no Stream Decks are connected.
+import { openStreamDeck } = require('elgato-stream-deck')
+const myStreamDeck = openStreamDeck() // Will throw an error if no Stream Decks are connected.
 
 myStreamDeck.on('down', keyIndex => {
-	console.log('key %d down', keyIndex);
-});
+	console.log('key %d down', keyIndex)
+})
 
 myStreamDeck.on('up', keyIndex => {
-	console.log('key %d up', keyIndex);
-});
+	console.log('key %d up', keyIndex)
+})
 
 // Fired whenever an error is detected by the `node-hid` library.
 // Always add a listener for this event! If you don't, errors will be silently dropped.
 myStreamDeck.on('error', error => {
-	console.error(error);
-});
+	console.error(error)
+})
 ```
-
-### Features
-
-* Multiplatform support: Windows 7-10, MacOS, Linux, and even Raspberry Pi!
-* Key `down` and key `up` events
-* Fill keys with images or solid RGB colors
-* Fill the entire panel with a single image, spread across all keys
-* Set the Stream Deck brightness
-* TypeScript support
-
-### Installation
-On linux, the udev subsystem blocks access to the StreamDeck without some special configuration.
-Save the following to `/etc/udev/rules.d/50-elgato.rules` and reload the rules with `sudo udevadm control --reload-rules`
-```
-SUBSYSTEM=="input", GROUP="input", MODE="0666"
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0060", MODE:="666", GROUP="plugdev"
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0063", MODE:="666", GROUP="plugdev"
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006c", MODE:="666", GROUP="plugdev"
-```
-Unplug and replug the device and it should be usable
-
-### Contributing
-
-The elgato-stream-deck team enthusiastically welcomes contributions and project participation! There's a bunch of things you can do if you want to contribute! The [Contributor Guide](CONTRIBUTING.md) has all the information you need for everything from reporting bugs to contributing entire new features. Please don't hesitate to jump in if you'd like to, or even ask us questions if something isn't clear.
-
-All participants and maintainers in this project are expected to follow [Code of Conduct](CODE_OF_CONDUCT.md), and just generally be kind to each other.
-
-Please refer to the [Changelog](CHANGELOG.md) for project history details, too.
 
 ### API
 
-#### <a name="listDevices"></a> `> StreamDeck.listDevices() -> Array`
+#### <a name="open-streamdeck"></a> `> openStreamDeck(path?: string, options?: OpenStreamDeckOptions) -> StreamDeckDeviceInfo | undefined`
+
+Opens a StreamDeck.
+
+If a path is provided, then a specific device will be opened, otherwise the first found device will be used. See [listDevices](#list-devices) for info on how to discover devices.
+
+Some device types have additional options, as part of the options object. This is not required to be provided.
+
+Options:
+
+-   useOriginalKeyOrder: This restores the right-to-left key order for the Original StreamDeck. Since v3.0.0 the default key order has been changed to make sense and be consistent with the other models
+
+```javascript
+const streamDeck = openStreamDeck()
+
+// Or
+
+const streamDeck = openStreamDeck('0001:0021:00')
+
+// Or
+
+const streamDeck = openStreamDeck('0001:0021:00', {
+	useOriginalKeyOrder: true
+})
+```
+
+#### <a name="list-devices"></a> `> listDevices() -> Array<StreamDeckDeviceInfo>`
 
 This will scan for and list all detected StreamDeck devices on the system along with their model. The path property can be passed into the constructor to open a specific device.
 
-#### <a name="write"></a> `> streamDeck.write(buffer) -> undefined`
+```javascript
+console.log('Devices: ', listDevices())
+/**
+ * Devices: [
+ *   {
+ *     model: 'original',
+ *     path: '0001:0023:00',
+ *     serialNumber: 'AL37G1A02840'
+ *   },
+ *   {
+ *     model: 'xl',
+ *     path: '0001:0021:00',
+ *     serialNumber: 'CL18I1A00913'
+ *   }
+ * ]
+ */
+```
 
-Synchronously writes an arbitrary [`Buffer`](https://nodejs.org/api/buffer.html) instance to the Stream Deck.
-Throws if an error is encountered during the write operation.
+#### <a name="get-streamdeck-info"></a> `> getStreamDeckInfo(path: string) -> StreamDeckDeviceInfo | undefined`
 
-##### Example
+Get the info for a given device. Returns `undefined` if the path is not a valid StreamDeck
 
 ```javascript
-// Writes 16 bytes of zero to the Stream Deck.
-streamDeck.write(Buffer.alloc(16));
+console.log('Info: ', getStreamDeckInfo('0001:0021:00'))
+/**
+ * Info: {
+ *   model: 'xl',
+ *   path: '0001:0021:00',
+ *   serialNumber: 'CL18I1A00913'
+ * }
+ */
 ```
 
 #### <a name="fill-color"></a> `> streamDeck.fillColor(keyIndex, r, g, b) -> undefined`
 
 Synchronously sets the given `keyIndex`'s screen to a solid RGB color.
+An error will be thrown if the keyIndex is not valid, of a colour component is outside of the range 0-255
 
 ##### Example
 
 ```javascript
 // Turn key 4 (the top left key) solid red.
-streamDeck.fillColor(4, 255, 0, 0);
+streamDeck.fillColor(4, 255, 0, 0)
 ```
 
 #### <a name="fill-image"></a> `> streamDeck.fillImage(keyIndex, buffer) -> undefined`
 
-Synchronously writes a buffer of 72x72 RGB image data to the given `keyIndex`'s screen.
-The buffer must be exactly 15552 bytes in length. Any other length will result in an error being thrown.
+Synchronously writes a buffer of RGB image data to the given `keyIndex`'s screen.
+The required size of the buffer varies by device, and must be the exact length. Any other length will result in an error being thrown.
+
+The expected sizes are:
+
+-   Original: 15552 (72px)
+-   Mini: 19200 (80px)
+-   XL: 27648 (96px)
 
 ##### Example
 
 ```javascript
 // Fill the third button from the left in the first row with an image of the GitHub logo.
-const sharp = require('sharp'); // See http://sharp.dimens.io/en/stable/ for full docs on this great library!
+const sharp = require('sharp') // See http://sharp.dimens.io/en/stable/ for full docs on this great library!
 sharp(path.resolve(__dirname, 'github_logo.png'))
 	.flatten() // Eliminate alpha channel, if any.
 	.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE) // Scale up/down to the right size, cropping if necessary.
 	.raw() // Give us uncompressed RGB.
 	.toBuffer()
 	.then(buffer => {
-		return streamDeck.fillImage(2, buffer);
+		streamDeck.fillImage(2, buffer)
 	})
 	.catch(err => {
-		console.error(err);
-	});
+		console.error(err)
+	})
 ```
 
 #### <a name="fill-panel"></a> `> streamDeck.fillPanel(buffer) -> undefined`
@@ -213,29 +275,30 @@ Applies an image to the entire panel, spreading it over all keys. The image must
 
 ```javascript
 // Fill the entire panel with a photo of a sunny field.
-const sharp = require('sharp'); // See http://sharp.dimens.io/en/stable/ for full docs on this great library!
+const sharp = require('sharp') // See http://sharp.dimens.io/en/stable/ for full docs on this great library!
 sharp(path.resolve(__dirname, 'github_logo.png'))
 	.flatten() // Eliminate alpha channel, if any.
-	.resize(streamDeck.ICON_SIZE * 5, streamDeck.ICON_SIZE * 3) // Scale up/down to the right size, cropping if necessary.
+	.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS) // Scale up/down to the right size, cropping if necessary.
 	.raw() // Give us uncompressed RGB.
 	.toBuffer()
 	.then(buffer => {
-		return streamDeck.fillPanel(buffer);
+		streamDeck.fillPanel(buffer)
 	})
 	.catch(err => {
-		console.error(err);
-	});
+		console.error(err)
+	})
 ```
 
 #### <a name="clear-key"></a> `> streamDeck.clearKey(keyIndex) -> undefined`
 
 Synchronously clears the given `keyIndex`'s screen.
+An error will be thrown if the keyIndex is not valid
 
 ##### Example
 
 ```javascript
 // Clear the third button from the left in the first row.
-streamDeck.clearKey(2);
+streamDeck.clearKey(2)
 ```
 
 #### <a name="clear-all-keys"></a> `> streamDeck.clearAllKeys() -> undefined`
@@ -246,44 +309,76 @@ Synchronously clears all keys on the device.
 
 ```javascript
 // Clear all keys.
-streamDeck.clearAllKeys();
+streamDeck.clearAllKeys()
 ```
 
 #### <a name="set-brightness"></a> `> streamDeck.setBrightness(percentage) -> undefined`
 
 Synchronously set the brightness of the Stream Deck. This affects all keys at once. The brightness of individual keys cannot be controlled.
+An error will be thrown if the brightness is not in the range 0-100
 
 ##### Example
 
 ```javascript
 // Set the Stream Deck to maximum brightness
-streamDeck.setBrightness(100);
+streamDeck.setBrightness(100)
+```
+
+#### <a name="reset-to-logo"></a> `> streamDeck.resetToLogo() -> undefined`
+
+Resets the device back to the startup Elgato logo.
+
+##### Example
+
+```javascript
+// Set the Stream Deck back to the Elgato logo
+streamDeck.resetToLogo()
+```
+
+#### <a name="get-firmware-version"></a> `> streamDeck.getFirmwareVersion() -> string`
+
+Gets the firmware version number.
+
+##### Example
+
+```javascript
+console.log(streamDeck.getFirmwareVersion())
+```
+
+#### <a name="get-serial-number"></a> `> streamDeck.getSerialNumber() -> string`
+
+Gets the serial number of the device.
+
+##### Example
+
+```javascript
+console.log(streamDeck.getSerialNumber())
 ```
 
 ### Events
 
 #### <a name="down"></a> `> down`
 
-Fired whenever a key is pressed. `keyIndex` is the 0-14 numerical index of that key.
+Fired whenever a key is pressed. `keyIndex` is the index of that key.
 
 ##### Example
 
 ```javascript
 streamDeck.on('down', keyIndex => {
-	console.log('key %d down', keyIndex);
-});
+	console.log('key %d down', keyIndex)
+})
 ```
 
 #### <a name="up"></a> `> up`
 
-Fired whenever a key is released. `keyIndex` is the 0-14 numerical index of that key.
+Fired whenever a key is released. `keyIndex` is the index of that key.
 
 ##### Example
 
 ```javascript
 streamDeck.on('up', keyIndex => {
-	console.log('key %d up', keyIndex);
-});
+	console.log('key %d up', keyIndex)
+})
 ```
 
 #### <a name="error"></a> `> error`
@@ -295,9 +390,17 @@ Fired whenever an error is detected by the `node-hid` library.
 
 ```javascript
 streamDeck.on('error', error => {
-	console.error(error);
-});
+	console.error(error)
+})
 ```
+
+### Contributing
+
+The elgato-stream-deck team enthusiastically welcomes contributions and project participation! There's a bunch of things you can do if you want to contribute! The [Contributor Guide](CONTRIBUTING.md) has all the information you need for everything from reporting bugs to contributing entire new features. Please don't hesitate to jump in if you'd like to, or even ask us questions if something isn't clear.
+
+All participants and maintainers in this project are expected to follow [Code of Conduct](CODE_OF_CONDUCT.md), and just generally be kind to each other.
+
+Please refer to the [Changelog](CHANGELOG.md) for project history details, too.
 
 ### Protocol Notes
 
