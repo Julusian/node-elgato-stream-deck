@@ -20,7 +20,7 @@
 			]
 		},
 		"declaration": true,
-		"importHelpers": true,
+		"importHelpers": false,
 		"listFiles": false,
 		"traceResolution": false,
 		"pretty": true,
