@@ -1,6 +1,49 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [3.0.0](https://github.com/lange/node-elgato-stream-deck/compare/v2.1.1...v3.0.0) (2019-06-03)
+
+
+### Bug Fixes
+
+* Don't depend on tslib ([3ebd04f](https://github.com/lange/node-elgato-stream-deck/commit/3ebd04f))
+* Failing tests ([c36125d](https://github.com/lange/node-elgato-stream-deck/commit/c36125d))
+* **xl:** Fill full button with image. Fix images being horizontally flipped ([4044809](https://github.com/lange/node-elgato-stream-deck/commit/4044809))
+* Gracefully handle missing jpeg-turbo ([574068f](https://github.com/lange/node-elgato-stream-deck/commit/574068f))
+* ignore tests in coverage report. format config files. Add tests for device info and listing functions ([2c1db92](https://github.com/lange/node-elgato-stream-deck/commit/2c1db92))
+* JPEG encoding tests ([8efb092](https://github.com/lange/node-elgato-stream-deck/commit/8efb092))
+* Mini image display ([99c0c94](https://github.com/lange/node-elgato-stream-deck/commit/99c0c94))
+* Missing dependencies in travis ([9e0f5b5](https://github.com/lange/node-elgato-stream-deck/commit/9e0f5b5))
+* Missing devDependency ([f94ff51](https://github.com/lange/node-elgato-stream-deck/commit/f94ff51))
+* Move static device info methods to be separately importable. Reformat examples ([6dfde88](https://github.com/lange/node-elgato-stream-deck/commit/6dfde88))
+* Refactor fillImage command generation, and some attempted fixes for the mini ([15ce1f2](https://github.com/lange/node-elgato-stream-deck/commit/15ce1f2))
+* Refactor the packet generation code to be simpler ([d0ef9cf](https://github.com/lange/node-elgato-stream-deck/commit/d0ef9cf))
+* Remove padding from images for the mini ([751fc62](https://github.com/lange/node-elgato-stream-deck/commit/751fc62))
+* Switch to testing version of jpeg-turbo ([01e2e30](https://github.com/lange/node-elgato-stream-deck/commit/01e2e30))
+* Test and fix some extra commands for the XL ([7399b28](https://github.com/lange/node-elgato-stream-deck/commit/7399b28))
+* Travis not updating coveralls ([ea57f08](https://github.com/lange/node-elgato-stream-deck/commit/ea57f08))
+* update dependencies, and linux version used ([8916aec](https://github.com/lange/node-elgato-stream-deck/commit/8916aec))
+* Update node-hid to 0.7.9 ([da010e5](https://github.com/lange/node-elgato-stream-deck/commit/da010e5))
+
+
+### Features
+
+* Add example for device detection ([81ad930](https://github.com/lange/node-elgato-stream-deck/commit/81ad930))
+* Add function to list available devices ([8c55598](https://github.com/lange/node-elgato-stream-deck/commit/8c55598))
+* Add resetToLogo function, ideal for when disconnecting from the device to reset it back to default ([1b94570](https://github.com/lange/node-elgato-stream-deck/commit/1b94570))
+* Convert to typescript ([a1492bd](https://github.com/lange/node-elgato-stream-deck/commit/a1492bd))
+* Functions to get firmware and serial numbers [#45](https://github.com/lange/node-elgato-stream-deck/issues/45) ([ba130b9](https://github.com/lange/node-elgato-stream-deck/commit/ba130b9))
+* Initial (untested) support for StreamDeck Mini ([c41e684](https://github.com/lange/node-elgato-stream-deck/commit/c41e684))
+* Port tests to jest and typescript ([4ceaf90](https://github.com/lange/node-elgato-stream-deck/commit/4ceaf90))
+* Refactor logic to have a common base class with each device extending it ([8632d93](https://github.com/lange/node-elgato-stream-deck/commit/8632d93))
+* Reimplement fillPanel to work solely on buffers. Fix up all the examples ([f35c26c](https://github.com/lange/node-elgato-stream-deck/commit/f35c26c))
+* Removed references to sharp (BREAKING CHANGE) ([d17b7c4](https://github.com/lange/node-elgato-stream-deck/commit/d17b7c4))
+* Reorder the keys on the original to be left to right. The old behaviour can be restored if desired ([fdff5f1](https://github.com/lange/node-elgato-stream-deck/commit/fdff5f1))
+* Use jpeg-turbo as an optional dependency for image encoding, as it is significantly faster than jpeg-js but has a lot more dependencies ([e7e509e](https://github.com/lange/node-elgato-stream-deck/commit/e7e509e))
+* Working XL, with slightly dodgey but working image transfer ([eb294e8](https://github.com/lange/node-elgato-stream-deck/commit/eb294e8))
+
+
 
 <a name="2.1.1"></a>
 ## [2.1.1](https://github.com/Lange/node-elgato-stream-deck/compare/v2.1.0...v2.1.1) (2018-04-05)

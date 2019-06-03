@@ -1,6 +1,6 @@
 {
   "name": "elgato-stream-deck",
-  "version": "2.1.1",
+  "version": "3.0.0",
   "description": "An npm module for interfacing with the Elgato Stream Deck",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -106,9 +106,5 @@
     "usb-detection": "^4.3.0",
     "weallbehave": "^1.2.0",
     "weallcontribute": "^1.0.8"
-  },
-  "standard-version": {
-    "message": "chore(release): %s [skip ci]",
-    "tagPrefix": ""
   }
 }
