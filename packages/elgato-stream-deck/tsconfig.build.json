@@ -1,0 +1,13 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"types": [
+			"node"
+		]
+	},
+	"exclude": [
+		"node_modules/**",
+		"src/__tests__/**",
+		"src/__mocks__/**"
+	]
+}

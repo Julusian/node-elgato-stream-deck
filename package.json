@@ -2,9 +2,42 @@
   "name": "elgato-stream-deck-packages",
   "private": true,
   "devDependencies": {
-    "lerna": "^3.16.4"
+    "@julusian/jpeg-turbo": "^0.5.1",
+    "@types/jest": "^24.0.11",
+    "@types/jpeg-js": "^0.3.0",
+    "@types/node": "^12.0.4",
+    "@types/node-hid": "^0.7.0",
+    "@types/sharp": "^0.22.2",
+    "coveralls": "^3.0.3",
+    "jest": "^24.7.1",
+    "jest-haste-map": "^24.7.1",
+    "jest-resolve": "^24.7.1",
+    "lerna": "^3.16.4",
+    "node-license-validator": "^1.3.0",
+    "open-cli": "^5.0.0",
+    "prettier": "^1.17.1",
+    "pureimage": "^0.1.3",
+    "sharp": "^0.22.1",
+    "standard-version": "^6.0.1",
+    "stream-buffers": "^3.0.1",
+    "trash-cli": "^3.0.0",
+    "ts-jest": "^24.0.2",
+    "ts-loader": "^6.0.0",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.4.2",
+    "usb-detection": "^4.3.0",
+    "weallbehave": "^1.2.0",
+    "weallcontribute": "^1.0.8"
   },
   "workspaces": {
-    "packages": ["packages/*"]
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "dependencies": {
+    "elgato-stream-deck": "file:packages\\elgato-stream-deck",
+    "elgato-stream-deck-core": "file:packages\\elgato-stream-deck-core"
   }
 }
