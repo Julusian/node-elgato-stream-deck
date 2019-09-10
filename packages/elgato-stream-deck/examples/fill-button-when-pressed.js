@@ -1,6 +1,6 @@
 const path = require('path')
 const sharp = require('sharp')
-const { openStreamDeck } = require('../packages/elgato-stream-deck-core/dist/index')
+const { openStreamDeck } = require('../dist/index')
 
 ;(async () => {
 	const streamDeck = openStreamDeck()

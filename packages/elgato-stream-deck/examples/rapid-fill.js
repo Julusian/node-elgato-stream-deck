@@ -1,4 +1,4 @@
-const { openStreamDeck } = require('../packages/elgato-stream-deck-core/dist/index')
+const { openStreamDeck } = require('../dist/index')
 const streamDeck = openStreamDeck()
 
 streamDeck.on('error', error => {

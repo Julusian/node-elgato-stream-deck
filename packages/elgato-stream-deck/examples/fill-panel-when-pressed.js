@@ -1,6 +1,6 @@
 const path = require('path')
 const sharp = require('sharp')
-const { openStreamDeck } = require('../packages/elgato-stream-deck-core/dist/index')
+const { openStreamDeck } = require('../dist/index')
 
 console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the second image.')
 ;(async () => {
