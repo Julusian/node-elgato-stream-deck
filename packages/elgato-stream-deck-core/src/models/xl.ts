@@ -1,7 +1,6 @@
 import { HIDDevice } from '../device'
-import { encodeJPEG } from '../jpeg'
 import { imageToByteArray, numberArrayToString } from '../util'
-import { StreamDeckBase, StreamDeckProperties } from './base'
+import { EncodeJPEGHelper, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { DeviceModelId, KeyIndex } from './id'
 
 const xlProperties: StreamDeckProperties = {
@@ -13,8 +12,12 @@ const xlProperties: StreamDeckProperties = {
 }
 
 export class StreamDeckXL extends StreamDeckBase {
-	constructor(device: HIDDevice) {
+	private encodeJPEG: EncodeJPEGHelper
+
+	constructor(device: HIDDevice, options: OpenStreamDeckOptions) {
 		super(device, xlProperties, 4)
+
+		this.encodeJPEG = options.encodeJPEG!
 	}
 	/**
 	 * Sets the brightness of the keys on the Stream Deck
@@ -92,7 +95,7 @@ export class StreamDeckXL extends StreamDeckBase {
 			this.ICON_SIZE
 		)
 
-		return encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE)
+		return this.encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE)
 	}
 
 	private transformCoordinates(x: number, y: number): { x: number; y: number } {

@@ -1,6 +1,7 @@
 import { DEVICE_MODELS, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from 'elgato-stream-deck-core'
 import * as HID from 'node-hid'
 import { NodeHIDDevice, StreamDeckDeviceInfo } from './device'
+import { encodeJPEG } from './jpeg'
 
 /*
  * The original StreamDeck uses packet sizes too large for the hidraw driver which is
@@ -51,6 +52,11 @@ export function openStreamDeck(devicePath?: string, options?: OpenStreamDeckOpti
 	const model = DEVICE_MODELS.find(m => m.id === foundDevices[0].model)
 	if (!model) {
 		throw new Error('Stream Deck is of unexpected type.')
+	}
+
+	options = options || {}
+	if (!options.encodeJPEG) {
+		options.encodeJPEG = encodeJPEG
 	}
 
 	const device = new NodeHIDDevice(foundDevices[0])

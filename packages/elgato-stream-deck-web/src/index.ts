@@ -1,4 +1,4 @@
-import { OpenStreamDeckOptions, VENDOR_ID, StreamDeck, DEVICE_MODELS } from 'elgato-stream-deck-core'
+import { DEVICE_MODELS, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from 'elgato-stream-deck-core'
 import { WebHIDDevice } from './device'
 
 export { DeviceModelId, StreamDeck } from 'elgato-stream-deck-core'
@@ -21,6 +21,9 @@ export async function requestStreamDeck(options?: OpenStreamDeckOptions): Promis
 			}
 
 			await browserDevice.open()
+
+			options = options || {}
+			if (!options.encodeJPEG) { options.encodeJPEG = buf => buf } // TODO
 
 			return new model.class(new WebHIDDevice(browserDevice), options || {})
 		})

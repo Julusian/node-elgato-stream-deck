@@ -3,7 +3,7 @@ import { BMP_HEADER_LENGTH, bufferToIntArray, imageToByteArray, writeBMPHeader }
 import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { DeviceModelId, KeyIndex } from './id'
 
-const miniProperties: StreamDeckProperties = {
+const originalProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.ORIGINAL,
 	COLUMNS: 5,
 	ROWS: 3,
@@ -15,7 +15,7 @@ export class StreamDeckOriginal extends StreamDeckBase {
 	private readonly useOriginalKeyOrder: boolean
 
 	constructor(device: HIDDevice, options: OpenStreamDeckOptions) {
-		super(device, miniProperties, 1)
+		super(device, originalProperties, 1)
 
 		this.useOriginalKeyOrder = !!options.useOriginalKeyOrder
 	}

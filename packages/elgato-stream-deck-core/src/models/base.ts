@@ -5,8 +5,11 @@ import { DeviceModelId } from '../models'
 import { bufferToIntArray, numberArrayToString } from '../util'
 import { KeyIndex } from './id'
 
+export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Buffer
+
 export interface OpenStreamDeckOptions {
 	useOriginalKeyOrder?: boolean
+	encodeJPEG?: EncodeJPEGHelper
 }
 
 export interface StreamDeckProperties {
