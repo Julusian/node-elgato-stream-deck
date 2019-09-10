@@ -19,9 +19,9 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 		this.device.on('error', error => this.emit('error', error))
 	}
 
-	public sendFeatureReport(reportId: number, data: number[]): Promise<void> {
+	public sendFeatureReport(data: number[]): Promise<void> {
 		// TODO - performance?
-		this.device.sendFeatureReport([reportId, ...data])
+		this.device.sendFeatureReport(data)
 		return Promise.resolve()
 	}
 	public getFeatureReport(reportId: number, reportLength: number): Promise<number[]> {

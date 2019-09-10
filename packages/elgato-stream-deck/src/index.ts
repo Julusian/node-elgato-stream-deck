@@ -48,15 +48,11 @@ export function openStreamDeck(devicePath?: string, options?: OpenStreamDeckOpti
 		}
 	}
 
-	if (!options) {
-		options = {}
-	}
-
 	const model = DEVICE_MODELS.find(m => m.id === foundDevices[0].model)
 	if (!model) {
 		throw new Error('Stream Deck is of unexpected type.')
 	}
 
 	const device = new NodeHIDDevice(foundDevices[0])
-	return new model.class(device, options)
+	return new model.class(device, options || {})
 }

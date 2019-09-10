@@ -28,17 +28,22 @@ export class StreamDeckXL extends StreamDeckBase {
 
 		// prettier-ignore
 		const brightnessCommandBuffer = [
+			0x03,
 			0x08, percentage, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		]
-		this.device.sendFeatureReport(0x03, brightnessCommandBuffer)
+		this.device.sendFeatureReport(brightnessCommandBuffer)
 	}
 
 	public resetToLogo() {
-		const resetCommandBuffer = [0x02]
-		this.device.sendFeatureReport(0x03, resetCommandBuffer)
+		// prettier-ignore
+		const resetCommandBuffer = [
+			0x03,
+			0x02
+		]
+		this.device.sendFeatureReport(resetCommandBuffer)
 	}
 
 	public getFirmwareVersion() {
