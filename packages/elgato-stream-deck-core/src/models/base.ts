@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events'
-import * as HID from 'node-hid'
 
+import { HIDDevice } from '../device'
 import { DeviceModelId } from '../models'
 import { bufferToIntArray, numberArrayToString } from '../util'
-import { KeyIndex, StreamDeckDeviceInfo } from './id'
+import { KeyIndex } from './id'
 
 export interface OpenStreamDeckOptions {
 	useOriginalKeyOrder?: boolean
@@ -79,12 +79,12 @@ export interface StreamDeck {
 	/**
 	 * Get firmware version from Stream Deck
 	 */
-	getFirmwareVersion(): string
+	getFirmwareVersion(): Promise<string>
 
 	/**
 	 * Get serial number from Stream Deck
 	 */
-	getSerialNumber(): string
+	getSerialNumber(): Promise<string>
 
 	on(event: 'down' | 'up', listener: (keyIndex: KeyIndex) => void): any
 	on(event: 'error', listener: (e: any) => void): any
@@ -112,15 +112,15 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.deviceProperties.MODEL
 	}
 
-	protected device: HID.HID
+	protected device: HIDDevice
 	private deviceProperties: StreamDeckProperties
 	private keyState: boolean[]
 
-	constructor(deviceInfo: StreamDeckDeviceInfo, properties: StreamDeckProperties, dataKeyOffset: number) {
+	constructor(device: HIDDevice, properties: StreamDeckProperties, dataKeyOffset: number) {
 		super()
 
 		this.deviceProperties = properties
-		this.device = new HID.HID(deviceInfo.path)
+		this.device = device
 
 		this.keyState = new Array(this.NUM_KEYS).fill(false)
 
@@ -216,29 +216,27 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 		// prettier-ignore
 		const brightnessCommandBuffer = [
-			0x05, 0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00
+			0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		]
-		this.device.sendFeatureReport(brightnessCommandBuffer)
+		this.device.sendFeatureReport(0x05, brightnessCommandBuffer)
 	}
 
 	public resetToLogo() {
 		// prettier-ignore
 		const resetCommandBuffer = [
-			0x0B, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00
+			0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		]
-		this.device.sendFeatureReport(resetCommandBuffer)
+		this.device.sendFeatureReport(0x0b, resetCommandBuffer)
 	}
 
 	public getFirmwareVersion() {
-		return numberArrayToString(this.device.getFeatureReport(4, 17).slice(5))
+		return this.device.getFeatureReport(4, 17).then(val => numberArrayToString(val.slice(5)))
 	}
 
 	public getSerialNumber() {
-		return numberArrayToString(this.device.getFeatureReport(3, 17).slice(5))
+		return this.device.getFeatureReport(3, 17).then(val => numberArrayToString(val.slice(5)))
 	}
 
 	protected abstract transformKeyIndex(keyIndex: KeyIndex): KeyIndex
@@ -297,7 +295,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 		const packets = this.generateFillImageWrites(keyIndex, byteBuffer)
 		for (const packet of packets) {
-			this.device.write(packet)
+			this.device.sendReport(packet)
 		}
 	}
 

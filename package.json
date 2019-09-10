@@ -1,12 +1,14 @@
 {
   "name": "elgato-stream-deck-packages",
   "private": true,
+  "scripts": {
+    "tslint-check": "tslint-config-prettier-check ./tslint.json",
+    "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
+    "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'"
+  },
   "devDependencies": {
-    "@julusian/jpeg-turbo": "^0.5.1",
     "@types/jest": "^24.0.11",
     "@types/jpeg-js": "^0.3.0",
-    "@types/node": "^12.0.4",
-    "@types/node-hid": "^0.7.0",
     "@types/sharp": "^0.22.2",
     "coveralls": "^3.0.3",
     "jest": "^24.7.1",
@@ -35,9 +37,5 @@
     "packages": [
       "packages/*"
     ]
-  },
-  "dependencies": {
-    "elgato-stream-deck": "file:packages\\elgato-stream-deck",
-    "elgato-stream-deck-core": "file:packages\\elgato-stream-deck-core"
   }
 }

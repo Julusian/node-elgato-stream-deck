@@ -1,6 +1,7 @@
+import { HIDDevice } from '../device'
 import { BMP_HEADER_LENGTH, bufferToIntArray, imageToByteArray, writeBMPHeader } from '../util'
 import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
-import { DeviceModelId, KeyIndex, StreamDeckDeviceInfo } from './id'
+import { DeviceModelId, KeyIndex } from './id'
 
 const miniProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.ORIGINAL,
@@ -13,8 +14,8 @@ const miniProperties: StreamDeckProperties = {
 export class StreamDeckOriginal extends StreamDeckBase {
 	private readonly useOriginalKeyOrder: boolean
 
-	constructor(deviceInfo: StreamDeckDeviceInfo, options: OpenStreamDeckOptions) {
-		super(deviceInfo, miniProperties, 1)
+	constructor(device: HIDDevice, options: OpenStreamDeckOptions) {
+		super(device, miniProperties, 1)
 
 		this.useOriginalKeyOrder = !!options.useOriginalKeyOrder
 	}

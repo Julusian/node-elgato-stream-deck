@@ -5,9 +5,3 @@ export enum DeviceModelId {
 	MINI = 'mini',
 	XL = 'xl'
 }
-
-export interface StreamDeckDeviceInfo {
-	model: DeviceModelId
-	path: string
-	serialNumber?: string
-}

@@ -1234,7 +1234,7 @@
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.3.tgz#3dca0e3f33b200fc7d1139c0cd96c1268cadfd9d"
   integrity sha512-tHq6qdbT9U1IRSGf14CL0pUlULksvY9OZ+5eEgl1N7t+OA3tGvNpxJCzuKQlsNgCVwbAs670L1vcVQi8j9HjnA==
 
-"@types/node-hid@^0.7.0":
+"@types/node-hid@^0.7.2":
   version "0.7.2"
   resolved "https://registry.yarnpkg.com/@types/node-hid/-/node-hid-0.7.2.tgz#d6f57103fe410aafe0bf4a62d564ee3068d9b142"
   integrity sha512-uWSDOBaJ0qCiuyx6NSvxFFgKeC9DEmK/G2Nm4jZp5yt1p6gg2Gg7nkrWGlzkaYiLf3YNCqm3X260PTYylIxfsA==
@@ -2748,6 +2748,11 @@ ecc-jsbn@~0.1.1:
   dependencies:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
+
+"elgato-stream-deck-core@file:packages/elgato-stream-deck-core":
+  version "3.0.0"
+  dependencies:
+    jpeg-js "^0.3.5"
 
 emoji-regex@^7.0.1:
   version "7.0.3"

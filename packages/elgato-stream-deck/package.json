@@ -54,14 +54,10 @@
     "build": "trash dist && yarn build:main",
     "build:main": "tsc -p tsconfig.build.json",
     "release": "standard-version",
-    "test": "yarn lint && yarn build && yarn unit",
     "watch": "jest --watch",
     "cov": "jest --coverage; open-cli coverage/lcov-report/index.html",
     "cov-open": "open-cli coverage/lcov-report/index.html",
     "testci": "yarn lint && jest --coverage && cat ./coverage/lcov.info | coveralls",
-    "unit": "jest",
-    "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
-    "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
     "lint": "tslint --project tsconfig.json --config ../../tslint.json && yarn prettier --check \"src/**/*.ts\"",
     "lint-fix": "tslint --project tsconfig.json --config ../../tslint.json --fix && yarn prettier --write \"src/**/*.ts\"",
     "tslint-check": "tslint-config-prettier-check ../../tslint.json",
@@ -76,6 +72,12 @@
   },
   "dependencies": {
     "elgato-stream-deck-core": "file:../elgato-stream-deck-core",
+    "jpeg-js": "^0.3.5",
     "node-hid": "^0.7.9"
+  },
+  "devDependencies": {
+    "@julusian/jpeg-turbo": "^0.5.1",
+    "@types/node": "^12.0.4",
+    "@types/node-hid": "^0.7.2"
   }
 }

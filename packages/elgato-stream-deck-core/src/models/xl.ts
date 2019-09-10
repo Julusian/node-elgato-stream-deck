@@ -1,7 +1,8 @@
+import { HIDDevice } from '../device'
 import { encodeJPEG } from '../jpeg'
 import { imageToByteArray, numberArrayToString } from '../util'
 import { StreamDeckBase, StreamDeckProperties } from './base'
-import { DeviceModelId, KeyIndex, StreamDeckDeviceInfo } from './id'
+import { DeviceModelId, KeyIndex } from './id'
 
 const xlProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.XL,
@@ -12,8 +13,8 @@ const xlProperties: StreamDeckProperties = {
 }
 
 export class StreamDeckXL extends StreamDeckBase {
-	constructor(deviceInfo: StreamDeckDeviceInfo) {
-		super(deviceInfo, xlProperties, 4)
+	constructor(device: HIDDevice) {
+		super(device, xlProperties, 4)
 	}
 	/**
 	 * Sets the brightness of the keys on the Stream Deck
@@ -27,28 +28,25 @@ export class StreamDeckXL extends StreamDeckBase {
 
 		// prettier-ignore
 		const brightnessCommandBuffer = [
-			0x03, 0x08, percentage, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x08, percentage, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		]
-		this.device.sendFeatureReport(brightnessCommandBuffer)
+		this.device.sendFeatureReport(0x03, brightnessCommandBuffer)
 	}
 
 	public resetToLogo() {
-		// prettier-ignore
-		const resetCommandBuffer = [
-			0x03, 0x02
-		]
-		this.device.sendFeatureReport(resetCommandBuffer)
+		const resetCommandBuffer = [0x02]
+		this.device.sendFeatureReport(0x03, resetCommandBuffer)
 	}
 
 	public getFirmwareVersion() {
-		return numberArrayToString(this.device.getFeatureReport(5, 32).slice(6))
+		return this.device.getFeatureReport(5, 32).then(val => numberArrayToString(val.slice(6)))
 	}
 
 	public getSerialNumber() {
-		return numberArrayToString(this.device.getFeatureReport(6, 32).slice(2))
+		return this.device.getFeatureReport(6, 32).then(val => numberArrayToString(val.slice(2)))
 	}
 
 	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {
