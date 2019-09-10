@@ -1,0 +1,110 @@
+{
+  "name": "elgato-stream-deck",
+  "version": "3.0.0",
+  "description": "An npm module for interfacing with the Elgato Stream Deck",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "license": "MIT",
+  "homepage": "https://github.com/lange/node-elgato-stream-deck#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lange/node-elgato-stream-deck.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lange/node-elgato-stream-deck/issues"
+  },
+  "author": {
+    "name": "Alex Van Camp",
+    "email": "email@alexvan.camp",
+    "url": "https://alexvan.camp/",
+    "twitter": "vancamp"
+  },
+  "contributors": [
+    {
+      "name": "Håkon Nessjøen",
+      "email": "haakon@bitfocus.io"
+    },
+    {
+      "name": "Richard Fox",
+      "twitter": "ProbablePrime"
+    },
+    {
+      "name": "Chris Hanel",
+      "twitter": "chrishanel",
+      "email": "chrishanel@gmail.com",
+      "url": "http://www.chrishanel.com/"
+    },
+    {
+      "name": "Julian Waller",
+      "email": "git@julusian.co.uk"
+    }
+  ],
+  "keywords": [
+    "elgato",
+    "stream",
+    "deck",
+    "streamdeck",
+    "hid",
+    "usb",
+    "hardware",
+    "interface",
+    "controller"
+  ],
+  "scripts": {
+    "build": "trash dist && yarn build:main",
+    "build:main": "tsc -p tsconfig.build.json",
+    "release": "standard-version",
+    "test": "yarn lint && yarn build && yarn unit",
+    "watch": "jest --watch",
+    "cov": "jest --coverage; open-cli coverage/lcov-report/index.html",
+    "cov-open": "open-cli coverage/lcov-report/index.html",
+    "testci": "yarn lint && jest --coverage && cat ./coverage/lcov.info | coveralls",
+    "unit": "jest",
+    "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
+    "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
+    "lint": "tslint --project tsconfig.json --config tslint.json && yarn prettier --check \"src/**/*.ts\"",
+    "lint-fix": "tslint --project tsconfig.json --config tslint.json --fix && yarn prettier --write \"src/**/*.ts\"",
+    "tslint-check": "tslint-config-prettier-check ./tslint.json",
+    "validate:dependencies": "yarn audit && yarn license-validate",
+    "license-validate": "node-license-validator -p -d --allow-licenses MIT BSD BSD-3-Clause ISC Apache Unlicense WTFPL"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=7.6"
+  },
+  "dependencies": {
+    "jpeg-js": "^0.3.5",
+    "node-hid": "^0.7.9"
+  },
+  "devDependencies": {
+    "@julusian/jpeg-turbo": "^0.5.1",
+    "@types/jest": "^24.0.11",
+    "@types/jpeg-js": "^0.3.0",
+    "@types/node": "^12.0.4",
+    "@types/node-hid": "^0.7.0",
+    "@types/sharp": "^0.22.2",
+    "coveralls": "^3.0.3",
+    "jest": "^24.7.1",
+    "jest-haste-map": "^24.7.1",
+    "jest-resolve": "^24.7.1",
+    "node-license-validator": "^1.3.0",
+    "open-cli": "^5.0.0",
+    "prettier": "^1.17.1",
+    "pureimage": "^0.1.3",
+    "sharp": "^0.22.1",
+    "standard-version": "^6.0.1",
+    "stream-buffers": "^3.0.1",
+    "trash-cli": "^3.0.0",
+    "ts-jest": "^24.0.2",
+    "ts-loader": "^6.0.0",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.4.2",
+    "usb-detection": "^4.3.0",
+    "weallbehave": "^1.2.0",
+    "weallcontribute": "^1.0.8"
+  }
+}

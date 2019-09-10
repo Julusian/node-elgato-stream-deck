@@ -1,4 +1,4 @@
-const { openStreamDeck } = require('../dist/index')
+const { openStreamDeck } = require('../packages/elgato-stream-deck-core/dist/index')
 const streamDeck = openStreamDeck()
 
 // Fill it white so we can see the brightness changes

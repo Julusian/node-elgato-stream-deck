@@ -65,3 +65,4 @@ typings/
 /.vscode
 
 /dist
+/packages/*/dist

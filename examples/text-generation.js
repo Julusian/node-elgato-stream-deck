@@ -2,7 +2,7 @@ const sharp = require('sharp')
 const path = require('path')
 const PImage = require('pureimage')
 const streamBuffers = require('stream-buffers')
-const { openStreamDeck } = require('../dist/index')
+const { openStreamDeck } = require('../packages/elgato-stream-deck-core/dist/index')
 
 const streamDeck = openStreamDeck()
 streamDeck.clearAllKeys()

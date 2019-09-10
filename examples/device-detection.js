@@ -1,5 +1,5 @@
 const usbDetect = require('usb-detection')
-const { listStreamDecks, openStreamDeck } = require('../dist/index')
+const { listStreamDecks, openStreamDeck } = require('../packages/elgato-stream-deck-core/dist/index')
 const streamDecks = {}
 
 function addDevice(info) {
