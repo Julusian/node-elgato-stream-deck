@@ -1,0 +1,59 @@
+{
+  "name": "elgato-stream-deck-web",
+  "version": "3.0.0",
+  "description": "An npm module for interfacing with the Elgato Stream Deck in the browser",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "license": "MIT",
+  "homepage": "https://github.com/lange/node-elgato-stream-deck#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lange/node-elgato-stream-deck.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lange/node-elgato-stream-deck/issues"
+  },
+  "author": {
+    "name": "Alex Van Camp",
+    "email": "email@alexvan.camp",
+    "url": "https://alexvan.camp/",
+    "twitter": "vancamp"
+  },
+  "contributors": [
+    {
+      "name": "Julian Waller",
+      "email": "git@julusian.co.uk"
+    }
+  ],
+  "keywords": [
+    "elgato",
+    "stream",
+    "deck",
+    "streamdeck",
+    "hid",
+    "usb",
+    "hardware",
+    "interface",
+    "controller"
+  ],
+  "scripts": {
+    "build": "trash dist && yarn build:main",
+    "build:main": "tsc -p tsconfig.build.json",
+    "release": "standard-version",
+    "watch": "jest --watch",
+    "cov": "jest --coverage; open-cli coverage/lcov-report/index.html",
+    "cov-open": "open-cli coverage/lcov-report/index.html",
+    "testci": "yarn lint && jest --coverage && cat ./coverage/lcov.info | coveralls",
+    "lint": "tslint --project tsconfig.json --config ../../tslint.json && yarn prettier --check \"src/**/*.ts\"",
+    "lint-fix": "tslint --project tsconfig.json --config ../../tslint.json --fix && yarn prettier --write \"src/**/*.ts\"",
+    "tslint-check": "tslint-config-prettier-check ../../tslint.json",
+    "validate:dependencies": "yarn audit && yarn license-validate",
+    "license-validate": "node-license-validator -p -d --allow-licenses MIT BSD BSD-3-Clause ISC Apache Unlicense WTFPL"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "elgato-stream-deck-core": "file:../elgato-stream-deck-core"
+  }
+}

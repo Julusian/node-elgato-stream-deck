@@ -1,0 +1,38 @@
+{
+  "name": "elgato-stream-deck-web-example",
+  "version": "3.0.0",
+  "private": true,
+  "license": "MIT",
+  "homepage": "https://github.com/lange/node-elgato-stream-deck#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lange/node-elgato-stream-deck.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lange/node-elgato-stream-deck/issues"
+  },
+  "author": {
+    "name": "Alex Van Camp",
+    "email": "email@alexvan.camp",
+    "url": "https://alexvan.camp/",
+    "twitter": "vancamp"
+  },
+  "contributors": [
+    {
+      "name": "Julian Waller",
+      "email": "git@julusian.co.uk"
+    }
+  ],
+  "scripts": {
+    "start": "webpack-dev-server --mode development --color"
+  },
+  "dependencies": {
+    "elgato-stream-deck-web": "file:../elgato-stream-deck-web"
+  },
+  "devDependencies": {
+    "ts-loader": "^6.1.0",
+    "webpack": "^4.39.3",
+    "webpack-cli": "^3.3.8",
+    "webpack-dev-server": "^3.8.0"
+  }
+}
