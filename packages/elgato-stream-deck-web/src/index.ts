@@ -17,7 +17,7 @@ function encodeJPEG(buffer: Buffer, width: number, height: number): Promise<Buff
 			canvas.toBlob(
 				b => {
 					if (b) {
-						resolve(Buffer.from((b as any).arrayBuffer()))
+						resolve(b)
 					} else {
 						reject()
 					}
@@ -29,6 +29,8 @@ function encodeJPEG(buffer: Buffer, width: number, height: number): Promise<Buff
 			reject()
 		}
 	})
+		.then(blob => (blob as any).arrayBuffer() as Promise<ArrayBuffer>)
+		.then(buf => Buffer.from(buf))
 }
 
 // TODO - typings
