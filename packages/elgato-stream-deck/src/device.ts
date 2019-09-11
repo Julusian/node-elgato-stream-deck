@@ -27,21 +27,17 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 		})
 	}
 
-	public close(): Promise<void> {
+	public async close(): Promise<void> {
 		this.device.close()
-		return Promise.resolve()
 	}
 
-	public sendFeatureReport(data: number[]): Promise<void> {
-		// TODO - performance?
+	public async sendFeatureReport(data: number[]): Promise<void> {
 		this.device.sendFeatureReport(data)
-		return Promise.resolve()
 	}
-	public getFeatureReport(reportId: number, reportLength: number): Promise<number[]> {
-		return Promise.resolve(this.device.getFeatureReport(reportId, reportLength))
+	public async getFeatureReport(reportId: number, reportLength: number): Promise<number[]> {
+		return this.device.getFeatureReport(reportId, reportLength)
 	}
-	public sendReport(data: number[]): Promise<void> {
+	public async sendReport(data: number[]): Promise<void> {
 		this.device.write(data)
-		return Promise.resolve()
 	}
 }

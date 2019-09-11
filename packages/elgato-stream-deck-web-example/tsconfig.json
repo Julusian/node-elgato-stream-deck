@@ -2,7 +2,8 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"lib": ["es6", "dom"],
-		"outDir": "./dist"
+		"outDir": "./dist",
+		"declaration": false
 	},
 	"include": ["src/**/*.ts"]
 }

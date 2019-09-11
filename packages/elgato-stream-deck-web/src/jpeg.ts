@@ -1,5 +1,5 @@
-export function encodeJPEG(buffer: Buffer, width: number, height: number): Promise<Buffer> {
-	return new Promise((resolve, reject) => {
+export async function encodeJPEG(buffer: Buffer, width: number, height: number): Promise<Buffer> {
+	const blob = await new Promise((resolve, reject) => {
 		const canvas = document.createElement('canvas')
 		canvas.width = width
 		canvas.height = height
@@ -8,7 +8,6 @@ export function encodeJPEG(buffer: Buffer, width: number, height: number): Promi
 			const imageData = ctx.createImageData(width, height)
 			imageData.data.set(buffer)
 			ctx.putImageData(imageData, 0, 0)
-
 			canvas.toBlob(
 				b => {
 					if (b) {
@@ -24,6 +23,6 @@ export function encodeJPEG(buffer: Buffer, width: number, height: number): Promi
 			reject()
 		}
 	})
-		.then(blob => (blob as any).arrayBuffer() as Promise<ArrayBuffer>)
-		.then(buf => Buffer.from(buf))
+	const buf: ArrayBuffer = await (blob as any).arrayBuffer()
+	return Buffer.from(buf)
 }

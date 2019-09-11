@@ -5,7 +5,8 @@
     "tslint-check": "tslint-config-prettier-check ./tslint.json",
     "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
     "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
-    "start-web": "cd packages/elgato-stream-deck-web-example && yarn start"
+    "start-web": "cd packages/elgato-stream-deck-web-example && yarn start",
+    "dist-web": "cd packages/elgato-stream-deck-web-example && yarn dist"
   },
   "devDependencies": {
     "@types/jest": "^24.0.11",

@@ -1,4 +1,5 @@
 const path = require('path')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
 	// Where to fine the source code
@@ -45,5 +46,7 @@ module.exports = {
 				exclude: /node_modules/
 			}
 		]
-	}
+	},
+
+	plugins: [new CopyWebpackPlugin([{ from: path.join(__dirname, '/public'), to: path.join(__dirname, '/dist') }])]
 }

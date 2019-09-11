@@ -24,12 +24,15 @@
     }
   ],
   "scripts": {
-    "start": "webpack-dev-server --mode development --color"
+    "start": "webpack-dev-server --mode development --color",
+    "dist": "trash dist && cross-env NODE_ENV=production webpack -p --progress --colors"
   },
   "dependencies": {
+    "cross-env": "^5.1.1",
     "elgato-stream-deck-web": "file:../elgato-stream-deck-web"
   },
   "devDependencies": {
+    "copy-webpack-plugin": "^5.0.4",
     "ts-loader": "^6.1.0",
     "webpack": "^4.39.3",
     "webpack-cli": "^3.3.8",
