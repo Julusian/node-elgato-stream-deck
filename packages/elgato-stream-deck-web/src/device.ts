@@ -9,9 +9,8 @@ export interface StreamDeckDeviceInfo {
 
 // TODO - use better typings
 export class WebHIDDevice extends EventEmitter implements HIDDevice {
-	private device: any
-
 	public dataKeyOffset?: number
+	private device: any
 
 	constructor(device: any) {
 		super()

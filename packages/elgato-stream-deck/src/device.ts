@@ -9,9 +9,8 @@ export interface StreamDeckDeviceInfo {
 }
 
 export class NodeHIDDevice extends EventEmitter implements HIDDevice {
-	private device: HID.HID
-
 	public dataKeyOffset?: number
+	private device: HID.HID
 
 	constructor(deviceInfo: StreamDeckDeviceInfo) {
 		super()

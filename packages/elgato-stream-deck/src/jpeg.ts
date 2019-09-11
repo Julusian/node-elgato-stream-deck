@@ -8,7 +8,7 @@ try {
 	// This is expected and can be ignored
 }
 
-export function encodeJPEG(buffer: Buffer, width: number, height: number): Buffer {
+export function encodeJPEG(buffer: Buffer, width: number, height: number): Promise<Buffer> {
 	try {
 		// Try using jpeg-turbo if it is available
 		if (jpegTurbo && jpegTurbo.bufferSize && jpegTurbo.compressSync) {
@@ -20,7 +20,15 @@ export function encodeJPEG(buffer: Buffer, width: number, height: number): Buffe
 			}
 			if (buffer.length === width * height * 4) {
 				const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(options))
-				return jpegTurbo.compressSync(buffer, tmpBuffer, options)
+				return new Promise((resolve, reject) => {
+					jpegTurbo!.compress(buffer, tmpBuffer, options, (err, resBuffer) => {
+						if (err) {
+							reject(err)
+						} else {
+							resolve(resBuffer)
+						}
+					})
+				})
 			}
 		}
 	} catch (e) {
@@ -37,5 +45,5 @@ export function encodeJPEG(buffer: Buffer, width: number, height: number): Buffe
 		},
 		95
 	)
-	return jpegBuffer2.data
+	return Promise.resolve(jpegBuffer2.data)
 }
