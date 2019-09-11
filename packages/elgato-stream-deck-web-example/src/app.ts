@@ -9,16 +9,31 @@ function appendLog(str: string) {
 
 const consentButton = document.getElementById('consent-button')
 if (consentButton) {
+	let device: StreamDeck | null = null
+
+	const brightnessRange = document.getElementById('brightness-range') as HTMLInputElement
+	if (brightnessRange) {
+		brightnessRange.addEventListener('input', _e => {
+			const value = (brightnessRange.value as any) as number
+			if (device) {
+				device.setBrightness(value)
+			}
+		})
+	}
+
 	consentButton.addEventListener('click', async () => {
+		if (device) {
+			appendLog('Closing device')
+			await device.close()
+			device = null
+		}
 		// Prompt for a device
-		let device: StreamDeck
 		try {
-			const device2 = await requestStreamDeck()
-			if (!device2) {
+			device = await requestStreamDeck()
+			if (!device) {
 				appendLog('No device was selected')
 				return
 			}
-			device = device2
 		} catch (error) {
 			appendLog(`No device access granted: ${error}`)
 			return
@@ -27,6 +42,9 @@ if (consentButton) {
 		appendLog(
 			`Device opened. Serial: ${await device.getSerialNumber()} Firmware: ${await device.getFirmwareVersion()}`
 		)
+
+		device.on('down', key => appendLog(`Key ${key} down`))
+		device.on('up', key => appendLog(`Key ${key} up`))
 
 		// Sample actions
 		device.setBrightness(70)

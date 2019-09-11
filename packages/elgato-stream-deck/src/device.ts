@@ -11,12 +11,22 @@ export interface StreamDeckDeviceInfo {
 export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 	private device: HID.HID
 
+	public dataKeyOffset?: number
+
 	constructor(deviceInfo: StreamDeckDeviceInfo) {
 		super()
 
 		this.device = new HID.HID(deviceInfo.path)
-		this.device.on('data', data => this.emit('data', data))
 		this.device.on('error', error => this.emit('error', error))
+
+		this.device.on('data', data => {
+			// Button press
+			if (data[0] === 0x01) {
+				const keyData = data.slice(this.dataKeyOffset || 0, data.length - 1)
+
+				this.emit('input', keyData)
+			}
+		})
 	}
 
 	public sendFeatureReport(data: number[]): Promise<void> {

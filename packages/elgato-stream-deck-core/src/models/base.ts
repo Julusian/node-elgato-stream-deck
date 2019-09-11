@@ -31,6 +31,11 @@ export interface StreamDeck {
 	readonly MODEL: DeviceModelId
 
 	/**
+	 * Close the device
+	 */
+	close(): Promise<void>
+
+	/**
 	 * Fills the given key with a solid color.
 	 *
 	 * @param {number} keyIndex The key to fill
@@ -127,13 +132,10 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 		this.keyState = new Array(this.NUM_KEYS).fill(false)
 
-		this.device.on('data', data => {
-			// The first byte is a report ID, the last byte appears to be padding.
-			// We strip these out for now.
-			data = data.slice(dataKeyOffset, data.length - 1)
-
+		this.device.dataKeyOffset = dataKeyOffset
+		this.device.on('input', data => {
 			for (let i = 0; i < this.NUM_KEYS; i++) {
-				const keyPressed = Boolean(data[i])
+				const keyPressed = data[i]
 				const keyIndex = this.transformKeyIndex(i)
 				const stateChanged = keyPressed !== this.keyState[keyIndex]
 				if (stateChanged) {
@@ -150,6 +152,10 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		this.device.on('error', err => {
 			this.emit('error', err)
 		})
+	}
+
+	public close() {
+		return this.device.close()
 	}
 
 	public fillColor(keyIndex: KeyIndex, r: number, g: number, b: number) {

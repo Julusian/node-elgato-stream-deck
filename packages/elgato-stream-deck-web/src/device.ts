@@ -20,15 +20,20 @@ export class WebHIDDevice extends EventEmitter implements HIDDevice {
 		this.device.addEventListener('inputreport', (event: any) => {
 			// Button press
 			if (event.reportId === 0x01) {
+				const buttons = []
 				const data = new Uint8Array(event.data.buffer)
+				// TODO - offset for XL?
 				for (let i = 0; i < 15; i++) {
-					if (data[i]) {
-						// TODO - properly
-						console.log(`Pressed: ${i}`)
-					}
+					buttons[i] = !!data[i]
 				}
+
+				this.emit('input', buttons)
 			}
 		})
+	}
+
+	public close(): Promise<void> {
+		return this.device.close()
 	}
 
 	public sendFeatureReport(data: number[]): Promise<void> {
