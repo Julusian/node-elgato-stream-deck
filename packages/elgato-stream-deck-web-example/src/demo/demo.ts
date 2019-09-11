@@ -1,9 +1,9 @@
 import { KeyIndex, StreamDeck } from 'elgato-stream-deck-core'
 
 export interface Demo {
-	start(device: StreamDeck): void
-	stop(device: StreamDeck): void
+	start(device: StreamDeck): Promise<void>
+	stop(device: StreamDeck): Promise<void>
 
-	keyDown(device: StreamDeck, keyIndex: KeyIndex): void
-	keyUp(device: StreamDeck, keyIndex: KeyIndex): void
+	keyDown(device: StreamDeck, keyIndex: KeyIndex): Promise<void>
+	keyUp(device: StreamDeck, keyIndex: KeyIndex): Promise<void>
 }

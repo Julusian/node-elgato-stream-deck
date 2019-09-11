@@ -20,7 +20,7 @@ export class StreamDeckMini extends StreamDeckBase {
 		return keyIndex
 	}
 
-	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number): Buffer {
+	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number): Promise<Buffer> {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
 			sourceOffset,
@@ -31,7 +31,7 @@ export class StreamDeckMini extends StreamDeckBase {
 			this.ICON_SIZE
 		)
 		writeBMPHeader(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 2835)
-		return byteBuffer
+		return Promise.resolve(byteBuffer)
 	}
 
 	protected getFillImagePacketLength() {

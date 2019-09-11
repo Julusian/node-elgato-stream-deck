@@ -10,7 +10,7 @@ function getRandomIntInclusive(min: number, max: number) {
 export class RapidFillDemo implements Demo {
 	private interval: number | undefined
 
-	start(device: StreamDeck): void {
+	async start(device: StreamDeck): Promise<void> {
 		if (!this.interval) {
 			this.interval = window.setInterval(() => {
 				const r = getRandomIntInclusive(0, 255)
@@ -23,12 +23,12 @@ export class RapidFillDemo implements Demo {
 			}, 1000 / 5)
 		}
 	}
-	stop(_device: StreamDeck): void {
+	async stop(_device: StreamDeck): Promise<void> {
 		if (this.interval) {
 			window.clearInterval(this.interval)
 			this.interval = undefined
 		}
 	}
-	keyDown(_device: StreamDeck, _keyIndex: number): void {}
-	keyUp(_device: StreamDeck, _keyIndex: number): void {}
+	async keyDown(_device: StreamDeck, _keyIndex: number): Promise<void> {}
+	async keyUp(_device: StreamDeck, _keyIndex: number): Promise<void> {}
 }

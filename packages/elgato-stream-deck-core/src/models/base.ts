@@ -5,7 +5,7 @@ import { DeviceModelId } from '../models'
 import { bufferToIntArray, numberArrayToString } from '../util'
 import { KeyIndex } from './id'
 
-export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Buffer
+export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
 export interface OpenStreamDeckOptions {
 	useOriginalKeyOrder?: boolean
@@ -43,7 +43,7 @@ export interface StreamDeck {
 	 * @param {number} g The color's green value. 0 - 255
 	 * @param {number} b The color's blue value. 0 -255
 	 */
-	fillColor(keyIndex: KeyIndex, r: number, g: number, b: number): void
+	fillColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
 
 	/**
 	 * Fills the given key with an image in a Buffer.
@@ -51,38 +51,38 @@ export interface StreamDeck {
 	 * @param {number} keyIndex The key to fill
 	 * @param {Buffer} imageBuffer
 	 */
-	fillImage(keyIndex: KeyIndex, imageBuffer: Buffer): void
+	fillImage(keyIndex: KeyIndex, imageBuffer: Buffer): Promise<void>
 
 	/**
 	 * Fills the whole panel with an image in a Buffer.
 	 *
 	 * @param {Buffer} imageBuffer
 	 */
-	fillPanel(imageBuffer: Buffer): void
+	fillPanel(imageBuffer: Buffer): Promise<void>
 
 	/**
 	 * Clears the given key.
 	 *
 	 * @param {number} keyIndex The key to clear
 	 */
-	clearKey(keyIndex: KeyIndex): void
+	clearKey(keyIndex: KeyIndex): Promise<void>
 
 	/**
 	 * Clears all keys.
 	 */
-	clearAllKeys(): void
+	clearAllKeys(): Promise<void>
 
 	/**
 	 * Sets the brightness of the keys on the Stream Deck
 	 *
 	 * @param {number} percentage The percentage brightness
 	 */
-	setBrightness(percentage: number): void
+	setBrightness(percentage: number): Promise<void>
 
 	/**
 	 * Resets the display to the startup logo
 	 */
-	resetToLogo(): void
+	resetToLogo(): Promise<void>
 
 	/**
 	 * Get firmware version from Stream Deck
@@ -158,7 +158,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.device.close()
 	}
 
-	public fillColor(keyIndex: KeyIndex, r: number, g: number, b: number) {
+	public fillColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
 		this.checkRGBValue(r)
@@ -167,10 +167,10 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 		const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]))
 		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		this.fillImageRange(keyIndex2, pixels, 0, this.ICON_SIZE * 3)
+		return this.fillImageRange(keyIndex2, pixels, 0, this.ICON_SIZE * 3)
 	}
 
-	public fillImage(keyIndex: KeyIndex, imageBuffer: Buffer) {
+	public fillImage(keyIndex: KeyIndex, imageBuffer: Buffer): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
 		if (imageBuffer.length !== this.ICON_BYTES) {
@@ -178,10 +178,10 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		}
 
 		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		this.fillImageRange(keyIndex2, imageBuffer, 0, this.ICON_SIZE * 3)
+		return this.fillImageRange(keyIndex2, imageBuffer, 0, this.ICON_SIZE * 3)
 	}
 
-	public fillPanel(imageBuffer: Buffer) {
+	public async fillPanel(imageBuffer: Buffer): Promise<void> {
 		if (imageBuffer.length !== this.ICON_BYTES * this.NUM_KEYS) {
 			throw new RangeError(
 				`Expected image buffer of length ${this.ICON_BYTES * this.NUM_KEYS}, got length ${imageBuffer.length}`
@@ -201,24 +201,24 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 				const rowOffset = stride * row * this.ICON_SIZE
 				const colOffset = column * this.ICON_SIZE * 3
 
-				this.fillImageRange(index, imageBuffer, rowOffset + colOffset, stride)
+				await this.fillImageRange(index, imageBuffer, rowOffset + colOffset, stride)
 			}
 		}
 	}
 
-	public clearKey(keyIndex: KeyIndex) {
+	public clearKey(keyIndex: KeyIndex): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 		return this.fillColor(keyIndex, 0, 0, 0)
 	}
 
-	public clearAllKeys() {
+	public async clearAllKeys(): Promise<void> {
 		// TODO - this could be restructured to be more efficient (by reusing the final colour buffer)
 		for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
-			this.clearKey(keyIndex)
+			await this.clearKey(keyIndex)
 		}
 	}
 
-	public setBrightness(percentage: number) {
+	public async setBrightness(percentage: number): Promise<void> {
 		if (percentage < 0 || percentage > 100) {
 			throw new RangeError('Expected brightness percentage to be between 0 and 100')
 		}
@@ -229,30 +229,34 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 			0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		]
-		this.device.sendFeatureReport(brightnessCommandBuffer)
+		await this.device.sendFeatureReport(brightnessCommandBuffer)
 	}
 
-	public resetToLogo() {
+	public async resetToLogo(): Promise<void> {
 		// prettier-ignore
 		const resetCommandBuffer = [
 			0x0b,
 			0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		]
-		this.device.sendFeatureReport(resetCommandBuffer)
+		await this.device.sendFeatureReport(resetCommandBuffer)
 	}
 
-	public getFirmwareVersion() {
+	public getFirmwareVersion(): Promise<string> {
 		return this.device.getFeatureReport(4, 17).then(val => numberArrayToString(val.slice(5)))
 	}
 
-	public getSerialNumber() {
+	public getSerialNumber(): Promise<string> {
 		return this.device.getFeatureReport(3, 17).then(val => numberArrayToString(val.slice(5)))
 	}
 
 	protected abstract transformKeyIndex(keyIndex: KeyIndex): KeyIndex
 
-	protected abstract convertFillImage(imageBuffer: Buffer, sourceOffset: number, sourceStride: number): Buffer
+	protected abstract convertFillImage(
+		imageBuffer: Buffer,
+		sourceOffset: number,
+		sourceStride: number
+	): Promise<Buffer>
 
 	protected getFillImageCommandHeaderLength() {
 		return 16
@@ -299,14 +303,14 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return result
 	}
 
-	private fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOffset: number, sourceStride: number) {
+	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOffset: number, sourceStride: number) {
 		this.checkValidKeyIndex(keyIndex)
 
-		const byteBuffer = this.convertFillImage(imageBuffer, sourceOffset, sourceStride)
+		const byteBuffer = await this.convertFillImage(imageBuffer, sourceOffset, sourceStride)
 
 		const packets = this.generateFillImageWrites(keyIndex, byteBuffer)
 		for (const packet of packets) {
-			this.device.sendReport(packet)
+			await this.device.sendReport(packet)
 		}
 	}
 

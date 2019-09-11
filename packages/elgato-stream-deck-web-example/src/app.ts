@@ -91,4 +91,52 @@ if (consentButton) {
 	})
 
 	appendLog('Page loaded')
+
+	// const img = new Image() // Create new img element
+	// img.src = 'github_logo.png' // Set source path
+
+	// const canvas = document.createElement('canvas')
+	// canvas.width = 100
+	// canvas.height = 100
+	// const ctx = canvas.getContext('2d')
+
+	// if (ctx) {
+	// 	const myImageData = ctx.createImageData(100, 100)
+
+	// 	// myImageData.data.set()
+
+	// 	// TODO
+	// 	ctx.putImageData(myImageData, 0, 0)
+	// }
+
+	// img.addEventListener(
+	// 	'load',
+	// 	function() {
+	// 		// execute drawImage statements here
+	// 		ctx!.drawImage(img, 0, 0, 100, 100)
+
+	// 		canvas.toBlob(
+	// 			b => {
+	// 				console.log('blob', b!.size)
+	// 			},
+	// 			'image/jpeg',
+	// 			0.9
+	// 		)
+	// 	},
+	// 	false
+	// )
+
+	// canvas.toBlob(
+	// 	b => {
+	// 		console.log('blob', b!.size)
+	// 	},
+	// 	'image/jpeg',
+	// 	0.9
+	// )
+
+	// canvasToImage(canvas, {
+	// 	name: 'myImage',
+	// 	type: 'jpg',
+	// 	quality: 0.7
+	// })
 }

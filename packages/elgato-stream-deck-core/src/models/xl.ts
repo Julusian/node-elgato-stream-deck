@@ -24,7 +24,7 @@ export class StreamDeckXL extends StreamDeckBase {
 	 *
 	 * @param {number} percentage The percentage brightness
 	 */
-	public setBrightness(percentage: number) {
+	public async setBrightness(percentage: number): Promise<void> {
 		if (percentage < 0 || percentage > 100) {
 			throw new RangeError('Expected brightness percentage to be between 0 and 100')
 		}
@@ -37,23 +37,23 @@ export class StreamDeckXL extends StreamDeckBase {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		]
-		this.device.sendFeatureReport(brightnessCommandBuffer)
+		await this.device.sendFeatureReport(brightnessCommandBuffer)
 	}
 
-	public resetToLogo() {
+	public async resetToLogo(): Promise<void> {
 		// prettier-ignore
 		const resetCommandBuffer = [
 			0x03,
 			0x02
 		]
-		this.device.sendFeatureReport(resetCommandBuffer)
+		await this.device.sendFeatureReport(resetCommandBuffer)
 	}
 
-	public getFirmwareVersion() {
+	public getFirmwareVersion(): Promise<string> {
 		return this.device.getFeatureReport(5, 32).then(val => numberArrayToString(val.slice(6)))
 	}
 
-	public getSerialNumber() {
+	public getSerialNumber(): Promise<string> {
 		return this.device.getFeatureReport(6, 32).then(val => numberArrayToString(val.slice(2)))
 	}
 
@@ -84,7 +84,7 @@ export class StreamDeckXL extends StreamDeckBase {
 		return 1024
 	}
 
-	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number): Buffer {
+	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number): Promise<Buffer> {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
 			sourceOffset,

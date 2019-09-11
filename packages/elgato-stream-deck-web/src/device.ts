@@ -25,7 +25,6 @@ export class WebHIDDevice extends EventEmitter implements HIDDevice {
 				const data = new Uint8Array(event.data.buffer)
 				const offset = this.dataKeyOffset || 1
 				const buttons = Array.from(data).slice(offset - 1, data.length - 1)
-				console.log(`len ${buttons.length} ${data.length}, ${this.dataKeyOffset}`)
 				this.emit('input', buttons)
 			}
 		})

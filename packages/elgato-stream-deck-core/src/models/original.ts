@@ -35,7 +35,7 @@ export class StreamDeckOriginal extends StreamDeckBase {
 		return 8191
 	}
 
-	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number): Buffer {
+	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number): Promise<Buffer> {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
 			sourceOffset,
@@ -46,7 +46,7 @@ export class StreamDeckOriginal extends StreamDeckBase {
 			this.ICON_SIZE
 		)
 		writeBMPHeader(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 3780)
-		return byteBuffer
+		return Promise.resolve(byteBuffer)
 	}
 
 	protected generateFillImageWrites(keyIndex: KeyIndex, byteBuffer: Buffer): number[][] {
