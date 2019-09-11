@@ -135,7 +135,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		this.device.dataKeyOffset = dataKeyOffset
 		this.device.on('input', data => {
 			for (let i = 0; i < this.NUM_KEYS; i++) {
-				const keyPressed = data[i]
+				const keyPressed = Boolean(data[i])
 				const keyIndex = this.transformKeyIndex(i)
 				const stateChanged = keyPressed !== this.keyState[keyIndex]
 				if (stateChanged) {

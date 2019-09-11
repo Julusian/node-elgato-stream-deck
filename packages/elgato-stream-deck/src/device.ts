@@ -23,10 +23,14 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 			// Button press
 			if (data[0] === 0x01) {
 				const keyData = data.slice(this.dataKeyOffset || 0, data.length - 1)
-
 				this.emit('input', keyData)
 			}
 		})
+	}
+
+	public close(): Promise<void> {
+		this.device.close()
+		return Promise.resolve()
 	}
 
 	public sendFeatureReport(data: number[]): Promise<void> {

@@ -11,6 +11,8 @@ export interface StreamDeckDeviceInfo {
 export class WebHIDDevice extends EventEmitter implements HIDDevice {
 	private device: any
 
+	public dataKeyOffset?: number
+
 	constructor(device: any) {
 		super()
 
@@ -20,13 +22,10 @@ export class WebHIDDevice extends EventEmitter implements HIDDevice {
 		this.device.addEventListener('inputreport', (event: any) => {
 			// Button press
 			if (event.reportId === 0x01) {
-				const buttons = []
 				const data = new Uint8Array(event.data.buffer)
-				// TODO - offset for XL?
-				for (let i = 0; i < 15; i++) {
-					buttons[i] = !!data[i]
-				}
-
+				const offset = this.dataKeyOffset || 1
+				const buttons = Array.from(data).slice(offset - 1, data.length - 1)
+				console.log(`len ${buttons.length} ${data.length}, ${this.dataKeyOffset}`)
 				this.emit('input', buttons)
 			}
 		})

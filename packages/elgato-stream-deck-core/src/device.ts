@@ -2,7 +2,7 @@ export interface HIDDevice {
 	dataKeyOffset?: number
 
 	on(event: 'error', handler: (data: any) => void): this
-	on(event: 'input', handler: (keys: boolean[]) => void): this
+	on(event: 'input', handler: (keys: number[]) => void): this
 
 	close(): Promise<void>
 
