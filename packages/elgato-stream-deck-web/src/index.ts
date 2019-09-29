@@ -2,6 +2,8 @@ import { DEVICE_MODELS, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from 'elg
 import { WebHIDDevice } from './device'
 import { encodeJPEG } from './jpeg'
 
+export { DeviceModelId, KeyIndex, StreamDeck } from 'elgato-stream-deck-core'
+
 // TODO - typings
 export async function requestStreamDeck(options?: OpenStreamDeckOptions): Promise<StreamDeck | null> {
 	// TODO - error handling

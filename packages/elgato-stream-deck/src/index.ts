@@ -3,6 +3,8 @@ import * as HID from 'node-hid'
 import { NodeHIDDevice, StreamDeckDeviceInfo } from './device'
 import { encodeJPEG } from './jpeg'
 
+export { DeviceModelId, KeyIndex, StreamDeck } from 'elgato-stream-deck-core'
+
 /*
  * The original StreamDeck uses packet sizes too large for the hidraw driver which is
  * the default on linux. https://github.com/node-hid/node-hid/issues/249
