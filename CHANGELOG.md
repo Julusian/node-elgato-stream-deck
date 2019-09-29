@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/lange/node-elgato-stream-deck/compare/v3.0.0...v3.1.0) (2019-09-29)
+
+
+### Bug Fixes
+
+* **xl:** resetToLogo not working ([2475726](https://github.com/lange/node-elgato-stream-deck/commit/2475726))
+
+
+### Features
+
+* Add close method to cleanly close the HID device ([#72](https://github.com/lange/node-elgato-stream-deck/issues/72)) ([877b5da](https://github.com/lange/node-elgato-stream-deck/commit/877b5da))
+
 ## [3.0.0](https://github.com/lange/node-elgato-stream-deck/compare/v2.1.1...v3.0.0) (2019-06-03)
 
 
