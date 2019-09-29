@@ -150,6 +150,15 @@ function runForDevice(path: string, model: DeviceModelId) {
 		})
 	}
 
+	test('close', () => {
+		const device = getDevice()
+		device.close = jest.fn()
+
+		streamDeck.close()
+
+		expect(device.close).toHaveBeenCalledTimes(1)
+	})
+
 	test('fillPanel', () => {
 		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.ICON_BYTES)
 

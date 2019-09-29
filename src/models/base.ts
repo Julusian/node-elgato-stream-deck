@@ -86,6 +86,11 @@ export interface StreamDeck {
 	 */
 	getSerialNumber(): string
 
+	/**
+	 * Close the Stream Deck
+	 */
+	close(): void
+
 	on(event: 'down' | 'up', listener: (keyIndex: KeyIndex) => void): any
 	on(event: 'error', listener: (e: any) => void): any
 }
@@ -239,6 +244,10 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 	public getSerialNumber() {
 		return numberArrayToString(this.device.getFeatureReport(3, 17).slice(5))
+	}
+
+	public close() {
+		this.device.close()
 	}
 
 	protected abstract transformKeyIndex(keyIndex: KeyIndex): KeyIndex
