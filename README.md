@@ -77,7 +77,7 @@ However, in the event that installation _does_ fail (**or if you are on a platfo
 -   [Example](#example)
 -   [API](#api)
     -   [`openStreamDeck`](#open-streamdeck)
-    -   [`listDevices`](#list-devices)
+    -   [`listStreamDecks`](#list-streamdecks)
     -   [`getStreamDeckInfo`](#get-streamdeck-info)
     -   [`fillColor`](#fill-color)
     -   [`fillImage`](#fill-image)
@@ -189,12 +189,12 @@ const streamDeck = openStreamDeck('0001:0021:00', {
 })
 ```
 
-#### <a name="list-devices"></a> `> listDevices() -> Array<StreamDeckDeviceInfo>`
+#### <a name="list-streamdecks"></a> `> listStreamDecks() -> Array<StreamDeckDeviceInfo>`
 
 This will scan for and list all detected StreamDeck devices on the system along with their model. The path property can be passed into the constructor to open a specific device.
 
 ```javascript
-console.log('Devices: ', listDevices())
+console.log('Devices: ', listStreamDecks())
 /**
  * Devices: [
  *   {
