@@ -1,6 +1,6 @@
 import { encodeJPEG } from '../jpeg'
 import { imageToByteArray, numberArrayToString } from '../util'
-import { StreamDeckBase, StreamDeckProperties } from './base'
+import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { DeviceModelId, KeyIndex, StreamDeckDeviceInfo } from './id'
 
 const xlProperties: StreamDeckProperties = {
@@ -8,12 +8,13 @@ const xlProperties: StreamDeckProperties = {
 	COLUMNS: 8,
 	ROWS: 4,
 	ICON_SIZE: 96,
-	KEY_DIRECTION: 'ltr'
+	KEY_DIRECTION: 'ltr',
+	KEY_DATA_OFFSET: 4
 }
 
 export class StreamDeckXL extends StreamDeckBase {
-	constructor(deviceInfo: StreamDeckDeviceInfo) {
-		super(deviceInfo, xlProperties, 4)
+	constructor(deviceInfo: StreamDeckDeviceInfo, options: OpenStreamDeckOptions) {
+		super(deviceInfo, options, xlProperties)
 	}
 	/**
 	 * Sets the brightness of the keys on the Stream Deck

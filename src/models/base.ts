@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events'
+import exitHook = require('exit-hook')
 import * as HID from 'node-hid'
 
 import { DeviceModelId } from '../models'
@@ -7,6 +8,7 @@ import { KeyIndex, StreamDeckDeviceInfo } from './id'
 
 export interface OpenStreamDeckOptions {
 	useOriginalKeyOrder?: boolean
+	resetToLogoOnExit?: boolean
 }
 
 export interface StreamDeckProperties {
@@ -15,6 +17,7 @@ export interface StreamDeckProperties {
 	ROWS: number
 	ICON_SIZE: number
 	KEY_DIRECTION: 'ltr' | 'rtl'
+	KEY_DATA_OFFSET: number
 }
 
 export interface StreamDeck {
@@ -117,22 +120,33 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.deviceProperties.MODEL
 	}
 
-	protected device: HID.HID
-	private deviceProperties: StreamDeckProperties
-	private keyState: boolean[]
+	protected readonly device: HID.HID
+	private readonly releaseExitHook: () => void
+	private readonly deviceProperties: Readonly<StreamDeckProperties>
+	private readonly options: Readonly<OpenStreamDeckOptions>
+	private readonly keyState: boolean[]
 
-	constructor(deviceInfo: StreamDeckDeviceInfo, properties: StreamDeckProperties, dataKeyOffset: number) {
+	constructor(deviceInfo: StreamDeckDeviceInfo, options: OpenStreamDeckOptions, properties: StreamDeckProperties) {
 		super()
 
 		this.deviceProperties = properties
+		this.options = options
 		this.device = new HID.HID(deviceInfo.path)
+
+		this.releaseExitHook = exitHook(() => {
+			try {
+				this.close()
+			} catch (e) {
+				// Ignore errors, as device is already closed
+			}
+		})
 
 		this.keyState = new Array(this.NUM_KEYS).fill(false)
 
 		this.device.on('data', data => {
 			// The first byte is a report ID, the last byte appears to be padding.
 			// We strip these out for now.
-			data = data.slice(dataKeyOffset, data.length - 1)
+			data = data.slice(this.deviceProperties.KEY_DATA_OFFSET, data.length - 1)
 
 			for (let i = 0; i < this.NUM_KEYS; i++) {
 				const keyPressed = Boolean(data[i])
@@ -247,6 +261,11 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 	}
 
 	public close() {
+		this.releaseExitHook()
+		if (this.options.resetToLogoOnExit) {
+			// This makes the reset happen much quicker than the default timeout
+			this.resetToLogo()
+		}
 		this.device.close()
 	}
 

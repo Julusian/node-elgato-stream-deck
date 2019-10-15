@@ -62,7 +62,7 @@ const models = [
 	}
 ]
 
-export function openStreamDeck(devicePath?: string, options?: OpenStreamDeckOptions): StreamDeck {
+export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeckOptions): StreamDeck {
 	let foundDevices = listStreamDecks()
 	if (devicePath) {
 		foundDevices = foundDevices.filter(d => d.path === devicePath)
@@ -76,9 +76,8 @@ export function openStreamDeck(devicePath?: string, options?: OpenStreamDeckOpti
 		}
 	}
 
-	if (!options) {
-		options = {}
-	}
+	// Clone the options, to ensure they dont get changed
+	const options = { ...userOptions }
 
 	const model = models.find(m => m.id === foundDevices[0].model)
 	if (!model) {

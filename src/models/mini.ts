@@ -1,5 +1,5 @@
 import { BMP_HEADER_LENGTH, imageToByteArray, writeBMPHeader } from '../util'
-import { StreamDeckBase, StreamDeckProperties } from './base'
+import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { DeviceModelId, KeyIndex, StreamDeckDeviceInfo } from './id'
 
 const miniProperties: StreamDeckProperties = {
@@ -7,12 +7,13 @@ const miniProperties: StreamDeckProperties = {
 	COLUMNS: 3,
 	ROWS: 2,
 	ICON_SIZE: 80,
-	KEY_DIRECTION: 'ltr'
+	KEY_DIRECTION: 'ltr',
+	KEY_DATA_OFFSET: 1
 }
 
 export class StreamDeckMini extends StreamDeckBase {
-	constructor(deviceInfo: StreamDeckDeviceInfo) {
-		super(deviceInfo, miniProperties, 1)
+	constructor(deviceInfo: StreamDeckDeviceInfo, options: OpenStreamDeckOptions) {
+		super(deviceInfo, options, miniProperties)
 	}
 
 	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {

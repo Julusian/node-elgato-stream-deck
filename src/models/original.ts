@@ -2,19 +2,20 @@ import { BMP_HEADER_LENGTH, bufferToIntArray, imageToByteArray, writeBMPHeader }
 import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { DeviceModelId, KeyIndex, StreamDeckDeviceInfo } from './id'
 
-const miniProperties: StreamDeckProperties = {
+const origProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.ORIGINAL,
 	COLUMNS: 5,
 	ROWS: 3,
 	ICON_SIZE: 72,
-	KEY_DIRECTION: 'rtl'
+	KEY_DIRECTION: 'rtl',
+	KEY_DATA_OFFSET: 1
 }
 
 export class StreamDeckOriginal extends StreamDeckBase {
 	private readonly useOriginalKeyOrder: boolean
 
 	constructor(deviceInfo: StreamDeckDeviceInfo, options: OpenStreamDeckOptions) {
-		super(deviceInfo, miniProperties, 1)
+		super(deviceInfo, options, origProperties)
 
 		this.useOriginalKeyOrder = !!options.useOriginalKeyOrder
 	}
