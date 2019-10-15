@@ -62,8 +62,7 @@
     "unit": "jest",
     "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
     "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
-    "lint": "tslint --project tsconfig.json --config tslint.json && yarn prettier --check \"src/**/*.ts\"",
-    "lint-fix": "tslint --project tsconfig.json --config tslint.json --fix && yarn prettier --write \"src/**/*.ts\"",
+    "lint": "tslint --project tsconfig.json --config tslint.json",
     "tslint-check": "tslint-config-prettier-check ./tslint.json",
     "validate:dependencies": "yarn audit && yarn license-validate",
     "license-validate": "node-license-validator -p -d --allow-licenses MIT BSD BSD-3-Clause ISC Apache Unlicense WTFPL"
@@ -102,6 +101,7 @@
     "ts-node": "^8.1.0",
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
     "typescript": "^3.4.2",
     "usb-detection": "^4.3.0",
     "weallbehave": "^1.2.0",
