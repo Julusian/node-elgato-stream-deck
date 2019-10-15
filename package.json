@@ -84,7 +84,7 @@
     "@types/jpeg-js": "^0.3.0",
     "@types/node": "^12.0.4",
     "@types/node-hid": "^0.7.0",
-    "@types/sharp": "^0.22.2",
+    "@types/sharp": "^0.23.0",
     "coveralls": "^3.0.3",
     "jest": "^24.7.1",
     "jest-haste-map": "^24.7.1",
