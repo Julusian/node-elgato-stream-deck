@@ -3425,7 +3425,7 @@ ee-first@1.1.1:
 "elgato-stream-deck-web@file:packages/elgato-stream-deck-web":
   version "4.0.0-alpha.0"
   dependencies:
-    elgato-stream-deck-core "file:../../.cache/yarn/v6/npm-elgato-stream-deck-web-4.0.0-alpha.0-8cf0ce07-4ed1-4b49-9d2c-8dcb8237847d-1571598440554/node_modules/elgato-stream-deck-core"
+    elgato-stream-deck-core "file:../../.cache/yarn/v6/npm-elgato-stream-deck-web-4.0.0-alpha.0-ca6a208a-8b9a-4a2d-838e-d129e6e111f4-1571604122691/node_modules/elgato-stream-deck-core"
 
 elliptic@^6.0.0:
   version "6.5.1"
@@ -4603,6 +4603,11 @@ html-entities@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-1.2.1.tgz#0df29351f0721163515dfb9e5543e5f6eed5162f"
   integrity sha1-DfKTUfByEWNRXfueVUPl9u7VFi8=
+
+html-to-image@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/html-to-image/-/html-to-image-0.1.1.tgz#0db51267b4bbd1bc682a07d8dae44bc431ec6acd"
+  integrity sha512-UAjpXmokENeOyzfLwL0+zQ502lXyg6pkzVUmRjtljOH9dR/YdEYQhWrQ/O14hmH5/1L7jv1aOupU4Zi3Y8+iow==
 
 http-cache-semantics@^3.8.1:
   version "3.8.1"

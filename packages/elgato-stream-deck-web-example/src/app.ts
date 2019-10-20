@@ -2,6 +2,7 @@ import { requestStreamDeck, StreamDeck } from 'elgato-stream-deck-web'
 import { Demo } from './demo/demo'
 import { FillWhenPressedDemo } from './demo/fill-when-pressed'
 import { RapidFillDemo } from './demo/rapid-fill'
+import { DomImageDemo } from './demo/dom'
 
 function appendLog(str: string) {
 	const logElm = document.getElementById('log')
@@ -34,6 +35,9 @@ if (consentButton) {
 			switch (demoSelect.value) {
 				case 'rapid-fill':
 					demo = new RapidFillDemo()
+					break
+				case 'dom':
+					demo = new DomImageDemo()
 					break
 				case 'fill-when-pressed':
 				default:

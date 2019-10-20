@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "cross-env": "^5.1.1",
+    "html-to-image": "^0.1.1",
     "elgato-stream-deck-web": "file:../elgato-stream-deck-web"
   },
   "devDependencies": {
