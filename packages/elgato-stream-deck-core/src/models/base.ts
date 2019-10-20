@@ -33,6 +33,12 @@ export interface StreamDeck {
 	readonly MODEL: DeviceModelId
 
 	/**
+	 * Checks if a keyIndex is valid. Throws an error on failure
+	 * @param keyIndex The key to check
+	 */
+	checkValidKeyIndex(keyIndex: KeyIndex): void
+
+	/**
 	 * Close the device
 	 */
 	close(): Promise<void>
@@ -156,6 +162,12 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		this.device.on('error', err => {
 			this.emit('error', err)
 		})
+	}
+
+	public checkValidKeyIndex(keyIndex: KeyIndex) {
+		if (keyIndex < 0 || keyIndex >= this.NUM_KEYS) {
+			throw new TypeError(`Expected a valid keyIndex 0 - ${this.NUM_KEYS - 1}`)
+		}
 	}
 
 	public close() {
@@ -315,12 +327,6 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		const packets = this.generateFillImageWrites(keyIndex, byteBuffer)
 		for (const packet of packets) {
 			await this.device.sendReport(packet)
-		}
-	}
-
-	private checkValidKeyIndex(keyIndex: KeyIndex) {
-		if (keyIndex < 0 || keyIndex >= this.NUM_KEYS) {
-			throw new TypeError(`Expected a valid keyIndex 0 - ${this.NUM_KEYS - 1}`)
 		}
 	}
 

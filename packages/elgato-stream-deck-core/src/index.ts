@@ -2,6 +2,7 @@ import { DeviceModelId, StreamDeckMini, StreamDeckOriginal, StreamDeckXL } from 
 
 export { HIDDevice } from './device'
 export { DeviceModelId, KeyIndex, StreamDeck, OpenStreamDeckOptions } from './models'
+export { StreamDeckProxy } from './proxy'
 
 export const VENDOR_ID = 0x0fd9
 

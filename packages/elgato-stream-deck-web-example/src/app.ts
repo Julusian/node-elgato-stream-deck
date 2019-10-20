@@ -1,4 +1,4 @@
-import { requestStreamDeck, StreamDeck } from 'elgato-stream-deck-web'
+import { requestStreamDeck, StreamDeckWeb } from 'elgato-stream-deck-web'
 import { Demo } from './demo/demo'
 import { DomImageDemo } from './demo/dom'
 import { FillWhenPressedDemo } from './demo/fill-when-pressed'
@@ -14,7 +14,7 @@ function appendLog(str: string) {
 const consentButton = document.getElementById('consent-button')
 if (consentButton) {
 	let demo: Demo = new FillWhenPressedDemo()
-	let device: StreamDeck | null = null
+	let device: StreamDeckWeb | null = null
 
 	const brightnessRange = document.getElementById('brightness-range') as HTMLInputElement | undefined
 	if (brightnessRange) {
