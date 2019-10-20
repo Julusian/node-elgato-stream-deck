@@ -6,12 +6,14 @@
     "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
     "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
     "start-web": "cd packages/elgato-stream-deck-web-example && yarn start",
-    "dist-web": "cd packages/elgato-stream-deck-web-example && yarn dist"
+    "dist-web": "cd packages/elgato-stream-deck-web-example && yarn dist",
+    "build": "yarn lerna run build",
+    "test": "yarn lerna run test"
   },
   "devDependencies": {
     "@types/jest": "^24.0.11",
     "@types/jpeg-js": "^0.3.0",
-    "@types/sharp": "^0.22.2",
+    "@types/sharp": "^0.23.0",
     "coveralls": "^3.0.3",
     "jest": "^24.7.1",
     "jest-haste-map": "^24.7.1",
@@ -21,8 +23,8 @@
     "open-cli": "^5.0.0",
     "prettier": "^1.17.1",
     "pureimage": "^0.1.3",
-    "sharp": "^0.22.1",
-    "standard-version": "^6.0.1",
+    "sharp": "^0.23.1",
+    "standard-version": "^7.0.0",
     "stream-buffers": "^3.0.1",
     "trash-cli": "^3.0.0",
     "ts-jest": "^24.0.2",
@@ -39,5 +41,8 @@
     "packages": [
       "packages/*"
     ]
+  },
+  "dependencies": {
+    "cross-env": "^6.0.3"
   }
 }
