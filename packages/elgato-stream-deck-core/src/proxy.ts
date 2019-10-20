@@ -33,20 +33,20 @@ export class StreamDeckProxy implements StreamDeck {
 	public close(): Promise<void> {
 		return this.device.close()
 	}
-	public fillColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
-		return this.device.fillColor(keyIndex, r, g, b)
+	public fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
+		return this.device.fillKeyColor(keyIndex, r, g, b)
 	}
-	public fillImage(keyIndex: KeyIndex, imageBuffer: Buffer): Promise<void> {
-		return this.device.fillImage(keyIndex, imageBuffer)
+	public fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer): Promise<void> {
+		return this.device.fillKeyBuffer(keyIndex, imageBuffer)
 	}
-	public fillPanel(imageBuffer: Buffer): Promise<void> {
-		return this.device.fillPanel(imageBuffer)
+	public fillPanelBuffer(imageBuffer: Buffer): Promise<void> {
+		return this.device.fillPanelBuffer(imageBuffer)
 	}
 	public clearKey(keyIndex: KeyIndex): Promise<void> {
 		return this.device.clearKey(keyIndex)
 	}
-	public clearAllKeys(): Promise<void> {
-		return this.device.clearAllKeys()
+	public clearPanel(): Promise<void> {
+		return this.device.clearPanel()
 	}
 	public setBrightness(percentage: number): Promise<void> {
 		return this.device.setBrightness(percentage)

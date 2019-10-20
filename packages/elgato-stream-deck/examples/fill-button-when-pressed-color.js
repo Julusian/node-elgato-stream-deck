@@ -6,7 +6,7 @@ streamDeck.clearAllKeys()
 streamDeck.on('down', keyIndex => {
 	// Fill the pressed key with an image of the GitHub logo.
 	console.log('Filling button #%d', keyIndex)
-	streamDeck.fillColor(keyIndex, 255, 0, 0)
+	streamDeck.fillKeyColor(keyIndex, 255, 0, 0)
 })
 
 streamDeck.on('up', keyIndex => {

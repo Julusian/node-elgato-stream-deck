@@ -12,9 +12,9 @@ function addDevice(info) {
 	console.log('Firmware:', streamDecks[path].getFirmwareVersion())
 
 	// Clear all keys
-	streamDecks[path].clearAllKeys()
+	streamDecks[path].clearPanel()
 	// Fill one key in red
-	streamDecks[path].fillColor(0, 255, 0, 0)
+	streamDecks[path].fillKeyColor(0, 255, 0, 0)
 
 	streamDecks[path].resetToLogo()
 

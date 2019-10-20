@@ -46,7 +46,7 @@ font.load(() => {
 				.flatten()
 				.raw()
 				.toBuffer()
-			await streamDeck.fillImage(keyIndex, finalBuffer)
+			await streamDeck.fillKeyBuffer(keyIndex, finalBuffer)
 		} catch (error) {
 			console.error(error)
 		}

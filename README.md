@@ -79,11 +79,11 @@ However, in the event that installation _does_ fail (**or if you are on a platfo
     -   [`openStreamDeck`](#open-streamdeck)
     -   [`listStreamDecks`](#list-streamdecks)
     -   [`getStreamDeckInfo`](#get-streamdeck-info)
-    -   [`fillColor`](#fill-color)
-    -   [`fillImage`](#fill-image)
-    -   [`fillPanel`](#fill-panel)
+    -   [`fillKeyColor`](#fill-color)
+    -   [`fillKeyBuffer`](#fill-image)
+    -   [`fillPanelBuffer`](#fill-panel)
     -   [`clearKey`](#clear-key)
-    -   [`clearAllKeys`](#clear-all-keys)
+    -   [`clearPanel`](#clear-all-keys)
     -   [`setBrightness`](#set-brightness)
     -   [`resetToLogo`](#reset-to-logo)
     -   [`getFirmwareVersion`](#get-firmware-version)
@@ -136,7 +136,7 @@ myStreamDeck.on('error', error => {
 })
 
 // Fill the first button form the left in the first row with a solid red color. This is synchronous.
-myStreamDeck.fillColor(4, 255, 0, 0)
+myStreamDeck.fillKeyColor(4, 255, 0, 0)
 console.log('Successfully wrote a red square to key 4.')
 ```
 
@@ -226,7 +226,7 @@ console.log('Info: ', getStreamDeckInfo('0001:0021:00'))
  */
 ```
 
-#### <a name="fill-color"></a> `> streamDeck.fillColor(keyIndex, r, g, b) -> undefined`
+#### <a name="fill-color"></a> `> streamDeck.fillKeyColor(keyIndex, r, g, b) -> undefined`
 
 Synchronously sets the given `keyIndex`'s screen to a solid RGB color.
 An error will be thrown if the keyIndex is not valid, of a colour component is outside of the range 0-255
@@ -235,10 +235,10 @@ An error will be thrown if the keyIndex is not valid, of a colour component is o
 
 ```javascript
 // Turn key 4 (the top left key) solid red.
-streamDeck.fillColor(4, 255, 0, 0)
+streamDeck.fillKeyColor(4, 255, 0, 0)
 ```
 
-#### <a name="fill-image"></a> `> streamDeck.fillImage(keyIndex, buffer) -> undefined`
+#### <a name="fill-image"></a> `> streamDeck.fillKeyBuffer(keyIndex, buffer) -> undefined`
 
 Synchronously writes a buffer of RGB image data to the given `keyIndex`'s screen.
 The required size of the buffer varies by device, and must be the exact length. Any other length will result in an error being thrown.
@@ -260,14 +260,14 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 	.raw() // Give us uncompressed RGB.
 	.toBuffer()
 	.then(buffer => {
-		streamDeck.fillImage(2, buffer)
+		streamDeck.fillKeyBuffer(2, buffer)
 	})
 	.catch(err => {
 		console.error(err)
 	})
 ```
 
-#### <a name="fill-panel"></a> `> streamDeck.fillPanel(buffer) -> undefined`
+#### <a name="fill-panel"></a> `> streamDeck.fillPanelBuffer(buffer) -> undefined`
 
 Applies an image to the entire panel, spreading it over all keys. The image must be exactly the correct resolution for your device. Any other size will result in an error being thrown.
 
@@ -282,7 +282,7 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 	.raw() // Give us uncompressed RGB.
 	.toBuffer()
 	.then(buffer => {
-		streamDeck.fillPanel(buffer)
+		streamDeck.fillPanelBuffer(buffer)
 	})
 	.catch(err => {
 		console.error(err)
@@ -301,7 +301,7 @@ An error will be thrown if the keyIndex is not valid
 streamDeck.clearKey(2)
 ```
 
-#### <a name="clear-all-keys"></a> `> streamDeck.clearAllKeys() -> undefined`
+#### <a name="clear-all-keys"></a> `> streamDeck.clearPanel() -> undefined`
 
 Synchronously clears all keys on the device.
 
@@ -309,7 +309,7 @@ Synchronously clears all keys on the device.
 
 ```javascript
 // Clear all keys.
-streamDeck.clearAllKeys()
+streamDeck.clearPanel()
 ```
 
 #### <a name="set-brightness"></a> `> streamDeck.setBrightness(percentage) -> undefined`

@@ -3,7 +3,7 @@ const streamDeck = openStreamDeck()
 
 // Fill it white so we can see the brightness changes
 for (let i = 0; i < streamDeck.NUM_KEYS; i++) {
-	streamDeck.fillColor(i, 255, 255, 255)
+	streamDeck.fillKeyColor(i, 255, 255, 255)
 }
 
 streamDeck.on('down', keyIndex => {

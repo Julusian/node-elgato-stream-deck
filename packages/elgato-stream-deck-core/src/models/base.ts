@@ -51,7 +51,7 @@ export interface StreamDeck {
 	 * @param {number} g The color's green value. 0 - 255
 	 * @param {number} b The color's blue value. 0 -255
 	 */
-	fillColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
+	fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
 
 	/**
 	 * Fills the given key with an image in a Buffer.
@@ -59,14 +59,14 @@ export interface StreamDeck {
 	 * @param {number} keyIndex The key to fill
 	 * @param {Buffer} imageBuffer
 	 */
-	fillImage(keyIndex: KeyIndex, imageBuffer: Buffer): Promise<void>
+	fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer): Promise<void>
 
 	/**
 	 * Fills the whole panel with an image in a Buffer.
 	 *
 	 * @param {Buffer} imageBuffer
 	 */
-	fillPanel(imageBuffer: Buffer): Promise<void>
+	fillPanelBuffer(imageBuffer: Buffer): Promise<void>
 
 	/**
 	 * Clears the given key.
@@ -78,7 +78,7 @@ export interface StreamDeck {
 	/**
 	 * Clears all keys.
 	 */
-	clearAllKeys(): Promise<void>
+	clearPanel(): Promise<void>
 
 	/**
 	 * Sets the brightness of the keys on the Stream Deck
@@ -174,7 +174,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.device.close()
 	}
 
-	public fillColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
+	public fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
 		this.checkRGBValue(r)
@@ -186,7 +186,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.fillImageRange(keyIndex2, pixels, 0, this.ICON_SIZE * 3)
 	}
 
-	public fillImage(keyIndex: KeyIndex, imageBuffer: Buffer): Promise<void> {
+	public fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
 		if (imageBuffer.length !== this.ICON_BYTES) {
@@ -197,7 +197,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.fillImageRange(keyIndex2, imageBuffer, 0, this.ICON_SIZE * 3)
 	}
 
-	public async fillPanel(imageBuffer: Buffer): Promise<void> {
+	public async fillPanelBuffer(imageBuffer: Buffer): Promise<void> {
 		if (imageBuffer.length !== this.ICON_BYTES * this.NUM_KEYS) {
 			throw new RangeError(
 				`Expected image buffer of length ${this.ICON_BYTES * this.NUM_KEYS}, got length ${imageBuffer.length}`
@@ -224,13 +224,16 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 	public clearKey(keyIndex: KeyIndex): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
-		return this.fillColor(keyIndex, 0, 0, 0)
+
+		const pixels = Buffer.alloc(this.ICON_BYTES, 0)
+		const keyIndex2 = this.transformKeyIndex(keyIndex)
+		return this.fillImageRange(keyIndex2, pixels, 0, this.ICON_SIZE * 3)
 	}
 
-	public async clearAllKeys(): Promise<void> {
-		// TODO - this could be restructured to be more efficient (by reusing the final colour buffer)
+	public async clearPanel(): Promise<void> {
+		const pixels = Buffer.alloc(this.ICON_BYTES, 0)
 		for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
-			await this.clearKey(keyIndex)
+			await this.fillImageRange(keyIndex, pixels, 0, this.ICON_SIZE * 3)
 		}
 	}
 

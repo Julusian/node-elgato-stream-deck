@@ -6,7 +6,7 @@ export class StreamDeckWeb extends StreamDeckProxy {
 		super(device)
 	}
 
-	public fillCanvas(keyIndex: KeyIndex, canvas: HTMLCanvasElement): Promise<void> {
+	public fillKeyCanvas(keyIndex: KeyIndex, canvas: HTMLCanvasElement): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
 		const ctx = canvas.getContext('2d')
@@ -15,7 +15,7 @@ export class StreamDeckWeb extends StreamDeckProxy {
 		}
 
 		const data = ctx.getImageData(0, 0, this.ICON_SIZE, this.ICON_SIZE)
-		return this.device.fillImage(keyIndex, dropAlpha(data.data))
+		return this.device.fillKeyBuffer(keyIndex, dropAlpha(data.data))
 	}
 
 	public fillPanelCanvas(canvas: HTMLCanvasElement): Promise<void> {
@@ -25,6 +25,6 @@ export class StreamDeckWeb extends StreamDeckProxy {
 		}
 
 		const data = ctx.getImageData(0, 0, this.ICON_SIZE * this.KEY_COLUMNS, this.ICON_SIZE * this.KEY_ROWS)
-		return this.device.fillPanel(dropAlpha(data.data))
+		return this.device.fillPanelBuffer(dropAlpha(data.data))
 	}
 }
