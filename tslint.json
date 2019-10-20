@@ -1,13 +1,17 @@
 {
-	"extends": [
-		"tslint:latest",
-		"tslint-config-prettier"
-	],
+	"extends": ["tslint-plugin-prettier", "tslint:latest", "tslint-config-prettier"],
 	"rules": {
+		"prettier": true,
 		"interface-name": false,
 		"object-literal-sort-keys": false,
 		"no-implicit-dependencies": [false, "optional", ["ts-jest"]],
-		"variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "require-const-for-all-caps"],
+		"variable-name": [
+			true,
+			"ban-keywords",
+			"check-format",
+			"allow-leading-underscore",
+			"require-const-for-all-caps"
+		],
 		"max-classes-per-file": [true, 1, "exclude-class-expressions"]
 	}
 }

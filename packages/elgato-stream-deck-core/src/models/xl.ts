@@ -8,14 +8,15 @@ const xlProperties: StreamDeckProperties = {
 	COLUMNS: 8,
 	ROWS: 4,
 	ICON_SIZE: 96,
-	KEY_DIRECTION: 'ltr'
+	KEY_DIRECTION: 'ltr',
+	KEY_DATA_OFFSET: 4
 }
 
 export class StreamDeckXL extends StreamDeckBase {
 	private encodeJPEG: EncodeJPEGHelper
 
 	constructor(device: HIDDevice, options: OpenStreamDeckOptions) {
-		super(device, xlProperties, 4)
+		super(device, options, xlProperties)
 
 		this.encodeJPEG = options.encodeJPEG!
 	}
@@ -44,7 +45,10 @@ export class StreamDeckXL extends StreamDeckBase {
 		// prettier-ignore
 		const resetCommandBuffer = [
 			0x03,
-			0x02
+			0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		]
 		await this.device.sendFeatureReport(resetCommandBuffer)
 	}

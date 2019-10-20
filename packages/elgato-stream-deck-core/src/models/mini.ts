@@ -1,6 +1,6 @@
 import { HIDDevice } from '../device'
 import { BMP_HEADER_LENGTH, imageToByteArray, writeBMPHeader } from '../util'
-import { StreamDeckBase, StreamDeckProperties } from './base'
+import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { DeviceModelId, KeyIndex } from './id'
 
 const miniProperties: StreamDeckProperties = {
@@ -8,12 +8,13 @@ const miniProperties: StreamDeckProperties = {
 	COLUMNS: 3,
 	ROWS: 2,
 	ICON_SIZE: 80,
-	KEY_DIRECTION: 'ltr'
+	KEY_DIRECTION: 'ltr',
+	KEY_DATA_OFFSET: 1
 }
 
 export class StreamDeckMini extends StreamDeckBase {
-	constructor(device: HIDDevice) {
-		super(device, miniProperties, 1)
+	constructor(device: HIDDevice, options: OpenStreamDeckOptions) {
+		super(device, options, miniProperties)
 	}
 
 	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {

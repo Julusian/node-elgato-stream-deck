@@ -60,8 +60,7 @@
     "cov-open": "open-cli coverage/lcov-report/index.html",
     "testci": "yarn lint && jest --coverage && cat ./coverage/lcov.info | coveralls",
     "unit": "jest",
-    "lint": "tslint --project tsconfig.json --config ../../tslint.json && yarn prettier --check \"src/**/*.ts\"",
-    "lint-fix": "tslint --project tsconfig.json --config ../../tslint.json --fix && yarn prettier --write \"src/**/*.ts\"",
+    "lint": "tslint --project tsconfig.json --config ../../tslint.json",
     "validate:dependencies": "yarn audit && yarn license-validate",
     "license-validate": "node-license-validator -p -d --allow-licenses MIT BSD BSD-3-Clause ISC Apache Unlicense WTFPL"
   },

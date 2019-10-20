@@ -150,6 +150,15 @@ function runForDevice(path: string, model: DeviceModelId) {
 		})
 	}
 
+	test('close', () => {
+		const device = getDevice()
+		device.close = jest.fn()
+
+		streamDeck.close()
+
+		expect(device.close).toHaveBeenCalledTimes(1)
+	})
+
 	test('fillPanel', () => {
 		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.ICON_BYTES)
 
@@ -486,7 +495,8 @@ describe('StreamDeck XL', () => {
 		streamDeck.resetToLogo()
 
 		expect(device.sendFeatureReport).toHaveBeenCalledTimes(1)
-		expect(device.sendFeatureReport).toHaveBeenNthCalledWith(1, [0x03, 0x02])
+		// prettier-ignore
+		expect(device.sendFeatureReport).toHaveBeenNthCalledWith(1, [0x03, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
 	})
 
 	test('firmwareVersion', () => {

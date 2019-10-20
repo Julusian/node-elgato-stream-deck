@@ -8,7 +8,8 @@
     "start-web": "cd packages/elgato-stream-deck-web-example && yarn start",
     "dist-web": "cd packages/elgato-stream-deck-web-example && yarn dist",
     "build": "yarn lerna run build",
-    "test": "yarn lerna run test"
+    "test": "yarn lerna run test",
+    "lint": "yarn lerna run lint"
   },
   "devDependencies": {
     "@types/jest": "^24.0.11",
@@ -32,6 +33,7 @@
     "ts-node": "^8.1.0",
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
     "typescript": "^3.4.2",
     "usb-detection": "^4.3.0",
     "weallbehave": "^1.2.0",

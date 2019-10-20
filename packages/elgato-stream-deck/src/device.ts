@@ -1,5 +1,6 @@
 import { DeviceModelId, HIDDevice } from 'elgato-stream-deck-core'
 import { EventEmitter } from 'events'
+import exitHook = require('exit-hook')
 import * as HID from 'node-hid'
 
 export interface StreamDeckDeviceInfo {
@@ -11,12 +12,21 @@ export interface StreamDeckDeviceInfo {
 export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 	public dataKeyOffset?: number
 	private device: HID.HID
+	private readonly releaseExitHook: () => void
 
 	constructor(deviceInfo: StreamDeckDeviceInfo) {
 		super()
 
 		this.device = new HID.HID(deviceInfo.path)
 		this.device.on('error', error => this.emit('error', error))
+
+		this.releaseExitHook = exitHook(() => {
+			try {
+				this.close()
+			} catch (e) {
+				// Ignore errors, as device is already closed
+			}
+		})
 
 		this.device.on('data', data => {
 			// Button press
@@ -28,6 +38,12 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 	}
 
 	public async close(): Promise<void> {
+		this.releaseExitHook()
+		// TODO - fix this
+		// if (this.resetToLogoOnExit) {
+		// 	// This makes the reset happen much quicker than the default timeout
+		// 	this.resetToLogo()
+		// }
 		this.device.close()
 	}
 

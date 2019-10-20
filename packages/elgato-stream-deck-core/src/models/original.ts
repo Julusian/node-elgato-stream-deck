@@ -8,14 +8,15 @@ const originalProperties: StreamDeckProperties = {
 	COLUMNS: 5,
 	ROWS: 3,
 	ICON_SIZE: 72,
-	KEY_DIRECTION: 'rtl'
+	KEY_DIRECTION: 'rtl',
+	KEY_DATA_OFFSET: 1
 }
 
 export class StreamDeckOriginal extends StreamDeckBase {
 	private readonly useOriginalKeyOrder: boolean
 
 	constructor(device: HIDDevice, options: OpenStreamDeckOptions) {
-		super(device, originalProperties, 1)
+		super(device, options, originalProperties)
 
 		this.useOriginalKeyOrder = !!options.useOriginalKeyOrder
 	}

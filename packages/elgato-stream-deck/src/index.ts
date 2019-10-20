@@ -37,7 +37,7 @@ export function getStreamDeckInfo(path: string): StreamDeckDeviceInfo | undefine
 	return listStreamDecks().find(dev => dev.path === path)
 }
 
-export function openStreamDeck(devicePath?: string, options?: OpenStreamDeckOptions): StreamDeck {
+export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeckOptions): StreamDeck {
 	let foundDevices = listStreamDecks()
 	if (devicePath) {
 		foundDevices = foundDevices.filter(d => d.path === devicePath)
@@ -56,7 +56,9 @@ export function openStreamDeck(devicePath?: string, options?: OpenStreamDeckOpti
 		throw new Error('Stream Deck is of unexpected type.')
 	}
 
-	options = options || {}
+	// Clone the options, to ensure they dont get changed
+	const options: OpenStreamDeckOptions = { ...userOptions }
+
 	if (!options.encodeJPEG) {
 		options.encodeJPEG = encodeJPEG
 	}

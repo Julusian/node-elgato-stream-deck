@@ -9,6 +9,7 @@ export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) =
 
 export interface OpenStreamDeckOptions {
 	useOriginalKeyOrder?: boolean
+	resetToLogoOnExit?: boolean
 	encodeJPEG?: EncodeJPEGHelper
 }
 
@@ -18,6 +19,7 @@ export interface StreamDeckProperties {
 	ROWS: number
 	ICON_SIZE: number
 	KEY_DIRECTION: 'ltr' | 'rtl'
+	KEY_DATA_OFFSET: number
 }
 
 export interface StreamDeck {
@@ -120,19 +122,21 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.deviceProperties.MODEL
 	}
 
-	protected device: HIDDevice
-	private deviceProperties: StreamDeckProperties
-	private keyState: boolean[]
+	protected readonly device: HIDDevice
+	private readonly deviceProperties: Readonly<StreamDeckProperties>
+	// private readonly options: Readonly<OpenStreamDeckOptions>
+	private readonly keyState: boolean[]
 
-	constructor(device: HIDDevice, properties: StreamDeckProperties, dataKeyOffset: number) {
+	constructor(device: HIDDevice, options: OpenStreamDeckOptions, properties: StreamDeckProperties) {
 		super()
 
 		this.deviceProperties = properties
+		options = options // TODO - is options wanted?
 		this.device = device
 
 		this.keyState = new Array(this.NUM_KEYS).fill(false)
 
-		this.device.dataKeyOffset = dataKeyOffset
+		this.device.dataKeyOffset = properties.KEY_DATA_OFFSET
 		this.device.on('input', data => {
 			for (let i = 0; i < this.NUM_KEYS; i++) {
 				const keyPressed = Boolean(data[i])
