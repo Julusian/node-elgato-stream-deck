@@ -1,8 +1,8 @@
 import { requestStreamDeck, StreamDeck } from 'elgato-stream-deck-web'
 import { Demo } from './demo/demo'
+import { DomImageDemo } from './demo/dom'
 import { FillWhenPressedDemo } from './demo/fill-when-pressed'
 import { RapidFillDemo } from './demo/rapid-fill'
-import { DomImageDemo } from './demo/dom'
 
 function appendLog(str: string) {
 	const logElm = document.getElementById('log')
@@ -30,7 +30,9 @@ if (consentButton) {
 	function demoChange() {
 		if (demoSelect) {
 			console.log(`Selected demo: ${demoSelect.value}`)
-			if (device) demo.stop(device)
+			if (device) {
+				demo.stop(device)
+			}
 
 			switch (demoSelect.value) {
 				case 'rapid-fill':
@@ -45,7 +47,9 @@ if (consentButton) {
 					break
 			}
 
-			if (device) demo.start(device)
+			if (device) {
+				demo.start(device)
+			}
 		}
 	}
 	if (demoSelect) {
@@ -95,52 +99,4 @@ if (consentButton) {
 	})
 
 	appendLog('Page loaded')
-
-	// const img = new Image() // Create new img element
-	// img.src = 'github_logo.png' // Set source path
-
-	// const canvas = document.createElement('canvas')
-	// canvas.width = 100
-	// canvas.height = 100
-	// const ctx = canvas.getContext('2d')
-
-	// if (ctx) {
-	// 	const myImageData = ctx.createImageData(100, 100)
-
-	// 	// myImageData.data.set()
-
-	// 	// TODO
-	// 	ctx.putImageData(myImageData, 0, 0)
-	// }
-
-	// img.addEventListener(
-	// 	'load',
-	// 	function() {
-	// 		// execute drawImage statements here
-	// 		ctx!.drawImage(img, 0, 0, 100, 100)
-
-	// 		canvas.toBlob(
-	// 			b => {
-	// 				console.log('blob', b!.size)
-	// 			},
-	// 			'image/jpeg',
-	// 			0.9
-	// 		)
-	// 	},
-	// 	false
-	// )
-
-	// canvas.toBlob(
-	// 	b => {
-	// 		console.log('blob', b!.size)
-	// 	},
-	// 	'image/jpeg',
-	// 	0.9
-	// )
-
-	// canvasToImage(canvas, {
-	// 	name: 'myImage',
-	// 	type: 'jpg',
-	// 	quality: 0.7
-	// })
 }

@@ -1,6 +1,6 @@
-import { Demo } from './demo'
-import { toCanvas } from 'html-to-image'
 import { StreamDeck } from 'elgato-stream-deck-web'
+import { toCanvas } from 'html-to-image'
+import { Demo } from './demo'
 
 function dropAlpha(rawBuffer: Uint8ClampedArray): Buffer {
 	const pixels = rawBuffer.length / 4
@@ -19,9 +19,9 @@ function dropAlpha(rawBuffer: Uint8ClampedArray): Buffer {
 }
 
 function getRandomColor() {
-	var letters = '0123456789ABCDEF'
-	var color = '#'
-	for (var i = 0; i < 6; i++) {
+	const letters = '0123456789ABCDEF'
+	let color = '#'
+	for (let i = 0; i < 6; i++) {
 		color += letters[Math.floor(Math.random() * 16)]
 	}
 	return color
@@ -83,5 +83,7 @@ export class DomImageDemo implements Demo {
 			this.element.style.background = getRandomColor()
 		}
 	}
-	public async keyUp(_device: StreamDeck, _keyIndex: number): Promise<void> {}
+	public async keyUp(_device: StreamDeck, _keyIndex: number): Promise<void> {
+		// Nothing to do
+	}
 }

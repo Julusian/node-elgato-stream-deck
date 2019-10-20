@@ -1,5 +1,5 @@
-import { Demo } from './demo'
 import { StreamDeck } from 'elgato-stream-deck-web'
+import { Demo } from './demo'
 
 function getRandomIntInclusive(min: number, max: number) {
 	min = Math.ceil(min)
@@ -10,7 +10,7 @@ function getRandomIntInclusive(min: number, max: number) {
 export class RapidFillDemo implements Demo {
 	private interval: number | undefined
 
-	async start(device: StreamDeck): Promise<void> {
+	public async start(device: StreamDeck): Promise<void> {
 		if (!this.interval) {
 			this.interval = window.setInterval(() => {
 				const r = getRandomIntInclusive(0, 255)
@@ -23,12 +23,16 @@ export class RapidFillDemo implements Demo {
 			}, 1000 / 5)
 		}
 	}
-	async stop(_device: StreamDeck): Promise<void> {
+	public async stop(_device: StreamDeck): Promise<void> {
 		if (this.interval) {
 			window.clearInterval(this.interval)
 			this.interval = undefined
 		}
 	}
-	async keyDown(_device: StreamDeck, _keyIndex: number): Promise<void> {}
-	async keyUp(_device: StreamDeck, _keyIndex: number): Promise<void> {}
+	public async keyDown(_device: StreamDeck, _keyIndex: number): Promise<void> {
+		// Nothing to do
+	}
+	public async keyUp(_device: StreamDeck, _keyIndex: number): Promise<void> {
+		// Nothing to do
+	}
 }

@@ -1,23 +1,23 @@
-import { Demo } from './demo'
 import { StreamDeck } from 'elgato-stream-deck-web'
+import { Demo } from './demo'
 
 export class FillWhenPressedDemo implements Demo {
 	private pressed: number[] = []
 
-	async start(device: StreamDeck): Promise<void> {
+	public async start(device: StreamDeck): Promise<void> {
 		await device.clearAllKeys()
 	}
-	async stop(device: StreamDeck): Promise<void> {
+	public async stop(device: StreamDeck): Promise<void> {
 		await device.clearAllKeys()
 	}
-	async keyDown(device: StreamDeck, keyIndex: number): Promise<void> {
+	public async keyDown(device: StreamDeck, keyIndex: number): Promise<void> {
 		if (this.pressed.indexOf(keyIndex) === -1) {
 			this.pressed.push(keyIndex)
 
 			await device.fillColor(keyIndex, 255, 0, 0)
 		}
 	}
-	async keyUp(device: StreamDeck, keyIndex: number): Promise<void> {
+	public async keyUp(device: StreamDeck, keyIndex: number): Promise<void> {
 		const index = this.pressed.indexOf(keyIndex)
 		if (index !== -1) {
 			this.pressed.splice(index, 1)
