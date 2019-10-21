@@ -2,22 +2,6 @@ import { StreamDeckWeb } from 'elgato-stream-deck-web'
 import { toCanvas } from 'html-to-image'
 import { Demo } from './demo'
 
-// function dropAlpha(rawBuffer: Uint8ClampedArray): Buffer {
-// 	const pixels = rawBuffer.length / 4
-// 	const res = Buffer.alloc(pixels * 3)
-// 	for (let i = 0; i < pixels; i++) {
-// 		const o = i * 4
-// 		const p = i * 3
-
-// 		res[p] = rawBuffer[o]
-// 		res[p + 1] = rawBuffer[o + 1]
-// 		res[p + 2] = rawBuffer[o + 2]
-// 		res[p + 3] = rawBuffer[o + 3]
-// 	}
-
-// 	return res
-// }
-
 function getRandomColor() {
 	const letters = '0123456789ABCDEF'
 	let color = '#'
@@ -53,17 +37,7 @@ export class DomImageDemo implements Demo {
 					this.isSending = true
 					toCanvas(elm).then(async canvas => {
 						await device.fillPanelCanvas(canvas)
-						// const ctx = canvas.getContext('2d')
-						// if (ctx) {
-						// 	const data = ctx.getImageData(
-						// 		0,
-						// 		0,
-						// 		device.KEY_COLUMNS * device.ICON_SIZE,
-						// 		device.KEY_ROWS * device.ICON_SIZE
-						// 	)
-						// 	await device.fillPanel(dropAlpha(data.data))
 						this.isSending = false
-						// }
 					})
 				}
 			}, 1000 / 5)
