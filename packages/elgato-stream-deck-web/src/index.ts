@@ -1,4 +1,5 @@
-import { DEVICE_MODELS, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from 'elgato-stream-deck-core'
+import { detect } from 'detect-browser'
+import { DEVICE_MODELS, DeviceModelId, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from 'elgato-stream-deck-core'
 import { WebHIDDevice } from './device'
 import { encodeJPEG } from './jpeg'
 import { StreamDeckWeb } from './wrapper'
@@ -22,6 +23,14 @@ export async function requestStreamDeck(options?: OpenStreamDeckOptions): Promis
 			const model = DEVICE_MODELS.find(m => m.productId === browserDevice.productId)
 			if (!model) {
 				throw new Error('Stream Deck is of unexpected type.')
+			}
+
+			if (model.id === DeviceModelId.ORIGINAL) {
+				const browser = detect()
+				if (browser && browser.os === 'Linux') {
+					// See https://github.com/node-hid/node-hid/issues/249 for more info.
+					throw new Error('This is not supported on linux')
+				}
 			}
 
 			await browserDevice.open()
