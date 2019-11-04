@@ -10,6 +10,11 @@ module.exports = {
 
 	entry: path.join(__dirname, '/src/app.ts'),
 
+	optimization: {
+		// We no not want to minimize our code.
+		minimize: false
+	},
+
 	output: {
 		// The destination file name concatenated with hash (generated whenever you change your code).
 		// The hash is really useful to let the browser knows when it should get a new bundle
