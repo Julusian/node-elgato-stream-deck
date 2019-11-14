@@ -7,8 +7,8 @@ import {
 	StreamDeckDeviceInfo,
 	StreamDeckMini,
 	StreamDeckOriginal,
-	StreamDeckXL,
-	StreamDeckOriginalV2
+	StreamDeckOriginalV2,
+	StreamDeckXL
 } from './models'
 
 export { DeviceModelId, KeyIndex, StreamDeck, StreamDeckDeviceInfo } from './models'
