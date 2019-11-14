@@ -17,7 +17,7 @@ with the various models of the [Elgato Stream Deck](https://www.elgato.com/en/ga
 
 `$ npm install --save @julusian/jpeg-turbo@^0.5.1` (Optional)
 
-It is recommended to install `@julusian/jpeg-turbo@^0.5.1` to greatly improve performance for writing images to the StreamDeck XL. Without doing so `jpeg-js` will be used instead, but image transfers will be noticably more cpu intensive and slower. `jpeg-turbo` has prebuilt binaries, but is not installed by default to ensure installation time is kept to a minimum for users who do not need the performance or the XL.
+It is recommended to install `@julusian/jpeg-turbo@^0.5.1` to greatly improve performance for writing images to the StreamDeck XL or the Original-v2. Without doing so `jpeg-js` will be used instead, but image transfers will be noticably more cpu intensive and slower. `jpeg-turbo` has prebuilt binaries, but is not installed by default to ensure installation time is kept to a minimum for users who do not need the performance or the XL or the Original-v2.
 
 ### Linux
 
@@ -29,6 +29,7 @@ SUBSYSTEM=="input", GROUP="input", MODE="0666"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0060", MODE:="666", GROUP="plugdev"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0063", MODE:="666", GROUP="plugdev"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006c", MODE:="666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006d", MODE:="666", GROUP="plugdev"
 ```
 
 Unplug and replug the device and it should be usable
