@@ -10,7 +10,7 @@ setInterval(() => {
 	const g = getRandomIntInclusive(0, 255)
 	const b = getRandomIntInclusive(0, 255)
 	console.log('Filling with rgb(%d, %d, %d)', r, g, b)
-	for (let i = 0; i < 15; i++) {
+	for (let i = 0; i < streamDeck.NUM_KEYS; i++) {
 		streamDeck.fillColor(i, r, g, b)
 	}
 }, 1000 / 5)
