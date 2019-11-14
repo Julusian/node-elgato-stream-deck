@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://github.com/lange/node-elgato-stream-deck/compare/v3.1.0...v3.2.0) (2019-11-14)
+
+
+### Features
+
+* Add support for the new hardware version of the original Stream Deck ([992ee21](https://github.com/lange/node-elgato-stream-deck/commit/992ee21c56a120717dce7113af24d94f70ec20e1))
+* close device on process exit ([105985e](https://github.com/lange/node-elgato-stream-deck/commit/105985eb5f5a1fa0bc9396388450b55083feacf9))
+* refactor originalv2 and xl to a shared base class ([c9357ac](https://github.com/lange/node-elgato-stream-deck/commit/c9357acefa85df5870288212e7d31d01b4b68688))
+
+
+### Bug Fixes
+
+* add tests for original-v2 ([40030a8](https://github.com/lange/node-elgato-stream-deck/commit/40030a8301a3c0dcb9e7375f6f0fd9fc15a37c56))
+* line endings on windows ([c0af2d6](https://github.com/lange/node-elgato-stream-deck/commit/c0af2d6f55f3268d932875543ea6fb9c7f4865bc))
+* lint errors in origialv2 ([d8e7942](https://github.com/lange/node-elgato-stream-deck/commit/d8e7942956930791aaa58c6b99363db089c4dd4b))
+
 ## [3.1.0](https://github.com/lange/node-elgato-stream-deck/compare/v3.0.0...v3.1.0) (2019-09-29)
 
 
