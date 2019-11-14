@@ -7,7 +7,8 @@ import {
 	StreamDeckDeviceInfo,
 	StreamDeckMini,
 	StreamDeckOriginal,
-	StreamDeckXL
+	StreamDeckXL,
+	StreamDeckOriginalV2
 } from './models'
 
 export { DeviceModelId, KeyIndex, StreamDeck, StreamDeckDeviceInfo } from './models'
@@ -59,6 +60,11 @@ const models = [
 		id: DeviceModelId.XL,
 		productId: 0x006c,
 		class: StreamDeckXL
+	},
+	{
+		id: DeviceModelId.ORIGINALV2,
+		productId: 0x006d,
+		class: StreamDeckOriginalV2
 	}
 ]
 
