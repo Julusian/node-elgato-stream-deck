@@ -3,7 +3,7 @@ import exitHook = require('exit-hook')
 import * as HID from 'node-hid'
 
 import { DeviceModelId } from '../models'
-import { bufferToIntArray, numberArrayToString } from '../util'
+import { numberArrayToString } from '../util'
 import { KeyIndex, StreamDeckDeviceInfo } from './id'
 
 export interface OpenStreamDeckOptions {
@@ -294,12 +294,12 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 	protected abstract getFillImagePacketLength(): number
 
-	protected generateFillImageWrites(keyIndex: KeyIndex, byteBuffer: Buffer): number[][] {
+	protected generateFillImageWrites(keyIndex: KeyIndex, byteBuffer: Buffer): Buffer[] {
 		const MAX_PACKET_SIZE = this.getFillImagePacketLength()
 		const PACKET_HEADER_LENGTH = this.getFillImageCommandHeaderLength()
 		const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH
 
-		const result: number[][] = []
+		const result: Buffer[] = []
 
 		let remainingBytes = byteBuffer.length
 		for (let part = 0; remainingBytes > 0; part++) {
@@ -312,7 +312,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 			remainingBytes -= byteCount
 			byteBuffer.copy(packet, PACKET_HEADER_LENGTH, byteOffset, byteOffset + byteCount)
 
-			result.push(bufferToIntArray(packet))
+			result.push(packet)
 		}
 
 		return result
