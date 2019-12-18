@@ -18,10 +18,8 @@ function getRandomColor() {
  * It would be better to render natively on a canvas.
  */
 export class DomImageDemo implements Demo {
-	private interval: number | undefined
-
 	private element: HTMLElement | undefined
-	private isSending = false
+	private run = false
 
 	public async start(device: StreamDeckWeb): Promise<void> {
 		this.element = document.querySelector<HTMLElement>('#image-source') || undefined
@@ -29,18 +27,21 @@ export class DomImageDemo implements Demo {
 			this.element.style.display = 'block'
 		}
 
-		if (!this.interval) {
-			this.interval = window.setInterval(() => {
-				if (this.element && !this.isSending) {
+		if (!this.run) {
+			this.run = true
+
+			const runTick = () => {
+				if (this.element && this.run) {
 					const elm = this.element
 
-					this.isSending = true
 					toCanvas(elm).then(async canvas => {
 						await device.fillPanelCanvas(canvas)
-						this.isSending = false
+						// It would run smoother to set the next tick going before sending to the panel, but then it becomes a race that could go wrong
+						runTick()
 					})
 				}
-			}, 1000 / 5)
+			}
+			runTick()
 		}
 	}
 	public async stop(_device: StreamDeckWeb): Promise<void> {
@@ -48,10 +49,7 @@ export class DomImageDemo implements Demo {
 			this.element.style.display = 'none'
 		}
 
-		if (this.interval) {
-			window.clearInterval(this.interval)
-			this.interval = undefined
-		}
+		this.run = false
 	}
 	public async keyDown(_device: StreamDeckWeb, _keyIndex: number): Promise<void> {
 		if (this.element) {
