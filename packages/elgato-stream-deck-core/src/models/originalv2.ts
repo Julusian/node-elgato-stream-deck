@@ -3,17 +3,17 @@ import { OpenStreamDeckOptions, StreamDeckProperties } from './base'
 import { StreamDeckGen2Base } from './base-gen2'
 import { DeviceModelId } from './id'
 
-const xlProperties: StreamDeckProperties = {
-	MODEL: DeviceModelId.XL,
-	COLUMNS: 8,
-	ROWS: 4,
-	ICON_SIZE: 96,
+const origV2Properties: StreamDeckProperties = {
+	MODEL: DeviceModelId.ORIGINALV2,
+	COLUMNS: 5,
+	ROWS: 3,
+	ICON_SIZE: 72,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 4
 }
 
-export class StreamDeckXL extends StreamDeckGen2Base {
+export class StreamDeckOriginalV2 extends StreamDeckGen2Base {
 	constructor(device: HIDDevice, options: OpenStreamDeckOptions) {
-		super(device, options, xlProperties)
+		super(device, options, origV2Properties)
 	}
 }

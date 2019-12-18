@@ -27,7 +27,7 @@ export function imageToByteArray(
 	const byteBuffer = Buffer.alloc(destOffset + imageSize * imageSize * colorMode.length)
 
 	for (let y = 0; y < imageSize; y++) {
-		const rowBytes: number[] = []
+		const rowOffset = destOffset + imageSize * colorMode.length * y
 		for (let x = 0; x < imageSize; x++) {
 			const { x: x2, y: y2 } = transformCoordinates(x, y)
 			const i = y2 * sourceStride + sourceOffset + x2 * 3
@@ -36,14 +36,18 @@ export function imageToByteArray(
 			const green = imageBuffer.readUInt8(i + 1)
 			const blue = imageBuffer.readUInt8(i + 2)
 
+			const offset = rowOffset + x * colorMode.length
 			if (colorMode === 'bgr') {
-				rowBytes.push(blue, green, red)
+				byteBuffer.writeUInt8(blue, offset)
+				byteBuffer.writeUInt8(green, offset + 1)
+				byteBuffer.writeUInt8(red, offset + 2)
 			} else {
-				rowBytes.push(red, green, blue, 255)
+				byteBuffer.writeUInt8(red, offset)
+				byteBuffer.writeUInt8(green, offset + 1)
+				byteBuffer.writeUInt8(blue, offset + 2)
+				byteBuffer.writeUInt8(255, offset + 3)
 			}
 		}
-
-		byteBuffer.set(rowBytes, destOffset + imageSize * colorMode.length * y)
 	}
 
 	return byteBuffer

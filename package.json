@@ -34,7 +34,7 @@
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
-    "typescript": "^3.4.2",
+    "typescript": "~3.6.4",
     "usb-detection": "^4.3.0",
     "weallbehave": "^1.2.0",
     "weallcontribute": "^1.0.8"

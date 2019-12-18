@@ -72,7 +72,7 @@
     "elgato-stream-deck-core": "file:../elgato-stream-deck-core",
     "exit-hook": "^2.2.0",
     "jpeg-js": "^0.3.5",
-    "node-hid": "^0.7.9"
+    "node-hid": "^1.1.0"
   },
   "devDependencies": {
     "@julusian/jpeg-turbo": "^0.5.1",

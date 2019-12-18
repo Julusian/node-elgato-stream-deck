@@ -3430,7 +3430,8 @@ ee-first@1.1.1:
 "elgato-stream-deck-web@file:packages/elgato-stream-deck-web":
   version "4.0.0-alpha.0"
   dependencies:
-    elgato-stream-deck-core "file:../../.cache/yarn/v6/npm-elgato-stream-deck-web-4.0.0-alpha.0-f840aaa4-5b32-4cdc-bf5e-fb73b448cbdb-1572820946437/node_modules/elgato-stream-deck-core"
+    detect-browser "^4.8.0"
+    elgato-stream-deck-core "file:../../.cache/yarn/v6/npm-elgato-stream-deck-web-4.0.0-alpha.0-257f704d-49af-4210-8c51-4e43061de473-1576697767227/node_modules/elgato-stream-deck-core"
 
 elliptic@^6.0.0:
   version "6.5.1"
@@ -6681,14 +6682,14 @@ node-gyp@^5.0.2:
     tar "^4.4.12"
     which "1"
 
-node-hid@^0.7.9:
-  version "0.7.9"
-  resolved "https://registry.yarnpkg.com/node-hid/-/node-hid-0.7.9.tgz#cc0cdf1418a286a7667f0b63642b5eeb544ccd05"
-  integrity sha512-vJnonTqmq3frCyTumJqG4g2IZcny3ynkfmbfDfQ90P3ZhRzcWYS/Um1ux6HFmAxmkaQnrZqIYHcGpL7kdqY8jA==
+node-hid@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/node-hid/-/node-hid-1.1.0.tgz#944adb5a4be8eb21f8b5d2e39583120186a4425b"
+  integrity sha512-XDaze6jvllflrXtSWTnwayLGkhko48cYerT33sTRcTbWjifaksRFlVFOhQT8lzcfUqAlxxxb9S5TMT0U293ebw==
   dependencies:
     bindings "^1.5.0"
-    nan "^2.13.2"
-    prebuild-install "^5.3.0"
+    nan "^2.14.0"
+    prebuild-install "^5.3.3"
 
 node-int64@^0.4.0:
   version "0.4.0"
@@ -7495,6 +7496,27 @@ prebuild-install@^5.1.0, prebuild-install@^5.3.0, prebuild-install@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-5.3.2.tgz#6392e9541ac0b879ef0f22b3d65037417eb2035e"
   integrity sha512-INDfXzTPnhT+WYQemqnAXlP7SvfiFMopMozSgXCZ+RDLb279gKfIuLk4o7PgEawLp3WrMgIYGBpkxpraROHsSA==
+  dependencies:
+    detect-libc "^1.0.3"
+    expand-template "^2.0.3"
+    github-from-package "0.0.0"
+    minimist "^1.2.0"
+    mkdirp "^0.5.1"
+    napi-build-utils "^1.0.1"
+    node-abi "^2.7.0"
+    noop-logger "^0.1.1"
+    npmlog "^4.0.1"
+    pump "^3.0.0"
+    rc "^1.2.7"
+    simple-get "^3.0.3"
+    tar-fs "^2.0.0"
+    tunnel-agent "^0.6.0"
+    which-pm-runs "^1.0.0"
+
+prebuild-install@^5.3.3:
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-5.3.3.tgz#ef4052baac60d465f5ba6bf003c9c1de79b9da8e"
+  integrity sha512-GV+nsUXuPW2p8Zy7SarF/2W/oiK8bFQgJcncoJ0d7kRpekEA0ftChjfEaF9/Y+QJEc/wFR7RAEa8lYByuUIe2g==
   dependencies:
     detect-libc "^1.0.3"
     expand-template "^2.0.3"
@@ -9369,7 +9391,7 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^3.4.2:
+typescript@~3.6.4:
   version "3.6.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.6.4.tgz#b18752bb3792bc1a0281335f7f6ebf1bbfc5b91d"
   integrity sha512-unoCll1+l+YK4i4F8f22TaNVPRHcD9PA3yCuZ8g5e0qGqlVlJ/8FSateOLLSagn+Yg5+ZwuPkL8LFUc0Jcvksg==

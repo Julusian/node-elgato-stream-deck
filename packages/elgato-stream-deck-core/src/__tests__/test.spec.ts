@@ -30,6 +30,14 @@ mocked(devices).mockImplementation(() => [
 		interface: 0,
 		path: 'some_path_for_xl',
 		release: 0
+	},
+	{
+		// Original V2
+		productId: 0x006d,
+		vendorId: 0x0fd9,
+		interface: 0,
+		path: 'some_path_for_v2',
+		release: 0
 	}
 ])
 
@@ -100,7 +108,7 @@ function runForDevice(path: string, model: DeviceModelId) {
 		expect(errorSpy).toHaveBeenNthCalledWith(1, new Error('Test'))
 	})
 
-	if (model !== DeviceModelId.XL) {
+	if (model !== DeviceModelId.XL && model !== DeviceModelId.ORIGINALV2) {
 		test('setBrightness', () => {
 			const device = getDevice()
 			device.sendFeatureReport = jest.fn()
@@ -147,6 +155,60 @@ function runForDevice(path: string, model: DeviceModelId) {
 
 			const firmware = streamDeck.getSerialNumber()
 			expect(firmware).toEqual('AL37G1A02840')
+		})
+	} else {
+		test('setBrightness', () => {
+			const device = getDevice()
+			device.sendFeatureReport = jest.fn()
+
+			streamDeck.setBrightness(100)
+			streamDeck.setBrightness(0)
+
+			expect(device.sendFeatureReport).toHaveBeenCalledTimes(2)
+			const expected = new Array(32).fill(0)
+			expected[0] = 0x03
+			expected[1] = 0x08
+			expected[2] = 0x64 // 100%
+			// prettier-ignore
+			expect(device.sendFeatureReport).toHaveBeenNthCalledWith(1, expected)
+			expected[2] = 0x00 // 100%
+			expect(device.sendFeatureReport).toHaveBeenNthCalledWith(2, expected)
+
+			expect(() => streamDeck.setBrightness(101)).toThrow()
+			expect(() => streamDeck.setBrightness(-1)).toThrow()
+		})
+
+		test('resetToLogo', () => {
+			const device = getDevice()
+			device.sendFeatureReport = jest.fn()
+
+			streamDeck.resetToLogo()
+
+			expect(device.sendFeatureReport).toHaveBeenCalledTimes(1)
+			// prettier-ignore
+			expect(device.sendFeatureReport).toHaveBeenNthCalledWith(1, [0x03, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+		})
+
+		test('firmwareVersion', () => {
+			const device = getDevice()
+			device.getFeatureReport = () => {
+				// prettier-ignore
+				return [ 5, 12, 254, 90, 239, 250, 49, 46, 48, 48, 46, 48, 48, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+			}
+
+			const firmware = streamDeck.getFirmwareVersion()
+			expect(firmware).toEqual('1.00.004')
+		})
+
+		test('serialNumber', () => {
+			const device = getDevice()
+			device.getFeatureReport = () => {
+				// prettier-ignore
+				return [ 6, 12, 67, 76, 49, 56, 73, 49, 65, 48, 48, 57, 49, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+			}
+
+			const firmware = streamDeck.getSerialNumber()
+			expect(firmware).toEqual('CL18I1A00913')
 		})
 	}
 
@@ -538,6 +600,63 @@ describe('StreamDeck XL', () => {
 			'fillImage-sample-icon-xl/page3.json',
 			'fillImage-sample-icon-xl/page4.json',
 			'fillImage-sample-icon-xl/page5.json'
+		])
+	})
+
+	test('down and up events', () => {
+		const downSpy = jest.fn()
+		const upSpy = jest.fn()
+		streamDeck.on('down', downSpy)
+		streamDeck.on('up', upSpy)
+
+		const device = getDevice()
+		// prettier-ignore
+		device.emit('data', Buffer.from([0x01, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
+		// prettier-ignore
+		device.emit('data', Buffer.from([0x01, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
+
+		expect(downSpy).toHaveBeenCalledTimes(1)
+		expect(upSpy).toHaveBeenCalledTimes(1)
+		expect(downSpy).toHaveBeenNthCalledWith(1, 0)
+		expect(upSpy).toHaveBeenNthCalledWith(1, 0)
+	})
+})
+
+describe('StreamDeck Original V2', () => {
+	const devicePath = 'some_path_for_v2'
+	let streamDeck: StreamDeck
+	function getDevice(sd?: StreamDeck): DummyHID {
+		return (sd || (streamDeck as any)).device
+	}
+
+	beforeEach(() => {
+		streamDeck = openStreamDeck(devicePath)
+	})
+
+	test('constructor uses the provided devicePath', () => {
+		const streamDeck2 = openStreamDeck(devicePath)
+		const device = getDevice(streamDeck2)
+		expect(device.path).toEqual(devicePath)
+		expect(streamDeck2.MODEL).toEqual(DeviceModelId.ORIGINALV2)
+	})
+
+	runForDevice(devicePath, DeviceModelId.ORIGINALV2)
+
+	test('fillImage', () => {
+		mocked(encodeJPEG).mockImplementationOnce((buffer: Buffer) => {
+			const start = buffer.length / 8
+			return buffer.slice(start, start * 2)
+		})
+
+		const device = getDevice()
+		device.write = jest.fn()
+		expect(device.write).toHaveBeenCalledTimes(0)
+		streamDeck.fillImage(0, Buffer.from(readFixtureJSON('fillImage-sample-icon-72.json')))
+
+		validateWriteCall(device.write, [
+			'fillImage-sample-icon-originalv2/page1.json',
+			'fillImage-sample-icon-originalv2/page2.json',
+			'fillImage-sample-icon-originalv2/page3.json'
 		])
 	})
 

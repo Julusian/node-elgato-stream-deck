@@ -1,4 +1,4 @@
-import { DeviceModelId, StreamDeckMini, StreamDeckOriginal, StreamDeckXL } from './models'
+import { DeviceModelId, StreamDeckMini, StreamDeckOriginal, StreamDeckOriginalV2, StreamDeckXL } from './models'
 
 export { HIDDevice } from './device'
 export { DeviceModelId, KeyIndex, StreamDeck, OpenStreamDeckOptions } from './models'
@@ -21,5 +21,10 @@ export const DEVICE_MODELS = [
 		id: DeviceModelId.XL,
 		productId: 0x006c,
 		class: StreamDeckXL
+	},
+	{
+		id: DeviceModelId.ORIGINALV2,
+		productId: 0x006d,
+		class: StreamDeckOriginalV2
 	}
 ]
