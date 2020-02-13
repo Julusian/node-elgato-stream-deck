@@ -11,7 +11,7 @@ export function validateWriteCall(fn: any, files: string[], filter?: (data: any)
 		if (filter) {
 			data = filter(data)
 		}
-		expect(fn).toHaveBeenNthCalledWith(i + 1, data)
+		expect(fn).toHaveBeenNthCalledWith(i + 1, Buffer.from(data))
 	}
 }
 

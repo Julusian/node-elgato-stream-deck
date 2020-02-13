@@ -234,21 +234,21 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		}
 
 		// prettier-ignore
-		const brightnessCommandBuffer = [
+		const brightnessCommandBuffer = Buffer.from([
 			0x05, 0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00
-		]
+		])
 		this.device.sendFeatureReport(brightnessCommandBuffer)
 	}
 
 	public resetToLogo() {
 		// prettier-ignore
-		const resetCommandBuffer = [
+		const resetCommandBuffer = Buffer.from([
 			0x0B, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00
-		]
+		])
 		this.device.sendFeatureReport(resetCommandBuffer)
 	}
 
