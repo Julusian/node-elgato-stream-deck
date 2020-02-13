@@ -24,7 +24,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		])
-		this.device.sendFeatureReport(brightnessCommandBuffer)
+		this.sendFeatureReport(brightnessCommandBuffer)
 	}
 
 	public resetToLogo() {
@@ -36,15 +36,15 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		])
-		this.device.sendFeatureReport(resetCommandBuffer)
+		this.sendFeatureReport(resetCommandBuffer)
 	}
 
 	public getFirmwareVersion() {
-		return numberArrayToString(this.device.getFeatureReport(5, 32).slice(6))
+		return numberArrayToString(this.getFeatureReport(5, 32).slice(6))
 	}
 
 	public getSerialNumber() {
-		return numberArrayToString(this.device.getFeatureReport(6, 32).slice(2))
+		return numberArrayToString(this.getFeatureReport(6, 32).slice(2))
 	}
 
 	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {

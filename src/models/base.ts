@@ -120,7 +120,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.deviceProperties.MODEL
 	}
 
-	protected readonly device: HID.HID
+	private readonly device: HID.HID
 	private readonly releaseExitHook: () => void
 	private readonly deviceProperties: Readonly<StreamDeckProperties>
 	private readonly options: Readonly<OpenStreamDeckOptions>
@@ -316,6 +316,13 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		}
 
 		return result
+	}
+
+	protected sendFeatureReport(payload: Buffer) {
+		return this.device.sendFeatureReport(payload)
+	}
+	protected getFeatureReport(reportId: number, reportLength: number) {
+		return this.device.getFeatureReport(reportId, reportLength)
 	}
 
 	private fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOffset: number, sourceStride: number) {
