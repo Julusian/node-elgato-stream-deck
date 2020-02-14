@@ -392,10 +392,10 @@
   dependencies:
     jpeg-js "*"
 
-"@types/node-hid@^0.7.0":
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/@types/node-hid/-/node-hid-0.7.3.tgz#993762b795473dc2ad8ee041f870838735087532"
-  integrity sha512-ip+Un3Ps0Qok3W3fMgYxaYxVYcbjDYM7yXNm8Uf1sggvSeXL/Q+vZG0AdSDWDQO9apQSE7Yieb4SjfymF1OqPA==
+"@types/node-hid@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@types/node-hid/-/node-hid-1.2.0.tgz#e3e5dfaad07c84e957af96809f6b2f03fc267f80"
+  integrity sha512-OTum88c5BiabsVgixAmVqhUL4tm+OExYSqw6FxCNVUTTysB/evPP+CI34LhhGohS1YsYfdlXC7g4UHnduxWVlQ==
   dependencies:
     "@types/node" "*"
 
