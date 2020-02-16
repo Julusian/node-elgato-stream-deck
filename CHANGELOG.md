@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.0](https://github.com/lange/node-elgato-stream-deck/compare/v3.2.0...v3.3.0) (2020-02-16)
+
+
+### Features
+
+* pass buffers to node-hid ([d371969](https://github.com/lange/node-elgato-stream-deck/commit/d371969be44e247c97e8f40e5b0b5f00bffc982a))
+* upgrade jpeg-turbo and expose quality options ([344254a](https://github.com/lange/node-elgato-stream-deck/commit/344254ae72119f34146dda4d30959ed7e65d19a4))
+
+
+### Bug Fixes
+
+* optimise buffer transform/color conversion ([c5987ac](https://github.com/lange/node-elgato-stream-deck/commit/c5987ac4783634282a1db132f8b38e93d9497ade))
+* remove dependency on node-hid typings for library users ([f83ae99](https://github.com/lange/node-elgato-stream-deck/commit/f83ae990bf6208fd6efa6ec2235d6712b69f5a33))
+* tests ([b493274](https://github.com/lange/node-elgato-stream-deck/commit/b493274c20a8b8d4fa4f175dc1b910554a74a6b2))
+* upgrade @types/node-hid ([3d59a4f](https://github.com/lange/node-elgato-stream-deck/commit/3d59a4f8d2c5165cb96e77669884e9074bd583f9))
+
 ## [3.2.0](https://github.com/lange/node-elgato-stream-deck/compare/v3.1.0...v3.2.0) (2019-11-14)
 
 
