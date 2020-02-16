@@ -286,10 +286,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@julusian/jpeg-turbo@^0.5.1":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@julusian/jpeg-turbo/-/jpeg-turbo-0.5.2.tgz#3a80b277a0bc553b2059068d3d9a657ca83baff1"
-  integrity sha512-Ap2jXfn71pNyAn1P2ZTkVrcyZO1F7c8/yWNxBP2fFtGRbsmpkfe1YiqRZ1PSzIMmI6Tfak1l1dOi1NnvCvEg1w==
+"@julusian/jpeg-turbo@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@julusian/jpeg-turbo/-/jpeg-turbo-0.5.3.tgz#8e208bb9c29578c06a826a58a16f0d98558c0de8"
+  integrity sha512-VqgX+5U6KZ7gQSpL21qseDycesaf1uFpVboENov6Q92fnJmdAtOnICkM77HbPRNexlB3bjX9dO4YfAGtCxuiSA==
   dependencies:
     bindings "^1.5.0"
     cmake-js "^5.2.0"

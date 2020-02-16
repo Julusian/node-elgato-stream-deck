@@ -85,7 +85,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 			this.ICON_SIZE
 		)
 
-		return encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE)
+		return encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE, this.options.jpegOptions)
 	}
 
 	private transformCoordinates(x: number, y: number): { x: number; y: number } {

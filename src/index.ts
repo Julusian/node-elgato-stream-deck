@@ -10,8 +10,10 @@ import {
 	StreamDeckOriginalV2,
 	StreamDeckXL
 } from './models'
+import { StreamDeckBase } from './models/base'
 
-export { DeviceModelId, KeyIndex, StreamDeck, StreamDeckDeviceInfo } from './models'
+export { DeviceModelId, KeyIndex, StreamDeck, StreamDeckDeviceInfo, OpenStreamDeckOptions } from './models'
+export { JPEGEncodeOptions } from './jpeg'
 
 /*
  * The original StreamDeck uses packet sizes too large for the hidraw driver which is
@@ -45,7 +47,13 @@ export function getStreamDeckInfo(path: string): StreamDeckDeviceInfo | undefine
 	return listStreamDecks().find(dev => dev.path === path)
 }
 
-const models = [
+interface ModelSpec {
+	id: DeviceModelId
+	productId: number
+	class: new (deviceInfo: StreamDeckDeviceInfo, options: OpenStreamDeckOptions) => StreamDeckBase
+}
+
+const models: ModelSpec[] = [
 	{
 		id: DeviceModelId.ORIGINAL,
 		productId: 0x0060,
@@ -83,7 +91,7 @@ export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeck
 	}
 
 	// Clone the options, to ensure they dont get changed
-	const options = { ...userOptions }
+	const options: OpenStreamDeckOptions = { ...userOptions }
 
 	const model = models.find(m => m.id === foundDevices[0].model)
 	if (!model) {

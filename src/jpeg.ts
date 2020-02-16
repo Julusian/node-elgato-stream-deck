@@ -8,19 +8,27 @@ try {
 	// This is expected and can be ignored
 }
 
-export function encodeJPEG(buffer: Buffer, width: number, height: number) {
+export interface JPEGEncodeOptions {
+	quality: number
+	subsampling?: number
+}
+
+const DEFAULT_QUALITY = 95
+
+export function encodeJPEG(buffer: Buffer, width: number, height: number, options: JPEGEncodeOptions | undefined) {
 	try {
 		// Try using jpeg-turbo if it is available
 		if (jpegTurbo && jpegTurbo.bufferSize && jpegTurbo.compressSync) {
-			const options = {
+			const encodeOptions: import('@julusian/jpeg-turbo').EncodeOptions = {
 				format: jpegTurbo.FORMAT_RGBA,
 				width,
 				height,
-				quality: 95
+				quality: DEFAULT_QUALITY,
+				...options
 			}
 			if (buffer.length === width * height * 4) {
-				const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(options))
-				return jpegTurbo.compressSync(buffer, tmpBuffer, options)
+				const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(encodeOptions))
+				return jpegTurbo.compressSync(buffer, tmpBuffer, encodeOptions)
 			}
 		}
 	} catch (e) {
@@ -35,7 +43,7 @@ export function encodeJPEG(buffer: Buffer, width: number, height: number) {
 			height,
 			data: buffer
 		},
-		95
+		options ? options.quality : DEFAULT_QUALITY
 	)
 	return jpegBuffer2.data
 }

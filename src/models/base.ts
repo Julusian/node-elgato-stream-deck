@@ -2,6 +2,7 @@ import { EventEmitter } from 'events'
 import exitHook = require('exit-hook')
 import * as HID from 'node-hid'
 
+import { JPEGEncodeOptions } from '../jpeg'
 import { DeviceModelId } from '../models'
 import { numberArrayToString } from '../util'
 import { KeyIndex, StreamDeckDeviceInfo } from './id'
@@ -9,6 +10,7 @@ import { KeyIndex, StreamDeckDeviceInfo } from './id'
 export interface OpenStreamDeckOptions {
 	useOriginalKeyOrder?: boolean
 	resetToLogoOnExit?: boolean
+	jpegOptions?: JPEGEncodeOptions
 }
 
 export interface StreamDeckProperties {
@@ -120,10 +122,11 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.deviceProperties.MODEL
 	}
 
+	protected readonly options: Readonly<OpenStreamDeckOptions>
+
 	private readonly device: HID.HID
 	private readonly releaseExitHook: () => void
 	private readonly deviceProperties: Readonly<StreamDeckProperties>
-	private readonly options: Readonly<OpenStreamDeckOptions>
 	private readonly keyState: boolean[]
 
 	constructor(deviceInfo: StreamDeckDeviceInfo, options: OpenStreamDeckOptions, properties: StreamDeckProperties) {
