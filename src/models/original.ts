@@ -1,5 +1,5 @@
 import { BMP_HEADER_LENGTH, imageToByteArray, writeBMPHeader } from '../util'
-import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
+import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties, InternalFillImageOptions } from './base'
 import { DeviceModelId, KeyIndex, StreamDeckDeviceInfo } from './id'
 
 const origProperties: StreamDeckProperties = {
@@ -35,12 +35,10 @@ export class StreamDeckOriginal extends StreamDeckBase {
 		return 8191
 	}
 
-	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number, sourceFormat: 'rgb' | 'rgba'): Buffer {
+	protected convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Buffer {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
-			sourceOffset,
-			sourceStride,
-			sourceFormat,
+			sourceOptions,
 			BMP_HEADER_LENGTH,
 			this.flipCoordinates.bind(this),
 			'bgr',

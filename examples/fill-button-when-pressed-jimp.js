@@ -17,7 +17,7 @@ const { openStreamDeck } = require('../dist/index')
 	streamDeck.on('down', keyIndex => {
 		// Fill the pressed key with an image of the GitHub logo.
 		console.log('Filling button #%d', keyIndex)
-		streamDeck.fillImage(keyIndex, img)
+		streamDeck.fillImage(keyIndex, img, { format: 'rgba' })
 	})
 
 	streamDeck.on('up', keyIndex => {

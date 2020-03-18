@@ -12,7 +12,15 @@ import {
 } from './models'
 import { StreamDeckBase } from './models/base'
 
-export { DeviceModelId, KeyIndex, StreamDeck, StreamDeckDeviceInfo, OpenStreamDeckOptions } from './models'
+export {
+	DeviceModelId,
+	KeyIndex,
+	StreamDeck,
+	StreamDeckDeviceInfo,
+	OpenStreamDeckOptions,
+	FillImageOptions,
+	FillPanelOptions
+} from './models'
 export { JPEGEncodeOptions } from './jpeg'
 
 /*

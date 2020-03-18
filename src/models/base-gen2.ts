@@ -1,6 +1,6 @@
 import { encodeJPEG } from '../jpeg'
 import { imageToByteArray, numberArrayToString } from '../util'
-import { StreamDeckBase } from './base'
+import { StreamDeckBase, InternalFillImageOptions } from './base'
 import { KeyIndex } from './id'
 
 /**
@@ -74,12 +74,10 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		return 1024
 	}
 
-	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number, sourceFormat: 'rgb' | 'rgba'): Buffer {
+	protected convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Buffer {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
-			sourceOffset,
-			sourceStride,
-			sourceFormat,
+			sourceOptions,
 			0,
 			this.transformCoordinates.bind(this),
 			'rgba',

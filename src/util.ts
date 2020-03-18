@@ -1,3 +1,5 @@
+import { InternalFillImageOptions } from './models/base'
+
 export function numberArrayToString(array: number[]): string {
 	const end = array.indexOf(0)
 	if (end !== -1) {
@@ -9,9 +11,7 @@ export function numberArrayToString(array: number[]): string {
 
 export function imageToByteArray(
 	imageBuffer: Buffer,
-	sourceOffset: number,
-	sourceStride: number,
-	sourceFormat: 'rgb' | 'rgba',
+	sourceOptions: InternalFillImageOptions,
 	destOffset: number,
 	transformCoordinates: (x: number, y: number) => { x: number; y: number },
 	colorMode: 'bgr' | 'rgba',
@@ -19,18 +19,20 @@ export function imageToByteArray(
 ) {
 	const byteBuffer = Buffer.alloc(destOffset + imageSize * imageSize * colorMode.length)
 
+	const flipColours = sourceOptions.format.substring(0, 3) !== colorMode.substring(0, 3)
+
 	for (let y = 0; y < imageSize; y++) {
 		const rowOffset = destOffset + imageSize * colorMode.length * y
 		for (let x = 0; x < imageSize; x++) {
 			const { x: x2, y: y2 } = transformCoordinates(x, y)
-			const i = y2 * sourceStride + sourceOffset + x2 * sourceFormat.length
+			const i = y2 * sourceOptions.stride + sourceOptions.offset + x2 * sourceOptions.format.length
 
 			const red = imageBuffer.readUInt8(i)
 			const green = imageBuffer.readUInt8(i + 1)
 			const blue = imageBuffer.readUInt8(i + 2)
 
 			const offset = rowOffset + x * colorMode.length
-			if (colorMode === 'bgr') {
+			if (flipColours) {
 				byteBuffer.writeUInt8(blue, offset)
 				byteBuffer.writeUInt8(green, offset + 1)
 				byteBuffer.writeUInt8(red, offset + 2)
@@ -38,6 +40,8 @@ export function imageToByteArray(
 				byteBuffer.writeUInt8(red, offset)
 				byteBuffer.writeUInt8(green, offset + 1)
 				byteBuffer.writeUInt8(blue, offset + 2)
+			}
+			if (colorMode.length === 4) {
 				byteBuffer.writeUInt8(255, offset + 3)
 			}
 		}
