@@ -38,6 +38,7 @@ export interface StreamDeck {
 	readonly KEY_ROWS: number
 
 	readonly ICON_SIZE: number
+	readonly ICON_PIXELS: number
 	readonly ICON_BYTES: number
 
 	readonly MODEL: DeviceModelId
