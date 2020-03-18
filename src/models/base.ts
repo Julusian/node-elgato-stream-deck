@@ -115,7 +115,10 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.deviceProperties.ICON_SIZE
 	}
 	get ICON_BYTES() {
-		return this.ICON_SIZE * this.ICON_SIZE * 3
+		return this.ICON_PIXELS * 3
+	}
+	get ICON_PIXELS() {
+		return this.ICON_SIZE * this.ICON_SIZE
 	}
 
 	get MODEL() {
@@ -180,25 +183,31 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 		const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]))
 		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		this.fillImageRange(keyIndex2, pixels, 0, this.ICON_SIZE * 3)
+		this.fillImageRange(keyIndex2, pixels, 0, this.ICON_SIZE * 3, 'rgb')
 	}
 
 	public fillImage(keyIndex: KeyIndex, imageBuffer: Buffer) {
 		this.checkValidKeyIndex(keyIndex)
 
-		if (imageBuffer.length !== this.ICON_BYTES) {
-			throw new RangeError(`Expected image buffer of length ${this.ICON_BYTES}, got length ${imageBuffer.length}`)
+		const rgbaSize = this.ICON_PIXELS * 4
+		const rgbSize = this.ICON_BYTES
+		const sourceFormat = imageBuffer.length === rgbaSize ? 'rgba' : 'rgb'
+
+		if (imageBuffer.length !== rgbaSize && imageBuffer.length !== rgbSize) {
+			throw new RangeError(`Expected image buffer of length ${rgbSize}, got length ${imageBuffer.length}`)
 		}
 
 		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		this.fillImageRange(keyIndex2, imageBuffer, 0, this.ICON_SIZE * 3)
+		this.fillImageRange(keyIndex2, imageBuffer, 0, this.ICON_SIZE * sourceFormat.length, sourceFormat)
 	}
 
 	public fillPanel(imageBuffer: Buffer) {
-		if (imageBuffer.length !== this.ICON_BYTES * this.NUM_KEYS) {
-			throw new RangeError(
-				`Expected image buffer of length ${this.ICON_BYTES * this.NUM_KEYS}, got length ${imageBuffer.length}`
-			)
+		const rgbaSize = this.ICON_PIXELS * 4 * this.NUM_KEYS
+		const rgbSize = this.ICON_BYTES * this.NUM_KEYS
+		const sourceFormat = imageBuffer.length === rgbaSize ? 'rgba' : 'rgb'
+
+		if (imageBuffer.length !== rgbSize && imageBuffer.length !== rgbaSize) {
+			throw new RangeError(`Expected image buffer of length ${rgbSize}, got length ${imageBuffer.length}`)
 		}
 
 		for (let row = 0; row < this.KEY_ROWS; row++) {
@@ -210,11 +219,11 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 					index += this.KEY_COLUMNS - column - 1
 				}
 
-				const stride = this.ICON_SIZE * 3 * this.KEY_COLUMNS
+				const stride = this.ICON_SIZE * sourceFormat.length * this.KEY_COLUMNS
 				const rowOffset = stride * row * this.ICON_SIZE
-				const colOffset = column * this.ICON_SIZE * 3
+				const colOffset = column * this.ICON_SIZE * sourceFormat.length
 
-				this.fillImageRange(index, imageBuffer, rowOffset + colOffset, stride)
+				this.fillImageRange(index, imageBuffer, rowOffset + colOffset, stride, sourceFormat)
 			}
 		}
 	}
@@ -274,7 +283,12 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 	protected abstract transformKeyIndex(keyIndex: KeyIndex): KeyIndex
 
-	protected abstract convertFillImage(imageBuffer: Buffer, sourceOffset: number, sourceStride: number): Buffer
+	protected abstract convertFillImage(
+		imageBuffer: Buffer,
+		sourceOffset: number,
+		sourceStride: number,
+		sourceFormat: 'rgb' | 'rgba'
+	): Buffer
 
 	protected getFillImageCommandHeaderLength() {
 		return 16
@@ -328,10 +342,16 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.device.getFeatureReport(reportId, reportLength)
 	}
 
-	private fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOffset: number, sourceStride: number) {
+	private fillImageRange(
+		keyIndex: KeyIndex,
+		imageBuffer: Buffer,
+		sourceOffset: number,
+		sourceStride: number,
+		sourceFormat: 'rgb' | 'rgba'
+	) {
 		this.checkValidKeyIndex(keyIndex)
 
-		const byteBuffer = this.convertFillImage(imageBuffer, sourceOffset, sourceStride)
+		const byteBuffer = this.convertFillImage(imageBuffer, sourceOffset, sourceStride, sourceFormat)
 
 		const packets = this.generateFillImageWrites(keyIndex, byteBuffer)
 		for (const packet of packets) {

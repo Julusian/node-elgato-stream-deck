@@ -35,11 +35,12 @@ export class StreamDeckOriginal extends StreamDeckBase {
 		return 8191
 	}
 
-	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number): Buffer {
+	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number, sourceFormat: 'rgb' | 'rgba'): Buffer {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
 			sourceOffset,
 			sourceStride,
+			sourceFormat,
 			BMP_HEADER_LENGTH,
 			this.flipCoordinates.bind(this),
 			'bgr',

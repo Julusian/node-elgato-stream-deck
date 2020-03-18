@@ -11,6 +11,7 @@ export function imageToByteArray(
 	imageBuffer: Buffer,
 	sourceOffset: number,
 	sourceStride: number,
+	sourceFormat: 'rgb' | 'rgba',
 	destOffset: number,
 	transformCoordinates: (x: number, y: number) => { x: number; y: number },
 	colorMode: 'bgr' | 'rgba',
@@ -22,7 +23,7 @@ export function imageToByteArray(
 		const rowOffset = destOffset + imageSize * colorMode.length * y
 		for (let x = 0; x < imageSize; x++) {
 			const { x: x2, y: y2 } = transformCoordinates(x, y)
-			const i = y2 * sourceStride + sourceOffset + x2 * 3
+			const i = y2 * sourceStride + sourceOffset + x2 * sourceFormat.length
 
 			const red = imageBuffer.readUInt8(i)
 			const green = imageBuffer.readUInt8(i + 1)

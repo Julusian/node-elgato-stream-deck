@@ -74,11 +74,12 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		return 1024
 	}
 
-	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number): Buffer {
+	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number, sourceFormat: 'rgb' | 'rgba'): Buffer {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
 			sourceOffset,
 			sourceStride,
+			sourceFormat,
 			0,
 			this.transformCoordinates.bind(this),
 			'rgba',

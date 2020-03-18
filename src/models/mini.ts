@@ -20,11 +20,12 @@ export class StreamDeckMini extends StreamDeckBase {
 		return keyIndex
 	}
 
-	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number): Buffer {
+	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number, sourceFormat: 'rgb' | 'rgba'): Buffer {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
 			sourceOffset,
 			sourceStride,
+			sourceFormat,
 			BMP_HEADER_LENGTH,
 			this.rotateCoordinates.bind(this),
 			'bgr',
