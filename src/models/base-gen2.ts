@@ -44,7 +44,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 	}
 
 	public getSerialNumber() {
-		return numberArrayToString(this.getFeatureReport(6, 32).slice(2))
+		return numberArrayToString(this.getFeatureReport(6, 32).slice(2, 14))
 	}
 
 	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {

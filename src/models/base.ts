@@ -260,7 +260,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 	}
 
 	public getSerialNumber() {
-		return numberArrayToString(this.device.getFeatureReport(3, 17).slice(5))
+		return numberArrayToString(this.device.getFeatureReport(3, 17).slice(5, 17))
 	}
 
 	public close() {
