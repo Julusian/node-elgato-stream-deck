@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.3.1](https://github.com/lange/node-elgato-stream-deck/compare/v3.3.0...v3.3.1) (2020-07-18)
+
+
+### Bug Fixes
+
+* only audit dependencies ([60e7cca](https://github.com/lange/node-elgato-stream-deck/commit/60e7ccabfb1f655829b55a255c8d2062bdb3a4c0))
+* only audit dependencies ([60e7cca](https://github.com/lange/node-elgato-stream-deck/commit/60e7ccabfb1f655829b55a255c8d2062bdb3a4c0))
+* trim the serial number to 12 characters, as it always is currently ([d371654](https://github.com/lange/node-elgato-stream-deck/commit/d371654df32f7e7bf07e9ce1c0fc14c7876799b4))
+* trim the serial number to 12 characters, as it always is currently ([d371654](https://github.com/lange/node-elgato-stream-deck/commit/d371654df32f7e7bf07e9ce1c0fc14c7876799b4))
+
 ## [3.3.0](https://github.com/lange/node-elgato-stream-deck/compare/v3.2.0...v3.3.0) (2020-02-16)
 
 
