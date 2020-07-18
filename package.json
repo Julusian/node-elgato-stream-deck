@@ -65,8 +65,8 @@
     "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
     "lint": "tslint --project tsconfig.json --config tslint.json",
     "tslint-check": "tslint-config-prettier-check ./tslint.json",
-    "validate:dependencies": "yarn audit && yarn license-validate",
-    "license-validate": "node-license-validator -p -d --allow-licenses MIT BSD BSD-3-Clause ISC Apache Unlicense WTFPL"
+    "validate:dependencies": "yarn audit --groups dependencies && yarn license-validate",
+    "license-validate": "node-license-validator -p -d --allow-licenses MIT 0BSD BSD BSD-3-Clause ISC Apache Unlicense WTFPL"
   },
   "files": [
     "dist"
