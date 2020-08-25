@@ -3427,15 +3427,10 @@ jest@^25.1.0:
     import-local "^3.0.2"
     jest-cli "^25.5.4"
 
-jpeg-js@*:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.4.1.tgz#937a3ae911eb6427f151760f8123f04c8bfe6ef7"
-  integrity sha512-jA55yJiB5tCXEddos8JBbvW+IMrqY0y1tjjx9KNVtA+QPmu7ND5j0zkKopClpUTsaETL135uOM2XfcYG4XRjmw==
-
-jpeg-js@^0.3.3, jpeg-js@^0.3.5:
-  version "0.3.7"
-  resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.3.7.tgz#471a89d06011640592d314158608690172b1028d"
-  integrity sha512-9IXdWudL61npZjvLuVe/ktHiA41iE8qFyLB+4VDTblEsWBzeg8WQTlktdUK4CdncUqtUgUg0bbOmTE2bKBKaBQ==
+jpeg-js@*, jpeg-js@^0.4.1, jpeg-js@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.4.2.tgz#8b345b1ae4abde64c2da2fe67ea216a114ac279d"
+  integrity sha512-+az2gi/hvex7eLTMTlbRLOhH6P6WFdk2ITI8HJsaH2VqYO0I594zXSYEP+tf4FW+8Cy68ScDXoAsQdyQanv3sw==
 
 js-tokens@^4.0.0:
   version "4.0.0"
@@ -4706,12 +4701,12 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-pureimage@^0.1.3:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/pureimage/-/pureimage-0.1.6.tgz#32b4de248e1ed660bddf744523375b6fa7be3821"
-  integrity sha512-t74leLaXyD3VGmMbcFZNWZoHqPQNX805gHYNBCrNEVRjUkDfdlopLJnDJI9QYdhWXwtNiD02coq+NB7+CryAwg==
+pureimage@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/pureimage/-/pureimage-0.2.5.tgz#10c9d314bcdfba712229ec70c3849164f537c248"
+  integrity sha512-D/oP8uaS8HLIOPqaxeVU0ZcJHUwvvFjeclKwn0RBeZJn3TBtZgKn7FVBN5auuCHQTC4K/wDAHfkY/JOuGCiohQ==
   dependencies:
-    jpeg-js "^0.3.3"
+    jpeg-js "^0.4.1"
     opentype.js "^0.4.3"
     pngjs "^3.3.1"
 
