@@ -23,8 +23,14 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+      - name: yarn install (ignore engines)
+        run: yarn --ignore-engines
+        if: matrix.node-version == '8.x'
+        env:
+          CI: true
       - name: yarn install
         run: yarn
+        if: matrix.node-version != '8.x'
         env:
           CI: true
       - name: yarn build
