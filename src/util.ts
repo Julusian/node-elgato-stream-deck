@@ -15,7 +15,7 @@ export function imageToByteArray(
 	transformCoordinates: (x: number, y: number) => { x: number; y: number },
 	colorMode: 'bgr' | 'rgba',
 	imageSize: number
-) {
+): Buffer {
 	const byteBuffer = Buffer.alloc(destOffset + imageSize * imageSize * colorMode.length)
 
 	for (let y = 0; y < imageSize; y++) {
@@ -46,7 +46,7 @@ export function imageToByteArray(
 }
 
 export const BMP_HEADER_LENGTH = 54
-export function writeBMPHeader(buf: Buffer, iconSize: number, iconBytes: number, imagePPM: number) {
+export function writeBMPHeader(buf: Buffer, iconSize: number, iconBytes: number, imagePPM: number): void {
 	// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
 
 	// Bitmap file header

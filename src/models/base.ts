@@ -96,29 +96,29 @@ export interface StreamDeck {
 	 */
 	close(): void
 
-	on(event: 'down' | 'up', listener: (keyIndex: KeyIndex) => void): any
-	on(event: 'error', listener: (e: any) => void): any
+	on(event: 'down' | 'up', listener: (keyIndex: KeyIndex) => void): this
+	on(event: 'error', listener: (e: unknown) => void): this
 }
 
 export abstract class StreamDeckBase extends EventEmitter implements StreamDeck {
-	get NUM_KEYS() {
+	get NUM_KEYS(): number {
 		return this.KEY_COLUMNS * this.KEY_ROWS
 	}
-	get KEY_COLUMNS() {
+	get KEY_COLUMNS(): number {
 		return this.deviceProperties.COLUMNS
 	}
-	get KEY_ROWS() {
+	get KEY_ROWS(): number {
 		return this.deviceProperties.ROWS
 	}
 
-	get ICON_SIZE() {
+	get ICON_SIZE(): number {
 		return this.deviceProperties.ICON_SIZE
 	}
-	get ICON_BYTES() {
+	get ICON_BYTES(): number {
 		return this.ICON_SIZE * this.ICON_SIZE * 3
 	}
 
-	get MODEL() {
+	get MODEL(): DeviceModelId {
 		return this.deviceProperties.MODEL
 	}
 
@@ -171,7 +171,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		})
 	}
 
-	public fillColor(keyIndex: KeyIndex, r: number, g: number, b: number) {
+	public fillColor(keyIndex: KeyIndex, r: number, g: number, b: number): void {
 		this.checkValidKeyIndex(keyIndex)
 
 		this.checkRGBValue(r)
@@ -183,7 +183,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		this.fillImageRange(keyIndex2, pixels, 0, this.ICON_SIZE * 3)
 	}
 
-	public fillImage(keyIndex: KeyIndex, imageBuffer: Buffer) {
+	public fillImage(keyIndex: KeyIndex, imageBuffer: Buffer): void {
 		this.checkValidKeyIndex(keyIndex)
 
 		if (imageBuffer.length !== this.ICON_BYTES) {
@@ -194,7 +194,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		this.fillImageRange(keyIndex2, imageBuffer, 0, this.ICON_SIZE * 3)
 	}
 
-	public fillPanel(imageBuffer: Buffer) {
+	public fillPanel(imageBuffer: Buffer): void {
 		if (imageBuffer.length !== this.ICON_BYTES * this.NUM_KEYS) {
 			throw new RangeError(
 				`Expected image buffer of length ${this.ICON_BYTES * this.NUM_KEYS}, got length ${imageBuffer.length}`
@@ -219,19 +219,19 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		}
 	}
 
-	public clearKey(keyIndex: KeyIndex) {
+	public clearKey(keyIndex: KeyIndex): void {
 		this.checkValidKeyIndex(keyIndex)
 		return this.fillColor(keyIndex, 0, 0, 0)
 	}
 
-	public clearAllKeys() {
+	public clearAllKeys(): void {
 		// TODO - this could be restructured to be more efficient (by reusing the final colour buffer)
 		for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
 			this.clearKey(keyIndex)
 		}
 	}
 
-	public setBrightness(percentage: number) {
+	public setBrightness(percentage: number): void {
 		if (percentage < 0 || percentage > 100) {
 			throw new RangeError('Expected brightness percentage to be between 0 and 100')
 		}
@@ -245,7 +245,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		this.device.sendFeatureReport(brightnessCommandBuffer)
 	}
 
-	public resetToLogo() {
+	public resetToLogo(): void {
 		// prettier-ignore
 		const resetCommandBuffer = Buffer.from([
 			0x0B, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -255,15 +255,15 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		this.device.sendFeatureReport(resetCommandBuffer)
 	}
 
-	public getFirmwareVersion() {
+	public getFirmwareVersion(): string {
 		return numberArrayToString(this.device.getFeatureReport(4, 17).slice(5))
 	}
 
-	public getSerialNumber() {
+	public getSerialNumber(): string {
 		return numberArrayToString(this.device.getFeatureReport(3, 17).slice(5, 17))
 	}
 
-	public close() {
+	public close(): void {
 		this.releaseExitHook()
 		if (this.options.resetToLogoOnExit) {
 			// This makes the reset happen much quicker than the default timeout
@@ -276,7 +276,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 	protected abstract convertFillImage(imageBuffer: Buffer, sourceOffset: number, sourceStride: number): Buffer
 
-	protected getFillImageCommandHeaderLength() {
+	protected getFillImageCommandHeaderLength(): number {
 		return 16
 	}
 
@@ -286,7 +286,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		partIndex: number,
 		isLast: boolean,
 		_bodyLength: number
-	) {
+	): void {
 		buffer.writeUInt8(0x02, 0)
 		buffer.writeUInt8(0x01, 1)
 		buffer.writeUInt16LE(partIndex, 2)
@@ -321,14 +321,14 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return result
 	}
 
-	protected sendFeatureReport(payload: Buffer) {
+	protected sendFeatureReport(payload: Buffer): number {
 		return this.device.sendFeatureReport(payload)
 	}
-	protected getFeatureReport(reportId: number, reportLength: number) {
+	protected getFeatureReport(reportId: number, reportLength: number): number[] {
 		return this.device.getFeatureReport(reportId, reportLength)
 	}
 
-	private fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOffset: number, sourceStride: number) {
+	private fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOffset: number, sourceStride: number): void {
 		this.checkValidKeyIndex(keyIndex)
 
 		const byteBuffer = this.convertFillImage(imageBuffer, sourceOffset, sourceStride)
@@ -339,13 +339,13 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		}
 	}
 
-	private checkValidKeyIndex(keyIndex: KeyIndex) {
+	private checkValidKeyIndex(keyIndex: KeyIndex): void {
 		if (keyIndex < 0 || keyIndex >= this.NUM_KEYS) {
 			throw new TypeError(`Expected a valid keyIndex 0 - ${this.NUM_KEYS - 1}`)
 		}
 	}
 
-	private checkRGBValue(value: number) {
+	private checkRGBValue(value: number): void {
 		if (value < 0 || value > 255) {
 			throw new TypeError('Expected a valid color RGB value 0 - 255')
 		}

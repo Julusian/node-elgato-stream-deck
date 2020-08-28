@@ -31,7 +31,7 @@ export class StreamDeckOriginal extends StreamDeckBase {
 		}
 	}
 
-	protected getFillImagePacketLength() {
+	protected getFillImagePacketLength(): number {
 		return 8191
 	}
 

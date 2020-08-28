@@ -2,7 +2,7 @@
 import { mocked } from 'ts-jest/utils'
 
 import { DummyHID } from '../__mocks__/hid'
-import { readFixtureJSON, validateWriteCall } from './helpers'
+import { readFixtureJSON } from './helpers'
 
 jest.mock('node-hid')
 import { devices, HID } from 'node-hid'
@@ -52,7 +52,7 @@ import { encodeJPEG } from '../jpeg'
 import { openStreamDeck, StreamDeck } from '../'
 import { DeviceModelId } from '../models'
 
-function runForDevice(path: string, model: DeviceModelId) {
+function runForDevice(path: string, model: DeviceModelId): void {
 	let streamDeck: StreamDeck
 	function getDevice(sd?: StreamDeck): DummyHID {
 		return (sd || (streamDeck as any)).device
@@ -138,7 +138,7 @@ function runForDevice(path: string, model: DeviceModelId) {
 
 		test('firmwareVersion', () => {
 			const device = getDevice()
-			device.getFeatureReport = () => {
+			device.getFeatureReport = (): number[] => {
 				return [4, 85, 170, 212, 4, 49, 46, 48, 46, 49, 55, 48, 49, 51, 51, 0, 0]
 			}
 
@@ -148,7 +148,7 @@ function runForDevice(path: string, model: DeviceModelId) {
 
 		test('serialNumber', () => {
 			const device = getDevice()
-			device.getFeatureReport = () => {
+			device.getFeatureReport = (): number[] => {
 				return [3, 85, 170, 211, 3, 65, 76, 51, 55, 71, 49, 65, 48, 50, 56, 52, 48]
 			}
 
@@ -190,7 +190,7 @@ function runForDevice(path: string, model: DeviceModelId) {
 
 		test('firmwareVersion', () => {
 			const device = getDevice()
-			device.getFeatureReport = () => {
+			device.getFeatureReport = (): number[] => {
 				// prettier-ignore
 				return [ 5, 12, 254, 90, 239, 250, 49, 46, 48, 48, 46, 48, 48, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 			}
@@ -201,7 +201,7 @@ function runForDevice(path: string, model: DeviceModelId) {
 
 		test('serialNumber', () => {
 			const device = getDevice()
-			device.getFeatureReport = () => {
+			device.getFeatureReport = (): number[] => {
 				// prettier-ignore
 				return [ 6, 12, 67, 76, 49, 56, 73, 49, 65, 48, 48, 57, 49, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 			}
@@ -289,9 +289,7 @@ function runForDevice(path: string, model: DeviceModelId) {
 		expect(fillImageMock).toHaveBeenCalledTimes(1)
 		expect(fillImageMock).toHaveBeenCalledWith(4, expect.any(Buffer), 0, streamDeck.ICON_SIZE * 3)
 		// console.log(JSON.stringify(bufferToIntArray(fillImageMock.mock.calls[0][1])))
-		expect(fillImageMock.mock.calls[0][1]).toEqual(
-			Buffer.from(readFixtureJSON(`fillColor-buffer-${streamDeck.ICON_SIZE}.json`))
-		)
+		expect(fillImageMock.mock.calls[0][1]).toEqual(readFixtureJSON(`fillColor-buffer-${streamDeck.ICON_SIZE}.json`))
 	})
 
 	test('fillColor bad rgb', () => {
@@ -329,14 +327,11 @@ describe('StreamDeck', () => {
 
 	test('fillImage', () => {
 		const device = getDevice()
-		device.write = jest.fn()
+		const writeFn: jest.Mock<number, [number[]]> = (device.write = jest.fn())
 		expect(device.write).toHaveBeenCalledTimes(0)
-		streamDeck.fillImage(0, Buffer.from(readFixtureJSON('fillImage-sample-icon-72.json')))
+		streamDeck.fillImage(0, readFixtureJSON('fillImage-sample-icon-72.json'))
 
-		validateWriteCall(device.write, [
-			'fillImage-sample-icon-original/page1.json',
-			'fillImage-sample-icon-original/page2.json'
-		])
+		expect(writeFn.mock.calls).toMatchSnapshot()
 	})
 
 	test('down and up events', () => {
@@ -461,32 +456,11 @@ describe('StreamDeck Mini', () => {
 
 	test('fillImage', () => {
 		const device = getDevice()
-		device.write = jest.fn()
+		const writeFn: jest.Mock<number, [number[]]> = (device.write = jest.fn())
 		expect(device.write).toHaveBeenCalledTimes(0)
-		streamDeck.fillImage(0, Buffer.from(readFixtureJSON('fillImage-sample-icon-80.json')))
+		streamDeck.fillImage(0, readFixtureJSON('fillImage-sample-icon-80.json'))
 
-		validateWriteCall(device.write, [
-			'fillImage-sample-icon-mini/page1.json',
-			'fillImage-sample-icon-mini/page2.json',
-			'fillImage-sample-icon-mini/page3.json',
-			'fillImage-sample-icon-mini/page4.json',
-			'fillImage-sample-icon-mini/page5.json',
-			'fillImage-sample-icon-mini/page6.json',
-			'fillImage-sample-icon-mini/page7.json',
-			'fillImage-sample-icon-mini/page8.json',
-			'fillImage-sample-icon-mini/page9.json',
-			'fillImage-sample-icon-mini/page10.json',
-			'fillImage-sample-icon-mini/page11.json',
-			'fillImage-sample-icon-mini/page12.json',
-			'fillImage-sample-icon-mini/page13.json',
-			'fillImage-sample-icon-mini/page14.json',
-			'fillImage-sample-icon-mini/page15.json',
-			'fillImage-sample-icon-mini/page16.json',
-			'fillImage-sample-icon-mini/page17.json',
-			'fillImage-sample-icon-mini/page18.json',
-			'fillImage-sample-icon-mini/page19.json',
-			'fillImage-sample-icon-mini/page20.json'
-		])
+		expect(writeFn.mock.calls).toMatchSnapshot()
 	})
 
 	test('down and up events', () => {
@@ -562,7 +536,7 @@ describe('StreamDeck XL', () => {
 
 	test('firmwareVersion', () => {
 		const device = getDevice()
-		device.getFeatureReport = () => {
+		device.getFeatureReport = (): number[] => {
 			// prettier-ignore
 			return [ 5, 12, 254, 90, 239, 250, 49, 46, 48, 48, 46, 48, 48, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
@@ -573,7 +547,7 @@ describe('StreamDeck XL', () => {
 
 	test('serialNumber', () => {
 		const device = getDevice()
-		device.getFeatureReport = () => {
+		device.getFeatureReport = (): number[] => {
 			// prettier-ignore
 			return [ 6, 12, 67, 76, 49, 56, 73, 49, 65, 48, 48, 57, 49, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
@@ -589,17 +563,11 @@ describe('StreamDeck XL', () => {
 		})
 
 		const device = getDevice()
-		device.write = jest.fn()
+		const writeFn: jest.Mock<number, [number[]]> = (device.write = jest.fn())
 		expect(device.write).toHaveBeenCalledTimes(0)
-		streamDeck.fillImage(0, Buffer.from(readFixtureJSON('fillImage-sample-icon-96.json')))
+		streamDeck.fillImage(0, readFixtureJSON('fillImage-sample-icon-96.json'))
 
-		validateWriteCall(device.write, [
-			'fillImage-sample-icon-xl/page1.json',
-			'fillImage-sample-icon-xl/page2.json',
-			'fillImage-sample-icon-xl/page3.json',
-			'fillImage-sample-icon-xl/page4.json',
-			'fillImage-sample-icon-xl/page5.json'
-		])
+		expect(writeFn.mock.calls).toMatchSnapshot()
 	})
 
 	test('down and up events', () => {
@@ -648,15 +616,11 @@ describe('StreamDeck Original V2', () => {
 		})
 
 		const device = getDevice()
-		device.write = jest.fn()
+		const writeFn: jest.Mock<number, [number[]]> = (device.write = jest.fn())
 		expect(device.write).toHaveBeenCalledTimes(0)
-		streamDeck.fillImage(0, Buffer.from(readFixtureJSON('fillImage-sample-icon-72.json')))
+		streamDeck.fillImage(0, readFixtureJSON('fillImage-sample-icon-72.json'))
 
-		validateWriteCall(device.write, [
-			'fillImage-sample-icon-originalv2/page1.json',
-			'fillImage-sample-icon-originalv2/page2.json',
-			'fillImage-sample-icon-originalv2/page3.json'
-		])
+		expect(writeFn.mock.calls).toMatchSnapshot()
 	})
 
 	test('down and up events', () => {
