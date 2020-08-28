@@ -1,6 +1,6 @@
 {
   "name": "elgato-stream-deck",
-  "version": "3.3.0",
+  "version": "3.3.2",
   "description": "An npm module for interfacing with the Elgato Stream Deck",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -63,10 +63,9 @@
     "unit": "jest",
     "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
     "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
-    "lint": "tslint --project tsconfig.json --config tslint.json",
-    "tslint-check": "tslint-config-prettier-check ./tslint.json",
-    "validate:dependencies": "yarn audit && yarn license-validate",
-    "license-validate": "node-license-validator -p -d --allow-licenses MIT BSD BSD-3-Clause ISC Apache Unlicense WTFPL"
+    "lint": "eslint . --ext .ts",
+    "validate:dependencies": "yarn audit --groups dependencies && yarn license-validate",
+    "license-validate": "node-license-validator -p -d --allow-licenses MIT 0BSD BSD BSD-3-Clause ISC Apache Unlicense WTFPL"
   },
   "files": [
     "dist"
@@ -76,7 +75,7 @@
   },
   "dependencies": {
     "exit-hook": "^2.2.0",
-    "jpeg-js": "^0.3.5",
+    "jpeg-js": "^0.4.2",
     "node-hid": "^1.2.0"
   },
   "devDependencies": {
@@ -85,29 +84,46 @@
     "@types/jpeg-js": "^0.3.0",
     "@types/node": "^12.0.4",
     "@types/node-hid": "^1.2.0",
-    "@types/sharp": "^0.24.0",
+    "@types/sharp": "^0.23.0",
+    "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
     "coveralls": "^3.0.3",
-    "jest": "^24.7.1",
-    "jest-haste-map": "^24.7.1",
-    "jest-resolve": "^24.7.1",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "jest": "^25.1.0",
+    "jest-haste-map": "^25.1.0",
+    "jest-resolve": "^25.1.0",
     "jimp": "^0.9.5",
     "node-license-validator": "^1.3.0",
     "open-cli": "^5.0.0",
     "prettier": "^1.17.1",
-    "pureimage": "^0.1.3",
-    "sharp": "^0.23.1",
+    "pureimage": "^0.2.5",
+    "sharp": "~0.23.3",
     "standard-version": "^7.0.0",
     "stream-buffers": "^3.0.1",
     "trash-cli": "^3.0.0",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.0",
     "ts-node": "^8.1.0",
-    "tslint": "^6.1.0",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-plugin-prettier": "^2.0.1",
     "typescript": "~3.6.4",
     "usb-detection": "^4.3.0",
     "weallbehave": "^1.2.0",
     "weallcontribute": "^1.0.8"
+  },
+  "resolutions": {
+    "**/conventional-changelog-angular": "5.0.6",
+    "**/conventional-changelog-atom": "2.0.3",
+    "**/conventional-changelog-codemirror": "2.0.3",
+    "**/conventional-changelog-core": "4.1.3",
+    "**/conventional-changelog-conventionalcommits": "4.2.3",
+    "**/conventional-changelog-ember": "2.0.4",
+    "**/conventional-changelog-eslint": "3.0.4",
+    "**/conventional-changelog-express": "2.0.1",
+    "**/conventional-changelog-jshint": "2.0.3",
+    "**/conventional-changelog-preset-loader": "2.3.0",
+    "**/conventional-changelog-writer": "4.0.11",
+    "**/conventional-commits-filter": "2.0.2",
+    "**/conventional-commits-parser": "3.0.8"
   }
 }

@@ -15,7 +15,12 @@ export interface JPEGEncodeOptions {
 
 const DEFAULT_QUALITY = 95
 
-export function encodeJPEG(buffer: Buffer, width: number, height: number, options: JPEGEncodeOptions | undefined) {
+export function encodeJPEG(
+	buffer: Buffer,
+	width: number,
+	height: number,
+	options: JPEGEncodeOptions | undefined
+): Buffer {
 	try {
 		// Try using jpeg-turbo if it is available
 		if (jpegTurbo && jpegTurbo.bufferSize && jpegTurbo.compressSync) {

@@ -1,6 +1,6 @@
 import { imageToByteArray } from '../util'
 
-function getSimpleBuffer(dim: number, components: 3 | 4) {
+function getSimpleBuffer(dim: number, components: 3 | 4): Buffer {
 	const buf = Buffer.alloc(dim * dim * components)
 	for (let i = 0; i < buf.length; i++) {
 		buf[i] = i

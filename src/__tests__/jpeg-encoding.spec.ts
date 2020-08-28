@@ -21,7 +21,7 @@ describe('jpeg-encoding', () => {
 	}
 
 	test('jpeg-turbo: encoded successfully', async () => {
-		const img = addAlphaChannel(Buffer.from(readFixtureJSON('fillImage-sample-icon-96.json')))
+		const img = addAlphaChannel(readFixtureJSON('fillImage-sample-icon-96.json'))
 
 		// Mock jpeg-js so we can see if it got used instead of jpeg-turbo
 		jest.doMock('jpeg-js')
@@ -39,7 +39,7 @@ describe('jpeg-encoding', () => {
 	})
 
 	test('jpeg-js: encoded successfully', async () => {
-		const img = addAlphaChannel(Buffer.from(readFixtureJSON('fillImage-sample-icon-96.json')))
+		const img = addAlphaChannel(readFixtureJSON('fillImage-sample-icon-96.json'))
 
 		jest.doMock('@julusian/jpeg-turbo', null)
 		const { encodeJPEG } = require('../jpeg')

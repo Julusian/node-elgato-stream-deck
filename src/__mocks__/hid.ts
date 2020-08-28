@@ -9,13 +9,13 @@ export class DummyHID extends EventEmitter {
 		this.path = devicePath
 	}
 
-	public close() {
+	public close(): void {
 		throw new Error('Not implemented')
 	}
-	public pause() {
+	public pause(): void {
 		throw new Error('Not implemented')
 	}
-	public read(_callback: (err: any, data: number[]) => void) {
+	public read(_callback: (err: any, data: number[]) => void): void {
 		throw new Error('Not implemented')
 	}
 	public readSync(): number[] {
@@ -30,7 +30,7 @@ export class DummyHID extends EventEmitter {
 	public getFeatureReport(_reportId: number, _reportLength: number): number[] {
 		throw new Error('Not implemented')
 	}
-	public resume() {
+	public resume(): void {
 		throw new Error('Not implemented')
 	}
 	// on (event: string, handler: (value: any) => void) {

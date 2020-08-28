@@ -12,7 +12,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 	 *
 	 * @param {number} percentage The percentage brightness
 	 */
-	public setBrightness(percentage: number) {
+	public setBrightness(percentage: number): void {
 		if (percentage < 0 || percentage > 100) {
 			throw new RangeError('Expected brightness percentage to be between 0 and 100')
 		}
@@ -27,7 +27,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		this.sendFeatureReport(brightnessCommandBuffer)
 	}
 
-	public resetToLogo() {
+	public resetToLogo(): void {
 		// prettier-ignore
 		const resetCommandBuffer = Buffer.from([
 			0x03,
@@ -39,19 +39,19 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		this.sendFeatureReport(resetCommandBuffer)
 	}
 
-	public getFirmwareVersion() {
+	public getFirmwareVersion(): string {
 		return numberArrayToString(this.getFeatureReport(5, 32).slice(6))
 	}
 
-	public getSerialNumber() {
-		return numberArrayToString(this.getFeatureReport(6, 32).slice(2))
+	public getSerialNumber(): string {
+		return numberArrayToString(this.getFeatureReport(6, 32).slice(2, 14))
 	}
 
 	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {
 		return keyIndex
 	}
 
-	protected getFillImageCommandHeaderLength() {
+	protected getFillImageCommandHeaderLength(): number {
 		return 8
 	}
 
@@ -61,7 +61,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		partIndex: number,
 		isLast: boolean,
 		bodyLength: number
-	) {
+	): void {
 		buffer.writeUInt8(0x02, 0)
 		buffer.writeUInt8(0x07, 1)
 		buffer.writeUInt8(keyIndex, 2)
@@ -70,7 +70,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		buffer.writeUInt16LE(partIndex++, 6)
 	}
 
-	protected getFillImagePacketLength() {
+	protected getFillImagePacketLength(): number {
 		return 1024
 	}
 

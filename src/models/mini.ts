@@ -33,7 +33,7 @@ export class StreamDeckMini extends StreamDeckBase {
 		return byteBuffer
 	}
 
-	protected getFillImagePacketLength() {
+	protected getFillImagePacketLength(): number {
 		return 1024
 	}
 
