@@ -1,6 +1,6 @@
 {
   "name": "elgato-stream-deck",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "description": "An npm module for interfacing with the Elgato Stream Deck",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
