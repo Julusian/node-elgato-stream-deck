@@ -13,7 +13,7 @@ mocked(devices).mockImplementation(() => [
 		vendorId: 0x0fd9,
 		interface: 0,
 		path: 'some_random_path_here',
-		release: 0
+		release: 0,
 	},
 	{
 		// Mini
@@ -21,7 +21,7 @@ mocked(devices).mockImplementation(() => [
 		vendorId: 0x0fd9,
 		interface: 0,
 		path: 'some_path_for_mini',
-		release: 0
+		release: 0,
 	},
 	{
 		// XL
@@ -29,7 +29,7 @@ mocked(devices).mockImplementation(() => [
 		vendorId: 0x0fd9,
 		interface: 0,
 		path: 'some_path_for_xl',
-		release: 0
+		release: 0,
 	},
 	{
 		// Original V2
@@ -37,8 +37,8 @@ mocked(devices).mockImplementation(() => [
 		vendorId: 0x0fd9,
 		interface: 0,
 		path: 'some_path_for_v2',
-		release: 0
-	}
+		release: 0,
+	},
 ])
 
 // Forcing path to be string, as there are multiple constructor options, we require the string one

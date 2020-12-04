@@ -25,7 +25,7 @@ describe('StreamDeck Devices', () => {
 				interface: 0,
 				path: 'path-original',
 				serialNumber: 'some-number',
-				release: 0
+				release: 0,
 			},
 			{
 				productId: 0x0060,
@@ -33,47 +33,47 @@ describe('StreamDeck Devices', () => {
 				interface: 0,
 				path: 'path-original2',
 				serialNumber: 'some-number-again',
-				release: 0
+				release: 0,
 			},
 			{
 				productId: 0x0063,
 				vendorId: 0x0fd9,
 				interface: 0,
 				path: 'path-mini',
-				release: 0
+				release: 0,
 			},
 			{
 				productId: 0x0060,
 				vendorId: 0x0f00,
 				interface: 0,
 				path: 'path-wrog-vendor',
-				release: 0
+				release: 0,
 			},
 			{
 				productId: 0x0022,
 				vendorId: 0x0fd9,
 				interface: 0,
 				path: 'path-bad-product',
-				release: 0
-			}
+				release: 0,
+			},
 		])
 
 		expect(listStreamDecks()).toEqual([
 			{
 				model: 'original',
 				path: 'path-original',
-				serialNumber: 'some-number'
+				serialNumber: 'some-number',
 			},
 			{
 				model: 'original',
 				path: 'path-original2',
-				serialNumber: 'some-number-again'
+				serialNumber: 'some-number-again',
 			},
 			{
 				model: 'mini',
 				path: 'path-mini',
-				serialNumber: undefined
-			}
+				serialNumber: undefined,
+			},
 		])
 	})
 	test('info for bad path', () => {
@@ -84,15 +84,15 @@ describe('StreamDeck Devices', () => {
 				interface: 0,
 				path: 'path-original',
 				serialNumber: 'some-number',
-				release: 0
+				release: 0,
 			},
 			{
 				productId: 0x0022,
 				vendorId: 0x0fd9,
 				interface: 0,
 				path: 'path-bad-product',
-				release: 0
-			}
+				release: 0,
+			},
 		])
 
 		const info = getStreamDeckInfo('not-a-real-path')
@@ -109,7 +109,7 @@ describe('StreamDeck Devices', () => {
 				interface: 0,
 				path: 'path-original',
 				serialNumber: 'some-number',
-				release: 0
+				release: 0,
 			},
 			{
 				productId: 0x0060,
@@ -117,15 +117,15 @@ describe('StreamDeck Devices', () => {
 				interface: 0,
 				path: 'path-original2',
 				serialNumber: 'some-number-again',
-				release: 0
-			}
+				release: 0,
+			},
 		])
 
 		const info2 = getStreamDeckInfo('path-original2')
 		expect(info2).toEqual({
 			model: 'original',
 			path: 'path-original2',
-			serialNumber: 'some-number-again'
+			serialNumber: 'some-number-again',
 		})
 	})
 	test('create for bad path', () => {
@@ -136,15 +136,15 @@ describe('StreamDeck Devices', () => {
 				interface: 0,
 				path: 'path-original',
 				serialNumber: 'some-number',
-				release: 0
+				release: 0,
 			},
 			{
 				productId: 0x0022,
 				vendorId: 0x0fd9,
 				interface: 0,
 				path: 'path-bad-product',
-				release: 0
-			}
+				release: 0,
+			},
 		])
 
 		expect(() => openStreamDeck('not-a-real-path')).toThrowError(

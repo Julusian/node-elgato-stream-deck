@@ -4,7 +4,7 @@ export function numberArrayToString(array: number[]): string {
 		array = array.slice(0, end)
 	}
 
-	return array.map(val => String.fromCharCode(val)).join('')
+	return array.map((val) => String.fromCharCode(val)).join('')
 }
 
 export function imageToByteArray(

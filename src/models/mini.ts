@@ -8,7 +8,7 @@ const miniProperties: StreamDeckProperties = {
 	ROWS: 2,
 	ICON_SIZE: 80,
 	KEY_DIRECTION: 'ltr',
-	KEY_DATA_OFFSET: 1
+	KEY_DATA_OFFSET: 1,
 }
 
 export class StreamDeckMini extends StreamDeckBase {

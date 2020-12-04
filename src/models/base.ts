@@ -146,7 +146,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 		this.keyState = new Array(this.NUM_KEYS).fill(false)
 
-		this.device.on('data', data => {
+		this.device.on('data', (data) => {
 			// The first byte is a report ID, the last byte appears to be padding.
 			// We strip these out for now.
 			data = data.slice(this.deviceProperties.KEY_DATA_OFFSET, data.length - 1)
@@ -166,7 +166,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 			}
 		})
 
-		this.device.on('error', err => {
+		this.device.on('error', (err) => {
 			this.emit('error', err)
 		})
 	}

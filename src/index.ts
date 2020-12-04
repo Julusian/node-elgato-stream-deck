@@ -8,7 +8,7 @@ import {
 	StreamDeckMini,
 	StreamDeckOriginal,
 	StreamDeckOriginalV2,
-	StreamDeckXL
+	StreamDeckXL,
 } from './models'
 import { StreamDeckBase } from './models/base'
 
@@ -27,13 +27,13 @@ HID.setDriverType('libusb')
 export function listStreamDecks(): StreamDeckDeviceInfo[] {
 	const devices: StreamDeckDeviceInfo[] = []
 	for (const dev of HID.devices()) {
-		const model = models.find(m => m.productId === dev.productId)
+		const model = models.find((m) => m.productId === dev.productId)
 
 		if (model && dev.vendorId === 0x0fd9 && dev.path) {
 			devices.push({
 				model: model.id,
 				path: dev.path,
-				serialNumber: dev.serialNumber
+				serialNumber: dev.serialNumber,
 			})
 		}
 	}
@@ -44,7 +44,7 @@ export function listStreamDecks(): StreamDeckDeviceInfo[] {
  * Get the info of a device if the given path is a streamdeck
  */
 export function getStreamDeckInfo(path: string): StreamDeckDeviceInfo | undefined {
-	return listStreamDecks().find(dev => dev.path === path)
+	return listStreamDecks().find((dev) => dev.path === path)
 }
 
 interface ModelSpec {
@@ -57,29 +57,29 @@ const models: ModelSpec[] = [
 	{
 		id: DeviceModelId.ORIGINAL,
 		productId: 0x0060,
-		class: StreamDeckOriginal
+		class: StreamDeckOriginal,
 	},
 	{
 		id: DeviceModelId.MINI,
 		productId: 0x0063,
-		class: StreamDeckMini
+		class: StreamDeckMini,
 	},
 	{
 		id: DeviceModelId.XL,
 		productId: 0x006c,
-		class: StreamDeckXL
+		class: StreamDeckXL,
 	},
 	{
 		id: DeviceModelId.ORIGINALV2,
 		productId: 0x006d,
-		class: StreamDeckOriginalV2
-	}
+		class: StreamDeckOriginalV2,
+	},
 ]
 
 export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeckOptions): StreamDeck {
 	let foundDevices = listStreamDecks()
 	if (devicePath) {
-		foundDevices = foundDevices.filter(d => d.path === devicePath)
+		foundDevices = foundDevices.filter((d) => d.path === devicePath)
 	}
 
 	if (foundDevices.length === 0) {
@@ -93,7 +93,7 @@ export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeck
 	// Clone the options, to ensure they dont get changed
 	const options: OpenStreamDeckOptions = { ...userOptions }
 
-	const model = models.find(m => m.id === foundDevices[0].model)
+	const model = models.find((m) => m.id === foundDevices[0].model)
 	if (!model) {
 		throw new Error('Stream Deck is of unexpected type.')
 	}

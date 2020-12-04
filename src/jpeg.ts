@@ -29,11 +29,11 @@ export function encodeJPEG(
 				width,
 				height,
 				quality: DEFAULT_QUALITY,
-				...options
+				...options,
 			}
 			if (buffer.length === width * height * 4) {
 				const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(encodeOptions))
-				return jpegTurbo.compressSync(buffer, tmpBuffer, encodeOptions)
+				return jpegTurbo.compressSync(buffer, tmpBuffer, encodeOptions).data
 			}
 		}
 	} catch (e) {
@@ -46,7 +46,7 @@ export function encodeJPEG(
 		{
 			width,
 			height,
-			data: buffer
+			data: buffer,
 		},
 		options ? options.quality : DEFAULT_QUALITY
 	)
