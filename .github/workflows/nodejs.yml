@@ -17,12 +17,13 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
-      - name: yarn install
-        run: yarn
+      - run: yarn install
         env:
           CI: true
-      - name: yarn lint
-        run: yarn lint
+      - run: yarn build
+        env:
+          CI: true
+      - run: yarn lint
         env:
           CI: true
   audit:
@@ -39,12 +40,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
-      - name: yarn install
-        run: yarn
+      - run: yarn install
         env:
           CI: true
-      - name: yarn audit
-        run: yarn validate:dependencies
+      - run: yarn validate:dependencies
         env:
           CI: true
 
@@ -68,24 +67,16 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: yarn install
-        run: yarn
+      - run: yarn install
         env:
           CI: true
-      - name: yarn build
-        run: yarn build
+      - run: yarn build
         env:
           CI: true
-      - name: yarn unit
-        run: yarn unit
+      - run: yarn unit
         env:
           CI: true
-      - name: yarn send-coverage
-        run: yarn send-coverage
+      - run: yarn send-coverage
         if: matrix.node-version == '12.x'
-        env:
-          CI: true
-      - name: yarn audit
-        run: yarn validate:dependencies
         env:
           CI: true
