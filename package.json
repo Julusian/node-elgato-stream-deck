@@ -79,7 +79,7 @@
     "node-hid": "^2.0.0-0"
   },
   "devDependencies": {
-    "@julusian/jpeg-turbo": "^0.5.6",
+    "@julusian/jpeg-turbo": "0.5.4",
     "@types/jest": "^26.0.16",
     "@types/jpeg-js": "^0.3.0",
     "@types/node": "^14.14.10",

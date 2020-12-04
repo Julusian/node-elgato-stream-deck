@@ -33,7 +33,7 @@ export function encodeJPEG(
 			}
 			if (buffer.length === width * height * 4) {
 				const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(encodeOptions))
-				return jpegTurbo.compressSync(buffer, tmpBuffer, encodeOptions).data
+				return jpegTurbo.compressSync(buffer, tmpBuffer, encodeOptions)
 			}
 		}
 	} catch (e) {

@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
-
-export class DummyHID extends EventEmitter {
+import type { HID } from 'node-hid'
+export class DummyHID extends EventEmitter implements HID {
 	public path: string
 
 	constructor(devicePath: string) {
@@ -8,7 +8,6 @@ export class DummyHID extends EventEmitter {
 		expect(typeof devicePath).toEqual('string')
 		this.path = devicePath
 	}
-
 	public close(): void {
 		throw new Error('Not implemented')
 	}
@@ -41,5 +40,8 @@ export class DummyHID extends EventEmitter {
 	}
 	public setDriverType(_type: string): void {
 		throw new Error('Not implemented')
+	}
+	public setNonBlocking(_no_block: boolean): void {
+		throw new Error('Method not implemented.')
 	}
 }
