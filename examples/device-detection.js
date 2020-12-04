@@ -18,7 +18,7 @@ function addDevice(info) {
 
 	streamDecks[path].resetToLogo()
 
-	streamDecks[path].on('error', e => {
+	streamDecks[path].on('error', (e) => {
 		console.log(e)
 		// assuming any error means we lost connection
 		streamDecks[path].removeAllListeners()
@@ -29,7 +29,7 @@ function addDevice(info) {
 
 function refresh() {
 	const streamdecks = listStreamDecks()
-	streamdecks.forEach(device => {
+	streamdecks.forEach((device) => {
 		if (!streamDecks[device.path]) {
 			addDevice(device)
 		}
@@ -39,6 +39,6 @@ refresh()
 
 usbDetect.startMonitoring()
 
-usbDetect.on('add:4057:96', function(device) {
+usbDetect.on('add:4057:96', function () {
 	refresh()
 })

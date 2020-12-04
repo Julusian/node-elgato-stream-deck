@@ -61,7 +61,7 @@
     "testci": "yarn lint && jest --coverage",
     "send-coverage": "cat ./coverage/lcov.info | coveralls",
     "unit": "jest",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint . --ext .ts --ext .js --ignore-pattern dist",
     "validate:dependencies": "yarn audit --groups dependencies && yarn license-validate",
     "license-validate": "yarn sofie-licensecheck"
   },

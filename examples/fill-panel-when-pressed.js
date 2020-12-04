@@ -19,7 +19,7 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 		.toBuffer()
 
 	let filled = false
-	streamDeck.on('down', keyIndex => {
+	streamDeck.on('down', (keyIndex) => {
 		if (filled) {
 			return
 		}
@@ -44,14 +44,14 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 		}
 
 		// Clear the key when all keys are released.
-		if (streamDeck.keyState.every(pressed => !pressed)) {
+		if (streamDeck.keyState.every((pressed) => !pressed)) {
 			console.log('Clearing all buttons')
 			streamDeck.clearAllKeys()
 			filled = false
 		}
 	})
 
-	streamDeck.on('error', error => {
+	streamDeck.on('error', (error) => {
 		console.error(error)
 	})
 })()
