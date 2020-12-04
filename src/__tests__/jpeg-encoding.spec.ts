@@ -1,4 +1,4 @@
-// tslint:disable-next-line: no-submodule-imports
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { mocked } from 'ts-jest/utils'
 import { readFixtureJSON } from './helpers'
 
@@ -41,7 +41,7 @@ describe('jpeg-encoding', () => {
 	test('jpeg-js: encoded successfully', async () => {
 		const img = addAlphaChannel(readFixtureJSON('fillImage-sample-icon-96.json'))
 
-		jest.doMock('@julusian/jpeg-turbo', null)
+		jest.doMock('@julusian/jpeg-turbo', undefined)
 		const { encodeJPEG } = require('../jpeg')
 
 		const encoded = encodeJPEG(img, iconSize, iconSize)
