@@ -3,9 +3,6 @@
 [![npm version](https://img.shields.io/npm/v/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck)
 [![license](https://img.shields.io/npm/l/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck)
 ![Node CI](https://github.com/Julusian/node-elgato-stream-deck/workflows/Node%20CI/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/Julusian/node-elgato-stream-deck/badge.svg?branch=master)](https://coveralls.io/github/Julusian/node-elgato-stream-deck?branch=master)
-
-![alt text](media/streamdeck_ui.png 'elgato-stream-deck')
 
 [`elgato-stream-deck`](https://github.com/julusian/elgato-stream-deck) is a Node.js library for interfacing
 with the various models of the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
