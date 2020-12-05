@@ -1,5 +1,5 @@
 export * from './id'
-export { OpenStreamDeckOptions, StreamDeck } from './base'
+export { OpenStreamDeckOptions, StreamDeck, FillImageOptions, FillPanelOptions } from './base'
 export { StreamDeckOriginal } from './original'
 export { StreamDeckMini } from './mini'
 export { StreamDeckXL } from './xl'

@@ -1,14 +1,16 @@
 const path = require('path')
-const fs = require('fs')
-const jpegJS = require('jpeg-js')
+const Jimp = require('jimp')
 const { openStreamDeck } = require('../dist/index')
 
 ;(async () => {
 	const streamDeck = openStreamDeck()
 	streamDeck.clearAllKeys()
 
-	const rawFile = fs.readFileSync(path.resolve(__dirname, `fixtures/github_logo_${streamDeck.ICON_SIZE}.jpg`))
-	const img = jpegJS.decode(rawFile).data
+	const bmpImg = await Jimp.read(path.resolve(__dirname, 'fixtures/github_logo.png')).then((img) => {
+		return img.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
+	})
+
+	const img = bmpImg.bitmap.data
 
 	streamDeck.on('down', (keyIndex) => {
 		// Fill the pressed key with an image of the GitHub logo.

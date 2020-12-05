@@ -231,10 +231,45 @@ function runForDevice(path: string, model: DeviceModelId): void {
 
 		const stride = streamDeck.KEY_COLUMNS * streamDeck.ICON_SIZE * 3
 		for (let i = 0; i < streamDeck.NUM_KEYS; i++) {
-			expect(fillImageMock).toHaveBeenCalledWith(i, expect.any(Buffer), expect.any(Number), stride)
+			expect(fillImageMock).toHaveBeenCalledWith(i, expect.any(Buffer), {
+				format: 'rgb',
+				offset: expect.any(Number),
+				stride,
+			})
 			// Buffer has to be seperately as a deep equality check is really slow
 			expect(fillImageMock.mock.calls[i][1]).toBe(buffer)
 		}
+	})
+
+	test('fillPanel with format', () => {
+		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.ICON_PIXELS * 4)
+
+		const fillImageMock = jest.fn()
+		;(streamDeck as any).fillImageRange = fillImageMock
+		streamDeck.fillPanel(buffer, { format: 'bgra' })
+
+		expect(fillImageMock).toHaveBeenCalledTimes(streamDeck.NUM_KEYS)
+
+		const stride = streamDeck.KEY_COLUMNS * streamDeck.ICON_SIZE * 4
+		for (let i = 0; i < streamDeck.NUM_KEYS; i++) {
+			expect(fillImageMock).toHaveBeenCalledWith(i, expect.any(Buffer), {
+				format: 'bgra',
+				offset: expect.any(Number),
+				stride,
+			})
+			// Buffer has to be seperately as a deep equality check is really slow
+			expect(fillImageMock.mock.calls[i][1]).toBe(buffer)
+		}
+	})
+
+	test('fillPanel bad format', () => {
+		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.ICON_BYTES)
+
+		const fillImageMock = jest.fn()
+		;(streamDeck as any).fillImageRange = fillImageMock
+		expect(() => streamDeck.fillPanel(buffer, { format: 'abc' as any })).toThrow()
+
+		expect(fillImageMock).toHaveBeenCalledTimes(0)
 	})
 
 	test('fillPanel bad buffer', () => {
@@ -255,7 +290,28 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		streamDeck.fillImage(2, buffer)
 
 		expect(fillImageMock).toHaveBeenCalledTimes(1)
-		expect(fillImageMock).toHaveBeenCalledWith(2, expect.any(Buffer), 0, streamDeck.ICON_SIZE * 3)
+		expect(fillImageMock).toHaveBeenCalledWith(2, expect.any(Buffer), {
+			format: 'rgb',
+			offset: 0,
+			stride: streamDeck.ICON_SIZE * 3,
+		})
+		// Buffer has to be seperately as a deep equality check is really slow
+		expect(fillImageMock.mock.calls[0][1]).toBe(buffer)
+	})
+
+	test('fillImage with format', () => {
+		const buffer = Buffer.alloc(streamDeck.ICON_PIXELS * 4)
+
+		const fillImageMock = jest.fn()
+		;(streamDeck as any).fillImageRange = fillImageMock
+		streamDeck.fillImage(2, buffer, { format: 'rgba' })
+
+		expect(fillImageMock).toHaveBeenCalledTimes(1)
+		expect(fillImageMock).toHaveBeenCalledWith(2, expect.any(Buffer), {
+			format: 'rgba',
+			offset: 0,
+			stride: streamDeck.ICON_SIZE * 4,
+		})
 		// Buffer has to be seperately as a deep equality check is really slow
 		expect(fillImageMock.mock.calls[0][1]).toBe(buffer)
 	})
@@ -267,6 +323,16 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		;(streamDeck as any).fillImageRange = fillImageMock
 		expect(() => streamDeck.fillImage(-1, buffer)).toThrow()
 		expect(() => streamDeck.fillImage(streamDeck.NUM_KEYS + 1, buffer)).toThrow()
+
+		expect(fillImageMock).toHaveBeenCalledTimes(0)
+	})
+
+	test('fillImage bad format', () => {
+		const buffer = Buffer.alloc(streamDeck.ICON_BYTES)
+
+		const fillImageMock = jest.fn()
+		;(streamDeck as any).fillImageRange = fillImageMock
+		expect(() => streamDeck.fillImage(1, buffer, { format: 'abc' as any })).toThrow()
 
 		expect(fillImageMock).toHaveBeenCalledTimes(0)
 	})
@@ -287,7 +353,11 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		streamDeck.fillColor(4, 123, 255, 86)
 
 		expect(fillImageMock).toHaveBeenCalledTimes(1)
-		expect(fillImageMock).toHaveBeenCalledWith(4, expect.any(Buffer), 0, streamDeck.ICON_SIZE * 3)
+		expect(fillImageMock).toHaveBeenCalledWith(4, expect.any(Buffer), {
+			format: 'rgb',
+			offset: 0,
+			stride: streamDeck.ICON_SIZE * 3,
+		})
 		// console.log(JSON.stringify(bufferToIntArray(fillImageMock.mock.calls[0][1])))
 		expect(fillImageMock.mock.calls[0][1]).toEqual(readFixtureJSON(`fillColor-buffer-${streamDeck.ICON_SIZE}.json`))
 	})
@@ -402,10 +472,26 @@ describe('StreamDeck (Flipped keymap)', () => {
 		streamDeck.fillColor(14, 1, 2, 3)
 
 		expect(fillImageMock).toHaveBeenCalledTimes(4)
-		expect(fillImageMock).toHaveBeenNthCalledWith(1, 4, expect.any(Buffer), 0, streamDeck.ICON_SIZE * 3)
-		expect(fillImageMock).toHaveBeenNthCalledWith(2, 0, expect.any(Buffer), 0, streamDeck.ICON_SIZE * 3)
-		expect(fillImageMock).toHaveBeenNthCalledWith(3, 7, expect.any(Buffer), 0, streamDeck.ICON_SIZE * 3)
-		expect(fillImageMock).toHaveBeenNthCalledWith(4, 10, expect.any(Buffer), 0, streamDeck.ICON_SIZE * 3)
+		expect(fillImageMock).toHaveBeenNthCalledWith(1, 4, expect.any(Buffer), {
+			format: 'rgb',
+			offset: 0,
+			stride: streamDeck.ICON_SIZE * 3,
+		})
+		expect(fillImageMock).toHaveBeenNthCalledWith(2, 0, expect.any(Buffer), {
+			format: 'rgb',
+			offset: 0,
+			stride: streamDeck.ICON_SIZE * 3,
+		})
+		expect(fillImageMock).toHaveBeenNthCalledWith(3, 7, expect.any(Buffer), {
+			format: 'rgb',
+			offset: 0,
+			stride: streamDeck.ICON_SIZE * 3,
+		})
+		expect(fillImageMock).toHaveBeenNthCalledWith(4, 10, expect.any(Buffer), {
+			format: 'rgb',
+			offset: 0,
+			stride: streamDeck.ICON_SIZE * 3,
+		})
 	})
 
 	test('down and up events', () => {

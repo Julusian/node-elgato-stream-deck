@@ -22,12 +22,23 @@ export interface StreamDeckProperties {
 	KEY_DATA_OFFSET: number
 }
 
+export interface FillImageOptions {
+	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
+}
+export type FillPanelOptions = FillImageOptions
+
+export interface InternalFillImageOptions extends FillImageOptions {
+	offset: number
+	stride: number
+}
+
 export interface StreamDeck {
 	readonly NUM_KEYS: number
 	readonly KEY_COLUMNS: number
 	readonly KEY_ROWS: number
 
 	readonly ICON_SIZE: number
+	readonly ICON_PIXELS: number
 	readonly ICON_BYTES: number
 
 	readonly MODEL: DeviceModelId
@@ -47,15 +58,16 @@ export interface StreamDeck {
 	 *
 	 * @param {number} keyIndex The key to fill
 	 * @param {Buffer} imageBuffer
+	 * @param {Object} options
 	 */
-	fillImage(keyIndex: KeyIndex, imageBuffer: Buffer): void
+	fillImage(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): void
 
 	/**
 	 * Fills the whole panel with an image in a Buffer.
 	 *
 	 * @param {Buffer} imageBuffer
 	 */
-	fillPanel(imageBuffer: Buffer): void
+	fillPanel(imageBuffer: Buffer, options?: FillPanelOptions): void
 
 	/**
 	 * Clears the given key.
@@ -115,7 +127,10 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.deviceProperties.ICON_SIZE
 	}
 	get ICON_BYTES(): number {
-		return this.ICON_SIZE * this.ICON_SIZE * 3
+		return this.ICON_PIXELS * 3
+	}
+	get ICON_PIXELS(): number {
+		return this.ICON_SIZE * this.ICON_SIZE
 	}
 
 	get MODEL(): DeviceModelId {
@@ -180,28 +195,49 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 		const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]))
 		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		this.fillImageRange(keyIndex2, pixels, 0, this.ICON_SIZE * 3)
+
+		// TODO - this could be cleverer and skip all the transform logic, but I dont expect it to be used enough to justify that
+		this.fillImageRange(keyIndex2, pixels, {
+			format: 'rgb',
+			offset: 0,
+			stride: this.ICON_SIZE * 3,
+		})
 	}
 
-	public fillImage(keyIndex: KeyIndex, imageBuffer: Buffer): void {
+	public fillImage(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): void {
 		this.checkValidKeyIndex(keyIndex)
 
-		if (imageBuffer.length !== this.ICON_BYTES) {
-			throw new RangeError(`Expected image buffer of length ${this.ICON_BYTES}, got length ${imageBuffer.length}`)
+		const sourceFormat = (options ? options.format : null) || 'rgb'
+		this.checkSourceFormat(sourceFormat)
+
+		const imageSize = this.ICON_PIXELS * sourceFormat.length
+		if (imageBuffer.length !== imageSize) {
+			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
 		}
 
 		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		this.fillImageRange(keyIndex2, imageBuffer, 0, this.ICON_SIZE * 3)
+		this.fillImageRange(keyIndex2, imageBuffer, {
+			format: sourceFormat,
+			offset: 0,
+			stride: this.ICON_SIZE * sourceFormat.length,
+		})
 	}
 
-	public fillPanel(imageBuffer: Buffer): void {
-		if (imageBuffer.length !== this.ICON_BYTES * this.NUM_KEYS) {
-			throw new RangeError(
-				`Expected image buffer of length ${this.ICON_BYTES * this.NUM_KEYS}, got length ${imageBuffer.length}`
-			)
+	public fillPanel(imageBuffer: Buffer, options?: FillPanelOptions): void {
+		const sourceFormat = (options ? options.format : null) || 'rgb'
+		this.checkSourceFormat(sourceFormat)
+
+		const imageSize = this.ICON_PIXELS * sourceFormat.length * this.NUM_KEYS
+		if (imageBuffer.length !== imageSize) {
+			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
 		}
 
+		const iconSize = this.ICON_SIZE * sourceFormat.length
+		const stride = iconSize * this.KEY_COLUMNS
+
 		for (let row = 0; row < this.KEY_ROWS; row++) {
+			const rowOffset = stride * row * this.ICON_SIZE
+
 			for (let column = 0; column < this.KEY_COLUMNS; column++) {
 				let index = row * this.KEY_COLUMNS
 				if (this.deviceProperties.KEY_DIRECTION === 'ltr') {
@@ -210,11 +246,13 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 					index += this.KEY_COLUMNS - column - 1
 				}
 
-				const stride = this.ICON_SIZE * 3 * this.KEY_COLUMNS
-				const rowOffset = stride * row * this.ICON_SIZE
-				const colOffset = column * this.ICON_SIZE * 3
+				const colOffset = column * iconSize
 
-				this.fillImageRange(index, imageBuffer, rowOffset + colOffset, stride)
+				this.fillImageRange(index, imageBuffer, {
+					format: sourceFormat,
+					offset: rowOffset + colOffset,
+					stride,
+				})
 			}
 		}
 	}
@@ -274,7 +312,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 	protected abstract transformKeyIndex(keyIndex: KeyIndex): KeyIndex
 
-	protected abstract convertFillImage(imageBuffer: Buffer, sourceOffset: number, sourceStride: number): Buffer
+	protected abstract convertFillImage(imageBuffer: Buffer, sourceOptions: InternalFillImageOptions): Buffer
 
 	protected getFillImageCommandHeaderLength(): number {
 		return 16
@@ -328,10 +366,10 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.device.getFeatureReport(reportId, reportLength)
 	}
 
-	private fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOffset: number, sourceStride: number): void {
+	private fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOptions: InternalFillImageOptions): void {
 		this.checkValidKeyIndex(keyIndex)
 
-		const byteBuffer = this.convertFillImage(imageBuffer, sourceOffset, sourceStride)
+		const byteBuffer = this.convertFillImage(imageBuffer, sourceOptions)
 
 		const packets = this.generateFillImageWrites(keyIndex, byteBuffer)
 		for (const packet of packets) {
@@ -348,6 +386,20 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 	private checkRGBValue(value: number): void {
 		if (value < 0 || value > 255) {
 			throw new TypeError('Expected a valid color RGB value 0 - 255')
+		}
+	}
+
+	private checkSourceFormat(format: 'rgb' | 'rgba' | 'bgr' | 'bgra'): void {
+		switch (format) {
+			case 'rgb':
+			case 'rgba':
+			case 'bgr':
+			case 'bgra':
+				break
+			default: {
+				const fmt: never = format
+				throw new TypeError(`Expected a known color format not "${fmt}"`)
+			}
 		}
 	}
 }
