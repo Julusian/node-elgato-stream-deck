@@ -207,7 +207,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 	public fillImage(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): void {
 		this.checkValidKeyIndex(keyIndex)
 
-		const sourceFormat = (options ? options.format : null) || 'rgb'
+		const sourceFormat = options?.format ?? 'rgb'
 		this.checkSourceFormat(sourceFormat)
 
 		const imageSize = this.ICON_PIXELS * sourceFormat.length
@@ -224,7 +224,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 	}
 
 	public fillPanel(imageBuffer: Buffer, options?: FillPanelOptions): void {
-		const sourceFormat = (options ? options.format : null) || 'rgb'
+		const sourceFormat = options?.format ?? 'rgb'
 		this.checkSourceFormat(sourceFormat)
 
 		const imageSize = this.ICON_PIXELS * sourceFormat.length * this.NUM_KEYS
