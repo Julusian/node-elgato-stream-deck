@@ -779,10 +779,10 @@
     "@babel/runtime" "^7.7.2"
     regenerator-runtime "^0.13.3"
 
-"@julusian/jpeg-turbo@^1.0.0-1":
-  version "1.0.0-1"
-  resolved "https://registry.yarnpkg.com/@julusian/jpeg-turbo/-/jpeg-turbo-1.0.0-1.tgz#4ea862182c23cbbfff4731ba149eebbb8a52797e"
-  integrity sha512-R+2lDJfduJesK0HJB6eM6tqBSXBruuGQVM+RNGt4BsQLwaVVHnv76oheAh5Q/gEzHEJubu2QB89sX6Z1A+neQQ==
+"@julusian/jpeg-turbo@^1.0.0-2":
+  version "1.0.0-2"
+  resolved "https://registry.yarnpkg.com/@julusian/jpeg-turbo/-/jpeg-turbo-1.0.0-2.tgz#4738d8f0db70c5ee4ba15948dc28af608c6776b9"
+  integrity sha512-mzdJfNZODaEDPeJYz2lySMydxXrLz04bB0dnbaEnJmNam0a9NOi10RMBKFJZr99VVodsLKTMa1DTMWSMSuDM7Q==
   dependencies:
     bindings "^1.5.0"
     cmake-js "^6.1.0"

@@ -17,9 +17,9 @@ with the various models of the [Elgato Stream Deck](https://www.elgato.com/en/ga
 
 `$ npm install --save elgato-stream-deck`
 
-`$ npm install --save @julusian/jpeg-turbo@^0.5.3` (Optional)
+`$ npm install --save @julusian/jpeg-turbo@^1.0.0-2` (Optional)
 
-It is recommended to install `@julusian/jpeg-turbo@^0.5.3` to greatly improve performance for writing images to the StreamDeck XL or the Original-v2. Without doing so `jpeg-js` will be used instead, but image transfers will be noticably more cpu intensive and slower. `jpeg-turbo` has prebuilt binaries, but is not installed by default to ensure installation time is kept to a minimum for users who do not need the performance or the XL or the Original-v2.
+It is recommended to install `@julusian/jpeg-turbo` to greatly improve performance for writing images to the StreamDeck XL or the Original-v2. Without doing so `jpeg-js` will be used instead, but image transfers will be noticably more cpu intensive and slower. `jpeg-turbo` has prebuilt binaries, but is not installed by default to ensure installation is easy for users who do not need the performance or the XL or the Original-v2.
 
 ### Linux
 
@@ -58,13 +58,12 @@ However, in the event that installation _does_ fail (**or if you are on a platfo
 * Linux (**including Raspberry Pi**)
   * Follow the instructions for Linux in the ["Compiling from source"](https://github.com/node-hid/node-hid#compiling-from-source) steps for `node-hid`:
 	```bash
-	sudo apt-get install build-essential git
-	sudo apt-get install gcc-4.8 g++-4.8 && export CXX=g++-4.8
+	sudo apt-get install build-essential git g++
 	sudo apt-get install sudo apt install libusb-1.0-0 libusb-1.0-0-dev
 	```
   * Install a recent version of Node.js.:
 	```bash
-	curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+	curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 	sudo apt-get install -y nodejs 
 	```
   * Try installing `node-elgato-stream-deck`
@@ -124,17 +123,17 @@ const { openStreamDeck } = require('elgato-stream-deck')
 // Available devices can be found with listStreamDecks()
 const myStreamDeck = openStreamDeck()
 
-myStreamDeck.on('down', keyIndex => {
+myStreamDeck.on('down', (keyIndex) => {
 	console.log('key %d down', keyIndex)
 })
 
-myStreamDeck.on('up', keyIndex => {
+myStreamDeck.on('up', (keyIndex) => {
 	console.log('key %d up', keyIndex)
 })
 
 // Fired whenever an error is detected by the `node-hid` library.
 // Always add a listener for this event! If you don't, errors will be silently dropped.
-myStreamDeck.on('error', error => {
+myStreamDeck.on('error', (error) => {
 	console.error(error)
 })
 
@@ -188,7 +187,7 @@ const streamDeck = openStreamDeck('0001:0021:00')
 // Or
 
 const streamDeck = openStreamDeck('0001:0021:00', {
-	useOriginalKeyOrder: true
+	useOriginalKeyOrder: true,
 })
 ```
 
@@ -262,10 +261,10 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 	.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE) // Scale up/down to the right size, cropping if necessary.
 	.raw() // Give us uncompressed RGB.
 	.toBuffer()
-	.then(buffer => {
+	.then((buffer) => {
 		streamDeck.fillImage(2, buffer)
 	})
-	.catch(err => {
+	.catch((err) => {
 		console.error(err)
 	})
 ```
@@ -284,10 +283,10 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 	.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS) // Scale up/down to the right size, cropping if necessary.
 	.raw() // Give us uncompressed RGB.
 	.toBuffer()
-	.then(buffer => {
+	.then((buffer) => {
 		streamDeck.fillPanel(buffer)
 	})
-	.catch(err => {
+	.catch((err) => {
 		console.error(err)
 	})
 ```
@@ -367,7 +366,7 @@ Fired whenever a key is pressed. `keyIndex` is the index of that key.
 ##### Example
 
 ```javascript
-streamDeck.on('down', keyIndex => {
+streamDeck.on('down', (keyIndex) => {
 	console.log('key %d down', keyIndex)
 })
 ```
@@ -379,7 +378,7 @@ Fired whenever a key is released. `keyIndex` is the index of that key.
 ##### Example
 
 ```javascript
-streamDeck.on('up', keyIndex => {
+streamDeck.on('up', (keyIndex) => {
 	console.log('key %d up', keyIndex)
 })
 ```
@@ -392,7 +391,7 @@ Fired whenever an error is detected by the `node-hid` library.
 ##### Example
 
 ```javascript
-streamDeck.on('error', error => {
+streamDeck.on('error', (error) => {
 	console.error(error)
 })
 ```
