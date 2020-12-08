@@ -5,6 +5,16 @@
 ![Node CI](https://github.com/Julusian/node-elgato-stream-deck/workflows/Node%20CI/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/Julusian/node-elgato-stream-deck/badge.svg?branch=master)](https://coveralls.io/github/Julusian/node-elgato-stream-deck?branch=master)
 
+## Project Status
+
+If you have come to this page due to issues installing this package in an existing project, then please update to the latest version, or let me know if you need an older version published (which will need to be under a new version number)
+
+This library is still being maintained, and will get the same support and maintainance as before. I (julusian) have been maintaining it for over a year and intend to keep doing so
+
+Somehow NPM let this package be unpublished, even though it meets multiple of their criteria to not be allowed to. This was by an ex-maintainer that still had permissions on npm.
+
+Until they respond to my support message about restoring the older versions, I can only publish to previously unused version numbers.
+
 ![alt text](media/streamdeck_ui.png 'elgato-stream-deck')
 
 [`elgato-stream-deck`](https://github.com/julusian/elgato-stream-deck) is a Node.js library for interfacing
@@ -402,9 +412,7 @@ streamDeck.on('error', error => {
 
 ### Contributing
 
-The elgato-stream-deck team enthusiastically welcomes contributions and project participation! There's a bunch of things you can do if you want to contribute! The [Contributor Guide](CONTRIBUTING.md) has all the information you need for everything from reporting bugs to contributing entire new features. Please don't hesitate to jump in if you'd like to, or even ask us questions if something isn't clear.
-
-All participants and maintainers in this project are expected to follow [Code of Conduct](CODE_OF_CONDUCT.md), and just generally be kind to each other.
+The elgato-stream-deck team enthusiastically welcomes contributions and project participation! There's a bunch of things you can do if you want to contribute! Please don't hesitate to jump in if you'd like to, or even ask us questions if something isn't clear.
 
 Please refer to the [Changelog](CHANGELOG.md) for project history details, too.
 

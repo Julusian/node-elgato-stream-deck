@@ -1,6 +1,6 @@
 {
   "name": "elgato-stream-deck",
-  "version": "3.3.3",
+  "version": "3.3.5-0",
   "description": "An npm module for interfacing with the Elgato Stream Deck",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -14,10 +14,8 @@
     "url": "https://github.com/julusian/node-elgato-stream-deck/issues"
   },
   "author": {
-    "name": "Alex Van Camp",
-    "email": "email@alexvan.camp",
-    "url": "https://alexvan.camp/",
-    "twitter": "vancamp"
+    "name": "Julian Waller",
+    "email": "git@julusian.co.uk"
   },
   "contributors": [
     {
@@ -33,10 +31,6 @@
       "twitter": "chrishanel",
       "email": "chrishanel@gmail.com",
       "url": "http://www.chrishanel.com/"
-    },
-    {
-      "name": "Julian Waller",
-      "email": "git@julusian.co.uk"
     }
   ],
   "keywords": [
@@ -61,8 +55,6 @@
     "testci": "yarn lint && jest --coverage",
     "send-coverage": "cat ./coverage/lcov.info | coveralls",
     "unit": "jest",
-    "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
-    "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'",
     "lint": "eslint . --ext .ts",
     "validate:dependencies": "yarn audit --groups dependencies && yarn license-validate",
     "license-validate": "node-license-validator -p -d --allow-licenses MIT 0BSD BSD BSD-3-Clause ISC Apache Unlicense WTFPL"
@@ -106,9 +98,7 @@
     "ts-loader": "^6.0.0",
     "ts-node": "^8.1.0",
     "typescript": "~3.6.4",
-    "usb-detection": "^4.3.0",
-    "weallbehave": "^1.2.0",
-    "weallcontribute": "^1.0.8"
+    "usb-detection": "^4.3.0"
   },
   "resolutions": {
     "**/conventional-changelog-angular": "5.0.6",
