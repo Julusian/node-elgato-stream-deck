@@ -32,18 +32,13 @@ font.load(() => {
 		try {
 			await PImage.encodePNGToStream(img, writableStreamBuffer)
 
-			// For some reason, adding an overlayWith command forces the final image to have
-			// an alpha channel, even if we call .flatten().
-			// To work around this, we have to overlay the image, render it as a PNG,
-			// then put that PNG back into Sharp, flatten it, and render raw.
-			// Seems like a bug in Sharp that we should make a test case for and report.
 			const pngBuffer = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 				.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
-				.overlayWith(writableStreamBuffer.getContents())
-				.png()
+				.composite([{ input: writableStreamBuffer.getContents() }])
+				.flatten()
+				.raw()
 				.toBuffer()
-			const finalBuffer = await sharp(pngBuffer).flatten().raw().toBuffer()
-			await streamDeck.fillImage(keyIndex, finalBuffer)
+			await streamDeck.fillImage(keyIndex, pngBuffer, { format: 'rgba' })
 		} catch (error) {
 			console.error(error)
 		}
