@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/julusian/node-elgato-stream-deck/compare/v3.3.5...v4.0.0) (2020-12-23)
+
+### BREAKING CHANGES
+
+-   Drop support for node 8 or older
+
+### Features
+
+-   support for buffers in any of rgb, rgba, bgr or bgra ([088d979](https://github.com/julusian/node-elgato-stream-deck/commit/088d979821d5614c0a751cfb594f7da936238552))
+
+### Bug Fixes
+
+-   broken text-generation example ([364f6de](https://github.com/julusian/node-elgato-stream-deck/commit/364f6de8ca83bfa89138f65bea31a01af42cd108))
+-   dependencies too new for node8 ([875f5bd](https://github.com/julusian/node-elgato-stream-deck/commit/875f5bd9a215310610ad3a8b06173a4aa8b3f7ff))
+
 ### [3.3.5](https://github.com/julusian/node-elgato-stream-deck/compare/v3.3.3...v3.3.5) (2020-12-08)
 
 ### [3.3.3](https://github.com/julusian/node-elgato-stream-deck/compare/v3.3.2...v3.3.3) (2020-12-04)
