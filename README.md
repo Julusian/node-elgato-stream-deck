@@ -56,16 +56,7 @@ However, in the event that installation _does_ fail (**or if you are on a platfo
   xcode-select --install
   ```
 * Linux (**including Raspberry Pi**)
-  * Follow the instructions for Linux in the ["Compiling from source"](https://github.com/node-hid/node-hid#compiling-from-source) steps for `node-hid`:
-	```bash
-	sudo apt-get install build-essential git g++
-	sudo apt-get install sudo apt install libusb-1.0-0 libusb-1.0-0-dev
-	```
-  * Install a recent version of Node.js.:
-	```bash
-	curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-	sudo apt-get install -y nodejs 
-	```
+  * Follow the instructions for Linux in the ["Compiling from source"](https://github.com/node-hid/node-hid#compiling-from-source) steps for 
   * Try installing `node-elgato-stream-deck`
   * If you still have issues, ensure everything is updated and try again:
 	```bash
