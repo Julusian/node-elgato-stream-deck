@@ -85,7 +85,7 @@
     ]
   },
   "devDependencies": {
-    "@julusian/jpeg-turbo": "^1.0.0-3",
+    "@julusian/jpeg-turbo": "^1.0.0",
     "@sofie-automation/code-standard-preset": "^0.2.1",
     "@types/jest": "^26.0.19",
     "@types/jpeg-js": "^0.3.0",

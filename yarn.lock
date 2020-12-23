@@ -778,14 +778,14 @@
     "@babel/runtime" "^7.7.2"
     regenerator-runtime "^0.13.3"
 
-"@julusian/jpeg-turbo@^1.0.0-3":
-  version "1.0.0-3"
-  resolved "https://registry.yarnpkg.com/@julusian/jpeg-turbo/-/jpeg-turbo-1.0.0-3.tgz#54b1b19eb61c09ff00c8d3022b22a16f01658838"
-  integrity sha512-5EfSLt0W3uyOnPcKQOJ1xCXHIZFR4hWGuKFxiykLEWYODaQwfUFxMYjqbPvbXRE/u5JQ86cA74lDMJWN+OzTIA==
+"@julusian/jpeg-turbo@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@julusian/jpeg-turbo/-/jpeg-turbo-1.0.0.tgz#61c8971a093e6bb4773c092f79927bd58f804886"
+  integrity sha512-GEgYG2rlEspbbr2AgOPoQfrqbzSt/EQTtW4R2fNOx1rj0EStJJ1ehr5qcMG6OQavv68HCwur6kyN2GTri8SXZg==
   dependencies:
     bindings "^1.5.0"
     cmake-js "^6.1.0"
-    node-addon-api "^3.0.2"
+    node-addon-api "^3.1.0"
     prebuild-install "^6.0.0"
 
 "@nodelib/fs.scandir@2.1.3":
