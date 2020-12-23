@@ -20,6 +20,11 @@ export async function requestStreamDeck(options?: OpenStreamDeckOptions): Promis
 			]
 		})
 		.then(async (browserDevice: any) => {
+			// requestDevice returns an array because a physical device might
+			// have multiple HID interfaces.  The StreamDeck only has one:
+			if (browserDevice.length > 0) {
+				browserDevice = browserDevice[0];
+			}
 			const model = DEVICE_MODELS.find(m => m.productId === browserDevice.productId)
 			if (!model) {
 				throw new Error('Stream Deck is of unexpected type.')
