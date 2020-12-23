@@ -57,7 +57,7 @@
     "unit": "jest",
     "lint": "eslint . --ext .ts --ext .js --ignore-pattern dist",
     "validate:dependencies": "yarn audit --groups dependencies && yarn license-validate",
-    "license-validate": "yarn sofie-licensecheck"
+    "license-validate": "yarn sofie-licensecheck --allowPackages buffers@0.1.1"
   },
   "files": [
     "dist"
@@ -86,10 +86,10 @@
   },
   "devDependencies": {
     "@julusian/jpeg-turbo": "^1.0.0-3",
-    "@sofie-automation/code-standard-preset": "^0.2.0",
+    "@sofie-automation/code-standard-preset": "^0.2.1",
     "@types/jest": "^26.0.19",
     "@types/jpeg-js": "^0.3.0",
-    "@types/node": "^14.14.12",
+    "@types/node": "^14.14.14",
     "@types/node-hid": "^1.3.0",
     "@types/sharp": "^0.26.1",
     "codecov": "^3.8.1",
@@ -100,12 +100,12 @@
     "open-cli": "^6.0.1",
     "pureimage": "^0.2.5",
     "rimraf": "^3.0.2",
-    "sharp": "~0.26.3",
+    "sharp": "~0.27.0",
     "standard-version": "^9.0.0",
     "stream-buffers": "^3.0.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^9.1.1",
-    "typescript": "~4.0.5",
+    "typescript": "~4.1.3",
     "usb-detection": "^4.10.0"
   }
 }
