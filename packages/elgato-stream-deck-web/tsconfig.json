@@ -1,9 +1,7 @@
 {
-	"extends": "../../tsconfig.json",
+	"extends": "./tsconfig.build.json",
+	"exclude": ["node_modules/**"],
 	"compilerOptions": {
-		"lib": ["dom"],
-		"types": [],
-		"outDir": "./dist"
-	},
-	"include": ["src/**/*.ts"]
+		"types": ["jest", "node"]
+	}
 }

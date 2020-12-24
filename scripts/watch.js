@@ -7,22 +7,24 @@ const concurrently = require('concurrently');
 		await concurrently(
 			[
 				{
-					command: 'yarn workspace @companion/module-framework watch',
-					name: 'FRAMEWORK',
-				},
-				{
-					command: `yarn workspace companion3 ${process.env.ELECTRON ? 'dev-electron' : 'dev-server'}`,
-					name: 'SERVER',
+					command: 'yarn workspace elgato-stream-deck-core build:main --watch',
 					prefixColor: 'bgBlue.bold',
-					env: {
-						MONGO_URL: mongoUrl,
-						DEVELOPER: 1,
-					},
+					name: 'CORE',
 				},
 				{
-					command: 'yarn workspace companion3 dev-client',
-					name: 'CLIENT',
+					command: 'yarn workspace elgato-stream-deck build:main --watch',
 					prefixColor: 'bgGreen.bold',
+					name: 'NODE',
+				},
+				{
+					command: 'yarn workspace elgato-stream-deck-web build:main --watch',
+					prefixColor: 'bgPink.bold',
+					name: 'WEB',
+				},
+				{
+					command: 'yarn workspace elgato-stream-deck-web-example start',
+					prefixColor: 'bgRed.bold',
+					name: 'DEMO',
 				},
 			],
 			{

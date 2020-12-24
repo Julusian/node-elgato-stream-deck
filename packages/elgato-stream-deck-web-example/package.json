@@ -25,7 +25,7 @@
   ],
   "scripts": {
     "start": "webpack-dev-server --mode development --color",
-    "dist": "trash dist && cross-env NODE_ENV=production webpack -p --progress --colors",
+    "build": "trash dist && cross-env NODE_ENV=production webpack -p --progress --colors",
     "lint": "tslint --project tsconfig.json --config ./tslint.json"
   },
   "dependencies": {
