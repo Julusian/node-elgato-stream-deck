@@ -1,6 +1,6 @@
 import { HIDDevice } from '../device'
-import { BMP_HEADER_LENGTH, bufferToIntArray, imageToByteArray, writeBMPHeader } from '../util'
-import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
+import { BMP_HEADER_LENGTH,  imageToByteArray, writeBMPHeader } from '../util'
+import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { DeviceModelId, KeyIndex } from './id'
 
 const originalProperties: StreamDeckProperties = {
@@ -9,7 +9,7 @@ const originalProperties: StreamDeckProperties = {
 	ROWS: 3,
 	ICON_SIZE: 72,
 	KEY_DIRECTION: 'rtl',
-	KEY_DATA_OFFSET: 1
+	KEY_DATA_OFFSET: 1,
 }
 
 export class StreamDeckOriginal extends StreamDeckBase {
@@ -32,15 +32,14 @@ export class StreamDeckOriginal extends StreamDeckBase {
 		}
 	}
 
-	protected getFillImagePacketLength() {
+	protected getFillImagePacketLength(): number {
 		return 8191
 	}
 
-	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number): Promise<Buffer> {
+	protected convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
-			sourceOffset,
-			sourceStride,
+			sourceOptions,
 			BMP_HEADER_LENGTH,
 			this.flipCoordinates.bind(this),
 			'bgr',
@@ -50,7 +49,7 @@ export class StreamDeckOriginal extends StreamDeckBase {
 		return Promise.resolve(byteBuffer)
 	}
 
-	protected generateFillImageWrites(keyIndex: KeyIndex, byteBuffer: Buffer): number[][] {
+	protected generateFillImageWrites(keyIndex: KeyIndex, byteBuffer: Buffer): Buffer[] {
 		const MAX_PACKET_SIZE = this.getFillImagePacketLength()
 		const PACKET_HEADER_LENGTH = this.getFillImageCommandHeaderLength()
 
@@ -66,7 +65,7 @@ export class StreamDeckOriginal extends StreamDeckBase {
 		this.writeFillImageCommandHeader(packet2, keyIndex, 0x02, true, packet1Bytes)
 		byteBuffer.copy(packet2, PACKET_HEADER_LENGTH, packet1Bytes)
 
-		return [bufferToIntArray(packet1), bufferToIntArray(packet2)]
+		return [packet1, packet2]
 	}
 
 	private flipCoordinates(x: number, y: number): { x: number; y: number } {

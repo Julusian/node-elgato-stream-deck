@@ -1,13 +1,13 @@
 module.exports = {
 	globals: {
 		'ts-jest': {
-			tsConfig: 'tsconfig.json',
-			diagnostics: false
-		}
+			tsconfig: 'tsconfig.json',
+			diagnostics: false,
+		},
 	},
 	moduleFileExtensions: ['ts', 'js', 'json'],
 	transform: {
-		'^.+\\.(ts|tsx)$': 'ts-jest'
+		'^.+\\.(ts|tsx)$': 'ts-jest',
 	},
 	testMatch: ['**/__tests__/**/*.spec.(ts|js)'],
 	testPathIgnorePatterns: ['integrationTests'],
@@ -17,10 +17,10 @@ module.exports = {
 			branches: 0,
 			functions: 0,
 			lines: 0,
-			statements: 0
-		}
+			statements: 0,
+		},
 	},
 	collectCoverageFrom: ['**/src/**/*.{ts,js}', '!**/src/__tests__/**', '!**/node_modules/**', '!**/dist/**'],
 	coverageDirectory: './coverage/',
-	collectCoverage: true
+	collectCoverage: true,
 }

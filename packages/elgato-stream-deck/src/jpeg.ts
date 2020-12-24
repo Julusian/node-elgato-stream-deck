@@ -8,20 +8,29 @@ try {
 	// This is expected and can be ignored
 }
 
-export function encodeJPEG(buffer: Buffer, width: number, height: number): Promise<Buffer> {
+export interface JPEGEncodeOptions {
+	quality: number
+	subsampling?: number
+}
+
+const DEFAULT_QUALITY = 95
+
+export function encodeJPEG(buffer: Buffer, width: number, height: number,
+	options: JPEGEncodeOptions | undefined): Promise<Buffer> {
 	try {
 		// Try using jpeg-turbo if it is available
 		if (jpegTurbo && jpegTurbo.bufferSize && jpegTurbo.compressSync) {
-			const options = {
+			const encodeOptions: import('@julusian/jpeg-turbo').EncodeOptions = {
 				format: jpegTurbo.FORMAT_RGBA,
 				width,
 				height,
-				quality: 95
+				quality: DEFAULT_QUALITY,
+				...options,
 			}
 			if (buffer.length === width * height * 4) {
-				const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(options))
+				const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(encodeOptions))
 				return new Promise((resolve, reject) => {
-					jpegTurbo!.compress(buffer, tmpBuffer, options, (err, resBuffer) => {
+					jpegTurbo!.compress(buffer, tmpBuffer, encodeOptions, (err, resBuffer) => {
 						if (err) {
 							reject(err)
 						} else {
@@ -41,9 +50,9 @@ export function encodeJPEG(buffer: Buffer, width: number, height: number): Promi
 		{
 			width,
 			height,
-			data: buffer
+			data: buffer,
 		},
-		95
+		options ? options.quality : DEFAULT_QUALITY
 	)
 	return Promise.resolve(jpegBuffer2.data)
 }

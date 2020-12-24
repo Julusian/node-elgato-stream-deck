@@ -2,7 +2,7 @@ import { EventEmitter } from 'events'
 
 import { HIDDevice } from '../device'
 import { DeviceModelId } from '../models'
-import { bufferToIntArray, numberArrayToString } from '../util'
+import {  numberArrayToString } from '../util'
 import { KeyIndex } from './id'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
@@ -11,6 +11,7 @@ export interface OpenStreamDeckOptions {
 	useOriginalKeyOrder?: boolean
 	resetToLogoOnExit?: boolean
 	encodeJPEG?: EncodeJPEGHelper
+	jpegOptions?: JPEGEncodeOptions
 }
 
 export interface StreamDeckProperties {
@@ -22,12 +23,23 @@ export interface StreamDeckProperties {
 	KEY_DATA_OFFSET: number
 }
 
+export interface FillImageOptions {
+	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
+}
+export type FillPanelOptions = FillImageOptions
+
+export interface InternalFillImageOptions extends FillImageOptions {
+	offset: number
+	stride: number
+}
+
 export interface StreamDeck {
 	readonly NUM_KEYS: number
 	readonly KEY_COLUMNS: number
 	readonly KEY_ROWS: number
 
 	readonly ICON_SIZE: number
+	readonly ICON_PIXELS: number
 	readonly ICON_BYTES: number
 
 	readonly MODEL: DeviceModelId
@@ -58,15 +70,16 @@ export interface StreamDeck {
 	 *
 	 * @param {number} keyIndex The key to fill
 	 * @param {Buffer} imageBuffer
+	 * @param {Object} options
 	 */
-	fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer): Promise<void>
+	fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void>
 
 	/**
 	 * Fills the whole panel with an image in a Buffer.
 	 *
 	 * @param {Buffer} imageBuffer
 	 */
-	fillPanelBuffer(imageBuffer: Buffer): Promise<void>
+	fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
 
 	/**
 	 * Clears the given key.
@@ -102,35 +115,39 @@ export interface StreamDeck {
 	 */
 	getSerialNumber(): Promise<string>
 
-	on(event: 'down' | 'up', listener: (keyIndex: KeyIndex) => void): any
-	on(event: 'error', listener: (e: any) => void): any
+	on(event: 'down' | 'up', listener: (keyIndex: KeyIndex) => void): this
+	on(event: 'error', listener: (e: unknown) => void): this
 }
 
 export abstract class StreamDeckBase extends EventEmitter implements StreamDeck {
-	get NUM_KEYS() {
+	get NUM_KEYS(): number {
 		return this.KEY_COLUMNS * this.KEY_ROWS
 	}
-	get KEY_COLUMNS() {
+	get KEY_COLUMNS(): number {
 		return this.deviceProperties.COLUMNS
 	}
-	get KEY_ROWS() {
+	get KEY_ROWS(): number {
 		return this.deviceProperties.ROWS
 	}
 
-	get ICON_SIZE() {
+	get ICON_SIZE(): number {
 		return this.deviceProperties.ICON_SIZE
 	}
-	get ICON_BYTES() {
-		return this.ICON_SIZE * this.ICON_SIZE * 3
+	get ICON_BYTES(): number {
+		return this.ICON_PIXELS * 3
+	}
+	get ICON_PIXELS(): number {
+		return this.ICON_SIZE * this.ICON_SIZE
 	}
 
-	get MODEL() {
+	get MODEL(): DeviceModelId {
 		return this.deviceProperties.MODEL
 	}
 
 	protected readonly device: HIDDevice
 	private readonly deviceProperties: Readonly<StreamDeckProperties>
 	// private readonly options: Readonly<OpenStreamDeckOptions>
+	private readonly releaseExitHook: () => void
 	private readonly keyState: boolean[]
 
 	constructor(device: HIDDevice, options: OpenStreamDeckOptions, properties: StreamDeckProperties) {
@@ -159,7 +176,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 			}
 		})
 
-		this.device.on('error', err => {
+		this.device.on('error', (err) => {
 			this.emit('error', err)
 		})
 	}
@@ -183,28 +200,47 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 		const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]))
 		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		return this.fillImageRange(keyIndex2, pixels, 0, this.ICON_SIZE * 3)
+		return this.fillImageRange(keyIndex2, pixels, {
+			format: 'rgb',
+			offset: 0,
+			stride: this.ICON_SIZE * 3,
+		})
 	}
 
-	public fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer): Promise<void> {
+	public fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
-		if (imageBuffer.length !== this.ICON_BYTES) {
-			throw new RangeError(`Expected image buffer of length ${this.ICON_BYTES}, got length ${imageBuffer.length}`)
+		const sourceFormat = options?.format ?? 'rgb'
+		this.checkSourceFormat(sourceFormat)
+
+		const imageSize = this.ICON_PIXELS * sourceFormat.length
+		if (imageBuffer.length !== imageSize) {
+			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
 		}
 
 		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		return this.fillImageRange(keyIndex2, imageBuffer, 0, this.ICON_SIZE * 3)
+		return this.fillImageRange(keyIndex2, imageBuffer, {
+			format: sourceFormat,
+			offset: 0,
+			stride: this.ICON_SIZE * sourceFormat.length,
+		})
 	}
 
-	public async fillPanelBuffer(imageBuffer: Buffer): Promise<void> {
-		if (imageBuffer.length !== this.ICON_BYTES * this.NUM_KEYS) {
-			throw new RangeError(
-				`Expected image buffer of length ${this.ICON_BYTES * this.NUM_KEYS}, got length ${imageBuffer.length}`
-			)
+	public async fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void> {
+		const sourceFormat = options?.format ?? 'rgb'
+		this.checkSourceFormat(sourceFormat)
+
+		const imageSize = this.ICON_PIXELS * sourceFormat.length * this.NUM_KEYS
+		if (imageBuffer.length !== imageSize) {
+			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
 		}
 
+		const iconSize = this.ICON_SIZE * sourceFormat.length
+		const stride = iconSize * this.KEY_COLUMNS
+
 		for (let row = 0; row < this.KEY_ROWS; row++) {
+			const rowOffset = stride * row * this.ICON_SIZE
+
 			for (let column = 0; column < this.KEY_COLUMNS; column++) {
 				let index = row * this.KEY_COLUMNS
 				if (this.deviceProperties.KEY_DIRECTION === 'ltr') {
@@ -213,11 +249,13 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 					index += this.KEY_COLUMNS - column - 1
 				}
 
-				const stride = this.ICON_SIZE * 3 * this.KEY_COLUMNS
-				const rowOffset = stride * row * this.ICON_SIZE
-				const colOffset = column * this.ICON_SIZE * 3
+				const colOffset = column * iconSize
 
-				await this.fillImageRange(index, imageBuffer, rowOffset + colOffset, stride)
+				await this.fillImageRange(index, imageBuffer, {
+					format: sourceFormat,
+					offset: rowOffset + colOffset,
+					stride,
+				})
 			}
 		}
 	}
@@ -243,21 +281,21 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		}
 
 		// prettier-ignore
-		const brightnessCommandBuffer = [
+		const brightnessCommandBuffer = Buffer.from([
 			0x05,
 			0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		]
+		])
 		await this.device.sendFeatureReport(brightnessCommandBuffer)
 	}
 
 	public async resetToLogo(): Promise<void> {
 		// prettier-ignore
-		const resetCommandBuffer = [
+		const resetCommandBuffer = Buffer.from([
 			0x0b,
 			0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		]
+		])
 		await this.device.sendFeatureReport(resetCommandBuffer)
 	}
 
@@ -271,13 +309,9 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 	protected abstract transformKeyIndex(keyIndex: KeyIndex): KeyIndex
 
-	protected abstract convertFillImage(
-		imageBuffer: Buffer,
-		sourceOffset: number,
-		sourceStride: number
-	): Promise<Buffer>
+	protected abstract convertFillImage(imageBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer>
 
-	protected getFillImageCommandHeaderLength() {
+	protected getFillImageCommandHeaderLength(): number {
 		return 16
 	}
 
@@ -287,7 +321,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		partIndex: number,
 		isLast: boolean,
 		_bodyLength: number
-	) {
+	): void {
 		buffer.writeUInt8(0x02, 0)
 		buffer.writeUInt8(0x01, 1)
 		buffer.writeUInt16LE(partIndex, 2)
@@ -298,12 +332,12 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 	protected abstract getFillImagePacketLength(): number
 
-	protected generateFillImageWrites(keyIndex: KeyIndex, byteBuffer: Buffer): number[][] {
+	protected generateFillImageWrites(keyIndex: KeyIndex, byteBuffer: Buffer): Buffer[] {
 		const MAX_PACKET_SIZE = this.getFillImagePacketLength()
 		const PACKET_HEADER_LENGTH = this.getFillImageCommandHeaderLength()
 		const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH
 
-		const result: number[][] = []
+		const result: Buffer[] = []
 
 		let remainingBytes = byteBuffer.length
 		for (let part = 0; remainingBytes > 0; part++) {
@@ -316,16 +350,16 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 			remainingBytes -= byteCount
 			byteBuffer.copy(packet, PACKET_HEADER_LENGTH, byteOffset, byteOffset + byteCount)
 
-			result.push(bufferToIntArray(packet))
+			result.push(packet)
 		}
 
 		return result
 	}
 
-	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOffset: number, sourceStride: number) {
+	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOptions: InternalFillImageOptions) {
 		this.checkValidKeyIndex(keyIndex)
 
-		const byteBuffer = await this.convertFillImage(imageBuffer, sourceOffset, sourceStride)
+		const byteBuffer = await this.convertFillImage(imageBuffer, sourceOptions)
 
 		const packets = this.generateFillImageWrites(keyIndex, byteBuffer)
 		for (const packet of packets) {
@@ -333,9 +367,23 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		}
 	}
 
-	private checkRGBValue(value: number) {
+	private checkRGBValue(value: number): void {
 		if (value < 0 || value > 255) {
 			throw new TypeError('Expected a valid color RGB value 0 - 255')
+		}
+	}
+
+	private checkSourceFormat(format: 'rgb' | 'rgba' | 'bgr' | 'bgra'): void {
+		switch (format) {
+			case 'rgb':
+			case 'rgba':
+			case 'bgr':
+			case 'bgra':
+				break
+			default: {
+				const fmt: never = format
+				throw new TypeError(`Expected a known color format not "${fmt}"`)
+			}
 		}
 	}
 }

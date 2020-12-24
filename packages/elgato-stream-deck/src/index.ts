@@ -23,7 +23,7 @@ export function listStreamDecks(): StreamDeckDeviceInfo[] {
 			devices.push({
 				model: model.id,
 				path: dev.path,
-				serialNumber: dev.serialNumber
+				serialNumber: dev.serialNumber,
 			})
 		}
 	}
@@ -34,13 +34,13 @@ export function listStreamDecks(): StreamDeckDeviceInfo[] {
  * Get the info of a device if the given path is a streamdeck
  */
 export function getStreamDeckInfo(path: string): StreamDeckDeviceInfo | undefined {
-	return listStreamDecks().find(dev => dev.path === path)
+	return listStreamDecks().find((dev) => dev.path === path)
 }
 
 export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeckOptions): StreamDeck {
 	let foundDevices = listStreamDecks()
 	if (devicePath) {
-		foundDevices = foundDevices.filter(d => d.path === devicePath)
+		foundDevices = foundDevices.filter((d) => d.path === devicePath)
 	}
 
 	if (foundDevices.length === 0) {

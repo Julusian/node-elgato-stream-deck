@@ -1,6 +1,6 @@
 import { HIDDevice } from '../device'
 import { imageToByteArray, numberArrayToString } from '../util'
-import { EncodeJPEGHelper, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
+import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { KeyIndex } from './id'
 
 /**
@@ -26,25 +26,25 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		}
 
 		// prettier-ignore
-		const brightnessCommandBuffer = [
+		const brightnessCommandBuffer = Buffer.from([
 			0x03,
 			0x08, percentage, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		]
+		])
 		await this.device.sendFeatureReport(brightnessCommandBuffer)
 	}
 
 	public async resetToLogo(): Promise<void> {
 		// prettier-ignore
-		const resetCommandBuffer = [
+		const resetCommandBuffer = Buffer.from([
 			0x03,
 			0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		]
+		])
 		await this.device.sendFeatureReport(resetCommandBuffer)
 	}
 
@@ -60,7 +60,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		return keyIndex
 	}
 
-	protected getFillImageCommandHeaderLength() {
+	protected getFillImageCommandHeaderLength(): number {
 		return 8
 	}
 
@@ -70,7 +70,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		partIndex: number,
 		isLast: boolean,
 		bodyLength: number
-	) {
+	): void {
 		buffer.writeUInt8(0x02, 0)
 		buffer.writeUInt8(0x07, 1)
 		buffer.writeUInt8(keyIndex, 2)
@@ -79,22 +79,21 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		buffer.writeUInt16LE(partIndex++, 6)
 	}
 
-	protected getFillImagePacketLength() {
+	protected getFillImagePacketLength(): number {
 		return 1024
 	}
 
-	protected convertFillImage(sourceBuffer: Buffer, sourceOffset: number, sourceStride: number): Promise<Buffer> {
+	protected convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
-			sourceOffset,
-			sourceStride,
+			sourceOptions,
 			0,
 			this.transformCoordinates.bind(this),
 			'rgba',
 			this.ICON_SIZE
 		)
 
-		return this.encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE)
+		return this.encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE, this.options.jpegOptions)
 	}
 
 	private transformCoordinates(x: number, y: number): { x: number; y: number } {

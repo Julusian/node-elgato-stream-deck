@@ -1,8 +1,10 @@
-# elgato-stream-deck [![npm version](https://img.shields.io/npm/v/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck) [![license](https://img.shields.io/npm/l/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck) [![Travis](https://travis-ci.org/Lange/node-elgato-stream-deck.svg?branch=master)](https://travis-ci.org/Lange/node-elgato-stream-deck) [![Coverage Status](https://coveralls.io/repos/github/Lange/node-elgato-stream-deck/badge.svg?branch=master)](https://coveralls.io/github/Lange/node-elgato-stream-deck?branch=master)
+# elgato-stream-deck
 
-![alt text](media/streamdeck_ui.png 'elgato-stream-deck')
+[![npm version](https://img.shields.io/npm/v/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck)
+[![license](https://img.shields.io/npm/l/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck)
+![Node CI](https://github.com/Julusian/node-elgato-stream-deck/workflows/Node%20CI/badge.svg)
 
-[`elgato-stream-deck`](https://github.com/lange/elgato-stream-deck) is a Node.js library for interfacing
+[`elgato-stream-deck`](https://github.com/julusian/elgato-stream-deck) is a Node.js library for interfacing
 with the various models of the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
 
 > ❗ Please note that `node-elgato-stream-deck` is **NOT a standalone application**. It is not something you download and run on its own. It is not an alternative to the [official Stream Deck program provided by Elgato](https://www.elgato.com/en/gaming/downloads). Instead, `node-elgato-stream-deck` is a code library which provides an API to the Stream Deck. Developers can use this API to make their own applications which interface with the Stream Deck.
@@ -15,9 +17,9 @@ with the various models of the [Elgato Stream Deck](https://www.elgato.com/en/ga
 
 `$ npm install --save elgato-stream-deck`
 
-`$ npm install --save @julusian/jpeg-turbo@^0.5.1` (Optional)
+`$ npm install --save @julusian/jpeg-turbo@^1.0.0` (Optional)
 
-It is recommended to install `@julusian/jpeg-turbo@^0.5.1` to greatly improve performance for writing images to the StreamDeck XL or the Original-v2. Without doing so `jpeg-js` will be used instead, but image transfers will be noticably more cpu intensive and slower. `jpeg-turbo` has prebuilt binaries, but is not installed by default to ensure installation time is kept to a minimum for users who do not need the performance or the XL or the Original-v2.
+It is recommended to install `@julusian/jpeg-turbo` to greatly improve performance for writing images to the StreamDeck XL or the Original-v2. Without doing so `jpeg-js` will be used instead, but image transfers will be noticably more cpu intensive and slower. `jpeg-turbo` has prebuilt binaries, but is not installed by default to ensure installation is easy for users who do not need the performance or the XL or the Original-v2.
 
 ### Linux
 
@@ -54,17 +56,7 @@ However, in the event that installation _does_ fail (**or if you are on a platfo
   xcode-select --install
   ```
 * Linux (**including Raspberry Pi**)
-  * Follow the instructions for Linux in the ["Compiling from source"](https://github.com/node-hid/node-hid#compiling-from-source) steps for `node-hid`:
-	```bash
-	sudo apt-get install build-essential git
-	sudo apt-get install gcc-4.8 g++-4.8 && export CXX=g++-4.8
-	sudo apt-get install sudo apt install libusb-1.0-0 libusb-1.0-0-dev
-	```
-  * Install a recent version of Node.js.:
-	```bash
-	curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-	sudo apt-get install -y nodejs 
-	```
+  * Follow the instructions for Linux in the ["Compiling from source"](https://github.com/node-hid/node-hid#compiling-from-source) steps for 
   * Try installing `node-elgato-stream-deck`
   * If you still have issues, ensure everything is updated and try again:
 	```bash
@@ -122,17 +114,17 @@ const { openStreamDeck } = require('elgato-stream-deck')
 // Available devices can be found with listStreamDecks()
 const myStreamDeck = openStreamDeck()
 
-myStreamDeck.on('down', keyIndex => {
+myStreamDeck.on('down', (keyIndex) => {
 	console.log('key %d down', keyIndex)
 })
 
-myStreamDeck.on('up', keyIndex => {
+myStreamDeck.on('up', (keyIndex) => {
 	console.log('key %d up', keyIndex)
 })
 
 // Fired whenever an error is detected by the `node-hid` library.
 // Always add a listener for this event! If you don't, errors will be silently dropped.
-myStreamDeck.on('error', error => {
+myStreamDeck.on('error', (error) => {
 	console.error(error)
 })
 
@@ -186,7 +178,7 @@ const streamDeck = openStreamDeck('0001:0021:00')
 // Or
 
 const streamDeck = openStreamDeck('0001:0021:00', {
-	useOriginalKeyOrder: true
+	useOriginalKeyOrder: true,
 })
 ```
 
@@ -263,7 +255,7 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 	.then(buffer => {
 		streamDeck.fillKeyBuffer(2, buffer)
 	})
-	.catch(err => {
+	.catch((err) => {
 		console.error(err)
 	})
 ```
@@ -285,7 +277,7 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 	.then(buffer => {
 		streamDeck.fillPanelBuffer(buffer)
 	})
-	.catch(err => {
+	.catch((err) => {
 		console.error(err)
 	})
 ```
@@ -365,7 +357,7 @@ Fired whenever a key is pressed. `keyIndex` is the index of that key.
 ##### Example
 
 ```javascript
-streamDeck.on('down', keyIndex => {
+streamDeck.on('down', (keyIndex) => {
 	console.log('key %d down', keyIndex)
 })
 ```
@@ -377,7 +369,7 @@ Fired whenever a key is released. `keyIndex` is the index of that key.
 ##### Example
 
 ```javascript
-streamDeck.on('up', keyIndex => {
+streamDeck.on('up', (keyIndex) => {
 	console.log('key %d up', keyIndex)
 })
 ```
@@ -390,16 +382,14 @@ Fired whenever an error is detected by the `node-hid` library.
 ##### Example
 
 ```javascript
-streamDeck.on('error', error => {
+streamDeck.on('error', (error) => {
 	console.error(error)
 })
 ```
 
 ### Contributing
 
-The elgato-stream-deck team enthusiastically welcomes contributions and project participation! There's a bunch of things you can do if you want to contribute! The [Contributor Guide](CONTRIBUTING.md) has all the information you need for everything from reporting bugs to contributing entire new features. Please don't hesitate to jump in if you'd like to, or even ask us questions if something isn't clear.
-
-All participants and maintainers in this project are expected to follow [Code of Conduct](CODE_OF_CONDUCT.md), and just generally be kind to each other.
+The elgato-stream-deck team enthusiastically welcomes contributions and project participation! There's a bunch of things you can do if you want to contribute! Please don't hesitate to jump in if you'd like to, or even ask us questions if something isn't clear.
 
 Please refer to the [Changelog](CHANGELOG.md) for project history details, too.
 

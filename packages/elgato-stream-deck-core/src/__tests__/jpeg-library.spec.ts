@@ -1,4 +1,4 @@
-// tslint:disable-next-line: no-submodule-imports
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { mocked } from 'ts-jest/utils'
 import { readFixtureJSON } from './helpers'
 
@@ -10,7 +10,7 @@ describe('jpeg-library', () => {
 	})
 
 	test('ensure falls back to jpeg-js when jpeg-turbo exceptions', async () => {
-		const img = Buffer.from(readFixtureJSON('fillImage-sample-icon-96.json'))
+		const img = readFixtureJSON('fillImage-sample-icon-96.json')
 
 		// Mock jpeg-turbo so that we can make it crash
 		jest.mock('@julusian/jpeg-turbo')
@@ -33,10 +33,10 @@ describe('jpeg-library', () => {
 	})
 
 	test('ensure falls back to jpeg-js when jpeg-turbo is not available', async () => {
-		const img = Buffer.from(readFixtureJSON('fillImage-sample-icon-96.json'))
+		const img = readFixtureJSON('fillImage-sample-icon-96.json')
 
 		// Mock jpeg-turbo so that we can make it appear not installed
-		jest.doMock('@julusian/jpeg-turbo', null)
+		jest.doMock('@julusian/jpeg-turbo', undefined)
 
 		// Mock jpeg-js so we can see that it got used instead of jpeg-turbo
 		jest.doMock('jpeg-js')

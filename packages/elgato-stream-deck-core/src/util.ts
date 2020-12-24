@@ -1,10 +1,4 @@
-export function bufferToIntArray(buffer: Buffer): number[] {
-	const array: number[] = []
-	for (const pair of buffer.entries()) {
-		array.push(pair[1])
-	}
-	return array
-}
+import { InternalFillImageOptions } from './models/base'
 
 export function numberArrayToString(array: number[]): string {
 	const end = array.indexOf(0)
@@ -12,40 +6,43 @@ export function numberArrayToString(array: number[]): string {
 		array = array.slice(0, end)
 	}
 
-	return array.map(val => String.fromCharCode(val)).join('')
+	return array.map((val) => String.fromCharCode(val)).join('')
 }
 
 export function imageToByteArray(
 	imageBuffer: Buffer,
-	sourceOffset: number,
-	sourceStride: number,
-	destOffset: number,
+	sourceOptions: InternalFillImageOptions,
+	destPadding: number,
 	transformCoordinates: (x: number, y: number) => { x: number; y: number },
 	colorMode: 'bgr' | 'rgba',
 	imageSize: number
-) {
-	const byteBuffer = Buffer.alloc(destOffset + imageSize * imageSize * colorMode.length)
+): Buffer {
+	const byteBuffer = Buffer.alloc(destPadding + imageSize * imageSize * colorMode.length)
+
+	const flipColours = sourceOptions.format.substring(0, 3) !== colorMode.substring(0, 3)
 
 	for (let y = 0; y < imageSize; y++) {
-		const rowOffset = destOffset + imageSize * colorMode.length * y
+		const rowOffset = destPadding + imageSize * colorMode.length * y
 		for (let x = 0; x < imageSize; x++) {
 			const { x: x2, y: y2 } = transformCoordinates(x, y)
-			const i = y2 * sourceStride + sourceOffset + x2 * 3
+			const srcOffset = y2 * sourceOptions.stride + sourceOptions.offset + x2 * sourceOptions.format.length
 
-			const red = imageBuffer.readUInt8(i)
-			const green = imageBuffer.readUInt8(i + 1)
-			const blue = imageBuffer.readUInt8(i + 2)
+			const red = imageBuffer.readUInt8(srcOffset)
+			const green = imageBuffer.readUInt8(srcOffset + 1)
+			const blue = imageBuffer.readUInt8(srcOffset + 2)
 
-			const offset = rowOffset + x * colorMode.length
-			if (colorMode === 'bgr') {
-				byteBuffer.writeUInt8(blue, offset)
-				byteBuffer.writeUInt8(green, offset + 1)
-				byteBuffer.writeUInt8(red, offset + 2)
+			const targetOffset = rowOffset + x * colorMode.length
+			if (flipColours) {
+				byteBuffer.writeUInt8(blue, targetOffset)
+				byteBuffer.writeUInt8(green, targetOffset + 1)
+				byteBuffer.writeUInt8(red, targetOffset + 2)
 			} else {
-				byteBuffer.writeUInt8(red, offset)
-				byteBuffer.writeUInt8(green, offset + 1)
-				byteBuffer.writeUInt8(blue, offset + 2)
-				byteBuffer.writeUInt8(255, offset + 3)
+				byteBuffer.writeUInt8(red, targetOffset)
+				byteBuffer.writeUInt8(green, targetOffset + 1)
+				byteBuffer.writeUInt8(blue, targetOffset + 2)
+			}
+			if (colorMode.length === 4) {
+				byteBuffer.writeUInt8(255, targetOffset + 3)
 			}
 		}
 	}
@@ -54,7 +51,7 @@ export function imageToByteArray(
 }
 
 export const BMP_HEADER_LENGTH = 54
-export function writeBMPHeader(buf: Buffer, iconSize: number, iconBytes: number, imagePPM: number) {
+export function writeBMPHeader(buf: Buffer, iconSize: number, iconBytes: number, imagePPM: number): void {
 	// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
 
 	// Bitmap file header

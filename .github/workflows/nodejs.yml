@@ -3,41 +3,80 @@ name: Node CI
 on: [push]
 
 jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yasm libudev-dev libusb-1.0-0-dev
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - run: yarn install
+        env:
+          CI: true
+      - run: yarn build
+        env:
+          CI: true
+      - run: yarn lint
+        env:
+          CI: true
+  audit:
+    name: audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yasm libudev-dev libusb-1.0-0-dev
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - run: yarn install
+        env:
+          CI: true
+      - run: yarn validate:dependencies
+        env:
+          CI: true
+
   test:
     name: Test on node ${{ matrix.node-version }} and ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        node-version: [8.x, 10.x, 12.x]
+        node-version: [10.x, 12.x, 14.x, 15.x]
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Install linux dependencies
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y yasm libudev-dev libusb-1.0-0-dev
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: yarn install
-      run: yarn
-      env:
-        CI: true
-    - name: yarn build
-      run: yarn build
-      env:
-        CI: true
-    - name: yarn testci
-      run: |
-        yarn testci
-        # yarn send-coverage
-      env:
-        CI: true
-    - name: yarn audit
-      run: yarn validate:dependencies
-      env:
-        CI: true
+      - uses: actions/checkout@v1
+      - name: Install linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yasm libudev-dev libusb-1.0-0-dev
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: yarn install
+        env:
+          CI: true
+      - run: yarn build
+        env:
+          CI: true
+      - run: yarn unit
+        env:
+          CI: true
+      - run: yarn send-coverage
+        if: matrix.node-version == '12.x'
+        env:
+          CI: true

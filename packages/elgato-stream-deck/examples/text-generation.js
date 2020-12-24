@@ -9,7 +9,7 @@ streamDeck.clearAllKeys()
 
 const font = PImage.registerFont(path.resolve(__dirname, 'fixtures/SourceSansPro-Regular.ttf'), 'Source Sans Pro')
 font.load(() => {
-	streamDeck.on('down', async keyIndex => {
+	streamDeck.on('down', async (keyIndex) => {
 		console.log('Filling button #%d', keyIndex)
 
 		const textString = `FOO #${keyIndex}`
@@ -26,39 +26,31 @@ font.load(() => {
 
 		const writableStreamBuffer = new streamBuffers.WritableStreamBuffer({
 			initialSize: 20736, // Start at what should be the exact size we need
-			incrementAmount: 1024 // Grow by 1 kilobyte each time buffer overflows.
+			incrementAmount: 1024, // Grow by 1 kilobyte each time buffer overflows.
 		})
 
 		try {
 			await PImage.encodePNGToStream(img, writableStreamBuffer)
 
-			// For some reason, adding an overlayWith command forces the final image to have
-			// an alpha channel, even if we call .flatten().
-			// To work around this, we have to overlay the image, render it as a PNG,
-			// then put that PNG back into Sharp, flatten it, and render raw.
-			// Seems like a bug in Sharp that we should make a test case for and report.
 			const pngBuffer = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 				.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
-				.overlayWith(writableStreamBuffer.getContents())
-				.png()
-				.toBuffer()
-			const finalBuffer = await sharp(pngBuffer)
+				.composite([{ input: writableStreamBuffer.getContents() }])
 				.flatten()
 				.raw()
 				.toBuffer()
-			await streamDeck.fillKeyBuffer(keyIndex, finalBuffer)
+			await streamDeck.fillKeyBuffer(keyIndex, finalBuffer, { format: 'rgba' })
 		} catch (error) {
 			console.error(error)
 		}
 	})
 
-	streamDeck.on('up', keyIndex => {
+	streamDeck.on('up', (keyIndex) => {
 		// Clear the key when it is released.
 		console.log('Clearing button #%d', keyIndex)
 		streamDeck.clearKey(keyIndex)
 	})
 
-	streamDeck.on('error', error => {
+	streamDeck.on('error', (error) => {
 		console.error(error)
 	})
 })

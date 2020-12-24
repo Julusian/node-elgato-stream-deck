@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
-
-export class DummyHID extends EventEmitter {
+import type { HID } from 'node-hid'
+export class DummyHID extends EventEmitter implements HID {
 	public path: string
 
 	constructor(devicePath: string) {
@@ -8,14 +8,13 @@ export class DummyHID extends EventEmitter {
 		expect(typeof devicePath).toEqual('string')
 		this.path = devicePath
 	}
-
-	public close() {
+	public close(): void {
 		throw new Error('Not implemented')
 	}
-	public pause() {
+	public pause(): void {
 		throw new Error('Not implemented')
 	}
-	public read(_callback: (err: any, data: number[]) => void) {
+	public read(_callback: (err: any, data: number[]) => void): void {
 		throw new Error('Not implemented')
 	}
 	public readSync(): number[] {
@@ -30,7 +29,7 @@ export class DummyHID extends EventEmitter {
 	public getFeatureReport(_reportId: number, _reportLength: number): number[] {
 		throw new Error('Not implemented')
 	}
-	public resume() {
+	public resume(): void {
 		throw new Error('Not implemented')
 	}
 	// on (event: string, handler: (value: any) => void) {
@@ -41,5 +40,8 @@ export class DummyHID extends EventEmitter {
 	}
 	public setDriverType(_type: string): void {
 		throw new Error('Not implemented')
+	}
+	public setNonBlocking(_no_block: boolean): void {
+		throw new Error('Method not implemented.')
 	}
 }

@@ -6,12 +6,12 @@ for (let i = 0; i < streamDeck.NUM_KEYS; i++) {
 	streamDeck.fillKeyColor(i, 255, 255, 255)
 }
 
-streamDeck.on('down', keyIndex => {
+streamDeck.on('down', (keyIndex) => {
 	const percentage = (100 / (streamDeck.NUM_KEYS - 1)) * keyIndex
 	console.log(`Setting brightness to ${percentage.toFixed(2)}%`)
 	streamDeck.setBrightness(percentage)
 })
 
-streamDeck.on('error', error => {
+streamDeck.on('error', (error) => {
 	console.error(error)
 })

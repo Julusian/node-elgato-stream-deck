@@ -3425,13 +3425,13 @@ ee-first@1.1.1:
   integrity sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=
 
 "elgato-stream-deck-core@file:packages/elgato-stream-deck-core":
-  version "4.0.0-alpha.0"
+  version "5.0.0-alpha.0"
 
 "elgato-stream-deck-web@file:packages/elgato-stream-deck-web":
-  version "4.0.0-alpha.0"
+  version "5.0.0-alpha.0"
   dependencies:
     detect-browser "^4.8.0"
-    elgato-stream-deck-core "file:../../.cache/yarn/v6/npm-elgato-stream-deck-web-4.0.0-alpha.0-257f704d-49af-4210-8c51-4e43061de473-1576697767227/node_modules/elgato-stream-deck-core"
+    elgato-stream-deck-core "file:../../.cache/yarn/v6/npm-elgato-stream-deck-web-5.0.0-alpha.0-257f704d-49af-4210-8c51-4e43061de473-1576697767227/node_modules/elgato-stream-deck-core"
 
 elliptic@^6.0.0:
   version "6.5.1"

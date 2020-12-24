@@ -4,5 +4,5 @@ export enum DeviceModelId {
 	ORIGINAL = 'original',
 	ORIGINALV2 = 'originalv2',
 	MINI = 'mini',
-	XL = 'xl'
+	XL = 'xl',
 }

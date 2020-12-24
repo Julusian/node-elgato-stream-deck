@@ -1,4 +1,4 @@
-// tslint:disable-next-line: no-submodule-imports
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { mocked } from 'ts-jest/utils'
 import { readFixtureJSON } from './helpers'
 
@@ -21,7 +21,7 @@ describe('jpeg-encoding', () => {
 	}
 
 	test('jpeg-turbo: encoded successfully', async () => {
-		const img = addAlphaChannel(Buffer.from(readFixtureJSON('fillImage-sample-icon-96.json')))
+		const img = addAlphaChannel(readFixtureJSON('fillImage-sample-icon-96.json'))
 
 		// Mock jpeg-js so we can see if it got used instead of jpeg-turbo
 		jest.doMock('jpeg-js')
@@ -39,9 +39,9 @@ describe('jpeg-encoding', () => {
 	})
 
 	test('jpeg-js: encoded successfully', async () => {
-		const img = addAlphaChannel(Buffer.from(readFixtureJSON('fillImage-sample-icon-96.json')))
+		const img = addAlphaChannel(readFixtureJSON('fillImage-sample-icon-96.json'))
 
-		jest.doMock('@julusian/jpeg-turbo', null)
+		jest.doMock('@julusian/jpeg-turbo', undefined)
 		const { encodeJPEG } = require('../jpeg')
 
 		const encoded = encodeJPEG(img, iconSize, iconSize)
