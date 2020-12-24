@@ -52,7 +52,7 @@
     "dist"
   ],
   "dependencies": {
-    "detect-browser": "^4.8.0",
+    "detect-browser": "^5.2.0",
     "elgato-stream-deck-core": "file:../elgato-stream-deck-core"
   }
 }

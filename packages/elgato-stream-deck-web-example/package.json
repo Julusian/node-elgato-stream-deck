@@ -29,15 +29,15 @@
     "lint": "tslint --project tsconfig.json --config ./tslint.json"
   },
   "dependencies": {
-    "cross-env": "^5.1.1",
-    "html-to-image": "^0.1.1",
-    "elgato-stream-deck-web": "file:../elgato-stream-deck-web"
+    "cross-env": "^7.0.3",
+    "elgato-stream-deck-web": "file:../elgato-stream-deck-web",
+    "html-to-image": "^0.1.1"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^5.0.4",
     "ts-loader": "^6.1.0",
     "webpack": "^4.39.3",
     "webpack-cli": "^3.3.8",
-    "webpack-dev-server": "^3.8.0"
+    "webpack-dev-server": "^3.11.0"
   }
 }
