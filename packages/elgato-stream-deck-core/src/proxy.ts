@@ -1,4 +1,4 @@
-import { KeyIndex, StreamDeck } from './models'
+import { DeviceModelId, KeyIndex, StreamDeck } from './models'
 
 export class StreamDeckProxy implements StreamDeck {
 	protected device: StreamDeck
@@ -7,29 +7,29 @@ export class StreamDeckProxy implements StreamDeck {
 		this.device = device
 	}
 
-	public get NUM_KEYS() {
+	public get NUM_KEYS(): number {
 		return this.device.NUM_KEYS
 	}
-	public get KEY_COLUMNS() {
+	public get KEY_COLUMNS(): number {
 		return this.device.KEY_COLUMNS
 	}
-	public get KEY_ROWS() {
+	public get KEY_ROWS(): number {
 		return this.device.KEY_ROWS
 	}
-	public get ICON_SIZE() {
+	public get ICON_SIZE(): number {
 		return this.device.ICON_SIZE
 	}
-	public get ICON_BYTES() {
+	public get ICON_BYTES(): number {
 		return this.device.ICON_BYTES
 	}
-	public get ICON_PIXELS() {
+	public get ICON_PIXELS(): number {
 		return this.device.ICON_PIXELS
 	}
-	public get MODEL() {
+	public get MODEL(): DeviceModelId {
 		return this.device.MODEL
 	}
 
-	public checkValidKeyIndex(keyIndex: KeyIndex) {
+	public checkValidKeyIndex(keyIndex: KeyIndex): void {
 		this.device.checkValidKeyIndex(keyIndex)
 	}
 
@@ -64,9 +64,9 @@ export class StreamDeckProxy implements StreamDeck {
 		return this.device.getSerialNumber()
 	}
 
-	public on(event: 'down' | 'up', listener: (keyIndex: KeyIndex) => void): any
-	public on(event: 'error', listener: (e: any) => void): any
-	public on(event: any, listener: any) {
-		return this.device.on(event, listener)
+	// @ts-expect-error the arguments doesn't want to behave
+	public on(...args: Parameters<StreamDeck['on']>): StreamDeckProxy {
+		this.device.on(...args)
+		return this
 	}
 }

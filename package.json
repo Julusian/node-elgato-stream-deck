@@ -2,7 +2,6 @@
   "name": "elgato-stream-deck-packages",
   "private": true,
   "scripts": {
-    "tslint-check": "tslint-config-prettier-check ./tslint.json",
     "start-web": "cd packages/elgato-stream-deck-web-example && yarn start",
     "dist-web": "cd packages/elgato-stream-deck-web-example && yarn dist",
     "build": "yarn workspaces run build",
@@ -10,29 +9,32 @@
     "lint": "yarn workspaces run lint",
     "dev": "yarn workspaces run build && node ./scripts/watch.js"
   },
+  "prettier": "@sofie-automation/code-standard-preset/.prettierrc.json",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,css,json,md,scss}": [
+      "prettier --write"
+    ],
+    "*.{ts,tsx}": [
+      "yarn lint --fix"
+    ]
+  },
   "devDependencies": {
     "@sofie-automation/code-standard-preset": "^0.2.1",
     "@types/jest": "^26.0.19",
-    "@types/jpeg-js": "^0.3.0",
-    "@types/sharp": "^0.26.1",
     "concurrently": "^5.3.0",
     "jest": "^26.6.3",
     "jest-haste-map": "^26.6.2",
     "jest-resolve": "^26.6.2",
-    "node-license-validator": "^1.3.0",
     "open-cli": "^6.0.1",
-    "prettier": "^2.2.1",
-    "pureimage": "^0.2.5",
-    "sharp": "^0.27.0",
     "standard-version": "^9.0.0",
-    "stream-buffers": "^3.0.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^9.1.1",
-    "tslint": "^6.1.3",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-plugin-prettier": "^2.3.0",
-    "typescript": "~4.1.3",
-    "usb-detection": "^4.10.0"
+    "typescript": "~4.1.3"
   },
   "workspaces": {
     "packages": [

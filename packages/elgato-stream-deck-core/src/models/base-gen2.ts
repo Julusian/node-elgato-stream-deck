@@ -1,6 +1,12 @@
 import { HIDDevice } from '../device'
 import { imageToByteArray, numberArrayToString } from '../util'
-import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
+import {
+	EncodeJPEGHelper,
+	InternalFillImageOptions,
+	OpenStreamDeckOptions,
+	StreamDeckBase,
+	StreamDeckProperties,
+} from './base'
 import { KeyIndex } from './id'
 
 /**
@@ -49,11 +55,11 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 	}
 
 	public getFirmwareVersion(): Promise<string> {
-		return this.device.getFeatureReport(5, 32).then(val => numberArrayToString(val.slice(6)))
+		return this.device.getFeatureReport(5, 32).then((val) => numberArrayToString(val.slice(6)))
 	}
 
 	public getSerialNumber(): Promise<string> {
-		return this.device.getFeatureReport(6, 32).then(val => numberArrayToString(val.slice(2)))
+		return this.device.getFeatureReport(6, 32).then((val) => numberArrayToString(val.slice(2)))
 	}
 
 	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {

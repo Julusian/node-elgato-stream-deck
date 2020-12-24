@@ -1,5 +1,5 @@
 import { HIDDevice } from '../device'
-import { BMP_HEADER_LENGTH,  imageToByteArray, writeBMPHeader } from '../util'
+import { BMP_HEADER_LENGTH, imageToByteArray, writeBMPHeader } from '../util'
 import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { DeviceModelId, KeyIndex } from './id'
 

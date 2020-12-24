@@ -32,7 +32,7 @@ font.load(() => {
 		try {
 			await PImage.encodePNGToStream(img, writableStreamBuffer)
 
-			const pngBuffer = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
+			const finalBuffer = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 				.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
 				.composite([{ input: writableStreamBuffer.getContents() }])
 				.flatten()

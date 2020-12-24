@@ -18,7 +18,7 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 		super()
 
 		this.device = new HID.HID(deviceInfo.path)
-		this.device.on('error', error => this.emit('error', error))
+		this.device.on('error', (error) => this.emit('error', error))
 
 		this.releaseExitHook = exitHook(() => {
 			try {
@@ -28,7 +28,7 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 			}
 		})
 
-		this.device.on('data', data => {
+		this.device.on('data', (data) => {
 			// Button press
 			if (data[0] === 0x01) {
 				const keyData = data.slice(this.dataKeyOffset || 0, data.length - 1)
@@ -47,7 +47,7 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 		this.device.close()
 	}
 
-	public async sendFeatureReport(data:  Buffer): Promise<void> {
+	public async sendFeatureReport(data: Buffer): Promise<void> {
 		this.device.sendFeatureReport(data)
 	}
 	public async getFeatureReport(reportId: number, reportLength: number): Promise<number[]> {

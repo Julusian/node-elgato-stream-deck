@@ -18,7 +18,22 @@
   "scripts": {
     "start": "webpack-dev-server --mode development --color",
     "build": "rimraf dist && cross-env NODE_ENV=production webpack -p --progress --colors",
-    "lint": "tslint --project tsconfig.json --config ./tslint.json"
+    "lint": "eslint . --ext .ts --ext .js --ignore-pattern dist",
+    "lint-fix": "yarn lint --fix"
+  },
+  "prettier": "@sofie-automation/code-standard-preset/.prettierrc.json",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,css,json,md,scss}": [
+      "prettier --write"
+    ],
+    "*.{ts,tsx}": [
+      "yarn lint --fix"
+    ]
   },
   "dependencies": {
     "cross-env": "^7.0.3",

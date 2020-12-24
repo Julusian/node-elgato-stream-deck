@@ -10,21 +10,21 @@ export const DEVICE_MODELS = [
 	{
 		id: DeviceModelId.ORIGINAL,
 		productId: 0x0060,
-		class: StreamDeckOriginal
+		class: StreamDeckOriginal,
 	},
 	{
 		id: DeviceModelId.MINI,
 		productId: 0x0063,
-		class: StreamDeckMini
+		class: StreamDeckMini,
 	},
 	{
 		id: DeviceModelId.XL,
 		productId: 0x006c,
-		class: StreamDeckXL
+		class: StreamDeckXL,
 	},
 	{
 		id: DeviceModelId.ORIGINALV2,
 		productId: 0x006d,
-		class: StreamDeckOriginalV2
-	}
+		class: StreamDeckOriginalV2,
+	},
 ]

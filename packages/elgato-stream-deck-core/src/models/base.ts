@@ -2,7 +2,7 @@ import { EventEmitter } from 'events'
 
 import { HIDDevice } from '../device'
 import { DeviceModelId } from '../models'
-import {  numberArrayToString } from '../util'
+import { numberArrayToString } from '../util'
 import { KeyIndex } from './id'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
@@ -148,17 +148,16 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 	// private readonly options: Readonly<OpenStreamDeckOptions>
 	private readonly keyState: boolean[]
 
-	constructor(device: HIDDevice, options: OpenStreamDeckOptions, properties: StreamDeckProperties) {
+	constructor(device: HIDDevice, _options: OpenStreamDeckOptions, properties: StreamDeckProperties) {
 		super()
 
 		this.deviceProperties = properties
-		options = options // TODO - is options wanted?
 		this.device = device
 
 		this.keyState = new Array(this.NUM_KEYS).fill(false)
 
 		this.device.dataKeyOffset = properties.KEY_DATA_OFFSET
-		this.device.on('input', data => {
+		this.device.on('input', (data) => {
 			for (let i = 0; i < this.NUM_KEYS; i++) {
 				const keyPressed = Boolean(data[i])
 				const keyIndex = this.transformKeyIndex(i)
@@ -179,13 +178,13 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		})
 	}
 
-	public checkValidKeyIndex(keyIndex: KeyIndex) {
+	public checkValidKeyIndex(keyIndex: KeyIndex): void {
 		if (keyIndex < 0 || keyIndex >= this.NUM_KEYS) {
 			throw new TypeError(`Expected a valid keyIndex 0 - ${this.NUM_KEYS - 1}`)
 		}
 	}
 
-	public close() {
+	public close(): Promise<void> {
 		return this.device.close()
 	}
 
@@ -306,11 +305,11 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 	}
 
 	public getFirmwareVersion(): Promise<string> {
-		return this.device.getFeatureReport(4, 17).then(val => numberArrayToString(val.slice(5)))
+		return this.device.getFeatureReport(4, 17).then((val) => numberArrayToString(val.slice(5)))
 	}
 
 	public getSerialNumber(): Promise<string> {
-		return this.device.getFeatureReport(3, 17).then(val => numberArrayToString(val.slice(5)))
+		return this.device.getFeatureReport(3, 17).then((val) => numberArrayToString(val.slice(5)))
 	}
 
 	protected abstract transformKeyIndex(keyIndex: KeyIndex): KeyIndex
