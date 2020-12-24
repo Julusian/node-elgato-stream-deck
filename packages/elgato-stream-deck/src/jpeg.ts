@@ -15,8 +15,12 @@ export interface JPEGEncodeOptions {
 
 const DEFAULT_QUALITY = 95
 
-export function encodeJPEG(buffer: Buffer, width: number, height: number,
-	options: JPEGEncodeOptions | undefined): Promise<Buffer> {
+export function encodeJPEG(
+	buffer: Buffer,
+	width: number,
+	height: number,
+	options: JPEGEncodeOptions | undefined
+): Promise<Buffer> {
 	try {
 		// Try using jpeg-turbo if it is available
 		if (jpegTurbo && jpegTurbo.bufferSize && jpegTurbo.compressSync) {
@@ -29,15 +33,7 @@ export function encodeJPEG(buffer: Buffer, width: number, height: number,
 			}
 			if (buffer.length === width * height * 4) {
 				const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(encodeOptions))
-				return new Promise((resolve, reject) => {
-					jpegTurbo!.compress(buffer, tmpBuffer, encodeOptions, (err, resBuffer) => {
-						if (err) {
-							reject(err)
-						} else {
-							resolve(resBuffer)
-						}
-					})
-				})
+				return jpegTurbo.compress(buffer, tmpBuffer, encodeOptions)
 			}
 		}
 	} catch (e) {

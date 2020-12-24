@@ -33,7 +33,7 @@ export class WebHIDDevice extends EventEmitter implements HIDDevice {
 		return this.device.close()
 	}
 
-	public sendFeatureReport(data: number[]): Promise<void> {
+	public sendFeatureReport(data: Buffer): Promise<void> {
 		return this.device.sendFeatureReport(data[0], new Uint8Array(data.slice(1)))
 	}
 	public getFeatureReport(reportId: number, reportLength: number): Promise<number[]> {
@@ -41,7 +41,7 @@ export class WebHIDDevice extends EventEmitter implements HIDDevice {
 			.receiveFeatureReport(reportId, reportLength)
 			.then((view: DataView) => Array.from(new Uint8Array(view.buffer)))
 	}
-	public sendReport(data: number[]): Promise<void> {
+	public sendReport(data: Buffer): Promise<void> {
 		return this.device.sendReport(data[0], new Uint8Array(data.slice(1)))
 	}
 }

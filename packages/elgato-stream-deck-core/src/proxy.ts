@@ -22,6 +22,9 @@ export class StreamDeckProxy implements StreamDeck {
 	public get ICON_BYTES() {
 		return this.device.ICON_BYTES
 	}
+	public get ICON_PIXELS() {
+		return this.device.ICON_PIXELS
+	}
 	public get MODEL() {
 		return this.device.MODEL
 	}

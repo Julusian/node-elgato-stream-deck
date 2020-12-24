@@ -11,7 +11,6 @@ export interface OpenStreamDeckOptions {
 	useOriginalKeyOrder?: boolean
 	resetToLogoOnExit?: boolean
 	encodeJPEG?: EncodeJPEGHelper
-	jpegOptions?: JPEGEncodeOptions
 }
 
 export interface StreamDeckProperties {
@@ -147,7 +146,6 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 	protected readonly device: HIDDevice
 	private readonly deviceProperties: Readonly<StreamDeckProperties>
 	// private readonly options: Readonly<OpenStreamDeckOptions>
-	private readonly releaseExitHook: () => void
 	private readonly keyState: boolean[]
 
 	constructor(device: HIDDevice, options: OpenStreamDeckOptions, properties: StreamDeckProperties) {
@@ -265,13 +263,21 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 		const pixels = Buffer.alloc(this.ICON_BYTES, 0)
 		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		return this.fillImageRange(keyIndex2, pixels, 0, this.ICON_SIZE * 3)
+		return this.fillImageRange(keyIndex2, pixels, {
+			format: 'rgb',
+			offset: 0,
+			stride: this.ICON_SIZE * 3,
+		})
 	}
 
 	public async clearPanel(): Promise<void> {
 		const pixels = Buffer.alloc(this.ICON_BYTES, 0)
 		for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
-			await this.fillImageRange(keyIndex, pixels, 0, this.ICON_SIZE * 3)
+			await this.fillImageRange(keyIndex, pixels, {
+				format: 'rgb',
+				offset: 0,
+				stride: this.ICON_SIZE * 3,
+			})
 		}
 	}
 
