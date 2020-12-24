@@ -5,19 +5,17 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "license": "MIT",
-  "homepage": "https://github.com/lange/node-elgato-stream-deck#readme",
+  "homepage": "https://github.com/julusian/node-elgato-stream-deck#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lange/node-elgato-stream-deck.git"
+    "url": "git+https://github.com/julusian/node-elgato-stream-deck.git"
   },
   "bugs": {
-    "url": "https://github.com/lange/node-elgato-stream-deck/issues"
+    "url": "https://github.com/julusian/node-elgato-stream-deck/issues"
   },
   "author": {
-    "name": "Alex Van Camp",
-    "email": "email@alexvan.camp",
-    "url": "https://alexvan.camp/",
-    "twitter": "vancamp"
+    "name": "Julian Waller",
+    "email": "git@julusian.co.uk"
   },
   "contributors": [
     {
@@ -33,10 +31,6 @@
       "twitter": "chrishanel",
       "email": "chrishanel@gmail.com",
       "url": "http://www.chrishanel.com/"
-    },
-    {
-      "name": "Julian Waller",
-      "email": "git@julusian.co.uk"
     }
   ],
   "keywords": [
@@ -66,5 +60,8 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "engines": {
+    "node": ">=10.10"
+  }
 }

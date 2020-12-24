@@ -45,7 +45,7 @@
     "controller"
   ],
   "scripts": {
-    "build": "trash dist && yarn build:main",
+    "build": "rimraf dist && yarn build:main",
     "build:main": "tsc -p tsconfig.build.json",
     "release": "standard-version",
     "watch": "jest --watch",

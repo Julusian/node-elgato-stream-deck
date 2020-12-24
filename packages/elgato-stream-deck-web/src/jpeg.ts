@@ -1,5 +1,5 @@
 export async function encodeJPEG(buffer: Buffer, width: number, height: number): Promise<Buffer> {
-	const blob = await new Promise((resolve, reject) => {
+	const blob = await new Promise<Blob>((resolve, reject) => {
 		const canvas = document.createElement('canvas')
 		canvas.width = width
 		canvas.height = height
@@ -23,6 +23,5 @@ export async function encodeJPEG(buffer: Buffer, width: number, height: number):
 			reject()
 		}
 	})
-	const buf: ArrayBuffer = await (blob as any).arrayBuffer()
-	return Buffer.from(buf)
+	return Buffer.from(await blob.arrayBuffer())
 }
