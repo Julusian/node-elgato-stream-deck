@@ -1,5 +1,4 @@
-import { DeviceModelId, KeyIndex, StreamDeck } from './models'
-
+import { DeviceModelId, KeyIndex, StreamDeck, FillImageOptions, FillPanelOptions } from './models'
 export class StreamDeckProxy implements StreamDeck {
 	protected device: StreamDeck
 
@@ -39,11 +38,11 @@ export class StreamDeckProxy implements StreamDeck {
 	public fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		return this.device.fillKeyColor(keyIndex, r, g, b)
 	}
-	public fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer): Promise<void> {
-		return this.device.fillKeyBuffer(keyIndex, imageBuffer)
+	public fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
+		return this.device.fillKeyBuffer(keyIndex, imageBuffer, options)
 	}
-	public fillPanelBuffer(imageBuffer: Buffer): Promise<void> {
-		return this.device.fillPanelBuffer(imageBuffer)
+	public fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void> {
+		return this.device.fillPanelBuffer(imageBuffer, options)
 	}
 	public clearKey(keyIndex: KeyIndex): Promise<void> {
 		return this.device.clearKey(keyIndex)
