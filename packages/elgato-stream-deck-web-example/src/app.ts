@@ -80,11 +80,11 @@ if (consentButton) {
 			`Device opened. Serial: ${await device.getSerialNumber()} Firmware: ${await device.getFirmwareVersion()}`
 		)
 
-		device.on('down', key => {
+		device.on('down', (key: number) => {
 			appendLog(`Key ${key} down`)
 			demo.keyDown(device!, key)
 		})
-		device.on('up', key => {
+		device.on('up', (key: number) => {
 			appendLog(`Key ${key} up`)
 			demo.keyUp(device!, key)
 		})
