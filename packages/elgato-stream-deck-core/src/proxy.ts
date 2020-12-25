@@ -64,7 +64,6 @@ export class StreamDeckProxy implements StreamDeck {
 		return this.device.getSerialNumber()
 	}
 
-	// @ts-expect-error the arguments doesn't want to behave
 	public on(...args: Parameters<StreamDeck['on']>): StreamDeckProxy {
 		this.device.on(...args)
 		return this
