@@ -1,4 +1,4 @@
-import { requestStreamDeck, StreamDeckWeb } from 'elgato-stream-deck-web'
+import { requestStreamDeck, getStreamDeck, StreamDeckWeb } from 'elgato-stream-deck-web'
 import { Demo } from './demo/demo'
 import { DomImageDemo } from './demo/dom'
 import { FillWhenPressedDemo } from './demo/fill-when-pressed'
@@ -16,6 +16,18 @@ const consentButton = document.getElementById('consent-button')
 if (consentButton) {
 	let demo: Demo = new FillWhenPressedDemo()
 	let device: StreamDeckWeb | null = null
+
+
+	window.addEventListener("load", (async () => {
+		// attempt to open a previously selected device.
+		device = await getStreamDeck()
+		if (device) {
+			openDevice(device)
+
+			demoChange()
+		}
+		console.log(device)
+	}))
 
 	const brightnessRange = document.getElementById('brightness-range') as HTMLInputElement | undefined
 	if (brightnessRange) {
@@ -61,25 +73,7 @@ if (consentButton) {
 		demoChange()
 	}
 
-	consentButton.addEventListener('click', async () => {
-		if (device) {
-			appendLog('Closing device')
-			demo.stop(device)
-			await device.close()
-			device = null
-		}
-		// Prompt for a device
-		try {
-			device = await requestStreamDeck()
-			if (!device) {
-				appendLog('No device was selected')
-				return
-			}
-		} catch (error) {
-			appendLog(`No device access granted: ${error}`)
-			return
-		}
-
+	async function openDevice(device: StreamDeckWeb): Promise<void> {
 		appendLog(
 			`Device opened. Serial: ${await device.getSerialNumber()} Firmware: ${await device.getFirmwareVersion()}`
 		)
@@ -100,6 +94,28 @@ if (consentButton) {
 
 		// device.fillColor(2, 255, 0, 0)
 		// device.fillColor(12, 0, 0, 255)
+	}
+
+	consentButton.addEventListener('click', async () => {
+		if (device) {
+			appendLog('Closing device')
+			demo.stop(device)
+			await device.close()
+			device = null
+		}
+		// Prompt for a device
+		try {
+			device = await requestStreamDeck()
+			if (!device) {
+				appendLog('No device was selected')
+				return
+			}
+		} catch (error) {
+			appendLog(`No device access granted: ${error}`)
+			return
+		}
+
+		openDevice(device)
 	})
 
 	appendLog('Page loaded')
