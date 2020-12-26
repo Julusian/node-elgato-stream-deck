@@ -3,6 +3,7 @@ import { Demo } from './demo/demo'
 import { DomImageDemo } from './demo/dom'
 import { FillWhenPressedDemo } from './demo/fill-when-pressed'
 import { RapidFillDemo } from './demo/rapid-fill'
+import { ChaseDemo } from './demo/chase'
 
 function appendLog(str: string) {
 	const logElm = document.getElementById('log')
@@ -40,6 +41,9 @@ if (consentButton) {
 					break
 				case 'dom':
 					demo = new DomImageDemo()
+					break
+				case 'chase':
+					demo = new ChaseDemo()
 					break
 				case 'fill-when-pressed':
 				default:
