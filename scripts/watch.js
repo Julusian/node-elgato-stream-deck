@@ -1,5 +1,10 @@
 const concurrently = require('concurrently');
 
+let devServerFlags = "";
+if ('DEVSERVER_FLAGS' in process.env) {
+	devServerFlags = process.env.DEVSERVER_FLAGS;
+}
+
 (async () => {
 	try {
 		console.log('Starting watchers');
@@ -22,7 +27,7 @@ const concurrently = require('concurrently');
 					name: 'WEB',
 				},
 				{
-					command: 'yarn workspace elgato-stream-deck-web-example start',
+					command: 'yarn workspace elgato-stream-deck-web-example start ' + devServerFlags,
 					prefixColor: 'bgRed.bold',
 					name: 'DEMO',
 				},
