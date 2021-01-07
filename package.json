@@ -1,5 +1,6 @@
 {
   "name": "elgato-stream-deck-packages",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "start-web": "cd packages/elgato-stream-deck-web-example && yarn start",
