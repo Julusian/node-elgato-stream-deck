@@ -4,6 +4,7 @@
 	"compilerOptions": {
 		"outDir": "./dist",
 		"baseUrl": "./",
+		"importHelpers": false,
 		"paths": {
 			"*": ["./node_modules/*"],
 			"elgato-stream-deck": ["./src/index.ts"]
