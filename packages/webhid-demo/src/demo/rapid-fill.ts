@@ -1,4 +1,4 @@
-import { StreamDeck } from 'elgato-stream-deck-web'
+import { StreamDeck } from '@elgato-stream-deck/webhid'
 import { Demo } from './demo'
 
 function getRandomIntInclusive(min: number, max: number) {

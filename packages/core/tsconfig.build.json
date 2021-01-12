@@ -7,7 +7,7 @@
 		"baseUrl": "./",
 		"paths": {
 			"*": ["./node_modules/*"],
-			"elgato-stream-deck-core": ["./src/index.ts"]
+			"@elgato-stream-deck/core": ["./src/index.ts"]
 		},
 		"types": ["node"]
 	}

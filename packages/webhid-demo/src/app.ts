@@ -1,4 +1,4 @@
-import { requestStreamDeck, getStreamDeck, StreamDeckWeb } from 'elgato-stream-deck-web'
+import { requestStreamDeck, getStreamDeck, StreamDeckWeb } from '@elgato-stream-deck/webhid'
 import { Demo } from './demo/demo'
 import { DomImageDemo } from './demo/dom'
 import { FillWhenPressedDemo } from './demo/fill-when-pressed'
@@ -17,8 +17,7 @@ if (consentButton) {
 	let demo: Demo = new FillWhenPressedDemo()
 	let device: StreamDeckWeb | null = null
 
-
-	window.addEventListener("load", (async () => {
+	window.addEventListener('load', async () => {
 		// attempt to open a previously selected device.
 		device = await getStreamDeck()
 		if (device) {
@@ -27,11 +26,11 @@ if (consentButton) {
 			demoChange()
 		}
 		console.log(device)
-	}))
+	})
 
 	const brightnessRange = document.getElementById('brightness-range') as HTMLInputElement | undefined
 	if (brightnessRange) {
-		brightnessRange.addEventListener('input', _e => {
+		brightnessRange.addEventListener('input', (_e) => {
 			const value = (brightnessRange.value as any) as number
 			if (device) {
 				device.setBrightness(value)

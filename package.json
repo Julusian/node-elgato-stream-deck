@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start-web": "cd packages/elgato-stream-deck-web-example && yarn start",
-    "dist-web": "cd packages/elgato-stream-deck-web-example && yarn dist",
+    "start-web": "cd packages/webhid-demo && yarn start",
+    "dist-web": "cd packages/webhid-demo && yarn dist",
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test",
     "lint": "yarn workspaces run lint",
@@ -39,10 +39,10 @@
   },
   "workspaces": {
     "packages": [
-      "packages/elgato-stream-deck-core",
-      "packages/elgato-stream-deck",
-      "packages/elgato-stream-deck-web",
-      "packages/elgato-stream-deck-web-example"
+      "packages/core",
+      "packages/node",
+      "packages/webhid",
+      "packages/webhid-demo"
     ]
   },
   "dependencies": {

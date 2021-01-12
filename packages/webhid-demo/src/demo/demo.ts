@@ -1,4 +1,4 @@
-import { KeyIndex, StreamDeckWeb } from 'elgato-stream-deck-web'
+import { KeyIndex, StreamDeckWeb } from '@elgato-stream-deck/webhid'
 
 export interface Demo {
 	start(device: StreamDeckWeb): Promise<void>

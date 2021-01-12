@@ -6,9 +6,10 @@
 		"baseUrl": "./",
 		"paths": {
 			"*": ["./node_modules/*"],
-			"elgato-stream-deck-web": ["./src/index.ts"]
+			"@elgato-stream-deck/webhid-demo": ["./src/index.ts"]
 		},
-		"lib": ["dom"],
-		"types": []
+		"lib": ["es6", "dom"],
+		"types": [],
+		"declaration": false
 	}
 }

@@ -1,4 +1,4 @@
-import { DeviceModelId, HIDDevice } from 'elgato-stream-deck-core'
+import { DeviceModelId, HIDDevice } from '@elgato-stream-deck/core'
 import { EventEmitter } from 'events'
 
 export interface StreamDeckDeviceInfo {

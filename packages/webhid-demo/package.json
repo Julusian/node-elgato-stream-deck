@@ -1,5 +1,5 @@
 {
-  "name": "elgato-stream-deck-web-example",
+  "name": "@elgato-stream-deck/webhid-demo",
   "version": "5.0.0-alpha.0",
   "private": true,
   "license": "MIT",
@@ -36,8 +36,8 @@
     ]
   },
   "dependencies": {
+    "@elgato-stream-deck/webhid": "file:../webhid",
     "cross-env": "^7.0.3",
-    "elgato-stream-deck-web": "file:../elgato-stream-deck-web",
     "html-to-image": "^1.3.20"
   },
   "devDependencies": {

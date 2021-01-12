@@ -1,18 +1,18 @@
-const concurrently = require('concurrently');
+const concurrently = require('concurrently')
 
-let devServerFlags = "";
+let devServerFlags = ''
 if ('DEVSERVER_FLAGS' in process.env) {
-	devServerFlags = process.env.DEVSERVER_FLAGS;
+	devServerFlags = process.env.DEVSERVER_FLAGS
 }
 
-(async () => {
+;(async () => {
 	try {
-		console.log('Starting watchers');
+		console.log('Starting watchers')
 		// Now run everything
 		await concurrently(
 			[
 				{
-					command: 'yarn workspace elgato-stream-deck-core build:main --watch',
+					command: 'yarn workspace @elgato-stream-deck/core build:main --watch',
 					prefixColor: 'bgBlue.bold',
 					name: 'CORE',
 				},
@@ -22,12 +22,12 @@ if ('DEVSERVER_FLAGS' in process.env) {
 					name: 'NODE',
 				},
 				{
-					command: 'yarn workspace elgato-stream-deck-web build:main --watch',
+					command: 'yarn workspace @elgato-stream-deck/webhid build:main --watch',
 					prefixColor: 'bgPink.bold',
 					name: 'WEB',
 				},
 				{
-					command: 'yarn workspace elgato-stream-deck-web-example start ' + devServerFlags,
+					command: 'yarn workspace @elgato-stream-deck/webhid-demo start ' + devServerFlags,
 					prefixColor: 'bgRed.bold',
 					name: 'DEMO',
 				},
@@ -36,12 +36,12 @@ if ('DEVSERVER_FLAGS' in process.env) {
 				prefix: 'name',
 				killOthers: ['failure', 'success'],
 				restartTries: 3,
-			},
-		);
-		console.log('Done!');
-		process.exit();
+			}
+		)
+		console.log('Done!')
+		process.exit()
 	} catch (err) {
-		console.error(`Failure: ${err}`);
-		process.exit(1);
+		console.error(`Failure: ${err}`)
+		process.exit(1)
 	}
-})();
+})()
