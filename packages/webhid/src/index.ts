@@ -8,7 +8,7 @@ export { DeviceModelId, KeyIndex, StreamDeck } from '@elgato-stream-deck/core'
 export { StreamDeckWeb } from './wrapper'
 
 // TODO - typings
-export async function requestStreamDeck(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb | null> {
+export async function requestStreamDecks(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb[]> {
 	// TODO - error handling
 	return (navigator as any).hid
 		.requestDevice({
@@ -18,17 +18,18 @@ export async function requestStreamDeck(options?: OpenStreamDeckOptions): Promis
 				},
 			],
 		})
-		.then(async (browserDevice: any) => {
-			// requestDevice returns an array because a physical device might
-			// have multiple HID interfaces.  The StreamDeck only has one:
-			if (browserDevice.length > 0) {
-				browserDevice = browserDevice[0]
-			}
-			return openDevice(browserDevice, options)
+		.then(async (browserDevices: any) => {
+			// // requestDevice returns an array because a physical device might
+			// // have multiple HID interfaces.  The StreamDeck only has one:
+			// if (browserDevice.length > 0) {
+			// 	browserDevice = browserDevice[0]
+			// }
+			// return openDevice(browserDevice, options)
+			return browserDevices.map((dev: any) => openDevice(dev, options))
 		})
 }
 
-export async function openDevice(browserDevice: any, options?: OpenStreamDeckOptions): Promise<StreamDeckWeb | null> {
+export async function openDevice(browserDevice: any, options?: OpenStreamDeckOptions): Promise<StreamDeckWeb> {
 	const model = DEVICE_MODELS.find((m) => m.productId === browserDevice.productId)
 	if (!model) {
 		throw new Error('Stream Deck is of unexpected type.')
@@ -54,18 +55,9 @@ export async function openDevice(browserDevice: any, options?: OpenStreamDeckOpt
 }
 
 // getStreamDeck returns a streamdeck that was previously selected.
-export async function getStreamDeck(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb | null> {
+export async function getStreamDecks(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb[]> {
 	// TODO - error handling
-	return (navigator as any).hid.getDevices().then(async (browserDevice: any) => {
-		// getDevices() might return more than one, but for simplicity, just
-		// pick the first one.   The user can always manually select another
-		// one.
-		if (browserDevice.length > 0) {
-			browserDevice = browserDevice[0]
-		}
-		if (browserDevice.length == 0) {
-			return null
-		}
-		return openDevice(browserDevice, options)
+	return (navigator as any).hid.getDevices().then(async (browserDevices: any) => {
+		return browserDevices.map((dev: any) => openDevice(dev, options))
 	})
 }

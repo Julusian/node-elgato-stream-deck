@@ -17,7 +17,7 @@ if ('DEVSERVER_FLAGS' in process.env) {
 					name: 'CORE',
 				},
 				{
-					command: 'yarn workspace elgato-stream-deck build:main --watch',
+					command: 'yarn workspace @elgato-stream-deck/node build:main --watch',
 					prefixColor: 'bgGreen.bold',
 					name: 'NODE',
 				},
