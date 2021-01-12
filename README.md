@@ -1,10 +1,11 @@
-# elgato-stream-deck
+# @elgato-stream-deck
+
+![Node CI](https://github.com/Julusian/node-elgato-stream-deck/workflows/Node%20CI/badge.svg)
 
 [![npm version](https://img.shields.io/npm/v/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck)
 [![license](https://img.shields.io/npm/l/elgato-stream-deck.svg)](https://npm.im/elgato-stream-deck)
-![Node CI](https://github.com/Julusian/node-elgato-stream-deck/workflows/Node%20CI/badge.svg)
 
-[`elgato-stream-deck`](https://github.com/julusian/elgato-stream-deck) is a Node.js library for interfacing
+[`@elgato-stream-deck`](https://github.com/julusian/node-elgato-stream-deck) is a Node.js library for interfacing
 with the various models of the [Elgato Stream Deck](https://www.elgato.com/en/gaming/stream-deck).
 
 > ❗ Please note that `node-elgato-stream-deck` is **NOT a standalone application**. It is not something you download and run on its own. It is not an alternative to the [official Stream Deck program provided by Elgato](https://www.elgato.com/en/gaming/downloads). Instead, `node-elgato-stream-deck` is a code library which provides an API to the Stream Deck. Developers can use this API to make their own applications which interface with the Stream Deck.
@@ -14,6 +15,8 @@ with the various models of the [Elgato Stream Deck](https://www.elgato.com/en/ga
 > This is a tool for developers to use. It is not a program for end users. It cannot and will not replace the official Stream Deck program. That is not its goal. However, it does enable someone to more easily write a program which _does_ do that.
 
 ## Install
+
+TODO - update this...
 
 `$ npm install --save elgato-stream-deck`
 
@@ -252,7 +255,7 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 	.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE) // Scale up/down to the right size, cropping if necessary.
 	.raw() // Give us uncompressed RGB.
 	.toBuffer()
-	.then(buffer => {
+	.then((buffer) => {
 		streamDeck.fillKeyBuffer(2, buffer)
 	})
 	.catch((err) => {
@@ -274,7 +277,7 @@ sharp(path.resolve(__dirname, 'github_logo.png'))
 	.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS) // Scale up/down to the right size, cropping if necessary.
 	.raw() // Give us uncompressed RGB.
 	.toBuffer()
-	.then(buffer => {
+	.then((buffer) => {
 		streamDeck.fillPanelBuffer(buffer)
 	})
 	.catch((err) => {

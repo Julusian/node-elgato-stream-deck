@@ -6,7 +6,6 @@ import { StreamDeckWeb } from './wrapper'
 
 export { DeviceModelId, KeyIndex, StreamDeck } from '@elgato-stream-deck/core'
 export { StreamDeckWeb } from './wrapper'
-export { dropAlpha } from './util'
 
 // TODO - typings
 export async function requestStreamDeck(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb | null> {

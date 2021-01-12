@@ -1,5 +1,4 @@
 import { KeyIndex, StreamDeck, StreamDeckProxy } from '@elgato-stream-deck/core'
-import { dropAlpha } from './util'
 
 export class StreamDeckWeb extends StreamDeckProxy {
 	constructor(device: StreamDeck) {
@@ -15,7 +14,7 @@ export class StreamDeckWeb extends StreamDeckProxy {
 		}
 
 		const data = ctx.getImageData(0, 0, this.ICON_SIZE, this.ICON_SIZE)
-		return this.device.fillKeyBuffer(keyIndex, dropAlpha(data.data))
+		return this.device.fillKeyBuffer(keyIndex, Buffer.from(data.data), { format: 'rgba' })
 	}
 
 	public fillPanelCanvas(canvas: HTMLCanvasElement): Promise<void> {
@@ -25,6 +24,6 @@ export class StreamDeckWeb extends StreamDeckProxy {
 		}
 
 		const data = ctx.getImageData(0, 0, this.ICON_SIZE * this.KEY_COLUMNS, this.ICON_SIZE * this.KEY_ROWS)
-		return this.device.fillPanelBuffer(dropAlpha(data.data))
+		return this.device.fillPanelBuffer(Buffer.from(data.data), { format: 'rgba' })
 	}
 }
