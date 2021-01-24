@@ -58,6 +58,6 @@ export async function openDevice(browserDevice: any, options?: OpenStreamDeckOpt
 export async function getStreamDecks(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb[]> {
 	// TODO - error handling
 	return (navigator as any).hid.getDevices().then(async (browserDevices: any) => {
-		return browserDevices.map((dev: any) => openDevice(dev, options))
+		return Promise.all(browserDevices.map((dev: any) => openDevice(dev, options)))
 	})
 }
