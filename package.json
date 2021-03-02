@@ -3,17 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start-web": "cd packages/webhid-demo && yarn start",
+    "dev": "yarn workspaces run build && node ./scripts/watch.js",
+    "postinstall": "lerna bootstrap",
     "dist-web": "cd packages/webhid-demo && yarn dist",
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test",
-    "lint": "yarn workspaces run lint",
-    "dev": "yarn workspaces run build && node ./scripts/watch.js",
-    "postinstall": "lerna bootstrap",
+    "lint": "eslint . --ext .ts --ext .js --ignore-pattern dist",
     "bump": "lerna version --conventional-commits",
     "publish": "lerna publish from-package"
   },
-  "prettier": "@sofie-automation/code-standard-preset/.prettierrc.json",
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"

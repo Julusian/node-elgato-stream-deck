@@ -51,9 +51,7 @@
     "watch": "jest --watch",
     "cov": "jest --coverage; open-cli coverage/lcov-report/index.html",
     "cov-open": "open-cli coverage/lcov-report/index.html",
-    "testci": "yarn lint && jest --coverage && cat ./coverage/lcov.info | coveralls",
-    "lint": "eslint . --ext .ts --ext .js --ignore-pattern dist",
-    "lint-fix": "yarn lint --fix",
+    "testci": "jest --coverage && cat ./coverage/lcov.info | coveralls",
     "validate:dependencies": "yarn audit && yarn license-validate",
     "license-validate": "yarn sofie-licensecheck"
   },
@@ -62,20 +60,6 @@
   ],
   "engines": {
     "node": ">=12.18"
-  },
-  "prettier": "@sofie-automation/code-standard-preset/.prettierrc.json",
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{js,css,json,md,scss}": [
-      "prettier --write"
-    ],
-    "*.{ts,tsx}": [
-      "yarn lint --fix"
-    ]
   },
   "dependencies": {
     "@elgato-stream-deck/core": "~5.0.0-alpha.0",
