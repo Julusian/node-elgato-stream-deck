@@ -105,8 +105,8 @@ function runForDevice(path: string, model: DeviceModelId): void {
 
 		test('firmwareVersion', async () => {
 			const device = getDevice()
-			device.getFeatureReport = async (): Promise<number[]> => {
-				return [4, 85, 170, 212, 4, 49, 46, 48, 46, 49, 55, 48, 49, 51, 51, 0, 0]
+			device.getFeatureReport = async (): Promise<Buffer> => {
+				return Buffer.from([4, 85, 170, 212, 4, 49, 46, 48, 46, 49, 55, 48, 49, 51, 51, 0, 0])
 			}
 
 			const firmware = await streamDeck.getFirmwareVersion()
@@ -115,8 +115,8 @@ function runForDevice(path: string, model: DeviceModelId): void {
 
 		test('serialNumber', async () => {
 			const device = getDevice()
-			device.getFeatureReport = async (): Promise<number[]> => {
-				return [3, 85, 170, 211, 3, 65, 76, 51, 55, 71, 49, 65, 48, 50, 56, 52, 48]
+			device.getFeatureReport = async (): Promise<Buffer> => {
+				return Buffer.from([3, 85, 170, 211, 3, 65, 76, 51, 55, 71, 49, 65, 48, 50, 56, 52, 48])
 			}
 
 			const firmware = await streamDeck.getSerialNumber()
@@ -157,9 +157,9 @@ function runForDevice(path: string, model: DeviceModelId): void {
 
 		test('firmwareVersion', async () => {
 			const device = getDevice()
-			device.getFeatureReport = async (): Promise<number[]> => {
+			device.getFeatureReport = async (): Promise<Buffer> => {
 				// prettier-ignore
-				return [ 5, 12, 254, 90, 239, 250, 49, 46, 48, 48, 46, 48, 48, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+				return Buffer.from([ 5, 12, 254, 90, 239, 250, 49, 46, 48, 48, 46, 48, 48, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ])
 			}
 
 			const firmware = await streamDeck.getFirmwareVersion()
@@ -168,9 +168,9 @@ function runForDevice(path: string, model: DeviceModelId): void {
 
 		test('serialNumber', async () => {
 			const device = getDevice()
-			device.getFeatureReport = async (): Promise<number[]> => {
+			device.getFeatureReport = async (): Promise<Buffer> => {
 				// prettier-ignore
-				return [ 6, 12, 67, 76, 49, 56, 73, 49, 65, 48, 48, 57, 49, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+				return Buffer.from([ 6, 12, 67, 76, 49, 56, 73, 49, 65, 48, 48, 57, 49, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ])
 			}
 
 			const firmware = await streamDeck.getSerialNumber()
@@ -579,9 +579,9 @@ describe('StreamDeck XL', () => {
 
 	test('firmwareVersion', async () => {
 		const device = getDevice()
-		device.getFeatureReport = async (): Promise<number[]> => {
+		device.getFeatureReport = async (): Promise<Buffer> => {
 			// prettier-ignore
-			return [ 5, 12, 254, 90, 239, 250, 49, 46, 48, 48, 46, 48, 48, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+			return Buffer.from([ 5, 12, 254, 90, 239, 250, 49, 46, 48, 48, 46, 48, 48, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ])
 		}
 
 		const firmware = await streamDeck.getFirmwareVersion()
@@ -590,9 +590,9 @@ describe('StreamDeck XL', () => {
 
 	test('serialNumber', async () => {
 		const device = getDevice()
-		device.getFeatureReport = async (): Promise<number[]> => {
+		device.getFeatureReport = async (): Promise<Buffer> => {
 			// prettier-ignore
-			return [ 6, 12, 67, 76, 49, 56, 73, 49, 65, 48, 48, 57, 49, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+			return Buffer.from([ 6, 12, 67, 76, 49, 56, 73, 49, 65, 48, 48, 57, 49, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ])
 		}
 
 		const firmware = await streamDeck.getSerialNumber()

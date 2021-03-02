@@ -308,7 +308,8 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 	public async getFirmwareVersion(): Promise<string> {
 		const val = await this.device.getFeatureReport(4, 17)
-		return val.toString('ascii', 5) // TODO - end??
+		const end = val.indexOf(0)
+		return val.toString('ascii', 5, end === -1 ? undefined : end)
 	}
 
 	public async getSerialNumber(): Promise<string> {
