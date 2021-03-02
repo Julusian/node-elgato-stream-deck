@@ -59,7 +59,7 @@
     ]
   },
   "dependencies": {
-    "@elgato-stream-deck/core": "file:../core",
+    "@elgato-stream-deck/core": "~5.0.0-alpha.0",
     "detect-browser": "^5.2.0"
   }
 }
