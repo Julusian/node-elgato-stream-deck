@@ -9,7 +9,9 @@
     "test": "yarn workspaces run test",
     "lint": "yarn workspaces run lint",
     "dev": "yarn workspaces run build && node ./scripts/watch.js",
-    "postinstall": "yarn lerna bootstrap"
+    "postinstall": "lerna bootstrap",
+    "bump": "lerna version --conventional-commits",
+    "publish": "lerna publish from-package"
   },
   "prettier": "@sofie-automation/code-standard-preset/.prettierrc.json",
   "husky": {

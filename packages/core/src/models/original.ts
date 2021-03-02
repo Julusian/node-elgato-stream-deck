@@ -15,7 +15,7 @@ const originalProperties: StreamDeckProperties = {
 export class StreamDeckOriginal extends StreamDeckBase {
 	private readonly useOriginalKeyOrder: boolean
 
-	constructor(device: HIDDevice, options: OpenStreamDeckOptions) {
+	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
 		super(device, options, originalProperties)
 
 		this.useOriginalKeyOrder = !!options.useOriginalKeyOrder

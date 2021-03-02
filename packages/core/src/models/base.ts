@@ -114,7 +114,11 @@ export interface StreamDeck {
 	 */
 	getSerialNumber(): Promise<string>
 
-	on(...args: [event: 'down' | 'up', listener: (keyIndex: KeyIndex) => void] | [event: 'error', listener: (e: unknown) => void]): StreamDeck
+	on(
+		...args:
+			| [event: 'down' | 'up', listener: (keyIndex: KeyIndex) => void]
+			| [event: 'error', listener: (e: unknown) => void]
+	): StreamDeck
 }
 
 export abstract class StreamDeckBase extends EventEmitter implements StreamDeck {

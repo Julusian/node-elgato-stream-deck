@@ -15,10 +15,10 @@ import { KeyIndex } from './id'
 export abstract class StreamDeckGen2Base extends StreamDeckBase {
 	private encodeJPEG: EncodeJPEGHelper
 
-	constructor(device: HIDDevice, options: OpenStreamDeckOptions, properties: StreamDeckProperties) {
+	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>, properties: StreamDeckProperties) {
 		super(device, options, properties)
 
-		this.encodeJPEG = options.encodeJPEG!
+		this.encodeJPEG = options.encodeJPEG
 	}
 
 	/**

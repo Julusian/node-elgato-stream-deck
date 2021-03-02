@@ -61,12 +61,15 @@ export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeck
 	}
 
 	// Clone the options, to ensure they dont get changed
-	const options: OpenStreamDeckOptionsNode = { ...userOptions }
+	const jpegOptions: JPEGEncodeOptions | undefined = userOptions?.jpegOptions
+		? { ...userOptions.jpegOptions }
+		: undefined
 
-	if (!options.encodeJPEG) {
-		const jpegOptions: JPEGEncodeOptions | undefined = options.jpegOptions ? { ...options.jpegOptions } : undefined
-		options.encodeJPEG = (buffer: Buffer, width: number, height: number) =>
-			encodeJPEG(buffer, width, height, jpegOptions)
+	const options: Required<OpenStreamDeckOptions> = {
+		useOriginalKeyOrder: false,
+		resetToLogoOnExit: false,
+		encodeJPEG: (buffer: Buffer, width: number, height: number) => encodeJPEG(buffer, width, height, jpegOptions),
+		...userOptions,
 	}
 
 	const device = new NodeHIDDevice(foundDevices[0])

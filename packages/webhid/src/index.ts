@@ -29,7 +29,7 @@ export async function requestStreamDecks(options?: OpenStreamDeckOptions): Promi
 		})
 }
 
-export async function openDevice(browserDevice: any, options?: OpenStreamDeckOptions): Promise<StreamDeckWeb> {
+export async function openDevice(browserDevice: any, userOptions?: OpenStreamDeckOptions): Promise<StreamDeckWeb> {
 	const model = DEVICE_MODELS.find((m) => m.productId === browserDevice.productId)
 	if (!model) {
 		throw new Error('Stream Deck is of unexpected type.')
@@ -45,9 +45,11 @@ export async function openDevice(browserDevice: any, options?: OpenStreamDeckOpt
 
 	await browserDevice.open()
 
-	options = options || {}
-	if (!options.encodeJPEG) {
-		options.encodeJPEG = encodeJPEG
+	const options: Required<OpenStreamDeckOptions> = {
+		useOriginalKeyOrder: false,
+		resetToLogoOnExit: false,
+		encodeJPEG: encodeJPEG,
+		...userOptions,
 	}
 
 	const device: StreamDeck = new model.class(new WebHIDDevice(browserDevice), options || {})

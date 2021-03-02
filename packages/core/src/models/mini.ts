@@ -13,7 +13,7 @@ const miniProperties: StreamDeckProperties = {
 }
 
 export class StreamDeckMini extends StreamDeckBase {
-	constructor(device: HIDDevice, options: OpenStreamDeckOptions) {
+	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
 		super(device, options, miniProperties)
 	}
 

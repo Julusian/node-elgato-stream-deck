@@ -13,7 +13,7 @@ const origV2Properties: StreamDeckProperties = {
 }
 
 export class StreamDeckOriginalV2 extends StreamDeckGen2Base {
-	constructor(device: HIDDevice, options: OpenStreamDeckOptions) {
+	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
 		super(device, options, origV2Properties)
 	}
 }
