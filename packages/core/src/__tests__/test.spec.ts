@@ -20,7 +20,7 @@ function openStreamDeck(path: string, deviceModel: DeviceModelId, userOptions?: 
 		throw new Error('Stream Deck is of unexpected type.')
 	}
 
-	const device = new DummyHID(path, encodeJPEGMock)
+	const device = new DummyHID(path, encodeJpegMock)
 	return new model.class(device, options || {})
 }
 

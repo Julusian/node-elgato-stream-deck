@@ -21,11 +21,8 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 		this.device.on('error', (error) => this.emit('error', error))
 
 		this.releaseExitHook = exitHook(() => {
-			try {
-				this.close()
-			} catch (e) {
-				// Ignore errors, as device is already closed
-			}
+			// Ignore errors, as device is already closed
+			this.close().catch(() => null)
 		})
 
 		this.device.on('data', (data) => {

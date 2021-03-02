@@ -47,11 +47,6 @@
   "scripts": {
     "build": "rimraf dist && yarn build:main",
     "build:main": "tsc -p tsconfig.build.json",
-    "release": "standard-version",
-    "watch": "jest --watch",
-    "cov": "jest --coverage; open-cli coverage/lcov-report/index.html",
-    "cov-open": "open-cli coverage/lcov-report/index.html",
-    "testci": "jest --coverage && cat ./coverage/lcov.info | coveralls",
     "validate:dependencies": "yarn audit && yarn license-validate",
     "license-validate": "yarn sofie-licensecheck"
   },

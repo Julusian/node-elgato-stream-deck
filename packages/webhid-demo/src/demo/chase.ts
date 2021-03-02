@@ -3,7 +3,7 @@ import { Demo } from './demo'
 
 export class ChaseDemo implements Demo {
 	private pressed: number[] = []
-	private counter: number = 0
+	private counter = 0
 	private interval: number | undefined
 
 	private async drawButtons(device: StreamDeck, canvas: HTMLCanvasElement, c: number): Promise<void> {
@@ -12,7 +12,7 @@ export class ChaseDemo implements Demo {
 
 		for (let i = 0; i < device.NUM_KEYS; i++) {
 			if (ctx) {
-				let n = c + i
+				const n = c + i
 				ctx.save()
 				ctx.clearRect(0, 0, canvas.width, canvas.height)
 				// Start with a font that's 80% as high as the button. maxWidth
@@ -24,7 +24,7 @@ export class ChaseDemo implements Demo {
 				ctx.fillStyle = 'white'
 				ctx.fillText(n.toString(), 8, 60, canvas.width * 0.8)
 
-				let id = ctx.getImageData(0, 0, canvas.width, canvas.height)
+				const id = ctx.getImageData(0, 0, canvas.width, canvas.height)
 				await device.fillKeyBuffer(i, Buffer.from(id.data), { format: 'rgba' })
 				ctx.restore()
 			}

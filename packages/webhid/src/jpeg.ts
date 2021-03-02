@@ -9,7 +9,7 @@ export async function encodeJPEG(buffer: Buffer, width: number, height: number):
 			imageData.data.set(buffer)
 			ctx.putImageData(imageData, 0, 0)
 			canvas.toBlob(
-				b => {
+				(b) => {
 					if (b) {
 						resolve(b)
 					} else {

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+// eslint-disable-next-line node/no-extraneous-import
 import { mocked } from 'ts-jest/utils'
 import { readFixtureJSON } from './helpers'
 
@@ -28,9 +29,9 @@ describe('jpeg-encoding', () => {
 		const jpegJS = require('jpeg-js')
 		mocked(jpegJS.encode).mockImplementation(() => ({ data: Buffer.alloc(100) }))
 
-		const { encodeJPEG } = require('../jpeg')
+		const { encodeJPEG } = require('../jpeg') as typeof import('../jpeg')
 
-		const encoded = encodeJPEG(img, iconSize, iconSize)
+		const encoded = await encodeJPEG(img, iconSize, iconSize, undefined)
 		expect(encoded).toBeTruthy()
 
 		// Check it looks like it has been encoded
@@ -42,9 +43,9 @@ describe('jpeg-encoding', () => {
 		const img = addAlphaChannel(readFixtureJSON('fillImage-sample-icon-96.json'))
 
 		jest.doMock('@julusian/jpeg-turbo', undefined)
-		const { encodeJPEG } = require('../jpeg')
+		const { encodeJPEG } = require('../jpeg') as typeof import('../jpeg')
 
-		const encoded = encodeJPEG(img, iconSize, iconSize)
+		const encoded = await encodeJPEG(img, iconSize, iconSize, undefined)
 		expect(encoded).toBeTruthy()
 
 		// Check it looks like it has been encoded

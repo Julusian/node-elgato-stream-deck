@@ -2,7 +2,7 @@ import * as jpegJS from 'jpeg-js'
 
 let jpegTurbo: typeof import('@julusian/jpeg-turbo') | undefined
 try {
-	// tslint:disable-next-line: no-var-requires
+	// eslint-disable-next-line node/no-extraneous-require
 	jpegTurbo = require('@julusian/jpeg-turbo')
 } catch (e) {
 	// This is expected and can be ignored

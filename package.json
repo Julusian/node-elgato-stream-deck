@@ -7,7 +7,8 @@
     "postinstall": "lerna bootstrap",
     "dist-web": "cd packages/webhid-demo && yarn dist",
     "build": "yarn workspaces run build",
-    "test": "yarn workspaces run test",
+    "test": "yarn lint && yarn unit",
+    "unit": "jest",
     "lint": "eslint . --ext .ts --ext .js --ignore-pattern dist",
     "bump": "lerna version --conventional-commits",
     "publish": "lerna publish from-package"
@@ -44,7 +45,6 @@
     "open-cli": "^6.0.1",
     "pureimage": "^0.2.7",
     "sharp": "^0.27.2",
-    "standard-version": "^9.1.1",
     "stream-buffers": "^3.0.2",
     "ts-jest": "^26.5.2",
     "ts-loader": "^8.0.17",

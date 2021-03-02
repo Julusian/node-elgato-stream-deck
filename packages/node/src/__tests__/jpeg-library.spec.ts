@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+// eslint-disable-next-line node/no-extraneous-import
 import { mocked } from 'ts-jest/utils'
 import { readFixtureJSON } from './helpers'
 
@@ -14,7 +15,8 @@ describe('jpeg-library', () => {
 
 		// Mock jpeg-turbo so that we can make it crash
 		jest.mock('@julusian/jpeg-turbo')
-		const jpegTurbo = require('@julusian/jpeg-turbo')
+		// eslint-disable-next-line node/no-extraneous-require
+		const jpegTurbo: typeof import('@julusian/jpeg-turbo') = require('@julusian/jpeg-turbo')
 		mocked(jpegTurbo.bufferSize).mockImplementation(() => 1000)
 		mocked(jpegTurbo.compressSync).mockImplementation(() => {
 			throw new Error('something failed')
@@ -25,9 +27,9 @@ describe('jpeg-library', () => {
 		const jpegJS = require('jpeg-js')
 		mocked(jpegJS.encode).mockImplementation(() => ({ data: Buffer.alloc(100) }))
 
-		const { encodeJPEG } = require('../jpeg')
+		const { encodeJPEG } = require('../jpeg') as typeof import('../jpeg')
 
-		const encoded = encodeJPEG(img, iconSize, iconSize)
+		const encoded = await encodeJPEG(img, iconSize, iconSize, undefined)
 		expect(encoded).toBeTruthy()
 		expect(encoded).toHaveLength(100)
 	})
@@ -43,9 +45,9 @@ describe('jpeg-library', () => {
 		const jpegJS = require('jpeg-js')
 		mocked(jpegJS.encode).mockImplementation(() => ({ data: Buffer.alloc(100) }))
 
-		const { encodeJPEG } = require('../jpeg')
+		const { encodeJPEG } = require('../jpeg') as typeof import('../jpeg')
 
-		const encoded = encodeJPEG(img, iconSize, iconSize)
+		const encoded = await encodeJPEG(img, iconSize, iconSize, undefined)
 		expect(encoded).toBeTruthy()
 		expect(encoded).toHaveLength(100)
 	})
