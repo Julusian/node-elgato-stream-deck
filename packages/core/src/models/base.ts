@@ -191,7 +191,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		return this.device.close()
 	}
 
-	public fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
+	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
 		this.checkRGBValue(r)
@@ -200,14 +200,14 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 		const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]))
 		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		return this.fillImageRange(keyIndex2, pixels, {
+		await this.fillImageRange(keyIndex2, pixels, {
 			format: 'rgb',
 			offset: 0,
 			stride: this.ICON_SIZE * 3,
 		})
 	}
 
-	public fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
+	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
 		const sourceFormat = options?.format ?? 'rgb'
@@ -219,7 +219,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		}
 
 		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		return this.fillImageRange(keyIndex2, imageBuffer, {
+		await this.fillImageRange(keyIndex2, imageBuffer, {
 			format: sourceFormat,
 			offset: 0,
 			stride: this.ICON_SIZE * sourceFormat.length,
@@ -260,12 +260,12 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		}
 	}
 
-	public clearKey(keyIndex: KeyIndex): Promise<void> {
+	public async clearKey(keyIndex: KeyIndex): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
 		const pixels = Buffer.alloc(this.ICON_BYTES, 0)
 		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		return this.fillImageRange(keyIndex2, pixels, {
+		await this.fillImageRange(keyIndex2, pixels, {
 			format: 'rgb',
 			offset: 0,
 			stride: this.ICON_SIZE * 3,
@@ -307,12 +307,14 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		await this.device.sendFeatureReport(resetCommandBuffer)
 	}
 
-	public getFirmwareVersion(): Promise<string> {
-		return this.device.getFeatureReport(4, 17).then((val) => numberArrayToString(val.slice(5)))
+	public async getFirmwareVersion(): Promise<string> {
+		const val = await this.device.getFeatureReport(4, 17)
+		return numberArrayToString(val.slice(5))
 	}
 
-	public getSerialNumber(): Promise<string> {
-		return this.device.getFeatureReport(3, 17).then((val) => numberArrayToString(val.slice(5)))
+	public async getSerialNumber(): Promise<string> {
+		const val = await this.device.getFeatureReport(3, 17)
+		return numberArrayToString(val.slice(5))
 	}
 
 	protected abstract transformKeyIndex(keyIndex: KeyIndex): KeyIndex

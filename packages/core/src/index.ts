@@ -1,6 +1,6 @@
 import { HIDDevice } from './device'
 import { DeviceModelId, StreamDeckMini, StreamDeckOriginal, StreamDeckOriginalV2, StreamDeckXL } from './models'
-import { StreamDeck } from './models/base'
+import { OpenStreamDeckOptions, StreamDeck } from './models/base'
 
 export { HIDDevice } from './device'
 export {
