@@ -5,13 +5,14 @@
   "scripts": {
     "dev": "yarn workspaces run build && node ./scripts/watch.js",
     "postinstall": "lerna bootstrap",
-    "dist-web": "cd packages/webhid-demo && yarn dist",
     "build": "yarn workspaces run build",
     "test": "yarn lint && yarn unit",
     "unit": "jest",
     "lint": "eslint . --ext .ts --ext .js --ignore-pattern dist",
     "bump": "lerna version --conventional-commits",
-    "publish": "lerna publish from-package"
+    "publish": "lerna publish from-package",
+    "validate:dependencies": "yarn audit && yarn license-validate",
+    "license-validate": "yarn sofie-licensecheck"
   },
   "husky": {
     "hooks": {

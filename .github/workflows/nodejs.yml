@@ -70,10 +70,7 @@ jobs:
       - run: yarn install
         env:
           CI: true
-      - run: yarn build
-        env:
-          CI: true
-      - run: yarn test
+      - run: yarn unit
         env:
           CI: true
       - run: yarn send-coverage

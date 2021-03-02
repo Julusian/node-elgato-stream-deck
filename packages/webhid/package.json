@@ -30,9 +30,7 @@
   ],
   "scripts": {
     "build": "rimraf dist && yarn build:main",
-    "build:main": "tsc -p tsconfig.build.json",
-    "validate:dependencies": "yarn audit && yarn license-validate",
-    "license-validate": "yarn sofie-licensecheck"
+    "build:main": "tsc -p tsconfig.build.json"
   },
   "files": [
     "dist"
