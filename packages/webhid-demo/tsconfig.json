@@ -1,5 +1,5 @@
 {
-	"extends": "@sofie-automation/code-standard-preset/ts/tsconfig.lib",
+	"extends": "@sofie-automation/code-standard-preset/ts/tsconfig.bin",
 	"exclude": ["node_modules/**", "src/**/*spec.ts", "src/**/__tests__/*", "src/**/__mocks__/*", "dist/**"],
 	"compilerOptions": {
 		"outDir": "./dist",
@@ -9,7 +9,6 @@
 			"@elgato-stream-deck/webhid-demo": ["./src/index.ts"]
 		},
 		"lib": ["es6", "dom"],
-		"types": [],
-		"declaration": false
+		"types": []
 	}
 }

@@ -12,7 +12,7 @@ module.exports = {
 
 	optimization: {
 		// We no not want to minimize our code.
-		minimize: false
+		minimize: false,
 	},
 
 	output: {
@@ -30,17 +30,17 @@ module.exports = {
 
 		// At some point you'll have to debug your code, that's why I'm giving you
 		// for free a source map file to make your life easier
-		sourceMapFilename: 'main.map'
+		sourceMapFilename: 'main.map',
 	},
 	resolve: {
-		extensions: ['.tsx', '.ts', '.js']
+		extensions: ['.tsx', '.ts', '.js'],
 	},
 	devServer: {
 		contentBase: path.join(__dirname, '/public'),
 		// match the output path
 		publicPath: '/',
 		// match the output `publicPath`
-		historyApiFallback: true
+		historyApiFallback: true,
 	},
 
 	module: {
@@ -48,10 +48,14 @@ module.exports = {
 			{
 				test: /\.tsx?$/,
 				loader: 'ts-loader',
-				exclude: /node_modules/
-			}
-		]
+				exclude: /node_modules/,
+			},
+		],
 	},
 
-	plugins: [new CopyWebpackPlugin([{ from: path.join(__dirname, '/public'), to: path.join(__dirname, '/dist') }])]
+	plugins: [
+		new CopyWebpackPlugin({
+			patterns: [{ from: path.join(__dirname, '/public'), to: path.join(__dirname, '/dist') }],
+		}),
+	],
 }

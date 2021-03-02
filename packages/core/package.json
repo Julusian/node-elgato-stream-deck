@@ -63,7 +63,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=10.10"
+    "node": ">=12.18"
   },
   "prettier": "@sofie-automation/code-standard-preset/.prettierrc.json",
   "husky": {
