@@ -3,16 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "yarn workspaces run build && node ./scripts/watch.js",
+    "dev": "yarn build && node ./scripts/watch.js",
     "postinstall": "lerna bootstrap",
-    "build": "yarn workspaces run build",
+    "build": "yarn lerna exec yarn build",
     "test": "yarn lint && yarn unit",
     "unit": "jest",
-    "lint": "eslint . --ext .ts --ext .js --ignore-pattern dist",
+    "send-coverage": "codecov",
+    "lint": "eslint packages --ext .ts --ext .js --ignore-pattern dist",
     "bump": "lerna version --conventional-commits",
     "publish": "lerna publish from-package",
     "validate:dependencies": "yarn audit && yarn license-validate",
-    "license-validate": "yarn sofie-licensecheck"
+    "license-validate": "yarn sofie-licensecheck --allowPackages \"buffers@0.1.1;@elgato-stream-deck/webhid-demo@5.0.0-alpha.0\""
   },
   "husky": {
     "hooks": {

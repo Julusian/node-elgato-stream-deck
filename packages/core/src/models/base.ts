@@ -2,7 +2,6 @@ import { EventEmitter } from 'events'
 
 import { HIDDevice } from '../device'
 import { DeviceModelId } from '../models'
-import { numberArrayToString } from '../util'
 import { KeyIndex } from './id'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
@@ -309,12 +308,12 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 	public async getFirmwareVersion(): Promise<string> {
 		const val = await this.device.getFeatureReport(4, 17)
-		return numberArrayToString(val.slice(5))
+		return val.toString('ascii', 5) // TODO - end??
 	}
 
 	public async getSerialNumber(): Promise<string> {
 		const val = await this.device.getFeatureReport(3, 17)
-		return numberArrayToString(val.slice(5))
+		return val.toString('ascii', 5, 17)
 	}
 
 	protected abstract transformKeyIndex(keyIndex: KeyIndex): KeyIndex

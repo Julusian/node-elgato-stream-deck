@@ -7,10 +7,9 @@ import { StreamDeckWeb } from './wrapper'
 export { DeviceModelId, KeyIndex, StreamDeck } from '@elgato-stream-deck/core'
 export { StreamDeckWeb } from './wrapper'
 
-// TODO - typings
 export async function requestStreamDecks(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb[]> {
 	// TODO - error handling
-	return (navigator as any).hid
+	return navigator.hid
 		.requestDevice({
 			filters: [
 				{
@@ -18,18 +17,15 @@ export async function requestStreamDecks(options?: OpenStreamDeckOptions): Promi
 				},
 			],
 		})
-		.then(async (browserDevices: any) => {
-			// // requestDevice returns an array because a physical device might
-			// // have multiple HID interfaces.  The StreamDeck only has one:
-			// if (browserDevice.length > 0) {
-			// 	browserDevice = browserDevice[0]
-			// }
-			// return openDevice(browserDevice, options)
-			return browserDevices.map((dev: any) => openDevice(dev, options))
+		.then(async (browserDevices) => {
+			return Promise.all(browserDevices.map((dev) => openDevice(dev, options)))
 		})
 }
 
-export async function openDevice(browserDevice: any, userOptions?: OpenStreamDeckOptions): Promise<StreamDeckWeb> {
+export async function openDevice(
+	browserDevice: HIDDevice,
+	userOptions?: OpenStreamDeckOptions
+): Promise<StreamDeckWeb> {
 	const model = DEVICE_MODELS.find((m) => m.productId === browserDevice.productId)
 	if (!model) {
 		throw new Error('Stream Deck is of unexpected type.')
@@ -59,7 +55,7 @@ export async function openDevice(browserDevice: any, userOptions?: OpenStreamDec
 // getStreamDeck returns a streamdeck that was previously selected.
 export async function getStreamDecks(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb[]> {
 	// TODO - error handling
-	return (navigator as any).hid.getDevices().then(async (browserDevices: any) => {
-		return Promise.all(browserDevices.map((dev: any) => openDevice(dev, options)))
+	return navigator.hid.getDevices().then(async (browserDevices) => {
+		return Promise.all(browserDevices.map((dev) => openDevice(dev, options)))
 	})
 }

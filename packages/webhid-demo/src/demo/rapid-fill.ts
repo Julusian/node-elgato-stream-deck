@@ -18,7 +18,7 @@ export class RapidFillDemo implements Demo {
 				const b = getRandomIntInclusive(0, 255)
 				console.log('Filling with rgb(%d, %d, %d)', r, g, b)
 				for (let i = 0; i < device.NUM_KEYS; i++) {
-					device.fillKeyColor(i, r, g, b)
+					device.fillKeyColor(i, r, g, b).catch(console.error)
 				}
 			}, 1000 / 5)
 		}

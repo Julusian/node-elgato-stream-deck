@@ -9,6 +9,6 @@
 			"@elgato-stream-deck/webhid": ["./src/index.ts"]
 		},
 		"lib": ["dom"],
-		"types": []
+		"types": ["w3c-web-hid"]
 	}
 }

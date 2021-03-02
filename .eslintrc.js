@@ -10,7 +10,7 @@ module.exports = {
 			},
 		},
 		{
-			files: ['packages/*/examples/**/*.js', 'packages/*/examples/**/*.ts'],
+			files: ['packages/*/examples/**/*.js', 'packages/*/examples/**/*.ts', '**/__tests__/**/*.ts'],
 			rules: {
 				'node/no-extraneous-import': 'off',
 				'node/no-extraneous-require': 'off',

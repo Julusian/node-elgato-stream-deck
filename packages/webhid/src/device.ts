@@ -1,4 +1,4 @@
-import { DeviceModelId, HIDDevice } from '@elgato-stream-deck/core'
+import { DeviceModelId, HIDDevice as CoreHIDDevice } from '@elgato-stream-deck/core'
 import { EventEmitter } from 'events'
 
 export interface StreamDeckDeviceInfo {
@@ -7,18 +7,17 @@ export interface StreamDeckDeviceInfo {
 	serialNumber?: string
 }
 
-// TODO - use better typings
-export class WebHIDDevice extends EventEmitter implements HIDDevice {
+export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 	public dataKeyOffset?: number
-	private device: any
+	private readonly device: HIDDevice
 
-	constructor(device: any) {
+	constructor(device: HIDDevice) {
 		super()
 
 		this.device = device
 		// this.device.on('data', data => this.emit('data', data))
 		// this.device.on('error', error => this.emit('error', error))
-		this.device.addEventListener('inputreport', (event: any) => {
+		this.device.addEventListener('inputreport', (event) => {
 			// Button press
 			if (event.reportId === 0x01) {
 				const data = new Uint8Array(event.data.buffer)
@@ -36,10 +35,9 @@ export class WebHIDDevice extends EventEmitter implements HIDDevice {
 	public sendFeatureReport(data: Buffer): Promise<void> {
 		return this.device.sendFeatureReport(data[0], new Uint8Array(data.slice(1)))
 	}
-	public getFeatureReport(reportId: number, reportLength: number): Promise<number[]> {
-		return this.device
-			.receiveFeatureReport(reportId, reportLength)
-			.then((view: DataView) => Array.from(new Uint8Array(view.buffer)))
+	public async getFeatureReport(reportId: number, _reportLength: number): Promise<Buffer> {
+		const view = await this.device.receiveFeatureReport(reportId)
+		return Buffer.from(view.buffer)
 	}
 	public sendReport(data: Buffer): Promise<void> {
 		return this.device.sendReport(data[0], new Uint8Array(data.slice(1)))

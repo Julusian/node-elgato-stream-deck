@@ -34,11 +34,13 @@ export class DomImageDemo implements Demo {
 				if (this.element && this.run) {
 					const elm = this.element
 
-					toCanvas(elm).then(async (canvas) => {
-						await device.fillPanelCanvas(canvas)
-						// It would run smoother to set the next tick going before sending to the panel, but then it becomes a race that could go wrong
-						runTick()
-					})
+					toCanvas(elm)
+						.then(async (canvas) => {
+							await device.fillPanelCanvas(canvas)
+							// It would run smoother to set the next tick going before sending to the panel, but then it becomes a race that could go wrong
+							runTick()
+						})
+						.catch(console.error)
 				}
 			}
 			runTick()

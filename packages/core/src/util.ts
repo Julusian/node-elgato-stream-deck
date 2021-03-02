@@ -1,14 +1,5 @@
 import { InternalFillImageOptions } from './models/base'
 
-export function numberArrayToString(array: number[]): string {
-	const end = array.indexOf(0)
-	if (end !== -1) {
-		array = array.slice(0, end)
-	}
-
-	return array.map((val) => String.fromCharCode(val)).join('')
-}
-
 export function imageToByteArray(
 	imageBuffer: Buffer,
 	sourceOptions: InternalFillImageOptions,

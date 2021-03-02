@@ -1,3 +1,4 @@
+/* eslint-disable node/no-extraneous-require */
 const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 

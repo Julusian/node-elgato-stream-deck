@@ -1,5 +1,5 @@
 import { HIDDevice } from '../device'
-import { imageToByteArray, numberArrayToString } from '../util'
+import { imageToByteArray } from '../util'
 import {
 	EncodeJPEGHelper,
 	InternalFillImageOptions,
@@ -54,12 +54,14 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		await this.device.sendFeatureReport(resetCommandBuffer)
 	}
 
-	public getFirmwareVersion(): Promise<string> {
-		return this.device.getFeatureReport(5, 32).then((val) => numberArrayToString(val.slice(6)))
+	public async getFirmwareVersion(): Promise<string> {
+		const val = await this.device.getFeatureReport(5, 32)
+		return val.toString('ascii', 6)
 	}
 
-	public getSerialNumber(): Promise<string> {
-		return this.device.getFeatureReport(6, 32).then((val) => numberArrayToString(val.slice(2)))
+	public async getSerialNumber(): Promise<string> {
+		const val = await this.device.getFeatureReport(6, 32)
+		return val.toString('ascii', 2, 14)
 	}
 
 	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {

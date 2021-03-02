@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-// eslint-disable-next-line node/no-extraneous-import
 import { mocked } from 'ts-jest/utils'
 import { readFixtureJSON } from './helpers'
 

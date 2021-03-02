@@ -7,7 +7,7 @@ export interface HIDDevice {
 	close(): Promise<void>
 
 	sendFeatureReport(data: Buffer): Promise<void>
-	getFeatureReport(reportId: number, reportLength: number): Promise<number[]>
+	getFeatureReport(reportId: number, reportLength: number): Promise<Buffer>
 
 	sendReport(data: Buffer): Promise<void>
 }

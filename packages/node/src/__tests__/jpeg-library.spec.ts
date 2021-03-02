@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-// eslint-disable-next-line node/no-extraneous-import
 import { mocked } from 'ts-jest/utils'
 import { readFixtureJSON } from './helpers'
 
@@ -15,7 +14,6 @@ describe('jpeg-library', () => {
 
 		// Mock jpeg-turbo so that we can make it crash
 		jest.mock('@julusian/jpeg-turbo')
-		// eslint-disable-next-line node/no-extraneous-require
 		const jpegTurbo: typeof import('@julusian/jpeg-turbo') = require('@julusian/jpeg-turbo')
 		mocked(jpegTurbo.bufferSize).mockImplementation(() => 1000)
 		mocked(jpegTurbo.compressSync).mockImplementation(() => {

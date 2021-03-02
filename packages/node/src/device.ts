@@ -47,8 +47,8 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 	public async sendFeatureReport(data: Buffer): Promise<void> {
 		this.device.sendFeatureReport(data)
 	}
-	public async getFeatureReport(reportId: number, reportLength: number): Promise<number[]> {
-		return this.device.getFeatureReport(reportId, reportLength)
+	public async getFeatureReport(reportId: number, reportLength: number): Promise<Buffer> {
+		return Buffer.from(this.device.getFeatureReport(reportId, reportLength))
 	}
 	public async sendReport(data: Buffer): Promise<void> {
 		this.device.write(data)

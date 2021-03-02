@@ -12,19 +12,70 @@ function appendLog(str: string) {
 	}
 }
 
+const demoSelect = document.getElementById('demo-select') as HTMLInputElement | undefined
 const consentButton = document.getElementById('consent-button')
-if (consentButton) {
-	let demo: Demo = new FillWhenPressedDemo()
-	let device: StreamDeckWeb | null = null
 
+let device: StreamDeckWeb | null = null
+let currentDemo: Demo = new FillWhenPressedDemo()
+function demoChange() {
+	if (demoSelect) {
+		console.log(`Selected demo: ${demoSelect.value}`)
+		if (device) {
+			currentDemo.stop(device).catch(console.error)
+		}
+
+		switch (demoSelect.value) {
+			case 'rapid-fill':
+				currentDemo = new RapidFillDemo()
+				break
+			case 'dom':
+				currentDemo = new DomImageDemo()
+				break
+			case 'chase':
+				currentDemo = new ChaseDemo()
+				break
+			case 'fill-when-pressed':
+			default:
+				currentDemo = new FillWhenPressedDemo()
+				break
+		}
+
+		if (device) {
+			currentDemo.start(device).catch(console.error)
+		}
+	}
+}
+
+async function openDevice(device: StreamDeckWeb): Promise<void> {
+	appendLog(`Device opened. Serial: ${await device.getSerialNumber()} Firmware: ${await device.getFirmwareVersion()}`)
+
+	device.on('down', (key: number) => {
+		appendLog(`Key ${key} down`)
+		currentDemo.keyDown(device, key).catch(console.error)
+	})
+	device.on('up', (key: number) => {
+		appendLog(`Key ${key} up`)
+		currentDemo.keyUp(device, key).catch(console.error)
+	})
+
+	currentDemo.start(device).catch(console.error)
+
+	// Sample actions
+	device.setBrightness(70).catch(console.error)
+
+	// device.fillColor(2, 255, 0, 0)
+	// device.fillColor(12, 0, 0, 255)
+}
+
+if (consentButton) {
 	window.addEventListener('load', async () => {
 		// attempt to open a previously selected device.
 		const devices = await getStreamDecks()
 		if (devices.length > 0) {
 			device = devices[0]
 			openDevice(device)
-
-			demoChange()
+				.then(() => demoChange())
+				.catch(console.error)
 		}
 		console.log(devices)
 	})
@@ -34,72 +85,20 @@ if (consentButton) {
 		brightnessRange.addEventListener('input', (_e) => {
 			const value = (brightnessRange.value as any) as number
 			if (device) {
-				device.setBrightness(value)
+				device.setBrightness(value).catch(console.error)
 			}
 		})
 	}
 
-	const demoSelect = document.getElementById('demo-select') as HTMLInputElement | undefined
-	function demoChange() {
-		if (demoSelect) {
-			console.log(`Selected demo: ${demoSelect.value}`)
-			if (device) {
-				demo.stop(device)
-			}
-
-			switch (demoSelect.value) {
-				case 'rapid-fill':
-					demo = new RapidFillDemo()
-					break
-				case 'dom':
-					demo = new DomImageDemo()
-					break
-				case 'chase':
-					demo = new ChaseDemo()
-					break
-				case 'fill-when-pressed':
-				default:
-					demo = new FillWhenPressedDemo()
-					break
-			}
-
-			if (device) {
-				demo.start(device)
-			}
-		}
-	}
 	if (demoSelect) {
 		demoSelect.addEventListener('input', demoChange)
 		demoChange()
 	}
 
-	async function openDevice(device: StreamDeckWeb): Promise<void> {
-		appendLog(
-			`Device opened. Serial: ${await device.getSerialNumber()} Firmware: ${await device.getFirmwareVersion()}`
-		)
-
-		device.on('down', (key: number) => {
-			appendLog(`Key ${key} down`)
-			demo.keyDown(device!, key)
-		})
-		device.on('up', (key: number) => {
-			appendLog(`Key ${key} up`)
-			demo.keyUp(device!, key)
-		})
-
-		demo.start(device)
-
-		// Sample actions
-		device.setBrightness(70)
-
-		// device.fillColor(2, 255, 0, 0)
-		// device.fillColor(12, 0, 0, 255)
-	}
-
 	consentButton.addEventListener('click', async () => {
 		if (device) {
 			appendLog('Closing device')
-			demo.stop(device)
+			currentDemo.stop(device).catch(console.error)
 			await device.close()
 			device = null
 		}
@@ -116,7 +115,7 @@ if (consentButton) {
 			return
 		}
 
-		openDevice(device)
+		openDevice(device).catch(console.error)
 	})
 
 	appendLog('Page loaded')
