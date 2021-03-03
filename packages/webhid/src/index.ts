@@ -43,7 +43,6 @@ export async function openDevice(
 
 	const options: Required<OpenStreamDeckOptions> = {
 		useOriginalKeyOrder: false,
-		resetToLogoOnExit: false,
 		encodeJPEG: encodeJPEG,
 		...userOptions,
 	}

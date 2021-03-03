@@ -8,7 +8,6 @@ export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) =
 
 export interface OpenStreamDeckOptions {
 	useOriginalKeyOrder?: boolean
-	resetToLogoOnExit?: boolean
 	encodeJPEG?: EncodeJPEGHelper
 }
 

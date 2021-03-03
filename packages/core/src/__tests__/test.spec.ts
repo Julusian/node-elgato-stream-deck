@@ -10,7 +10,6 @@ function openStreamDeck(path: string, deviceModel: DeviceModelId, userOptions?: 
 	})
 	const options: Required<OpenStreamDeckOptions> = {
 		useOriginalKeyOrder: false,
-		resetToLogoOnExit: false,
 		encodeJPEG: encodeJpegMock,
 		...userOptions,
 	}
