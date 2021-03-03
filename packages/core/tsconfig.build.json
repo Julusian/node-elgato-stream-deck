@@ -9,6 +9,7 @@
 			"*": ["./node_modules/*"],
 			"@elgato-stream-deck/core": ["./src/index.ts"]
 		},
-		"types": ["node"]
+		"types": ["node"],
+		"importHelpers": false
 	}
 }
