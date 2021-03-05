@@ -38,6 +38,7 @@
   "dependencies": {
     "@elgato-stream-deck/core": "~5.0.0-alpha.0",
     "@types/w3c-web-hid": "^1.0.0",
+    "buffer": "^6.0.3",
     "detect-browser": "^5.2.0"
   },
   "engines": {

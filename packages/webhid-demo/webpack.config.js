@@ -1,6 +1,7 @@
 /* eslint-disable node/no-extraneous-require */
 const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const { ProvidePlugin } = require('webpack')
 
 module.exports = {
 	// Where to fine the source code
@@ -57,6 +58,9 @@ module.exports = {
 	plugins: [
 		new CopyWebpackPlugin({
 			patterns: [{ from: path.join(__dirname, '/public'), to: path.join(__dirname, '/dist') }],
+		}),
+		new ProvidePlugin({
+			Buffer: ['buffer', 'Buffer'],
 		}),
 	],
 }
