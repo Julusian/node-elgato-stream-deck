@@ -43,8 +43,13 @@ export class ChaseDemo implements Demo {
 		await this.drawButtons(device, canvas, this.counter)
 
 		if (!this.interval) {
+			let isRunning = false
 			this.interval = window.setInterval(async () => {
-				await this.drawButtons(device, canvas, ++this.counter)
+				if (!isRunning) {
+					isRunning = true
+					await this.drawButtons(device, canvas, ++this.counter)
+					isRunning = false
+				}
 			}, 1000 / 5)
 		}
 	}
