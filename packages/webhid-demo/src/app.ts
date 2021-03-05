@@ -17,11 +17,11 @@ const consentButton = document.getElementById('consent-button')
 
 let device: StreamDeckWeb | null = null
 let currentDemo: Demo = new FillWhenPressedDemo()
-function demoChange() {
+async function demoChange() {
 	if (demoSelect) {
 		console.log(`Selected demo: ${demoSelect.value}`)
 		if (device) {
-			currentDemo.stop(device).catch(console.error)
+			await currentDemo.stop(device)
 		}
 
 		switch (demoSelect.value) {
@@ -41,7 +41,7 @@ function demoChange() {
 		}
 
 		if (device) {
-			currentDemo.start(device).catch(console.error)
+			await currentDemo.start(device)
 		}
 	}
 }
@@ -58,10 +58,10 @@ async function openDevice(device: StreamDeckWeb): Promise<void> {
 		currentDemo.keyUp(device, key).catch(console.error)
 	})
 
-	currentDemo.start(device).catch(console.error)
+	await currentDemo.start(device)
 
 	// Sample actions
-	device.setBrightness(70).catch(console.error)
+	await device.setBrightness(70)
 
 	// device.fillColor(2, 255, 0, 0)
 	// device.fillColor(12, 0, 0, 255)
@@ -73,9 +73,7 @@ if (consentButton) {
 		const devices = await getStreamDecks()
 		if (devices.length > 0) {
 			device = devices[0]
-			openDevice(device)
-				.then(() => demoChange())
-				.catch(console.error)
+			openDevice(device).catch(console.error)
 		}
 		console.log(devices)
 	})
@@ -91,8 +89,8 @@ if (consentButton) {
 	}
 
 	if (demoSelect) {
-		demoSelect.addEventListener('input', demoChange)
-		demoChange()
+		demoSelect.addEventListener('input', () => demoChange().catch(console.error))
+		demoChange().catch(console.error)
 	}
 
 	consentButton.addEventListener('click', async () => {

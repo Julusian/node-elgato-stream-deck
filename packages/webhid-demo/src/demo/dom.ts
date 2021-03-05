@@ -20,6 +20,7 @@ function getRandomColor() {
 export class DomImageDemo implements Demo {
 	private element: HTMLElement | undefined
 	private run = false
+	private running: Promise<void> | undefined
 
 	public async start(device: StreamDeckWeb): Promise<void> {
 		this.element = document.querySelector<HTMLElement>('#image-source') || undefined
@@ -36,7 +37,10 @@ export class DomImageDemo implements Demo {
 
 					toCanvas(elm)
 						.then(async (canvas) => {
-							await device.fillPanelCanvas(canvas)
+							this.running = device.fillPanelCanvas(canvas)
+							await this.running
+							this.running = undefined
+
 							// It would run smoother to set the next tick going before sending to the panel, but then it becomes a race that could go wrong
 							runTick()
 						})
@@ -46,12 +50,15 @@ export class DomImageDemo implements Demo {
 			runTick()
 		}
 	}
-	public async stop(_device: StreamDeckWeb): Promise<void> {
+	public async stop(device: StreamDeckWeb): Promise<void> {
 		if (this.element) {
 			this.element.style.display = 'none'
 		}
 
 		this.run = false
+
+		await this.running
+		await device.clearPanel()
 	}
 	public async keyDown(_device: StreamDeckWeb, _keyIndex: number): Promise<void> {
 		if (this.element) {
