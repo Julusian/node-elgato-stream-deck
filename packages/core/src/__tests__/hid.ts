@@ -15,7 +15,7 @@ export class DummyHID extends EventEmitter implements HIDDevice {
 	public getFeatureReport(_reportId: number, _reportLength: number): Promise<Buffer> {
 		throw new Error('Method not implemented.')
 	}
-	public sendReport(_data: Buffer): Promise<void> {
+	public sendReports(_data: Buffer[]): Promise<void> {
 		throw new Error('Method not implemented.')
 	}
 	public close(): Promise<void> {

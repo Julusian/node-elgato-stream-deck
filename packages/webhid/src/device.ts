@@ -1,5 +1,6 @@
 import { DeviceModelId, HIDDevice as CoreHIDDevice } from '@elgato-stream-deck/core'
 import { EventEmitter } from 'events'
+import Queue from 'p-queue'
 
 export interface StreamDeckDeviceInfo {
 	model: DeviceModelId
@@ -10,6 +11,8 @@ export interface StreamDeckDeviceInfo {
 export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 	public dataKeyOffset?: number
 	private readonly device: HIDDevice
+
+	private readonly reportQueue = new Queue({ concurrency: 1 })
 
 	constructor(device: HIDDevice) {
 		super()
@@ -39,7 +42,11 @@ export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 		const view = await this.device.receiveFeatureReport(reportId)
 		return Buffer.from(view.buffer)
 	}
-	public sendReport(data: Buffer): Promise<void> {
-		return this.device.sendReport(data[0], new Uint8Array(data.slice(1)))
+	public sendReports(buffers: Buffer[]): Promise<void> {
+		return this.reportQueue.add(async () => {
+			for (const data of buffers) {
+				await this.device.sendReport(data[0], new Uint8Array(data.slice(1)))
+			}
+		})
 	}
 }

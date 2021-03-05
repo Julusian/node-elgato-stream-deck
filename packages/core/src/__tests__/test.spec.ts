@@ -354,7 +354,7 @@ describe('StreamDeck', () => {
 
 	test('fillImage', async () => {
 		const device = getDevice()
-		const writeFn: jest.Mock<Promise<void>, [Buffer]> = (device.sendReport = jest.fn())
+		const writeFn: jest.Mock<Promise<void>, [Buffer[]]> = (device.sendReports = jest.fn())
 		expect(writeFn).toHaveBeenCalledTimes(0)
 		await streamDeck.fillKeyBuffer(0, readFixtureJSON('fillImage-sample-icon-72.json'))
 
@@ -498,7 +498,7 @@ describe('StreamDeck Mini', () => {
 
 	test('fillImage', async () => {
 		const device = getDevice()
-		const writeFn: jest.Mock<Promise<void>, [Buffer]> = (device.sendReport = jest.fn())
+		const writeFn: jest.Mock<Promise<void>, [Buffer[]]> = (device.sendReports = jest.fn())
 		expect(writeFn).toHaveBeenCalledTimes(0)
 		await streamDeck.fillKeyBuffer(0, readFixtureJSON('fillImage-sample-icon-80.json'))
 
@@ -605,7 +605,7 @@ describe('StreamDeck XL', () => {
 			return buffer.slice(start, start * 2)
 		})
 
-		const writeFn: jest.Mock<Promise<void>, [Buffer]> = (device.sendReport = jest.fn())
+		const writeFn: jest.Mock<Promise<void>, [Buffer[]]> = (device.sendReports = jest.fn())
 		expect(writeFn).toHaveBeenCalledTimes(0)
 		await streamDeck.fillKeyBuffer(0, readFixtureJSON('fillImage-sample-icon-96.json'))
 
@@ -658,7 +658,7 @@ describe('StreamDeck Original V2', () => {
 			return buffer.slice(start, start * 2)
 		})
 
-		const writeFn: jest.Mock<Promise<void>, [Buffer]> = (device.sendReport = jest.fn())
+		const writeFn: jest.Mock<Promise<void>, [Buffer[]]> = (device.sendReports = jest.fn())
 		expect(writeFn).toHaveBeenCalledTimes(0)
 		await streamDeck.fillKeyBuffer(0, readFixtureJSON('fillImage-sample-icon-72.json'))
 

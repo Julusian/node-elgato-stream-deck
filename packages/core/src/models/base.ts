@@ -371,9 +371,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		const byteBuffer = await this.convertFillImage(imageBuffer, sourceOptions)
 
 		const packets = this.generateFillImageWrites(keyIndex, byteBuffer)
-		for (const packet of packets) {
-			await this.device.sendReport(packet)
-		}
+		await this.device.sendReports(packets)
 	}
 
 	private checkRGBValue(value: number): void {
