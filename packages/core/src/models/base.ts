@@ -236,6 +236,7 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 		const iconSize = this.ICON_SIZE * sourceFormat.length
 		const stride = iconSize * this.KEY_COLUMNS
 
+		const ps: Array<Promise<void>> = []
 		for (let row = 0; row < this.KEY_ROWS; row++) {
 			const rowOffset = stride * row * this.ICON_SIZE
 
@@ -249,13 +250,16 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 				const colOffset = column * iconSize
 
-				await this.fillImageRange(index, imageBuffer, {
-					format: sourceFormat,
-					offset: rowOffset + colOffset,
-					stride,
-				})
+				ps.push(
+					this.fillImageRange(index, imageBuffer, {
+						format: sourceFormat,
+						offset: rowOffset + colOffset,
+						stride,
+					})
+				)
 			}
 		}
+		await ps
 	}
 
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
@@ -272,13 +276,17 @@ export abstract class StreamDeckBase extends EventEmitter implements StreamDeck 
 
 	public async clearPanel(): Promise<void> {
 		const pixels = Buffer.alloc(this.ICON_BYTES, 0)
+		const ps: Array<Promise<void>> = []
 		for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
-			await this.fillImageRange(keyIndex, pixels, {
-				format: 'rgb',
-				offset: 0,
-				stride: this.ICON_SIZE * 3,
-			})
+			ps.push(
+				this.fillImageRange(keyIndex, pixels, {
+					format: 'rgb',
+					offset: 0,
+					stride: this.ICON_SIZE * 3,
+				})
+			)
 		}
+		await Promise.all(ps)
 	}
 
 	public async setBrightness(percentage: number): Promise<void> {

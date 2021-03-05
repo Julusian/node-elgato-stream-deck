@@ -10,6 +10,8 @@ export class ChaseDemo implements Demo {
 		// We probably should reuse this instead of creating it each time.
 		const ctx = canvas.getContext('2d')
 
+		const ps: Array<Promise<void>> = []
+
 		for (let i = 0; i < device.NUM_KEYS; i++) {
 			if (ctx) {
 				const n = c + i
@@ -25,10 +27,12 @@ export class ChaseDemo implements Demo {
 				ctx.fillText(n.toString(), 8, 60, canvas.width * 0.8)
 
 				const id = ctx.getImageData(0, 0, canvas.width, canvas.height)
-				await device.fillKeyBuffer(i, Buffer.from(id.data), { format: 'rgba' })
+				ps.push(device.fillKeyBuffer(i, Buffer.from(id.data), { format: 'rgba' }))
 				ctx.restore()
 			}
 		}
+
+		await Promise.all(ps)
 	}
 
 	public async start(device: StreamDeck): Promise<void> {
