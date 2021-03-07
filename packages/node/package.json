@@ -58,5 +58,8 @@
     "@elgato-stream-deck/core": "~5.0.0-alpha.0",
     "jpeg-js": "^0.4.2",
     "node-hid": "^2.1.1"
+  },
+  "peerDependencies": {
+    "@julusian/jpeg-turbo": "^1.0.1"
   }
 }
