@@ -1,9 +1,9 @@
-import { EventEmitter } from 'events'
+import * as EventEmitter from 'eventemitter3'
 
 import { HIDDevice } from '../device'
 import { DeviceModelId } from '../models'
 import { KeyIndex } from './id'
-import { FillImageOptions, FillPanelOptions, StreamDeck } from './types'
+import { FillImageOptions, FillPanelOptions, StreamDeck, StreamDeckEvents } from './types'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
@@ -26,7 +26,7 @@ export interface InternalFillImageOptions extends FillImageOptions {
 	stride: number
 }
 
-export abstract class StreamDeckBase extends EventEmitter implements StreamDeck {
+export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
 	get NUM_KEYS(): number {
 		return this.KEY_COLUMNS * this.KEY_ROWS
 	}

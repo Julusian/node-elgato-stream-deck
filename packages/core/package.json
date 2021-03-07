@@ -53,5 +53,8 @@
   ],
   "engines": {
     "node": ">=12.18"
+  },
+  "dependencies": {
+    "eventemitter3": "^4.0.7"
   }
 }

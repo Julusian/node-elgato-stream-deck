@@ -1,3 +1,4 @@
+import * as EventEmitter from 'eventemitter3'
 import { DeviceModelId, KeyIndex } from './id'
 
 export interface FillImageOptions {
@@ -5,7 +6,13 @@ export interface FillImageOptions {
 }
 export type FillPanelOptions = FillImageOptions
 
-export interface StreamDeck {
+export type StreamDeckEvents = {
+	down: [key: KeyIndex]
+	up: [key: KeyIndex]
+	error: [err: unknown]
+}
+
+export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	/** The number of keys on this streamdeck */
 	readonly NUM_KEYS: number
 	/** The number of columns on this streamdeck */
@@ -95,9 +102,9 @@ export interface StreamDeck {
 	 */
 	getSerialNumber(): Promise<string>
 
-	on(
-		...args:
-			| [event: 'down' | 'up', listener: (keyIndex: KeyIndex) => void]
-			| [event: 'error', listener: (e: unknown) => void]
-	): StreamDeck
+	// on(
+	// 	...args:
+	// 		| [event: 'down' | 'up', listener: (keyIndex: KeyIndex) => void]
+	// 		| [event: 'error', listener: (e: unknown) => void]
+	// ): StreamDeck
 }

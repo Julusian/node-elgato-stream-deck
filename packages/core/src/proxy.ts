@@ -1,9 +1,12 @@
+import * as EventEmitter from 'eventemitter3'
 import { DeviceModelId, KeyIndex, StreamDeck, FillImageOptions, FillPanelOptions } from './models'
+import { StreamDeckEvents } from './models/types'
 
 /**
  * A minimal proxy around a StreamDeck instance.
  * This is intended to be used by libraries wrapping this that want to add more methods to the StreamDeck
  */
+
 export class StreamDeckProxy implements StreamDeck {
 	protected device: StreamDeck
 
@@ -68,8 +71,87 @@ export class StreamDeckProxy implements StreamDeck {
 		return this.device.getSerialNumber()
 	}
 
-	public on(...args: Parameters<StreamDeck['on']>): StreamDeckProxy {
-		this.device.on(...args)
+	/**
+	 * EventEmitter
+	 */
+
+	public eventNames(): Array<EventEmitter.EventNames<StreamDeckEvents>> {
+		return this.device.eventNames()
+	}
+
+	public listeners<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T
+	): Array<EventEmitter.EventListener<StreamDeckEvents, T>> {
+		return this.device.listeners(event)
+	}
+
+	public listenerCount(event: EventEmitter.EventNames<StreamDeckEvents>): number {
+		return this.device.listenerCount(event)
+	}
+
+	public emit<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+		...args: EventEmitter.EventArgs<StreamDeckEvents, T>
+	): boolean {
+		return this.device.emit(event, ...args)
+	}
+
+	/**
+	 * Add a listener for a given event.
+	 */
+	public on<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+		fn: EventEmitter.EventListener<StreamDeckEvents, T>,
+		context?: unknown
+	): this {
+		this.device.on(event, fn, context)
+		return this
+	}
+	public addListener<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+		fn: EventEmitter.EventListener<StreamDeckEvents, T>,
+		context?: unknown
+	): this {
+		this.device.addListener(event, fn, context)
+		return this
+	}
+
+	/**
+	 * Add a one-time listener for a given event.
+	 */
+	public once<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+		fn: EventEmitter.EventListener<StreamDeckEvents, T>,
+		context?: unknown
+	): this {
+		this.device.once(event, fn, context)
+		return this
+	}
+
+	/**
+	 * Remove the listeners of a given event.
+	 */
+	public removeListener<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+		fn?: EventEmitter.EventListener<StreamDeckEvents, T>,
+		context?: unknown,
+		once?: boolean
+	): this {
+		this.device.removeListener(event, fn, context, once)
+		return this
+	}
+	public off<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+		fn?: EventEmitter.EventListener<StreamDeckEvents, T>,
+		context?: unknown,
+		once?: boolean
+	): this {
+		this.device.off(event, fn, context, once)
+		return this
+	}
+
+	public removeAllListeners(event?: EventEmitter.EventNames<StreamDeckEvents>): this {
+		this.device.removeAllListeners(event)
 		return this
 	}
 }

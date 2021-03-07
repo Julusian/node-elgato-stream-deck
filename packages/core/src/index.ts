@@ -1,6 +1,13 @@
 import { HIDDevice } from './device'
-import { DeviceModelId, StreamDeckMini, StreamDeckOriginal, StreamDeckOriginalV2, StreamDeckXL } from './models'
-import { OpenStreamDeckOptions, StreamDeck } from './models/base'
+import {
+	DeviceModelId,
+	StreamDeckMini,
+	StreamDeckOriginal,
+	StreamDeckOriginalV2,
+	StreamDeckXL,
+	OpenStreamDeckOptions,
+	StreamDeck,
+} from './models'
 
 export { HIDDevice } from './device'
 export {
