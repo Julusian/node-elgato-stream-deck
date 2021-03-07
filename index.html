@@ -1,0 +1,62 @@
+<html>
+
+<head>
+	<link rel="stylesheet" href="lds-spinner.css" />
+
+</head>
+
+<body>
+	<h1>Elgato StreamDeck WebHID demo</h1>
+	<h3>Based on <a href="https://github.com/Julusian/node-elgato-stream-deck/pull/2">elgato-stream-deck</a></h3>
+	<h3>
+		Getting started
+	</h3>
+	<p>Requires Chrome and either:</p>
+	<ul>
+		<li>Chrome v89+</li>
+		<li>Go to chrome://flags and enable "Experimental Web Platform features", then restart your
+			browser</li>
+	</ul>
+	<h3>
+		Note: For linux, you need to ensure udev is setup with the correct device permissions for the hidraw driver.
+	</h3>
+	<p>
+		<a href="#" id="consent-button">Select device</a>
+	</p>
+
+	<p>
+		<select id="demo-select">
+			<option value="chase">chase</option>
+			<option value="fill-when-pressed">fill when pressed</option>
+			<option value="rapid-fill">rapid fill</option>
+			<option value="dom">dom</option>
+		</select>
+	</p>
+
+	<p>
+		<input type="range" min="1" max="100" value="60" id="brightness-range" />
+	</p>
+
+	<div id="image-source" style="display: none; background: #ab00ff; width: 360px; height: 216px;">
+		<div class="lds-spinner">
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+	</div>
+
+	<div id="log" style="white-space: pre; background: #ffffff;"></div>
+
+	<script src="app.js" type="text/javascript"></script>
+</body>
+
+</html>
