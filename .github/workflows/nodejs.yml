@@ -77,3 +77,33 @@ jobs:
         if: matrix.node-version == '14.x'
         env:
           CI: true
+
+  publish-demo:
+    name: Publish demo to Github Pages
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 15
+
+    # only run for master TODO - enable
+    # if: github.ref == 'refs/heads/master'
+
+    needs:
+      - test
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Prepare build
+        run: |
+          yarn install
+          yarn build
+        env:
+          CI: true
+      - name: Publish
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./packages/webhid-demo/dist
