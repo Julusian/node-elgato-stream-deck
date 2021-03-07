@@ -20,7 +20,20 @@ module.exports = {
 			statements: 0,
 		},
 	},
-	collectCoverageFrom: ['**/src/**/*.{ts,js}', '!**/src/__tests__/**', '!**/node_modules/**', '!**/dist/**'],
-	coverageDirectory: './coverage/',
+	collectCoverageFrom: [
+		'**/src/**/*.{ts,js}',
+		'!**/src/__tests__/**',
+		'!**/node_modules/**',
+		'!**/dist/**',
+		'!packages/webhid-demo/**',
+	],
 	collectCoverage: true,
+	projects: ['<rootDir>'],
+	coverageDirectory: '<rootDir>/coverage/',
+
+	preset: 'ts-jest',
+
+	moduleNameMapper: {
+		'@elgato-stream-deck/(.+)': '<rootDir>/packages/$1/src',
+	},
 }
