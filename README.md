@@ -23,7 +23,7 @@ The existing implementations are a light wrapper around the platform agnostic [`
 
 ## Demo
 
-If you are using a Chromium v89+ based browser, you can try out the [webhid demo](https://streamdeck.julusian.dev)
+If you are using a Chromium v89+ based browser, you can try out the [webhid demo](https://julusian.github.io/node-elgato-stream-deck/)
 
 ## Linux
 

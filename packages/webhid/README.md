@@ -114,7 +114,7 @@ await myStreamDecks[0].fillKeyColor(4, 255, 0, 0)
 console.log('Successfully wrote a red square to key 4.')
 ```
 
-Some the [demo site](https://streamdeck.julusian.dev) for some more complete examples and its corresponding [source](/packages/webhid-demo).
+Some the [demo site](https://julusian.github.io/node-elgato-stream-deck/) for some more complete examples and its corresponding [source](/packages/webhid-demo).
 
 ## Contributing
 
