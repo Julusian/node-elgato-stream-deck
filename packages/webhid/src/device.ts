@@ -1,13 +1,11 @@
-import { DeviceModelId, HIDDevice as CoreHIDDevice } from '@elgato-stream-deck/core'
+import { HIDDevice as CoreHIDDevice } from '@elgato-stream-deck/core'
 import { EventEmitter } from 'events'
 import Queue from 'p-queue'
 
-export interface StreamDeckDeviceInfo {
-	model: DeviceModelId
-	path: string
-	serialNumber?: string
-}
-
+/**
+ * The wrapped browser HIDDevice.
+ * This translates it into the common format expected by @elgato-stream-deck/core
+ */
 export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 	public dataKeyOffset?: number
 	private readonly device: HIDDevice

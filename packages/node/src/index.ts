@@ -18,7 +18,7 @@ export interface OpenStreamDeckOptionsNode extends OpenStreamDeckOptions {
 HID.setDriverType('libusb')
 
 /**
- * List detected devices
+ * Scan for and list detected devices
  */
 export function listStreamDecks(): StreamDeckDeviceInfo[] {
 	const devices: StreamDeckDeviceInfo[] = []
@@ -43,6 +43,11 @@ export function getStreamDeckInfo(path: string): StreamDeckDeviceInfo | undefine
 	return listStreamDecks().find((dev) => dev.path === path)
 }
 
+/**
+ * Open a streamdeck
+ * @param devicePath The path of the device to open. If not set, the first will be used
+ * @param userOptions Options to customise the device behvaiour
+ */
 export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeckOptionsNode): StreamDeck {
 	let foundDevices = listStreamDecks()
 	if (devicePath) {

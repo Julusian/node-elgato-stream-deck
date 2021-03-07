@@ -13,6 +13,7 @@ export {
 } from './models'
 export { StreamDeckProxy } from './proxy'
 
+/** Elgato vendor id */
 export const VENDOR_ID = 0x0fd9
 
 export interface DeviceModelSpec {
@@ -21,6 +22,7 @@ export interface DeviceModelSpec {
 	class: new (device: HIDDevice, options: Required<OpenStreamDeckOptions>) => StreamDeck
 }
 
+/** List of all the known models, and the classes to use them */
 export const DEVICE_MODELS: DeviceModelSpec[] = [
 	{
 		id: DeviceModelId.ORIGINAL,

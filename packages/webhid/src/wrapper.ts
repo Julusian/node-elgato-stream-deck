@@ -1,5 +1,9 @@
 import { KeyIndex, StreamDeck, StreamDeckProxy } from '@elgato-stream-deck/core'
 
+/**
+ * A StreamDeck instance.
+ * This is an extended variant of the class, to provide some more web friendly helpers, such as accepting a canvas
+ */
 export class StreamDeckWeb extends StreamDeckProxy {
 	constructor(device: StreamDeck) {
 		super(device)

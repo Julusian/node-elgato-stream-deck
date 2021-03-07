@@ -15,6 +15,13 @@ export interface JPEGEncodeOptions {
 
 const DEFAULT_QUALITY = 95
 
+/**
+ * The default JPEG encoder.
+ * `@julusian/jpeg-turbo` will be used if it can be found, otherwise it will fall back to `jpeg-js`
+ * @param buffer The buffer to convert
+ * @param width Width of the image
+ * @param height Hieght of the image
+ */
 export function encodeJPEG(
 	buffer: Buffer,
 	width: number,

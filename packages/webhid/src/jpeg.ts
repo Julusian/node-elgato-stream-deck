@@ -1,3 +1,10 @@
+/**
+ * The default JPEG encoder.
+ * Utilises a hidden canvas to convert a byte array buffer into a jpeg
+ * @param buffer The buffer to convert
+ * @param width Width of the image
+ * @param height Hieght of the image
+ */
 export async function encodeJPEG(buffer: Buffer, width: number, height: number): Promise<Buffer> {
 	const blob = await new Promise<Blob>((resolve, reject) => {
 		const canvas = document.createElement('canvas')

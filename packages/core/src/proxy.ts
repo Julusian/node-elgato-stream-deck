@@ -1,4 +1,9 @@
 import { DeviceModelId, KeyIndex, StreamDeck, FillImageOptions, FillPanelOptions } from './models'
+
+/**
+ * A minimal proxy around a StreamDeck instance.
+ * This is intended to be used by libraries wrapping this that want to add more methods to the StreamDeck
+ */
 export class StreamDeckProxy implements StreamDeck {
 	protected device: StreamDeck
 
