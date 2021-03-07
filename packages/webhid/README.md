@@ -59,6 +59,34 @@ Unplug and replug the device and it should be usable
 -   The original model of the 15key is not supported on linux
 -   When having a hid device open, you will still be subject to background tab throttling which affects the draw rate
 
+## API
+
+The root methods exposed by the library are as follows. For more information it is recommended to rely on the typescript typings for hints or to browse through the source to see what methods are available
+
+```typescript
+/**
+ * Request the user to select some streamdecks to open
+ * @param userOptions Options to customise the device behvaiour
+ */
+export async function requestStreamDecks(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb[]>
+
+/**
+ * Reopen previously selected streamdecks.
+ * The browser remembers what the user previously allowed your site to access, and this will open those without the request dialog
+ * @param options Options to customise the device behvaiour
+ */
+export async function getStreamDecks(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb[]>
+
+/**
+ * Open a StreamDeck from a manually selected HIDDevice handle
+ * @param browserDevice The unopened browser HIDDevice
+ * @param userOptions Options to customise the device behvaiour
+ */
+export async function openDevice(browserDevice: HIDDevice, userOptions?: OpenStreamDeckOptions): Promise<StreamDeckWeb>
+```
+
+The StreamDeck type can be found [here](/packages/core/src/models/types.ts#L15)
+
 ## Example
 
 ```typescript

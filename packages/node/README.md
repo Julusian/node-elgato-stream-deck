@@ -74,6 +74,31 @@ Unplug and replug the device and it should be usable
 -   Set the Stream Deck brightness
 -   TypeScript support
 
+## API
+
+The root methods exposed by the library are as follows. For more information it is recommended to rely on the typescript typings for hints or to browse through the source to see what methods are available
+
+```typescript
+/**
+ * Scan for and list detected devices
+ */
+export function listStreamDecks(): StreamDeckDeviceInfo[]
+
+/**
+ * Get the info of a device if the given path is a streamdeck
+ */
+export function getStreamDeckInfo(path: string): StreamDeckDeviceInfo | undefined
+
+/**
+ * Open a streamdeck
+ * @param devicePath The path of the device to open. If not set, the first will be used
+ * @param userOptions Options to customise the device behvaiour
+ */
+export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeckOptionsNode): StreamDeck
+```
+
+The StreamDeck type can be found [here](/packages/core/src/models/types.ts#L15)
+
 ## Example
 
 ```typescript
