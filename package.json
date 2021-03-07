@@ -10,7 +10,7 @@
     "unit": "jest",
     "send-coverage": "codecov",
     "lint": "eslint packages --ext .ts --ext .js --ignore-pattern dist",
-    "bump": "lerna version --conventional-commits --no-private --no-push",
+    "bump": "lerna version --conventional-commits --no-private --no-push -m \"chore(release): publish %s\"",
     "publish2": "lerna publish from-package",
     "validate:dependencies": "yarn audit && yarn license-validate",
     "license-validate": "yarn sofie-licensecheck --allowPackages \"buffers@0.1.1;@elgato-stream-deck/webhid-demo@5.0.0-alpha.0;caniuse-lite@1.0.30001194;npm-lifecycle@3.1.5\""
