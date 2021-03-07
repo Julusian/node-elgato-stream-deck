@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.1](https://github.com/julusian/node-elgato-stream-deck/compare/v4.0.0...v4.0.1) (2021-01-07)
+
+
+### Bug Fixes
+
+* don't require tslib in generated code ([69e1dfe](https://github.com/julusian/node-elgato-stream-deck/commit/69e1dfeda180ff0a04d0c82956bfe0e455b7f54a))
+
 ## [4.0.0](https://github.com/julusian/node-elgato-stream-deck/compare/v3.3.5...v4.0.0) (2020-12-23)
 
 ### BREAKING CHANGES
