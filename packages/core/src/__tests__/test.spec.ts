@@ -73,7 +73,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		expect(errorSpy).toHaveBeenNthCalledWith(1, new Error('Test'))
 	})
 
-	if (model !== DeviceModelId.XL && model !== DeviceModelId.ORIGINALV2) {
+	if (model !== DeviceModelId.XL && model !== DeviceModelId.ORIGINALV2 && model !== DeviceModelId.ORIGINALMK2) {
 		test('setBrightness', async () => {
 			const device = getDevice()
 			device.sendFeatureReport = jest.fn()
@@ -122,7 +122,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 			expect(firmware).toEqual('AL37G1A02840')
 		})
 	} else {
-		test('setBrightness', async () => {
+		test('setBrightness-jpeg', async () => {
 			const device = getDevice()
 			device.sendFeatureReport = jest.fn()
 
@@ -143,7 +143,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 			await expect(() => streamDeck.setBrightness(-1)).rejects.toThrow()
 		})
 
-		test('resetToLogo', async () => {
+		test('resetToLogo-jpeg', async () => {
 			const device = getDevice()
 			device.sendFeatureReport = jest.fn()
 
@@ -154,7 +154,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 			expect(device.sendFeatureReport).toHaveBeenNthCalledWith(1, Buffer.from([0x03, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
 		})
 
-		test('firmwareVersion', async () => {
+		test('firmwareVersion-jpeg', async () => {
 			const device = getDevice()
 			device.getFeatureReport = async (): Promise<Buffer> => {
 				// prettier-ignore
@@ -165,7 +165,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 			expect(firmware).toEqual('1.00.004')
 		})
 
-		test('serialNumber', async () => {
+		test('serialNumber-jpeg', async () => {
 			const device = getDevice()
 			device.getFeatureReport = async (): Promise<Buffer> => {
 				// prettier-ignore

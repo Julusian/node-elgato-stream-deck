@@ -81,7 +81,7 @@ if (consentButton) {
 	const brightnessRange = document.getElementById('brightness-range') as HTMLInputElement | undefined
 	if (brightnessRange) {
 		brightnessRange.addEventListener('input', (_e) => {
-			const value = (brightnessRange.value as any) as number
+			const value = brightnessRange.value as any as number
 			if (device) {
 				device.setBrightness(value).catch(console.error)
 			}

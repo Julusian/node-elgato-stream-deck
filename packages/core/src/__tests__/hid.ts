@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-standalone-expect */
 import { EventEmitter } from 'events'
 import { EncodeJPEGHelper } from '../models/base'
 import { HIDDevice } from '../device'

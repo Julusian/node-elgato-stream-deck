@@ -4,6 +4,7 @@ import {
 	StreamDeckMini,
 	StreamDeckOriginal,
 	StreamDeckOriginalV2,
+	StreamDeckOriginalMK2,
 	StreamDeckXL,
 	OpenStreamDeckOptions,
 	StreamDeck,
@@ -54,6 +55,6 @@ export const DEVICE_MODELS: DeviceModelSpec[] = [
 	{
 		id: DeviceModelId.ORIGINALMK2,
 		productId: 0x0080,
-		class: StreamDeckOriginalV2,
+		class: StreamDeckOriginalMK2,
 	},
 ]

@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-standalone-expect */
 import { EventEmitter } from 'events'
 import type { HID } from 'node-hid'
 export class DummyHID extends EventEmitter implements HID {
