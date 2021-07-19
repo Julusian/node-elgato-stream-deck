@@ -4790,7 +4790,7 @@ exports.DEVICE_MODELS = [
     {
         id: models_1.DeviceModelId.ORIGINALMK2,
         productId: 0x0080,
-        class: models_1.StreamDeckOriginalV2,
+        class: models_1.StreamDeckOriginalMK2,
     },
 ];
 //# sourceMappingURL=index.js.map
@@ -5154,7 +5154,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckOriginalV2 = exports.StreamDeckXL = exports.StreamDeckMini = exports.StreamDeckOriginal = void 0;
+exports.StreamDeckOriginalMK2 = exports.StreamDeckOriginalV2 = exports.StreamDeckXL = exports.StreamDeckMini = exports.StreamDeckOriginal = void 0;
 __exportStar(__webpack_require__(766), exports);
 var original_1 = __webpack_require__(148);
 Object.defineProperty(exports, "StreamDeckOriginal", ({ enumerable: true, get: function () { return original_1.StreamDeckOriginal; } }));
@@ -5164,6 +5164,8 @@ var xl_1 = __webpack_require__(287);
 Object.defineProperty(exports, "StreamDeckXL", ({ enumerable: true, get: function () { return xl_1.StreamDeckXL; } }));
 var originalv2_1 = __webpack_require__(168);
 Object.defineProperty(exports, "StreamDeckOriginalV2", ({ enumerable: true, get: function () { return originalv2_1.StreamDeckOriginalV2; } }));
+var original_mk2_1 = __webpack_require__(51);
+Object.defineProperty(exports, "StreamDeckOriginalMK2", ({ enumerable: true, get: function () { return original_mk2_1.StreamDeckOriginalMK2; } }));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -5207,6 +5209,33 @@ class StreamDeckMini extends base_1.StreamDeckBase {
 }
 exports.StreamDeckMini = StreamDeckMini;
 //# sourceMappingURL=mini.js.map
+
+/***/ }),
+
+/***/ 51:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamDeckOriginalMK2 = void 0;
+const base_gen2_1 = __webpack_require__(679);
+const id_1 = __webpack_require__(766);
+const origMK2Properties = {
+    MODEL: id_1.DeviceModelId.ORIGINALMK2,
+    COLUMNS: 5,
+    ROWS: 3,
+    ICON_SIZE: 72,
+    KEY_DIRECTION: 'ltr',
+    KEY_DATA_OFFSET: 4,
+};
+class StreamDeckOriginalMK2 extends base_gen2_1.StreamDeckGen2Base {
+    constructor(device, options) {
+        super(device, options, origMK2Properties);
+    }
+}
+exports.StreamDeckOriginalMK2 = StreamDeckOriginalMK2;
+//# sourceMappingURL=original-mk2.js.map
 
 /***/ }),
 
