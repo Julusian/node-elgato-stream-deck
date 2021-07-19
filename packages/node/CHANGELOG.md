@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.1](https://github.com/julusian/node-elgato-stream-deck/compare/v5.1.0...v5.1.1) (2021-07-19)
+
+
+### Bug Fixes
+
+* mk2 is different to v2 ([71feace](https://github.com/julusian/node-elgato-stream-deck/commit/71feace86e0c097ea2b375b4981c252628f7eb4b))
+
+
+
+
+
 # [5.1.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.0.0...v5.1.0) (2021-07-19)
 
 

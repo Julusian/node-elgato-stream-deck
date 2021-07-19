@@ -1,6 +1,6 @@
 {
   "name": "@elgato-stream-deck/core",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "description": "An npm module for interfacing with the Elgato Stream Deck",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
