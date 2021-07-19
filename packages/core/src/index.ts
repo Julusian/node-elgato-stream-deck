@@ -52,7 +52,7 @@ export const DEVICE_MODELS: DeviceModelSpec[] = [
 		class: StreamDeckOriginalV2,
 	},
 	{
-		id: DeviceModelId.ORIGINALV2,
+		id: DeviceModelId.ORIGINALMK2,
 		productId: 0x0080,
 		class: StreamDeckOriginalV2,
 	},
