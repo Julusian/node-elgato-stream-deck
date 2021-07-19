@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/julusian/node-elgato-stream-deck/compare/v4.0.0...v4.1.0) (2021-07-19)
+
+
+### Features
+
+* streamdeck mk2 (15 key, new design) support ([efa6f06](https://github.com/julusian/node-elgato-stream-deck/commit/efa6f06c82d97072461f17794c77f9a8b5ed25ab))
+
+
+### Bug Fixes
+
+* don't require tslib in generated code ([69e1dfe](https://github.com/julusian/node-elgato-stream-deck/commit/69e1dfeda180ff0a04d0c82956bfe0e455b7f54a))
+
 ### [4.0.1](https://github.com/julusian/node-elgato-stream-deck/compare/v4.0.0...v4.0.1) (2021-01-07)
 
 
