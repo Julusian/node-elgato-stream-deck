@@ -8,6 +8,7 @@ import {
 	StreamDeckMini,
 	StreamDeckOriginal,
 	StreamDeckOriginalV2,
+	StreamDeckOriginalMK2,
 	StreamDeckXL,
 } from './models'
 import { StreamDeckBase } from './models/base'
@@ -81,6 +82,11 @@ const models: ModelSpec[] = [
 		id: DeviceModelId.ORIGINALV2,
 		productId: 0x006d,
 		class: StreamDeckOriginalV2,
+	},
+	{
+		id: DeviceModelId.ORIGINALMK2,
+		productId: 0x0080,
+		class: StreamDeckOriginalMK2,
 	},
 ]
 
