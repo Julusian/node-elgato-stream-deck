@@ -4,7 +4,7 @@ const { openStreamDeck } = require('../dist/index')
 
 ;(async () => {
 	const streamDeck = openStreamDeck()
-	streamDeck.clearAllKeys()
+	streamDeck.clearPanel()
 
 	const bmpImg = await Jimp.read(path.resolve(__dirname, 'fixtures/github_logo.png')).then((img) => {
 		return img.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
@@ -15,7 +15,7 @@ const { openStreamDeck } = require('../dist/index')
 	streamDeck.on('down', (keyIndex) => {
 		// Fill the pressed key with an image of the GitHub logo.
 		console.log('Filling button #%d', keyIndex)
-		streamDeck.fillImage(keyIndex, img, { format: 'rgba' })
+		streamDeck.fillKeyBuffer(keyIndex, img, { format: 'rgba' })
 	})
 
 	streamDeck.on('up', (keyIndex) => {

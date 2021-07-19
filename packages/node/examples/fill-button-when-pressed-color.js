@@ -1,7 +1,7 @@
 const { openStreamDeck } = require('../dist/index')
 
 const streamDeck = openStreamDeck()
-streamDeck.clearAllKeys()
+streamDeck.clearPanel()
 
 streamDeck.on('down', (keyIndex) => {
 	// Fill the pressed key with an image of the GitHub logo.

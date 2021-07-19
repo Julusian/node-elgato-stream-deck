@@ -4,7 +4,7 @@ const { openStreamDeck } = require('../dist/index')
 
 ;(async () => {
 	const streamDeck = openStreamDeck()
-	streamDeck.clearAllKeys()
+	streamDeck.clearPanel()
 
 	const img = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 		.flatten()

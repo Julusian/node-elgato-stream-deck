@@ -5,7 +5,7 @@ const { openStreamDeck } = require('../dist/index')
 console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the second image.')
 ;(async () => {
 	const streamDeck = openStreamDeck()
-	streamDeck.clearAllKeys()
+	streamDeck.clearPanel()
 
 	const bmpImgField = await Jimp.read(path.resolve(__dirname, 'fixtures/sunny_field.png')).then((img) => {
 		return img.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
@@ -47,7 +47,7 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 		// Clear the key when all keys are released.
 		if (streamDeck.keyState.every((pressed) => !pressed)) {
 			console.log('Clearing all buttons')
-			streamDeck.clearAllKeys()
+			streamDeck.clearPanel()
 			filled = false
 		}
 	})

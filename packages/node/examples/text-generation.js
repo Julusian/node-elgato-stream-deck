@@ -5,7 +5,7 @@ const streamBuffers = require('stream-buffers')
 const { openStreamDeck } = require('../dist/index')
 
 const streamDeck = openStreamDeck()
-streamDeck.clearAllKeys()
+streamDeck.clearPanel()
 
 const font = PImage.registerFont(path.resolve(__dirname, 'fixtures/SourceSansPro-Regular.ttf'), 'Source Sans Pro')
 font.load(() => {
