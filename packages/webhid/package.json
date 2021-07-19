@@ -37,7 +37,7 @@
   ],
   "dependencies": {
     "@elgato-stream-deck/core": "^5.1.0",
-    "@types/w3c-web-hid": "^1.0.0",
+    "@types/w3c-web-hid": "^1.0.1",
     "detect-browser": "^5.2.0",
     "p-queue": "^6.6.2"
   },
