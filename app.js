@@ -3069,6 +3069,7 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
+  "getWebFontEmbedCss": () => (/* binding */ getWebFontEmbedCss),
   "toBlob": () => (/* binding */ es_toBlob),
   "toCanvas": () => (/* binding */ toCanvas),
   "toJpeg": () => (/* binding */ toJpeg),
@@ -3168,12 +3169,12 @@ function px(node, styleProperty) {
 function getNodeWidth(node) {
     const leftBorder = px(node, 'border-left-width');
     const rightBorder = px(node, 'border-right-width');
-    return node.scrollWidth + leftBorder + rightBorder;
+    return node.clientWidth + leftBorder + rightBorder;
 }
 function getNodeHeight(node) {
     const topBorder = px(node, 'border-top-width');
     const bottomBorder = px(node, 'border-bottom-width');
-    return node.scrollHeight + topBorder + bottomBorder;
+    return node.clientHeight + topBorder + bottomBorder;
 }
 function getPixelRatio() {
     let ratio;
@@ -3308,8 +3309,9 @@ function cloneSingleNode(node) {
     });
 }
 function cloneChildren(nativeNode, clonedNode, filter) {
+    var _a;
     return cloneNode_awaiter(this, void 0, void 0, function* () {
-        const children = toArray(nativeNode.childNodes);
+        const children = toArray(((_a = nativeNode.shadowRoot) !== null && _a !== void 0 ? _a : nativeNode).childNodes);
         if (children.length === 0) {
             return Promise.resolve(clonedNode);
         }
@@ -3339,6 +3341,8 @@ function decorate(nativeNode, clonedNode) {
 function cloneCssStyle(nativeNode, clonedNode) {
     const source = window.getComputedStyle(nativeNode);
     const target = clonedNode.style;
+    if (!target)
+        return;
     if (source.cssText) {
         target.cssText = source.cssText;
     }
@@ -3414,14 +3418,29 @@ function getBlobFromURL(url, options) {
     const deferred = window.fetch
         ? window
             .fetch(url)
-            .then((response) => response.blob())
-            .then((blob) => new Promise((resolve, reject) => {
+            .then((response) => {
+            return new Promise((res, rej) => {
+                response.blob().then((blob) => {
+                    res({
+                        blob,
+                        contentType: response.headers.get('Content-Type'),
+                    });
+                });
+            });
+        })
+            .then(({ blob, contentType }) => new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
+            reader.onloadend = () => resolve({
+                contentType,
+                blob: reader.result,
+            });
             reader.onerror = reject;
             reader.readAsDataURL(blob);
         }))
-            .then(getDataURLContent)
+            .then(({ blob, contentType }) => ({
+            contentType,
+            blob: getDataURLContent(blob),
+        }))
             .catch(() => new Promise((resolve, reject) => reject()))
         : new Promise((resolve, reject) => {
             const req = new XMLHttpRequest();
@@ -3438,7 +3457,10 @@ function getBlobFromURL(url, options) {
                 }
                 const encoder = new FileReader();
                 encoder.onloadend = () => {
-                    resolve(getDataURLContent(encoder.result));
+                    resolve({
+                        blob: getDataURLContent(encoder.result),
+                        contentType: req.getResponseHeader('Content-Type') || '',
+                    });
                 };
                 encoder.readAsDataURL(req.response);
             };
@@ -3458,6 +3480,8 @@ function getBlobFromURL(url, options) {
 
 
 const URL_REGEX = /url\((['"]?)([^'"]+?)\1\)/g;
+const URL_WITH_FORMAT_REGEX = /url\([^)]+\)\s*format\((["'])([^"']+)\1\)/g;
+const FONT_SRC_REGEX = /src:\s*(?:url\([^)]+\)\s*format\([^)]+\)[,;]\s*)+/g;
 function shouldEmbed(string) {
     return string.search(URL_REGEX) !== -1;
 }
@@ -3465,9 +3489,25 @@ function embedResources(cssString, baseUrl, options) {
     if (!shouldEmbed(cssString)) {
         return Promise.resolve(cssString);
     }
-    return Promise.resolve(cssString)
+    const filteredCssString = filterPreferredFontFormat(cssString, options);
+    return Promise.resolve(filteredCssString)
         .then(parseURLs)
-        .then((urls) => urls.reduce((done, url) => done.then((ret) => embedResources_embed(ret, url, baseUrl, options)), Promise.resolve(cssString)));
+        .then((urls) => urls.reduce((done, url) => done.then((ret) => embedResources_embed(ret, url, baseUrl, options)), Promise.resolve(filteredCssString)));
+}
+function filterPreferredFontFormat(str, { preferredFontFormat }) {
+    return !preferredFontFormat
+        ? str
+        : str.replace(FONT_SRC_REGEX, (match) => {
+            while (true) {
+                const [src, , format] = URL_WITH_FORMAT_REGEX.exec(match) || [];
+                if (!format) {
+                    return '';
+                }
+                if (format === preferredFontFormat) {
+                    return `src: ${src};`;
+                }
+            }
+        });
 }
 function parseURLs(str) {
     const result = [];
@@ -3480,8 +3520,13 @@ function parseURLs(str) {
 function embedResources_embed(cssString, resourceURL, baseURL, options, get) {
     const resolvedURL = baseURL ? resolveUrl(resourceURL, baseURL) : resourceURL;
     return Promise.resolve(resolvedURL)
-        .then((url) => (get ? get(url) : getBlobFromURL(url, options)))
-        .then((data) => toDataURL(data, getMimeType(resourceURL)))
+        .then((url) => get ? get(url) : getBlobFromURL(url, options))
+        .then((data) => {
+        if (typeof data === 'string') {
+            return toDataURL(data, getMimeType(resourceURL));
+        }
+        return toDataURL(data.blob, getMimeType(resourceURL) || data.contentType);
+    })
         .then((dataURL) => cssString.replace(urlToRegex(resourceURL), `$1${dataURL}$3`))
         .then((content) => content, () => resolvedURL);
 }
@@ -3541,8 +3586,9 @@ function embedImages(clonedNode, options) {
     });
 }
 function embedBackground(clonedNode, options) {
+    var _a;
     return embedImages_awaiter(this, void 0, void 0, function* () {
-        const background = clonedNode.style.getPropertyValue('background');
+        const background = (_a = clonedNode.style) === null || _a === void 0 ? void 0 : _a.getPropertyValue('background');
         if (!background) {
             return Promise.resolve(clonedNode);
         }
@@ -3560,7 +3606,7 @@ function embedImageNode(clonedNode, options) {
     }
     return Promise.resolve(clonedNode.src)
         .then((url) => getBlobFromURL(url, options))
-        .then((data) => toDataURL(data, getMimeType(clonedNode.src)))
+        .then((data) => toDataURL(data.blob, getMimeType(clonedNode.src) || data.contentType))
         .then((dataURL) => new Promise((resolve, reject) => {
         clonedNode.onload = resolve;
         clonedNode.onerror = reject;
@@ -3597,21 +3643,15 @@ function parseWebFontRules(clonedNode) {
             }
             resolve(toArray(clonedNode.ownerDocument.styleSheets));
         })
-            .then(getCssRules)
+            .then((styleSheets) => getCssRules(styleSheets))
             .then(getWebFontRules);
     });
 }
 function embedWebFonts(clonedNode, options) {
     return embedWebFonts_awaiter(this, void 0, void 0, function* () {
-        return parseWebFontRules(clonedNode)
-            .then((rules) => Promise.all(rules.map((rule) => {
-            const baseUrl = rule.parentStyleSheet
-                ? rule.parentStyleSheet.href
-                : null;
-            return embedResources(rule.cssText, baseUrl, options);
-        })))
-            .then((cssStrings) => cssStrings.join('\n'))
-            .then((cssString) => {
+        return (options.fontEmbedCss != null
+            ? Promise.resolve(options.fontEmbedCss)
+            : getWebFontCss(clonedNode, options)).then((cssString) => {
             const styleNode = document.createElement('style');
             const sytleContent = document.createTextNode(cssString);
             styleNode.appendChild(sytleContent);
@@ -3625,6 +3665,18 @@ function embedWebFonts(clonedNode, options) {
         });
     });
 }
+function getWebFontCss(node, options) {
+    return embedWebFonts_awaiter(this, void 0, void 0, function* () {
+        return parseWebFontRules(node)
+            .then((rules) => Promise.all(rules.map((rule) => {
+            const baseUrl = rule.parentStyleSheet
+                ? rule.parentStyleSheet.href
+                : null;
+            return embedResources(rule.cssText, baseUrl, options);
+        })))
+            .then((cssStrings) => cssStrings.join('\n'));
+    });
+}
 function getCssRules(styleSheets) {
     return embedWebFonts_awaiter(this, void 0, void 0, function* () {
         const ret = [];
@@ -3633,14 +3685,25 @@ function getCssRules(styleSheets) {
         styleSheets.forEach((sheet) => {
             if ('cssRules' in sheet) {
                 try {
-                    toArray(sheet.cssRules).forEach((item) => {
+                    toArray(sheet.cssRules).forEach((item, index) => {
                         if (item.type === CSSRule.IMPORT_RULE) {
+                            let importIndex = index + 1;
                             promises.push(fetchCSS(item.href, sheet)
                                 .then(embedFonts)
                                 .then((cssText) => {
                                 const parsed = parseCSS(cssText);
                                 parsed.forEach((rule) => {
-                                    sheet.insertRule(rule, sheet.cssRules.length);
+                                    try {
+                                        sheet.insertRule(rule, rule.startsWith('@import')
+                                            ? (importIndex = importIndex + 1)
+                                            : sheet.cssRules.length);
+                                    }
+                                    catch (error) {
+                                        console.log('Error inserting rule from remote css', {
+                                            rule,
+                                            error,
+                                        });
+                                    }
                                 });
                             })
                                 .catch((e) => {
@@ -3700,7 +3763,8 @@ function parseCSS(source) {
     const cssKeyframeRegex = '((@.*?keyframes [\\s\\S]*?){([\\s\\S]*?}\\s*?)})';
     const combinedCSSRegex = '((\\s*?(?:\\/\\*[\\s\\S]*?\\*\\/)?\\s*?@media[\\s\\S]' +
         '*?){([\\s\\S]*?)}\\s*?})|(([\\s\\S]*?){([\\s\\S]*?)})'; // to match css & media queries together
-    const cssCommentsRegex = new RegExp('(\\/\\*[\\s\\S]*?\\*\\/)', 'gi');
+    const cssCommentsRegex = /(\/\*[\s\S]*?\*\/)/gi;
+    const importRegex = /@import[\s\S]*?url\([^)]*\)[\s\S]*?;/gi;
     // strip out comments
     cssText = cssText.replace(cssCommentsRegex, '');
     const keyframesRegex = new RegExp(cssKeyframeRegex, 'gi');
@@ -3716,9 +3780,18 @@ function parseCSS(source) {
     // unified regex
     const unified = new RegExp(combinedCSSRegex, 'gi');
     while (true) {
-        arr = unified.exec(cssText);
+        arr = importRegex.exec(cssText);
         if (arr === null) {
-            break;
+            arr = unified.exec(cssText);
+            if (arr === null) {
+                break;
+            }
+            else {
+                importRegex.lastIndex = unified.lastIndex;
+            }
+        }
+        else {
+            unified.lastIndex = importRegex.lastIndex;
         }
         css.push(arr[0]);
     }
@@ -3853,15 +3926,17 @@ function toCanvas(domNode, options = {}) {
             const context = canvas.getContext('2d');
             const ratio = options.pixelRatio || getPixelRatio();
             const { width, height } = getImageSize(domNode, options);
-            canvas.width = width * ratio;
-            canvas.height = height * ratio;
-            canvas.style.width = `${width}`;
-            canvas.style.height = `${height}`;
+            const canvasWidth = options.canvasWidth || width;
+            const canvasHeight = options.canvasHeight || height;
+            canvas.width = canvasWidth * ratio;
+            canvas.height = canvasHeight * ratio;
+            canvas.style.width = `${canvasWidth}`;
+            canvas.style.height = `${canvasHeight}`;
             if (options.backgroundColor) {
                 context.fillStyle = options.backgroundColor;
                 context.fillRect(0, 0, canvas.width, canvas.height);
             }
-            context.drawImage(image, 0, 0);
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
             return canvas;
         });
     });
@@ -3888,6 +3963,11 @@ function toJpeg(domNode, options = {}) {
 function es_toBlob(domNode, options = {}) {
     return es_awaiter(this, void 0, void 0, function* () {
         return toCanvas(domNode, options).then(canvasToBlob);
+    });
+}
+function getWebFontEmbedCss(domNode, options = {}) {
+    return es_awaiter(this, void 0, void 0, function* () {
+        return getWebFontCss(domNode, options);
     });
 }
 //# sourceMappingURL=index.js.map
@@ -4707,6 +4787,11 @@ exports.DEVICE_MODELS = [
         productId: 0x006d,
         class: models_1.StreamDeckOriginalV2,
     },
+    {
+        id: models_1.DeviceModelId.ORIGINALMK2,
+        productId: 0x0080,
+        class: models_1.StreamDeckOriginalV2,
+    },
 ];
 //# sourceMappingURL=index.js.map
 
@@ -5045,6 +5130,7 @@ var DeviceModelId;
 (function (DeviceModelId) {
     DeviceModelId["ORIGINAL"] = "original";
     DeviceModelId["ORIGINALV2"] = "originalv2";
+    DeviceModelId["ORIGINALMK2"] = "original-mk2";
     DeviceModelId["MINI"] = "mini";
     DeviceModelId["XL"] = "xl";
 })(DeviceModelId = exports.DeviceModelId || (exports.DeviceModelId = {}));
@@ -7770,8 +7856,9 @@ exports.StreamDeckWeb = StreamDeckWeb;
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		if(__webpack_module_cache__[moduleId]) {
-/******/ 			return __webpack_module_cache__[moduleId].exports;
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
