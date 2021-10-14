@@ -38,9 +38,11 @@ module.exports = {
 		extensions: ['.tsx', '.ts', '.js'],
 	},
 	devServer: {
-		contentBase: path.join(__dirname, '/public'),
-		// match the output path
-		publicPath: '/',
+		static: {
+			directory: path.join(__dirname, '/public'),
+			// match the output path
+			publicPath: '/',
+		},
 		// match the output `publicPath`
 		historyApiFallback: true,
 	},

@@ -60,6 +60,6 @@
     "node-hid": "^2.1.1"
   },
   "peerDependencies": {
-    "@julusian/jpeg-turbo": "^1.0.1"
+    "@julusian/jpeg-turbo": "^1.1.1"
   }
 }
