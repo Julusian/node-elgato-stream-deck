@@ -166,7 +166,7 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 				)
 			}
 		}
-		await ps
+		await Promise.all(ps)
 	}
 
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
