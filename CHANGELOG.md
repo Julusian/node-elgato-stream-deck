@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.2](https://github.com/julusian/node-elgato-stream-deck/compare/v5.1.1...v5.1.2) (2021-12-02)
+
+
+### Bug Fixes
+
+* fillPanelBuffer not waiting for write [#28](https://github.com/julusian/node-elgato-stream-deck/issues/28) ([020a047](https://github.com/julusian/node-elgato-stream-deck/commit/020a047dceb8816f5b884d1aef3de07482c5d8c3))
+
+
+
+
+
 ## [5.1.1](https://github.com/julusian/node-elgato-stream-deck/compare/v5.1.0...v5.1.1) (2021-07-19)
 
 
