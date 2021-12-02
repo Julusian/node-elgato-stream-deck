@@ -9,7 +9,7 @@ export class StreamDeckWeb extends StreamDeckProxy {
 		super(device)
 	}
 
-	public fillKeyCanvas(keyIndex: KeyIndex, canvas: HTMLCanvasElement): Promise<void> {
+	public async fillKeyCanvas(keyIndex: KeyIndex, canvas: HTMLCanvasElement): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
 		const ctx = canvas.getContext('2d')
@@ -21,7 +21,7 @@ export class StreamDeckWeb extends StreamDeckProxy {
 		return this.device.fillKeyBuffer(keyIndex, Buffer.from(data.data), { format: 'rgba' })
 	}
 
-	public fillPanelCanvas(canvas: HTMLCanvasElement): Promise<void> {
+	public async fillPanelCanvas(canvas: HTMLCanvasElement): Promise<void> {
 		const ctx = canvas.getContext('2d')
 		if (!ctx) {
 			throw new Error('Failed to get canvas context')

@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/unbound-method */
+
 import { readFixtureJSON } from './helpers'
 import { DEVICE_MODELS, StreamDeck } from '../'
 import { DeviceModelId, OpenStreamDeckOptions } from '../models'
@@ -34,19 +39,19 @@ function runForDevice(path: string, model: DeviceModelId): void {
 	})
 
 	test('checkValidKeyIndex', async () => {
-		await expect(() => streamDeck.clearKey(-1)).rejects.toThrow()
-		await expect(() => streamDeck.clearKey(15)).rejects.toThrow()
+		await expect(async () => streamDeck.clearKey(-1)).rejects.toThrow()
+		await expect(async () => streamDeck.clearKey(15)).rejects.toThrow()
 	})
 
 	test('clearKey', async () => {
-		const mockedFn = ((streamDeck as any).fillImageRange = jest.fn(() => Promise.resolve()))
+		const mockedFn = ((streamDeck as any).fillImageRange = jest.fn(async () => Promise.resolve()))
 		await streamDeck.clearKey(2)
 		expect(mockedFn).toHaveBeenCalledTimes(1)
 		expect(mockedFn).toHaveBeenNthCalledWith(1, 2, expect.anything(), expect.anything())
 	})
 
 	test('clearPanel', async () => {
-		const mockedFn = ((streamDeck as any).fillImageRange = jest.fn(() => Promise.resolve()))
+		const mockedFn = ((streamDeck as any).fillImageRange = jest.fn(async () => Promise.resolve()))
 		await streamDeck.clearPanel()
 
 		const keyCount = streamDeck.NUM_KEYS
@@ -59,7 +64,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 	test('fillKeyBuffer throws on undersized buffers', async () => {
 		const smallBuffer = Buffer.alloc(1)
 
-		await expect(() => streamDeck.fillKeyBuffer(0, smallBuffer)).rejects.toThrow('Expected image buffer')
+		await expect(async () => streamDeck.fillKeyBuffer(0, smallBuffer)).rejects.toThrow('Expected image buffer')
 	})
 
 	test('forwards error events from the device', () => {
@@ -87,8 +92,8 @@ function runForDevice(path: string, model: DeviceModelId): void {
 			// prettier-ignore
 			expect(device.sendFeatureReport).toHaveBeenNthCalledWith(2, Buffer.from([0x05, 0x55, 0xaa, 0xd1, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
 
-			await expect(() => streamDeck.setBrightness(101)).rejects.toThrow()
-			await expect(() => streamDeck.setBrightness(-1)).rejects.toThrow()
+			await expect(async () => streamDeck.setBrightness(101)).rejects.toThrow()
+			await expect(async () => streamDeck.setBrightness(-1)).rejects.toThrow()
 		})
 
 		test('resetToLogo', async () => {
@@ -139,8 +144,8 @@ function runForDevice(path: string, model: DeviceModelId): void {
 			expected[2] = 0x00 // 100%
 			expect(device.sendFeatureReport).toHaveBeenNthCalledWith(2, expected)
 
-			await expect(() => streamDeck.setBrightness(101)).rejects.toThrow()
-			await expect(() => streamDeck.setBrightness(-1)).rejects.toThrow()
+			await expect(async () => streamDeck.setBrightness(101)).rejects.toThrow()
+			await expect(async () => streamDeck.setBrightness(-1)).rejects.toThrow()
 		})
 
 		test('resetToLogo-jpeg', async () => {
@@ -230,7 +235,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.ICON_BYTES)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
-		await expect(() => streamDeck.fillPanelBuffer(buffer, { format: 'abc' as any })).rejects.toThrow()
+		await expect(async () => streamDeck.fillPanelBuffer(buffer, { format: 'abc' as any })).rejects.toThrow()
 
 		expect(fillKeyBufferMock).toHaveBeenCalledTimes(0)
 	})
@@ -238,7 +243,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 	test('fillPanelBuffer bad buffer', async () => {
 		const buffer = Buffer.alloc(100)
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
-		await expect(() => streamDeck.fillPanelBuffer(buffer)).rejects.toThrow()
+		await expect(async () => streamDeck.fillPanelBuffer(buffer)).rejects.toThrow()
 
 		expect(fillKeyBufferMock).toHaveBeenCalledTimes(0)
 	})
@@ -279,8 +284,8 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		const buffer = Buffer.alloc(streamDeck.ICON_BYTES)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
-		await expect(() => streamDeck.fillKeyBuffer(-1, buffer)).rejects.toThrow()
-		await expect(() => streamDeck.fillKeyBuffer(streamDeck.NUM_KEYS + 1, buffer)).rejects.toThrow()
+		await expect(async () => streamDeck.fillKeyBuffer(-1, buffer)).rejects.toThrow()
+		await expect(async () => streamDeck.fillKeyBuffer(streamDeck.NUM_KEYS + 1, buffer)).rejects.toThrow()
 
 		expect(fillKeyBufferMock).toHaveBeenCalledTimes(0)
 	})
@@ -289,7 +294,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		const buffer = Buffer.alloc(streamDeck.ICON_BYTES)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
-		await expect(() => streamDeck.fillKeyBuffer(1, buffer, { format: 'abc' as any })).rejects.toThrow()
+		await expect(async () => streamDeck.fillKeyBuffer(1, buffer, { format: 'abc' as any })).rejects.toThrow()
 
 		expect(fillKeyBufferMock).toHaveBeenCalledTimes(0)
 	})
@@ -298,7 +303,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		const buffer = Buffer.alloc(100)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
-		await expect(() => streamDeck.fillKeyBuffer(2, buffer)).rejects.toThrow()
+		await expect(async () => streamDeck.fillKeyBuffer(2, buffer)).rejects.toThrow()
 
 		expect(fillKeyBufferMock).toHaveBeenCalledTimes(0)
 	})
@@ -320,15 +325,15 @@ function runForDevice(path: string, model: DeviceModelId): void {
 	})
 
 	test('fillKeyColor bad rgb', async () => {
-		await expect(() => streamDeck.fillKeyColor(0, 256, 0, 0)).rejects.toThrow()
-		await expect(() => streamDeck.fillKeyColor(0, 0, 256, 0)).rejects.toThrow()
-		await expect(() => streamDeck.fillKeyColor(0, 0, 0, 256)).rejects.toThrow()
-		await expect(() => streamDeck.fillKeyColor(0, -1, 0, 0)).rejects.toThrow()
+		await expect(async () => streamDeck.fillKeyColor(0, 256, 0, 0)).rejects.toThrow()
+		await expect(async () => streamDeck.fillKeyColor(0, 0, 256, 0)).rejects.toThrow()
+		await expect(async () => streamDeck.fillKeyColor(0, 0, 0, 256)).rejects.toThrow()
+		await expect(async () => streamDeck.fillKeyColor(0, -1, 0, 0)).rejects.toThrow()
 	})
 
 	test('fillKeyColor bad key', async () => {
-		await expect(() => streamDeck.fillKeyColor(-1, 0, 0, 0)).rejects.toThrow()
-		await expect(() => streamDeck.fillKeyColor(streamDeck.NUM_KEYS + 1, 0, 256, 0)).rejects.toThrow()
+		await expect(async () => streamDeck.fillKeyColor(-1, 0, 0, 0)).rejects.toThrow()
+		await expect(async () => streamDeck.fillKeyColor(streamDeck.NUM_KEYS + 1, 0, 256, 0)).rejects.toThrow()
 	})
 }
 
@@ -561,8 +566,8 @@ describe('StreamDeck XL', () => {
 		expected[2] = 0x00 // 100%
 		expect(device.sendFeatureReport).toHaveBeenNthCalledWith(2, expected)
 
-		await expect(() => streamDeck.setBrightness(101)).rejects.toThrow()
-		await expect(() => streamDeck.setBrightness(-1)).rejects.toThrow()
+		await expect(async () => streamDeck.setBrightness(101)).rejects.toThrow()
+		await expect(async () => streamDeck.setBrightness(-1)).rejects.toThrow()
 	})
 
 	test('resetToLogo', async () => {

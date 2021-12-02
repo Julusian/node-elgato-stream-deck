@@ -62,7 +62,7 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 		this.deviceProperties = properties
 		this.device = device
 
-		this.keyState = new Array(this.NUM_KEYS).fill(false)
+		this.keyState = new Array<boolean>(this.NUM_KEYS).fill(false)
 
 		this.device.dataKeyOffset = properties.KEY_DATA_OFFSET
 		this.device.on('input', (data) => {
@@ -92,7 +92,7 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 		}
 	}
 
-	public close(): Promise<void> {
+	public async close(): Promise<void> {
 		return this.device.close()
 	}
 
@@ -304,7 +304,7 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 				break
 			default: {
 				const fmt: never = format
-				throw new TypeError(`Expected a known color format not "${fmt}"`)
+				throw new TypeError(`Expected a known color format not "${fmt as string}"`)
 			}
 		}
 	}

@@ -13,7 +13,7 @@ export class RapidFillDemo implements Demo {
 
 	public async start(device: StreamDeck): Promise<void> {
 		if (!this.interval) {
-			this.interval = window.setInterval(async () => {
+			const doThing = async () => {
 				if (!this.running) {
 					const r = getRandomIntInclusive(0, 255)
 					const g = getRandomIntInclusive(0, 255)
@@ -29,6 +29,9 @@ export class RapidFillDemo implements Demo {
 					await this.running
 					this.running = undefined
 				}
+			}
+			this.interval = window.setInterval(() => {
+				doThing().catch((e) => console.log(e))
 			}, 1000 / 5)
 		}
 	}

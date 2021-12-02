@@ -6,7 +6,7 @@ import { DummyHID } from '../__mocks__/hid'
 jest.mock('node-hid')
 import { devices, HID } from 'node-hid'
 // Forcing path to be string, as there are multiple constructor options, we require the string one
-mocked(HID).mockImplementation((path: any) => new DummyHID(path))
+mocked(HID).mockImplementation((path: string | number) => new DummyHID(path as string))
 
 // Must be required after we register a mock for `node-hid`.
 import { getStreamDeckInfo, listStreamDecks, openStreamDeck } from '../'

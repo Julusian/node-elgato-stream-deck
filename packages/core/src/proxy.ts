@@ -40,34 +40,34 @@ export class StreamDeckProxy implements StreamDeck {
 		this.device.checkValidKeyIndex(keyIndex)
 	}
 
-	public close(): Promise<void> {
+	public async close(): Promise<void> {
 		return this.device.close()
 	}
-	public fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
+	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		return this.device.fillKeyColor(keyIndex, r, g, b)
 	}
-	public fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
+	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
 		return this.device.fillKeyBuffer(keyIndex, imageBuffer, options)
 	}
-	public fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void> {
+	public async fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void> {
 		return this.device.fillPanelBuffer(imageBuffer, options)
 	}
-	public clearKey(keyIndex: KeyIndex): Promise<void> {
+	public async clearKey(keyIndex: KeyIndex): Promise<void> {
 		return this.device.clearKey(keyIndex)
 	}
-	public clearPanel(): Promise<void> {
+	public async clearPanel(): Promise<void> {
 		return this.device.clearPanel()
 	}
-	public setBrightness(percentage: number): Promise<void> {
+	public async setBrightness(percentage: number): Promise<void> {
 		return this.device.setBrightness(percentage)
 	}
-	public resetToLogo(): Promise<void> {
+	public async resetToLogo(): Promise<void> {
 		return this.device.resetToLogo()
 	}
-	public getFirmwareVersion(): Promise<string> {
+	public async getFirmwareVersion(): Promise<string> {
 		return this.device.getFirmwareVersion()
 	}
-	public getSerialNumber(): Promise<string> {
+	public async getSerialNumber(): Promise<string> {
 		return this.device.getSerialNumber()
 	}
 

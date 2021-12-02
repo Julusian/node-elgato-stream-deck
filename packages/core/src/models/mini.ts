@@ -21,7 +21,7 @@ export class StreamDeckMini extends StreamDeckBase {
 		return keyIndex
 	}
 
-	protected convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
+	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
 			sourceOptions,

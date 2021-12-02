@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { mocked } from 'ts-jest/utils'
 import { readFixtureJSON } from './helpers'
 
@@ -25,8 +26,8 @@ describe('jpeg-encoding', () => {
 
 		// Mock jpeg-js so we can see if it got used instead of jpeg-turbo
 		jest.doMock('jpeg-js')
-		const jpegJS = require('jpeg-js')
-		mocked(jpegJS.encode).mockImplementation(() => ({ data: Buffer.alloc(100) }))
+		const jpegJS: typeof import('jpeg-js') = require('jpeg-js')
+		mocked(jpegJS.encode).mockImplementation((src) => ({ ...src, data: Buffer.alloc(100) }))
 
 		const { encodeJPEG } = require('../jpeg') as typeof import('../jpeg')
 

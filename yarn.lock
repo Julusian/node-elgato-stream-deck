@@ -1715,23 +1715,23 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@sofie-automation/code-standard-preset@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@sofie-automation/code-standard-preset/-/code-standard-preset-0.5.0.tgz#ab86502bae5e108f057a14b7280dadd3a2a67968"
-  integrity sha512-+DAQupGIgJnD9Zpnc+9lwucH+k0DFPpi0GQnEOIJ37Tt+ySf6HsEMWlHf5A64zgivtlL9mMP9aQ/XBgPjkAfQg==
+"@sofie-automation/code-standard-preset@0.5.1-nightly-feat-rules-updates-type-checking-20211202-101923-a57e9f6.0":
+  version "0.5.1-nightly-feat-rules-updates-type-checking-20211202-101923-a57e9f6.0"
+  resolved "https://registry.yarnpkg.com/@sofie-automation/code-standard-preset/-/code-standard-preset-0.5.1-nightly-feat-rules-updates-type-checking-20211202-101923-a57e9f6.0.tgz#a7ab4f6e65db74198d51a5caa39b3381ac8458fd"
+  integrity sha512-41F8hYXRwwrCo+ntx8kSLZJM3VATyOq4RNMnYO8bRWtjqfAdMifpljSPjDly+QoRIhvi9QLyFOtXCWc9N4q0Hg==
   dependencies:
-    "@typescript-eslint/eslint-plugin" "^5.2.0"
-    "@typescript-eslint/parser" "^5.2.0"
-    eslint "^8.1.0"
+    "@typescript-eslint/eslint-plugin" "^5.5.0"
+    "@typescript-eslint/parser" "^5.5.0"
+    eslint "^8.3.0"
     eslint-config-prettier "^8.3.0"
-    eslint-plugin-jest "^25.2.2"
+    eslint-plugin-jest "^25.3.0"
     eslint-plugin-node "^11.1.0"
     eslint-plugin-prettier "^4.0.0"
     husky "^7.0.4"
     license-checker "^25.0.1"
     lint-staged "^11.2.6"
-    meow "^10.1.1"
-    prettier "^2.4.1"
+    meow "^10.1.2"
+    prettier "^2.5.0"
     read-pkg-up "^9.0.0"
     shelljs "^0.8.4"
 
@@ -1926,7 +1926,7 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@typescript-eslint/eslint-plugin@^5.2.0":
+"@typescript-eslint/eslint-plugin@^5.5.0":
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-5.5.0.tgz#12d5f47f127af089b985f3a205c0e34a812f8fce"
   integrity sha512-4bV6fulqbuaO9UMXU0Ia0o6z6if+kmMRW8rMRyfqXj/eGrZZRGedS4n0adeGNnjr8LKAM495hrQ7Tea52UWmQA==
@@ -1952,7 +1952,7 @@
     eslint-scope "^5.1.1"
     eslint-utils "^3.0.0"
 
-"@typescript-eslint/parser@^5.2.0":
+"@typescript-eslint/parser@^5.5.0":
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-5.5.0.tgz#a38070e225330b771074daa659118238793f7fcd"
   integrity sha512-JsXBU+kgQOAgzUn2jPrLA+Rd0Y1dswOlX3hp8MuRO1hQDs6xgHtbCXEiAu7bz5hyVURxbXcA2draasMbNqrhmg==
@@ -3858,7 +3858,7 @@ eslint-plugin-es@^3.0.0:
     eslint-utils "^2.0.0"
     regexpp "^3.0.0"
 
-eslint-plugin-jest@^25.2.2:
+eslint-plugin-jest@^25.3.0:
   version "25.3.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-25.3.0.tgz#6c04bbf13624a75684a05391a825b58e2e291950"
   integrity sha512-79WQtuBsTN1S8Y9+7euBYwxIOia/k7ykkl9OCBHL3xuww5ecursHy/D8GCIlvzHVWv85gOkS5Kv6Sh7RxOgK1Q==
@@ -3929,7 +3929,7 @@ eslint-visitor-keys@^3.0.0, eslint-visitor-keys@^3.1.0:
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-3.1.0.tgz#eee4acea891814cda67a7d8812d9647dd0179af2"
   integrity sha512-yWJFpu4DtjsWKkt5GeNBBuZMlNcYVs6vRCLoCVEJrTjaSB6LC98gFipNK/erM2Heg/E8mIK+hXG/pJMLK+eRZA==
 
-eslint@^8.1.0:
+eslint@^8.3.0:
   version "8.3.0"
   resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.3.0.tgz#a3c2409507403c1c7f6c42926111d6cbefbc3e85"
   integrity sha512-aIay56Ph6RxOTC7xyr59Kt3ewX185SaGnAr8eWukoPLeriCrvGjvAubxuvaXOfsxhtwV5g0uBOsyhAom4qJdww==
@@ -6320,7 +6320,7 @@ memory-stream@0:
   dependencies:
     readable-stream "~1.0.26-2"
 
-meow@^10.1.1:
+meow@^10.1.2:
   version "10.1.2"
   resolved "https://registry.yarnpkg.com/meow/-/meow-10.1.2.tgz#62951cb69afa69594142c8250806bc30a3912e4d"
   integrity sha512-zbuAlN+V/sXlbGchNS9WTWjUzeamwMt/BApKCJi7B0QyZstZaMx0n4Unll/fg0njGtMdC9UP5SAscvOCLYdM+Q==
@@ -7499,7 +7499,7 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@^2.4.1:
+prettier@^2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.5.0.tgz#a6370e2d4594e093270419d9cc47f7670488f893"
   integrity sha512-FM/zAKgWTxj40rH03VxzIPdXmj39SwSjwG0heUcNFwI+EMZJnY93yAiKXM3dObIKAM5TA88werc8T/EwhB45eg==

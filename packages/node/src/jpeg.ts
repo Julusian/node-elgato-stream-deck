@@ -3,6 +3,7 @@ import * as jpegJS from 'jpeg-js'
 let jpegTurbo: typeof import('@julusian/jpeg-turbo') | undefined
 try {
 	// eslint-disable-next-line node/no-extraneous-require
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	jpegTurbo = require('@julusian/jpeg-turbo')
 } catch (e) {
 	// This is expected and can be ignored
@@ -22,7 +23,7 @@ const DEFAULT_QUALITY = 95
  * @param width Width of the image
  * @param height Hieght of the image
  */
-export function encodeJPEG(
+export async function encodeJPEG(
 	buffer: Buffer,
 	width: number,
 	height: number,

@@ -74,7 +74,8 @@ export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeck
 
 	const options: Required<OpenStreamDeckOptions> = {
 		useOriginalKeyOrder: false,
-		encodeJPEG: (buffer: Buffer, width: number, height: number) => encodeJPEG(buffer, width, height, jpegOptions),
+		encodeJPEG: async (buffer: Buffer, width: number, height: number) =>
+			encodeJPEG(buffer, width, height, jpegOptions),
 		...userOptions,
 	}
 

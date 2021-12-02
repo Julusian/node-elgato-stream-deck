@@ -8,7 +8,7 @@ import { ChaseDemo } from './demo/chase'
 function appendLog(str: string) {
 	const logElm = document.getElementById('log')
 	if (logElm) {
-		logElm.textContent = `${str}\n${logElm.textContent}`
+		logElm.textContent = `${str}\n${logElm.textContent ?? ''}`
 	}
 }
 
@@ -68,7 +68,7 @@ async function openDevice(device: StreamDeckWeb): Promise<void> {
 }
 
 if (consentButton) {
-	window.addEventListener('load', async () => {
+	const doLoad = async () => {
 		// attempt to open a previously selected device.
 		const devices = await getStreamDecks()
 		if (devices.length > 0) {
@@ -76,6 +76,9 @@ if (consentButton) {
 			openDevice(device).catch(console.error)
 		}
 		console.log(devices)
+	}
+	window.addEventListener('load', () => {
+		doLoad().catch((e) => console.error(e))
 	})
 
 	const brightnessRange = document.getElementById('brightness-range') as HTMLInputElement | undefined
@@ -89,11 +92,13 @@ if (consentButton) {
 	}
 
 	if (demoSelect) {
-		demoSelect.addEventListener('input', () => demoChange().catch(console.error))
+		demoSelect.addEventListener('input', () => {
+			demoChange().catch(console.error)
+		})
 		demoChange().catch(console.error)
 	}
 
-	consentButton.addEventListener('click', async () => {
+	const consentClick = async () => {
 		if (device) {
 			appendLog('Closing device')
 			currentDemo.stop(device).catch(console.error)
@@ -109,11 +114,14 @@ if (consentButton) {
 				return
 			}
 		} catch (error) {
-			appendLog(`No device access granted: ${error}`)
+			appendLog(`No device access granted: ${error as string}`)
 			return
 		}
 
 		openDevice(device).catch(console.error)
+	}
+	consentButton.addEventListener('click', () => {
+		consentClick().catch((e) => console.error(e))
 	})
 
 	appendLog('Page loaded')

@@ -20,7 +20,7 @@ export class ChaseDemo implements Demo {
 				ctx.clearRect(0, 0, canvas.width, canvas.height)
 				// Start with a font that's 80% as high as the button. maxWidth
 				// is used on the stroke and fill calls below to scale down.
-				ctx.font = canvas.height * 0.8 + 'px "Arial"'
+				ctx.font = `${canvas.height * 0.8}px "Arial"`
 				ctx.strokeStyle = 'blue'
 				ctx.lineWidth = 1
 				ctx.strokeText(n.toString(), 8, 60, canvas.width * 0.8)
@@ -48,12 +48,15 @@ export class ChaseDemo implements Demo {
 		await this.drawButtons(device, canvas, this.counter)
 
 		if (!this.interval) {
-			this.interval = window.setInterval(async () => {
+			const doThing = async () => {
 				if (!this.running) {
 					this.running = this.drawButtons(device, canvas, ++this.counter)
 					await this.running
 					this.running = undefined
 				}
+			}
+			this.interval = window.setInterval(() => {
+				doThing().catch((e) => console.error(e))
 			}, 1000 / 5)
 		}
 	}

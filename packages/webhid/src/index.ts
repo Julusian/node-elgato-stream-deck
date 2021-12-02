@@ -22,7 +22,7 @@ export async function requestStreamDecks(options?: OpenStreamDeckOptions): Promi
 			],
 		})
 		.then(async (browserDevices) => {
-			return Promise.all(browserDevices.map((dev) => openDevice(dev, options)))
+			return Promise.all(browserDevices.map(async (dev) => openDevice(dev, options)))
 		})
 }
 
@@ -34,7 +34,7 @@ export async function requestStreamDecks(options?: OpenStreamDeckOptions): Promi
 export async function getStreamDecks(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb[]> {
 	// TODO - error handling
 	return navigator.hid.getDevices().then(async (browserDevices) => {
-		return Promise.all(browserDevices.map((dev) => openDevice(dev, options)))
+		return Promise.all(browserDevices.map(async (dev) => openDevice(dev, options)))
 	})
 }
 

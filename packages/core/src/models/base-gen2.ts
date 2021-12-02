@@ -92,7 +92,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		return 1024
 	}
 
-	protected convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
+	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
 			sourceOptions,

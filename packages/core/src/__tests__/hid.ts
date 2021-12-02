@@ -10,16 +10,16 @@ export class DummyHID extends EventEmitter implements HIDDevice {
 		expect(typeof path).toEqual('string')
 	}
 
-	public sendFeatureReport(_data: Buffer): Promise<void> {
+	public async sendFeatureReport(_data: Buffer): Promise<void> {
 		throw new Error('Method not implemented.')
 	}
-	public getFeatureReport(_reportId: number, _reportLength: number): Promise<Buffer> {
+	public async getFeatureReport(_reportId: number, _reportLength: number): Promise<Buffer> {
 		throw new Error('Method not implemented.')
 	}
-	public sendReports(_data: Buffer[]): Promise<void> {
+	public async sendReports(_data: Buffer[]): Promise<void> {
 		throw new Error('Method not implemented.')
 	}
-	public close(): Promise<void> {
+	public async close(): Promise<void> {
 		throw new Error('Not implemented')
 	}
 }
