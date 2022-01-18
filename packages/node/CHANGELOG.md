@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.2.0-alpha.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.1.2...v5.2.0-alpha.0) (2022-01-18)
+
+
+### Features
+
+* add method to get info about a hid device, if it is a streamdeck ([1791e37](https://github.com/julusian/node-elgato-stream-deck/commit/1791e370e830c0fff7e3169e30cb0871675fdf86))
+
+
+
+
+
 ## [5.1.2](https://github.com/julusian/node-elgato-stream-deck/compare/v5.1.1...v5.1.2) (2021-12-02)
 
 **Note:** Version bump only for package @elgato-stream-deck/node

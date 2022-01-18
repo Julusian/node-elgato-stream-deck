@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.2.0-alpha.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.1.2...v5.2.0-alpha.0) (2022-01-18)
+
+
+### Features
+
+* add PRODUCT_NAME property ([fbe3d14](https://github.com/julusian/node-elgato-stream-deck/commit/fbe3d1476e5ce2c472cc738e0694c968a558e102))
+
+
+
+
+
 ## [5.1.2](https://github.com/julusian/node-elgato-stream-deck/compare/v5.1.1...v5.1.2) (2021-12-02)
 
 
