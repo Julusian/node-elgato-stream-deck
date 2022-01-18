@@ -35,6 +35,9 @@ export class StreamDeckProxy implements StreamDeck {
 	public get MODEL(): DeviceModelId {
 		return this.device.MODEL
 	}
+	public get PRODUCT_NAME(): string {
+		return this.device.PRODUCT_NAME
+	}
 
 	public checkValidKeyIndex(keyIndex: KeyIndex): void {
 		this.device.checkValidKeyIndex(keyIndex)

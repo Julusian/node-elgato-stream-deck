@@ -29,6 +29,8 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 
 	/** The model of this device */
 	readonly MODEL: DeviceModelId
+	/** The name of the product/model */
+	readonly PRODUCT_NAME: string
 
 	/**
 	 * Checks if a keyIndex is valid. Throws an error on failure

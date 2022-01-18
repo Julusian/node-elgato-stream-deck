@@ -5,6 +5,7 @@ import { DeviceModelId, KeyIndex } from './id'
 
 const miniProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.MINI,
+	PRODUCT_NAME: 'Streamdeck Mini',
 	COLUMNS: 3,
 	ROWS: 2,
 	ICON_SIZE: 80,

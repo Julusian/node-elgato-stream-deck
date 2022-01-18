@@ -12,14 +12,15 @@ export interface OpenStreamDeckOptions {
 	encodeJPEG?: EncodeJPEGHelper
 }
 
-export interface StreamDeckProperties {
+export type StreamDeckProperties = Readonly<{
 	MODEL: DeviceModelId
+	PRODUCT_NAME: string
 	COLUMNS: number
 	ROWS: number
 	ICON_SIZE: number
 	KEY_DIRECTION: 'ltr' | 'rtl'
 	KEY_DATA_OFFSET: number
-}
+}>
 
 export interface InternalFillImageOptions extends FillImageOptions {
 	offset: number
@@ -49,6 +50,9 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 
 	get MODEL(): DeviceModelId {
 		return this.deviceProperties.MODEL
+	}
+	get PRODUCT_NAME(): string {
+		return this.deviceProperties.PRODUCT_NAME
 	}
 
 	protected readonly device: HIDDevice

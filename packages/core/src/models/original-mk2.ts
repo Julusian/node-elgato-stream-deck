@@ -5,6 +5,7 @@ import { DeviceModelId } from './id'
 
 const origMK2Properties: StreamDeckProperties = {
 	MODEL: DeviceModelId.ORIGINALMK2,
+	PRODUCT_NAME: 'Streamdeck MK2',
 	COLUMNS: 5,
 	ROWS: 3,
 	ICON_SIZE: 72,
