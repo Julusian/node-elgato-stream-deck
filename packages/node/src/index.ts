@@ -23,17 +23,27 @@ HID.setDriverType('libusb')
 export function listStreamDecks(): StreamDeckDeviceInfo[] {
 	const devices: StreamDeckDeviceInfo[] = []
 	for (const dev of HID.devices()) {
-		const model = DEVICE_MODELS.find((m) => m.productId === dev.productId)
-
-		if (model && dev.vendorId === VENDOR_ID && dev.path) {
-			devices.push({
-				model: model.id,
-				path: dev.path,
-				serialNumber: dev.serialNumber,
-			})
-		}
+		const info = getStreamDeckDeviceInfo(dev)
+		if (info) devices.push(info)
 	}
 	return devices
+}
+
+/**
+ * If the provided device is a streamdeck, get the info about it
+ */
+export function getStreamDeckDeviceInfo(dev: HID.Device): StreamDeckDeviceInfo | null {
+	const model = DEVICE_MODELS.find((m) => m.productId === dev.productId)
+
+	if (model && dev.vendorId === VENDOR_ID && dev.path) {
+		return {
+			model: model.id,
+			path: dev.path,
+			serialNumber: dev.serialNumber,
+		}
+	} else {
+		return null
+	}
 }
 
 /**
