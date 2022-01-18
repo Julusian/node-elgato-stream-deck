@@ -9,7 +9,6 @@
     "build": "yarn lerna exec yarn build",
     "test": "yarn lint && yarn unit",
     "unit": "jest",
-    "send-coverage": "codecov",
     "lint:raw": "eslint --ext .ts --ext .js --ext .tsx --ext .jsx --ignore-pattern dist",
     "lint": "yarn lint:raw packages",
     "lint-fix": "yarn lint --fix",

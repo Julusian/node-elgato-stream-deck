@@ -73,10 +73,12 @@ jobs:
       - run: yarn unit
         env:
           CI: true
-      - run: yarn send-coverage
+      - name: Send coverage
         if: matrix.node-version == '14.x'
-        env:
-          CI: true
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+          # name: codecov-umbrella
 
   publish-demo:
     name: Publish demo to Github Pages
