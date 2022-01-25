@@ -2089,6 +2089,9 @@ var userAgentRules = [
     ['opera-mini', /Opera Mini.*Version\/([0-9\.]+)/],
     ['opera', /Opera\/([0-9\.]+)(?:\s|$)/],
     ['opera', /OPR\/([0-9\.]+)(:?\s|$)/],
+    ['pie', /^Microsoft Pocket Internet Explorer\/(\d+\.\d+)$/],
+    ['pie', /^Mozilla\/\d\.\d+\s\(compatible;\s(?:MSP?IE|MSInternet Explorer) (\d+\.\d+);.*Windows CE.*\)$/],
+    ['netfront', /^Mozilla\/\d\.\d+.*NetFront\/(\d.\d)/],
     ['ie', /Trident\/7\.0.*rv\:([0-9\.]+).*\).*Gecko$/],
     ['ie', /MSIE\s([0-9\.]+);.*Trident\/[4-7].0/],
     ['ie', /MSIE\s(7\.0)/],
@@ -2121,6 +2124,7 @@ var operatingSystemRules = [
     ['Windows 8.1', /(Windows NT 6.3)/],
     ['Windows 10', /(Windows NT 10.0)/],
     ['Windows ME', /Windows ME/],
+    ['Windows CE', /Windows CE|WinCE|Microsoft Pocket Internet Explorer/],
     ['Open BSD', /OpenBSD/],
     ['Sun OS', /SunOS/],
     ['Chrome OS', /CrOS/],
@@ -4539,7 +4543,7 @@ class ChaseDemo {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 // Start with a font that's 80% as high as the button. maxWidth
                 // is used on the stroke and fill calls below to scale down.
-                ctx.font = canvas.height * 0.8 + 'px "Arial"';
+                ctx.font = `${canvas.height * 0.8}px "Arial"`;
                 ctx.strokeStyle = 'blue';
                 ctx.lineWidth = 1;
                 ctx.strokeText(n.toString(), 8, 60, canvas.width * 0.8);
@@ -4560,12 +4564,15 @@ class ChaseDemo {
         canvas.height = device.ICON_SIZE;
         await this.drawButtons(device, canvas, this.counter);
         if (!this.interval) {
-            this.interval = window.setInterval(async () => {
+            const doThing = async () => {
                 if (!this.running) {
                     this.running = this.drawButtons(device, canvas, ++this.counter);
                     await this.running;
                     this.running = undefined;
                 }
+            };
+            this.interval = window.setInterval(() => {
+                doThing().catch((e) => console.error(e));
             }, 1000 / 5);
         }
     }
@@ -4632,7 +4639,7 @@ class DomImageDemo {
             const runTick = () => {
                 if (this.element && this.run) {
                     const elm = this.element;
-                    html_to_image_1.toCanvas(elm)
+                    (0, html_to_image_1.toCanvas)(elm)
                         .then(async (canvas) => {
                         this.running = device.fillPanelCanvas(canvas);
                         await this.running;
@@ -4719,7 +4726,7 @@ function getRandomIntInclusive(min, max) {
 class RapidFillDemo {
     async start(device) {
         if (!this.interval) {
-            this.interval = window.setInterval(async () => {
+            const doThing = async () => {
                 if (!this.running) {
                     const r = getRandomIntInclusive(0, 255);
                     const g = getRandomIntInclusive(0, 255);
@@ -4733,6 +4740,9 @@ class RapidFillDemo {
                     await this.running;
                     this.running = undefined;
                 }
+            };
+            this.interval = window.setInterval(() => {
+                doThing().catch((e) => console.log(e));
             }, 1000 / 5);
         }
     }
@@ -4876,8 +4886,8 @@ class StreamDeckGen2Base extends base_1.StreamDeckBase {
     getFillImagePacketLength() {
         return 1024;
     }
-    convertFillImage(sourceBuffer, sourceOptions) {
-        const byteBuffer = util_1.imageToByteArray(sourceBuffer, sourceOptions, 0, this.transformCoordinates.bind(this), 'rgba', this.ICON_SIZE);
+    async convertFillImage(sourceBuffer, sourceOptions) {
+        const byteBuffer = (0, util_1.imageToByteArray)(sourceBuffer, sourceOptions, 0, this.transformCoordinates.bind(this), 'rgba', this.ICON_SIZE);
         return this.encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE);
     }
     transformCoordinates(x, y) {
@@ -4946,12 +4956,15 @@ class StreamDeckBase extends EventEmitter {
     get MODEL() {
         return this.deviceProperties.MODEL;
     }
+    get PRODUCT_NAME() {
+        return this.deviceProperties.PRODUCT_NAME;
+    }
     checkValidKeyIndex(keyIndex) {
         if (keyIndex < 0 || keyIndex >= this.NUM_KEYS) {
             throw new TypeError(`Expected a valid keyIndex 0 - ${this.NUM_KEYS - 1}`);
         }
     }
-    close() {
+    async close() {
         return this.device.close();
     }
     async fillKeyColor(keyIndex, r, g, b) {
@@ -5012,7 +5025,7 @@ class StreamDeckBase extends EventEmitter {
                 }));
             }
         }
-        await ps;
+        await Promise.all(ps);
     }
     async clearKey(keyIndex) {
         this.checkValidKeyIndex(keyIndex);
@@ -5187,6 +5200,7 @@ const base_1 = __webpack_require__(576);
 const id_1 = __webpack_require__(766);
 const miniProperties = {
     MODEL: id_1.DeviceModelId.MINI,
+    PRODUCT_NAME: 'Streamdeck Mini',
     COLUMNS: 3,
     ROWS: 2,
     ICON_SIZE: 80,
@@ -5200,9 +5214,9 @@ class StreamDeckMini extends base_1.StreamDeckBase {
     transformKeyIndex(keyIndex) {
         return keyIndex;
     }
-    convertFillImage(sourceBuffer, sourceOptions) {
-        const byteBuffer = util_1.imageToByteArray(sourceBuffer, sourceOptions, util_1.BMP_HEADER_LENGTH, this.rotateCoordinates.bind(this), 'bgr', this.ICON_SIZE);
-        util_1.writeBMPHeader(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 2835);
+    async convertFillImage(sourceBuffer, sourceOptions) {
+        const byteBuffer = (0, util_1.imageToByteArray)(sourceBuffer, sourceOptions, util_1.BMP_HEADER_LENGTH, this.rotateCoordinates.bind(this), 'bgr', this.ICON_SIZE);
+        (0, util_1.writeBMPHeader)(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 2835);
         return Promise.resolve(byteBuffer);
     }
     getFillImagePacketLength() {
@@ -5228,6 +5242,7 @@ const base_gen2_1 = __webpack_require__(679);
 const id_1 = __webpack_require__(766);
 const origMK2Properties = {
     MODEL: id_1.DeviceModelId.ORIGINALMK2,
+    PRODUCT_NAME: 'Streamdeck MK2',
     COLUMNS: 5,
     ROWS: 3,
     ICON_SIZE: 72,
@@ -5257,6 +5272,7 @@ const base_1 = __webpack_require__(576);
 const id_1 = __webpack_require__(766);
 const originalProperties = {
     MODEL: id_1.DeviceModelId.ORIGINAL,
+    PRODUCT_NAME: 'Streamdeck',
     COLUMNS: 5,
     ROWS: 3,
     ICON_SIZE: 72,
@@ -5282,9 +5298,9 @@ class StreamDeckOriginal extends base_1.StreamDeckBase {
     getFillImagePacketLength() {
         return 8191;
     }
-    convertFillImage(sourceBuffer, sourceOptions) {
-        const byteBuffer = util_1.imageToByteArray(sourceBuffer, sourceOptions, util_1.BMP_HEADER_LENGTH, this.flipCoordinates.bind(this), 'bgr', this.ICON_SIZE);
-        util_1.writeBMPHeader(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 3780);
+    async convertFillImage(sourceBuffer, sourceOptions) {
+        const byteBuffer = (0, util_1.imageToByteArray)(sourceBuffer, sourceOptions, util_1.BMP_HEADER_LENGTH, this.flipCoordinates.bind(this), 'bgr', this.ICON_SIZE);
+        (0, util_1.writeBMPHeader)(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 3780);
         return Promise.resolve(byteBuffer);
     }
     generateFillImageWrites(keyIndex, byteBuffer) {
@@ -5320,6 +5336,7 @@ const base_gen2_1 = __webpack_require__(679);
 const id_1 = __webpack_require__(766);
 const origV2Properties = {
     MODEL: id_1.DeviceModelId.ORIGINALV2,
+    PRODUCT_NAME: 'Streamdeck',
     COLUMNS: 5,
     ROWS: 3,
     ICON_SIZE: 72,
@@ -5347,6 +5364,7 @@ const base_gen2_1 = __webpack_require__(679);
 const id_1 = __webpack_require__(766);
 const xlProperties = {
     MODEL: id_1.DeviceModelId.XL,
+    PRODUCT_NAME: 'Streamdeck XL',
     COLUMNS: 8,
     ROWS: 4,
     ICON_SIZE: 96,
@@ -5399,37 +5417,40 @@ class StreamDeckProxy {
     get MODEL() {
         return this.device.MODEL;
     }
+    get PRODUCT_NAME() {
+        return this.device.PRODUCT_NAME;
+    }
     checkValidKeyIndex(keyIndex) {
         this.device.checkValidKeyIndex(keyIndex);
     }
-    close() {
+    async close() {
         return this.device.close();
     }
-    fillKeyColor(keyIndex, r, g, b) {
+    async fillKeyColor(keyIndex, r, g, b) {
         return this.device.fillKeyColor(keyIndex, r, g, b);
     }
-    fillKeyBuffer(keyIndex, imageBuffer, options) {
+    async fillKeyBuffer(keyIndex, imageBuffer, options) {
         return this.device.fillKeyBuffer(keyIndex, imageBuffer, options);
     }
-    fillPanelBuffer(imageBuffer, options) {
+    async fillPanelBuffer(imageBuffer, options) {
         return this.device.fillPanelBuffer(imageBuffer, options);
     }
-    clearKey(keyIndex) {
+    async clearKey(keyIndex) {
         return this.device.clearKey(keyIndex);
     }
-    clearPanel() {
+    async clearPanel() {
         return this.device.clearPanel();
     }
-    setBrightness(percentage) {
+    async setBrightness(percentage) {
         return this.device.setBrightness(percentage);
     }
-    resetToLogo() {
+    async resetToLogo() {
         return this.device.resetToLogo();
     }
-    getFirmwareVersion() {
+    async getFirmwareVersion() {
         return this.device.getFirmwareVersion();
     }
-    getSerialNumber() {
+    async getSerialNumber() {
         return this.device.getSerialNumber();
     }
     /**
@@ -7696,17 +7717,17 @@ class WebHIDDevice extends events_1.EventEmitter {
             }
         });
     }
-    close() {
+    async close() {
         return this.device.close();
     }
-    sendFeatureReport(data) {
+    async sendFeatureReport(data) {
         return this.device.sendFeatureReport(data[0], new Uint8Array(data.slice(1)));
     }
     async getFeatureReport(reportId, _reportLength) {
         const view = await this.device.receiveFeatureReport(reportId);
         return Buffer.from(view.buffer);
     }
-    sendReports(buffers) {
+    async sendReports(buffers) {
         return this.reportQueue.add(async () => {
             for (const data of buffers) {
                 await this.device.sendReport(data[0], new Uint8Array(data.slice(1)));
@@ -7750,7 +7771,7 @@ async function requestStreamDecks(options) {
         ],
     })
         .then(async (browserDevices) => {
-        return Promise.all(browserDevices.map((dev) => openDevice(dev, options)));
+        return Promise.all(browserDevices.map(async (dev) => openDevice(dev, options)));
     });
 }
 exports.requestStreamDecks = requestStreamDecks;
@@ -7762,7 +7783,7 @@ exports.requestStreamDecks = requestStreamDecks;
 async function getStreamDecks(options) {
     // TODO - error handling
     return navigator.hid.getDevices().then(async (browserDevices) => {
-        return Promise.all(browserDevices.map((dev) => openDevice(dev, options)));
+        return Promise.all(browserDevices.map(async (dev) => openDevice(dev, options)));
     });
 }
 exports.getStreamDecks = getStreamDecks;
@@ -7777,7 +7798,7 @@ async function openDevice(browserDevice, userOptions) {
         throw new Error('Stream Deck is of unexpected type.');
     }
     if (model.id === core_1.DeviceModelId.ORIGINAL) {
-        const browser = detect_browser_1.detect();
+        const browser = (0, detect_browser_1.detect)();
         if (browser && browser.os === 'Linux') {
             // See https://github.com/node-hid/node-hid/issues/249 for more info.
             throw new Error('This is not supported on linux');
@@ -7859,7 +7880,7 @@ class StreamDeckWeb extends core_1.StreamDeckProxy {
     constructor(device) {
         super(device);
     }
-    fillKeyCanvas(keyIndex, canvas) {
+    async fillKeyCanvas(keyIndex, canvas) {
         this.checkValidKeyIndex(keyIndex);
         const ctx = canvas.getContext('2d');
         if (!ctx) {
@@ -7868,7 +7889,7 @@ class StreamDeckWeb extends core_1.StreamDeckProxy {
         const data = ctx.getImageData(0, 0, this.ICON_SIZE, this.ICON_SIZE);
         return this.device.fillKeyBuffer(keyIndex, Buffer.from(data.data), { format: 'rgba' });
     }
-    fillPanelCanvas(canvas) {
+    async fillPanelCanvas(canvas) {
         const ctx = canvas.getContext('2d');
         if (!ctx) {
             throw new Error('Failed to get canvas context');
@@ -7952,9 +7973,10 @@ const fill_when_pressed_1 = __webpack_require__(306);
 const rapid_fill_1 = __webpack_require__(283);
 const chase_1 = __webpack_require__(888);
 function appendLog(str) {
+    var _a;
     const logElm = document.getElementById('log');
     if (logElm) {
-        logElm.textContent = `${str}\n${logElm.textContent}`;
+        logElm.textContent = `${str}\n${(_a = logElm.textContent) !== null && _a !== void 0 ? _a : ''}`;
     }
 }
 const demoSelect = document.getElementById('demo-select');
@@ -8004,14 +8026,17 @@ async function openDevice(device) {
     // device.fillColor(12, 0, 0, 255)
 }
 if (consentButton) {
-    window.addEventListener('load', async () => {
+    const doLoad = async () => {
         // attempt to open a previously selected device.
-        const devices = await webhid_1.getStreamDecks();
+        const devices = await (0, webhid_1.getStreamDecks)();
         if (devices.length > 0) {
             device = devices[0];
             openDevice(device).catch(console.error);
         }
         console.log(devices);
+    };
+    window.addEventListener('load', () => {
+        doLoad().catch((e) => console.error(e));
     });
     const brightnessRange = document.getElementById('brightness-range');
     if (brightnessRange) {
@@ -8023,10 +8048,12 @@ if (consentButton) {
         });
     }
     if (demoSelect) {
-        demoSelect.addEventListener('input', () => demoChange().catch(console.error));
+        demoSelect.addEventListener('input', () => {
+            demoChange().catch(console.error);
+        });
         demoChange().catch(console.error);
     }
-    consentButton.addEventListener('click', async () => {
+    const consentClick = async () => {
         if (device) {
             appendLog('Closing device');
             currentDemo.stop(device).catch(console.error);
@@ -8035,7 +8062,7 @@ if (consentButton) {
         }
         // Prompt for a device
         try {
-            const devices = await webhid_1.requestStreamDecks();
+            const devices = await (0, webhid_1.requestStreamDecks)();
             device = devices[0];
             if (devices.length === 0) {
                 appendLog('No device was selected');
@@ -8047,6 +8074,9 @@ if (consentButton) {
             return;
         }
         openDevice(device).catch(console.error);
+    };
+    consentButton.addEventListener('click', () => {
+        consentClick().catch((e) => console.error(e));
     });
     appendLog('Page loaded');
 }
