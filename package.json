@@ -38,7 +38,7 @@
     "jest": "^27.4.7",
     "jimp": "^0.16.1",
     "lerna": "^4.0.0",
-    "open-cli": "^7.0.1",
+    "open-cli": "^6.0.1",
     "pureimage": "^0.3.8",
     "sharp": "^0.29.3",
     "stream-buffers": "^3.0.2",
