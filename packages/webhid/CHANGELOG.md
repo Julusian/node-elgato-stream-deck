@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.3.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.2.0...v5.3.0) (2022-02-21)
+
+
+### Features
+
+* allow the original 15 key to be used in webhid ([7ff5624](https://github.com/julusian/node-elgato-stream-deck/commit/7ff562446b77d17b119f27570937513f02338f28))
+
+
+
+
+
 # [5.2.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.2.0-alpha.1...v5.2.0) (2022-01-25)
 
 **Note:** Version bump only for package @elgato-stream-deck/webhid
