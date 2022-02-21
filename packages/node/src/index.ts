@@ -11,12 +11,6 @@ export interface OpenStreamDeckOptionsNode extends OpenStreamDeckOptions {
 	resetToLogoOnClose?: boolean
 }
 
-/*
- * The original StreamDeck uses packet sizes too large for the hidraw driver which is
- * the default on linux. https://github.com/node-hid/node-hid/issues/249
- */
-HID.setDriverType('libusb')
-
 /**
  * Scan for and list detected devices
  */
