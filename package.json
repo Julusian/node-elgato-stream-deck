@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "prepare": "husky install",
-    "dev": "yarn build && node ./scripts/watch.js",
+    "dev": "yarn build && node ./scripts/watch.mjs",
     "postinstall": "lerna bootstrap",
     "build": "yarn lerna exec yarn build",
     "test": "yarn lint && yarn unit",
