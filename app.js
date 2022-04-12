@@ -4537,43 +4537,117 @@ exports.RapidFillDemo = RapidFillDemo;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DEVICE_MODELS = exports.VENDOR_ID = exports.StreamDeckProxy = exports.DeviceModelId = void 0;
+exports.DEVICE_MODELS = exports.DeviceModelType = exports.VENDOR_ID = exports.StreamDeckProxy = exports.DeviceModelId = void 0;
 const models_1 = __webpack_require__(567);
+const pedal_1 = __webpack_require__(266);
 var models_2 = __webpack_require__(567);
 Object.defineProperty(exports, "DeviceModelId", ({ enumerable: true, get: function () { return models_2.DeviceModelId; } }));
 var proxy_1 = __webpack_require__(922);
 Object.defineProperty(exports, "StreamDeckProxy", ({ enumerable: true, get: function () { return proxy_1.StreamDeckProxy; } }));
 /** Elgato vendor id */
 exports.VENDOR_ID = 0x0fd9;
+var DeviceModelType;
+(function (DeviceModelType) {
+    DeviceModelType["STREAMDECK"] = "streamdeck";
+    DeviceModelType["PEDAL"] = "pedal";
+})(DeviceModelType = exports.DeviceModelType || (exports.DeviceModelType = {}));
 /** List of all the known models, and the classes to use them */
 exports.DEVICE_MODELS = [
     {
         id: models_1.DeviceModelId.ORIGINAL,
+        type: DeviceModelType.STREAMDECK,
         productId: 0x0060,
         class: models_1.StreamDeckOriginal,
     },
     {
         id: models_1.DeviceModelId.MINI,
+        type: DeviceModelType.STREAMDECK,
         productId: 0x0063,
         class: models_1.StreamDeckMini,
     },
     {
         id: models_1.DeviceModelId.XL,
+        type: DeviceModelType.STREAMDECK,
         productId: 0x006c,
         class: models_1.StreamDeckXL,
     },
     {
         id: models_1.DeviceModelId.ORIGINALV2,
+        type: DeviceModelType.STREAMDECK,
         productId: 0x006d,
         class: models_1.StreamDeckOriginalV2,
     },
     {
         id: models_1.DeviceModelId.ORIGINALMK2,
+        type: DeviceModelType.STREAMDECK,
         productId: 0x0080,
         class: models_1.StreamDeckOriginalMK2,
     },
+    {
+        id: models_1.DeviceModelId.PEDAL,
+        type: DeviceModelType.PEDAL,
+        productId: 0x0086,
+        class: pedal_1.StreamDeckPedal,
+    },
 ];
 //# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 882:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+/* provided dependency */ var Buffer = __webpack_require__(291)["Buffer"];
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamDeckGen1Base = void 0;
+const base_1 = __webpack_require__(576);
+/**
+ * Base class for generation 1 hardware (before the xl)
+ */
+class StreamDeckGen1Base extends base_1.StreamDeckBase {
+    constructor(device, options, properties) {
+        super(device, options, properties);
+    }
+    /**
+     * Sets the brightness of the keys on the Stream Deck
+     *
+     * @param {number} percentage The percentage brightness
+     */
+    async setBrightness(percentage) {
+        if (percentage < 0 || percentage > 100) {
+            throw new RangeError('Expected brightness percentage to be between 0 and 100');
+        }
+        // prettier-ignore
+        const brightnessCommandBuffer = Buffer.from([
+            0x05,
+            0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        ]);
+        await this.device.sendFeatureReport(brightnessCommandBuffer);
+    }
+    async resetToLogo() {
+        // prettier-ignore
+        const resetCommandBuffer = Buffer.from([
+            0x0b,
+            0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        ]);
+        await this.device.sendFeatureReport(resetCommandBuffer);
+    }
+    async getFirmwareVersion() {
+        const val = await this.device.getFeatureReport(4, 17);
+        const end = val.indexOf(0);
+        return val.toString('ascii', 5, end === -1 ? undefined : end);
+    }
+    async getSerialNumber() {
+        const val = await this.device.getFeatureReport(3, 17);
+        return val.toString('ascii', 5, 17);
+    }
+}
+exports.StreamDeckGen1Base = StreamDeckGen1Base;
+//# sourceMappingURL=base-gen1.js.map
 
 /***/ }),
 
@@ -4634,9 +4708,6 @@ class StreamDeckGen2Base extends base_1.StreamDeckBase {
         const val = await this.device.getFeatureReport(6, 32);
         return val.toString('ascii', 2, 14);
     }
-    transformKeyIndex(keyIndex) {
-        return keyIndex;
-    }
     getFillImageCommandHeaderLength() {
         return 8;
     }
@@ -4671,9 +4742,9 @@ exports.StreamDeckGen2Base = StreamDeckGen2Base;
 /* provided dependency */ var Buffer = __webpack_require__(291)["Buffer"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckBase = void 0;
+exports.StreamDeckBase = exports.StreamDeckInputBase = void 0;
 const EventEmitter = __webpack_require__(399);
-class StreamDeckBase extends EventEmitter {
+class StreamDeckInputBase extends EventEmitter {
     constructor(device, _options, properties) {
         super();
         this.deviceProperties = properties;
@@ -4732,6 +4803,12 @@ class StreamDeckBase extends EventEmitter {
     async close() {
         return this.device.close();
     }
+    transformKeyIndex(keyIndex) {
+        return keyIndex;
+    }
+}
+exports.StreamDeckInputBase = StreamDeckInputBase;
+class StreamDeckBase extends StreamDeckInputBase {
     async fillKeyColor(keyIndex, r, g, b) {
         this.checkValidKeyIndex(keyIndex);
         this.checkRGBValue(r);
@@ -4814,36 +4891,6 @@ class StreamDeckBase extends EventEmitter {
         }
         await Promise.all(ps);
     }
-    async setBrightness(percentage) {
-        if (percentage < 0 || percentage > 100) {
-            throw new RangeError('Expected brightness percentage to be between 0 and 100');
-        }
-        // prettier-ignore
-        const brightnessCommandBuffer = Buffer.from([
-            0x05,
-            0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        ]);
-        await this.device.sendFeatureReport(brightnessCommandBuffer);
-    }
-    async resetToLogo() {
-        // prettier-ignore
-        const resetCommandBuffer = Buffer.from([
-            0x0b,
-            0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        ]);
-        await this.device.sendFeatureReport(resetCommandBuffer);
-    }
-    async getFirmwareVersion() {
-        const val = await this.device.getFeatureReport(4, 17);
-        const end = val.indexOf(0);
-        return val.toString('ascii', 5, end === -1 ? undefined : end);
-    }
-    async getSerialNumber() {
-        const val = await this.device.getFeatureReport(3, 17);
-        return val.toString('ascii', 5, 17);
-    }
     getFillImageCommandHeaderLength() {
         return 16;
     }
@@ -4916,6 +4963,7 @@ var DeviceModelId;
     DeviceModelId["ORIGINALMK2"] = "original-mk2";
     DeviceModelId["MINI"] = "mini";
     DeviceModelId["XL"] = "xl";
+    DeviceModelId["PEDAL"] = "pedal";
 })(DeviceModelId = exports.DeviceModelId || (exports.DeviceModelId = {}));
 //# sourceMappingURL=id.js.map
 
@@ -4961,7 +5009,7 @@ Object.defineProperty(exports, "StreamDeckOriginalMK2", ({ enumerable: true, get
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckMini = void 0;
 const util_1 = __webpack_require__(764);
-const base_1 = __webpack_require__(576);
+const base_gen1_1 = __webpack_require__(882);
 const id_1 = __webpack_require__(766);
 const miniProperties = {
     MODEL: id_1.DeviceModelId.MINI,
@@ -4972,12 +5020,9 @@ const miniProperties = {
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 1,
 };
-class StreamDeckMini extends base_1.StreamDeckBase {
+class StreamDeckMini extends base_gen1_1.StreamDeckGen1Base {
     constructor(device, options) {
         super(device, options, miniProperties);
-    }
-    transformKeyIndex(keyIndex) {
-        return keyIndex;
     }
     async convertFillImage(sourceBuffer, sourceOptions) {
         const byteBuffer = (0, util_1.imageToByteArray)(sourceBuffer, sourceOptions, util_1.BMP_HEADER_LENGTH, this.rotateCoordinates.bind(this), 'bgr', this.ICON_SIZE);
@@ -5033,7 +5078,7 @@ exports.StreamDeckOriginalMK2 = StreamDeckOriginalMK2;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckOriginal = void 0;
 const util_1 = __webpack_require__(764);
-const base_1 = __webpack_require__(576);
+const base_gen1_1 = __webpack_require__(882);
 const id_1 = __webpack_require__(766);
 const originalProperties = {
     MODEL: id_1.DeviceModelId.ORIGINAL,
@@ -5044,7 +5089,7 @@ const originalProperties = {
     KEY_DIRECTION: 'rtl',
     KEY_DATA_OFFSET: 1,
 };
-class StreamDeckOriginal extends base_1.StreamDeckBase {
+class StreamDeckOriginal extends base_gen1_1.StreamDeckGen1Base {
     constructor(device, options) {
         super(device, options, originalProperties);
         this.useOriginalKeyOrder = !!options.useOriginalKeyOrder;
@@ -5115,6 +5160,69 @@ class StreamDeckOriginalV2 extends base_gen2_1.StreamDeckGen2Base {
 }
 exports.StreamDeckOriginalV2 = StreamDeckOriginalV2;
 //# sourceMappingURL=originalv2.js.map
+
+/***/ }),
+
+/***/ 266:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamDeckPedal = void 0;
+const base_1 = __webpack_require__(576);
+const id_1 = __webpack_require__(766);
+const pedalProperties = {
+    MODEL: id_1.DeviceModelId.PEDAL,
+    PRODUCT_NAME: 'Streamdeck Pedal',
+    COLUMNS: 3,
+    ROWS: 1,
+    ICON_SIZE: 0,
+    KEY_DIRECTION: 'ltr',
+    KEY_DATA_OFFSET: 4,
+};
+class StreamDeckPedal extends base_1.StreamDeckInputBase {
+    constructor(device, options) {
+        super(device, options, pedalProperties);
+    }
+    /**
+     * Sets the brightness of the keys on the Stream Deck
+     *
+     * @param {number} percentage The percentage brightness
+     */
+    async setBrightness(_percentage) {
+        // Not supported
+    }
+    async resetToLogo() {
+        // Not supported
+    }
+    async getFirmwareVersion() {
+        const val = await this.device.getFeatureReport(5, 32);
+        const end = val.indexOf(0);
+        return val.toString('ascii', 6, end === -1 ? undefined : end);
+    }
+    async getSerialNumber() {
+        const val = await this.device.getFeatureReport(6, 32);
+        return val.toString('ascii', 2, 14);
+    }
+    async fillKeyColor(_keyIndex, _r, _g, _b) {
+        // Not supported
+    }
+    async fillKeyBuffer(_keyIndex, _imageBuffer, _options) {
+        // Not supported
+    }
+    async fillPanelBuffer(_imageBuffer, _options) {
+        // Not supported
+    }
+    async clearKey(_keyIndex) {
+        // Not supported
+    }
+    async clearPanel() {
+        // Not supported
+    }
+}
+exports.StreamDeckPedal = StreamDeckPedal;
+//# sourceMappingURL=pedal.js.map
 
 /***/ }),
 
