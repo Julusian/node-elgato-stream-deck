@@ -13,7 +13,7 @@
     "lint": "yarn lint:raw packages",
     "lint-fix": "yarn lint --fix",
     "bump": "lerna version --exact --conventional-commits --no-push -m \"chore(release): publish %s\"",
-    "publish2": "yarn build && lerna publish from-package",
+    "publish2": "yarn build && lerna publish from-package --pre-dist-tag next",
     "validate:dependencies": "yarn audit && yarn license-validate",
     "license-validate": "yarn sofie-licensecheck --allowPackages \"buffers@0.1.1;@elgato-stream-deck/webhid-demo@$(node -p \"require('./packages/webhid-demo/package.json').version\");caniuse-lite@1.0.30001328;npm-lifecycle@3.1.5\""
   },
