@@ -27,7 +27,7 @@ export interface InternalFillImageOptions extends FillImageOptions {
 	stride: number
 }
 
-export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
+export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
 	get NUM_KEYS(): number {
 		return this.KEY_COLUMNS * this.KEY_ROWS
 	}
@@ -56,7 +56,7 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 	}
 
 	protected readonly device: HIDDevice
-	private readonly deviceProperties: Readonly<StreamDeckProperties>
+	protected readonly deviceProperties: Readonly<StreamDeckProperties>
 	// private readonly options: Readonly<OpenStreamDeckOptions>
 	private readonly keyState: boolean[]
 
@@ -100,6 +100,26 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 		return this.device.close()
 	}
 
+	public abstract setBrightness(percentage: number): Promise<void>
+
+	public abstract resetToLogo(): Promise<void>
+
+	public abstract getFirmwareVersion(): Promise<string>
+	public abstract getSerialNumber(): Promise<string>
+
+	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {
+		return keyIndex
+	}
+
+	public abstract fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
+	public abstract fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void>
+	public abstract fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
+
+	public abstract clearKey(keyIndex: KeyIndex): Promise<void>
+	public abstract clearPanel(): Promise<void>
+}
+
+export abstract class StreamDeckBase extends StreamDeckInputBase {
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
@@ -199,43 +219,6 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 		}
 		await Promise.all(ps)
 	}
-
-	public async setBrightness(percentage: number): Promise<void> {
-		if (percentage < 0 || percentage > 100) {
-			throw new RangeError('Expected brightness percentage to be between 0 and 100')
-		}
-
-		// prettier-ignore
-		const brightnessCommandBuffer = Buffer.from([
-			0x05,
-			0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		])
-		await this.device.sendFeatureReport(brightnessCommandBuffer)
-	}
-
-	public async resetToLogo(): Promise<void> {
-		// prettier-ignore
-		const resetCommandBuffer = Buffer.from([
-			0x0b,
-			0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		])
-		await this.device.sendFeatureReport(resetCommandBuffer)
-	}
-
-	public async getFirmwareVersion(): Promise<string> {
-		const val = await this.device.getFeatureReport(4, 17)
-		const end = val.indexOf(0)
-		return val.toString('ascii', 5, end === -1 ? undefined : end)
-	}
-
-	public async getSerialNumber(): Promise<string> {
-		const val = await this.device.getFeatureReport(3, 17)
-		return val.toString('ascii', 5, 17)
-	}
-
-	protected abstract transformKeyIndex(keyIndex: KeyIndex): KeyIndex
 
 	protected abstract convertFillImage(imageBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer>
 

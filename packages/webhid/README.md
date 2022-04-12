@@ -41,11 +41,13 @@ SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0063", MODE:="666"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006c", MODE:="666", GROUP="plugdev"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006d", MODE:="666", GROUP="plugdev"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0080", MODE:="666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0086", MODE:="666", GROUP="plugdev"
 KERNEL=="hidraw*", ATTRS{busnum}=="1", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0060", MODE="0666"
 KERNEL=="hidraw*", ATTRS{busnum}=="1", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0063", MODE="0666"
 KERNEL=="hidraw*", ATTRS{busnum}=="1", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006c", MODE="0666"
 KERNEL=="hidraw*", ATTRS{busnum}=="1", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006d", MODE="0666"
 KERNEL=="hidraw*", ATTRS{busnum}=="1", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0080", MODE="0666"
+KERNEL=="hidraw*", ATTRS{busnum}=="1", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0086", MODE="0666"
 
 ```
 
