@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0-alpha.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.3.1...v5.4.0-alpha.0) (2022-04-12)
+
+
+### Features
+
+* support for the pedal (untested) ([ccc4389](https://github.com/julusian/node-elgato-stream-deck/commit/ccc4389844c67194060f32e741c41407713c4cf7))
+
+
+
+
+
 # [5.2.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.2.0-alpha.1...v5.2.0) (2022-01-25)
 
 **Note:** Version bump only for package @elgato-stream-deck/core

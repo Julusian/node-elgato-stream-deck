@@ -7,7 +7,6 @@ import {
 	StreamDeckBase,
 	StreamDeckProperties,
 } from './base'
-import { KeyIndex } from './id'
 
 /**
  * Base class for generation 2 hardware (starting with the xl)
@@ -63,10 +62,6 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 	public async getSerialNumber(): Promise<string> {
 		const val = await this.device.getFeatureReport(6, 32)
 		return val.toString('ascii', 2, 14)
-	}
-
-	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {
-		return keyIndex
 	}
 
 	protected getFillImageCommandHeaderLength(): number {

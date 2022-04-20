@@ -1,7 +1,8 @@
 import { HIDDevice } from '../device'
 import { BMP_HEADER_LENGTH, imageToByteArray, writeBMPHeader } from '../util'
-import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
-import { DeviceModelId, KeyIndex } from './id'
+import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
+import { StreamDeckGen1Base } from './base-gen1'
+import { DeviceModelId } from './id'
 
 const miniProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.MINI,
@@ -13,13 +14,9 @@ const miniProperties: StreamDeckProperties = {
 	KEY_DATA_OFFSET: 1,
 }
 
-export class StreamDeckMini extends StreamDeckBase {
+export class StreamDeckMini extends StreamDeckGen1Base {
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
 		super(device, options, miniProperties)
-	}
-
-	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {
-		return keyIndex
 	}
 
 	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
