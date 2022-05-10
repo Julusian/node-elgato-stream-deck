@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.4.0-alpha.0...v5.4.0) (2022-05-10)
+
+**Note:** Version bump only for package @elgato-stream-deck/webhid-demo
+
+
+
+
+
 # [5.4.0-alpha.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.3.1...v5.4.0-alpha.0) (2022-04-12)
 
 **Note:** Version bump only for package @elgato-stream-deck/webhid-demo

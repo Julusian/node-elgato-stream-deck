@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.4.0-alpha.0...v5.4.0) (2022-05-10)
+
+
+### Bug Fixes
+
+* add missing tslib dependency ([6b53699](https://github.com/julusian/node-elgato-stream-deck/commit/6b536994bea3686b4b03fccadafeb2a532e63f4d))
+* UDEV rules example markdown. Missing * after hidraw ([#43](https://github.com/julusian/node-elgato-stream-deck/issues/43)) ([596b1f9](https://github.com/julusian/node-elgato-stream-deck/commit/596b1f9cf8b6bef2040c85a172e30690c15b9028))
+* UDEV rules example markdown. Missing * after hidraw ([#43](https://github.com/julusian/node-elgato-stream-deck/issues/43)) ([6f94093](https://github.com/julusian/node-elgato-stream-deck/commit/6f94093444951104b37064d1bf7a815ffef0aa60))
+
+
+
+
+
 # [5.4.0-alpha.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.3.1...v5.4.0-alpha.0) (2022-04-12)
 
 
