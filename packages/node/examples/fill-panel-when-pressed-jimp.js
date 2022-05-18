@@ -5,16 +5,14 @@ const { openStreamDeck } = require('../dist/index')
 console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the second image.')
 ;(async () => {
 	const streamDeck = openStreamDeck()
-	streamDeck.clearPanel()
+	await streamDeck.clearPanel()
 
 	const bmpImgField = await Jimp.read(path.resolve(__dirname, 'fixtures/sunny_field.png')).then((img) => {
 		return img.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
 	})
-	const bmpImgMosaic = await Jimp.read(path.resolve(__dirname, '../src/__tests__/fixtures/mosaic.png')).then(
-		(img) => {
-			return img.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
-		}
-	)
+	const bmpImgMosaic = await Jimp.read(path.resolve(__dirname, '../../../fixtures/mosaic.png')).then((img) => {
+		return img.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
+	})
 
 	const imgField = bmpImgField.bitmap.data
 	const imgMosaic = bmpImgMosaic.bitmap.data
@@ -36,7 +34,7 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 			image = imgMosaic
 		}
 
-		streamDeck.fillPanel(image, { format: 'rgba' })
+		streamDeck.fillPanelBuffer(image, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e))
 	})
 
 	streamDeck.on('up', () => {
@@ -44,12 +42,10 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 			return
 		}
 
-		// Clear the key when all keys are released.
-		if (streamDeck.keyState.every((pressed) => !pressed)) {
-			console.log('Clearing all buttons')
-			streamDeck.clearPanel()
-			filled = false
-		}
+		// Clear the key when any key is released.
+		console.log('Clearing all buttons')
+		streamDeck.clearPanel().catch((e) => console.error('Clear failed:', e))
+		filled = false
 	})
 
 	streamDeck.on('error', (error) => {
