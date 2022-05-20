@@ -38,6 +38,10 @@ refresh()
 
 usbDetect.startMonitoring()
 
-usbDetect.on('add:4057:96', function () {
+usbDetect.on('add:4057', function () {
+	refresh()
+})
+usbDetect.on('remove:4057', function (device) {
+	console.log(`${JSON.stringify(device)} was removed`)
 	refresh()
 })
