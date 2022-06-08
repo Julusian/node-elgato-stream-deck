@@ -13,23 +13,15 @@ describe('imageToByteArray', () => {
 		const res = imageToByteArray(
 			srcBuffer,
 			{ format: 'rgb', offset: 0, stride: 2 * 3 },
+			{ colorMode: 'rgba' },
 			5,
-			(x, y) => ({ x, y }),
-			'rgba',
 			2
 		)
 		expect(res).toMatchSnapshot()
 	})
 	test('basic rgb -> bgr', () => {
 		const srcBuffer = getSimpleBuffer(2, 3)
-		const res = imageToByteArray(
-			srcBuffer,
-			{ format: 'rgb', offset: 0, stride: 2 * 3 },
-			4,
-			(x, y) => ({ x, y }),
-			'bgr',
-			2
-		)
+		const res = imageToByteArray(srcBuffer, { format: 'rgb', offset: 0, stride: 2 * 3 }, { colorMode: 'bgr' }, 4, 2)
 		expect(res).toMatchSnapshot()
 	})
 	test('basic bgra -> bgr', () => {
@@ -37,9 +29,8 @@ describe('imageToByteArray', () => {
 		const res = imageToByteArray(
 			srcBuffer,
 			{ format: 'bgra', offset: 0, stride: 2 * 4 },
+			{ colorMode: 'bgr' },
 			4,
-			(x, y) => ({ x, y }),
-			'bgr',
 			2
 		)
 		expect(res).toMatchSnapshot()
@@ -49,9 +40,8 @@ describe('imageToByteArray', () => {
 		const res = imageToByteArray(
 			srcBuffer,
 			{ format: 'bgra', offset: 0, stride: 2 * 4 },
+			{ colorMode: 'rgba' },
 			4,
-			(x, y) => ({ x, y }),
-			'rgba',
 			2
 		)
 		expect(res).toMatchSnapshot()
@@ -62,9 +52,8 @@ describe('imageToByteArray', () => {
 		const res = imageToByteArray(
 			srcBuffer,
 			{ format: 'bgr', offset: 0, stride: 3 * 3 },
+			{ colorMode: 'bgr', yFlip: true },
 			4,
-			(x, y) => ({ x, y: 2 - y }),
-			'bgr',
 			3
 		)
 		expect(res).toMatchSnapshot()
@@ -75,9 +64,8 @@ describe('imageToByteArray', () => {
 		const res = imageToByteArray(
 			srcBuffer,
 			{ format: 'bgr', offset: 0, stride: 3 * 3 },
+			{ colorMode: 'bgr', xFlip: true },
 			4,
-			(x, y) => ({ x: 2 - x, y }),
-			'bgr',
 			3
 		)
 		expect(res).toMatchSnapshot()

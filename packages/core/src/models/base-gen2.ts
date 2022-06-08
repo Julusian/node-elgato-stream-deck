@@ -91,16 +91,11 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
 			sourceOptions,
+			{ colorMode: 'rgba', xFlip: true, yFlip: true },
 			0,
-			this.transformCoordinates.bind(this),
-			'rgba',
 			this.ICON_SIZE
 		)
 
 		return this.encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE)
-	}
-
-	private transformCoordinates(x: number, y: number): { x: number; y: number } {
-		return { x: this.ICON_SIZE - x - 1, y: this.ICON_SIZE - y - 1 }
 	}
 }

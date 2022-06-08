@@ -48,44 +48,4 @@ export abstract class StreamDeckGen1Base extends StreamDeckBase {
 		const val = await this.device.getFeatureReport(3, 17)
 		return val.toString('ascii', 5, 17)
 	}
-
-	// protected getFillImageCommandHeaderLength(): number {
-	// 	return 8
-	// }
-
-	// protected writeFillImageCommandHeader(
-	// 	buffer: Buffer,
-	// 	keyIndex: number,
-	// 	partIndex: number,
-	// 	isLast: boolean,
-	// 	bodyLength: number
-	// ): void {
-	// 	buffer.writeUInt8(0x02, 0)
-	// 	buffer.writeUInt8(0x07, 1)
-	// 	buffer.writeUInt8(keyIndex, 2)
-	// 	buffer.writeUInt8(isLast ? 1 : 0, 3)
-	// 	buffer.writeUInt16LE(bodyLength, 4)
-	// 	buffer.writeUInt16LE(partIndex++, 6)
-	// }
-
-	// protected getFillImagePacketLength(): number {
-	// 	return 1024
-	// }
-
-	// protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
-	// 	const byteBuffer = imageToByteArray(
-	// 		sourceBuffer,
-	// 		sourceOptions,
-	// 		0,
-	// 		this.transformCoordinates.bind(this),
-	// 		'rgba',
-	// 		this.ICON_SIZE
-	// 	)
-
-	// 	return this.encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE)
-	// }
-
-	// private transformCoordinates(x: number, y: number): { x: number; y: number } {
-	// 	return { x: this.ICON_SIZE - x - 1, y: this.ICON_SIZE - y - 1 }
-	// }
 }

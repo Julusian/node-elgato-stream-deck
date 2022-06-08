@@ -23,9 +23,8 @@ export class StreamDeckMini extends StreamDeckGen1Base {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
 			sourceOptions,
+			{ colorMode: 'bgr', rotate: true, yFlip: true },
 			BMP_HEADER_LENGTH,
-			this.rotateCoordinates.bind(this),
-			'bgr',
 			this.ICON_SIZE
 		)
 		writeBMPHeader(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 2835)
@@ -34,9 +33,5 @@ export class StreamDeckMini extends StreamDeckGen1Base {
 
 	protected getFillImagePacketLength(): number {
 		return 1024
-	}
-
-	private rotateCoordinates(x: number, y: number): { x: number; y: number } {
-		return { x: this.ICON_SIZE - y - 1, y: x }
 	}
 }

@@ -42,9 +42,8 @@ export class StreamDeckOriginal extends StreamDeckGen1Base {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
 			sourceOptions,
+			{ colorMode: 'bgr', xFlip: true },
 			BMP_HEADER_LENGTH,
-			this.flipCoordinates.bind(this),
-			'bgr',
 			this.ICON_SIZE
 		)
 		writeBMPHeader(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 3780)
@@ -68,9 +67,5 @@ export class StreamDeckOriginal extends StreamDeckGen1Base {
 		byteBuffer.copy(packet2, PACKET_HEADER_LENGTH, packet1Bytes)
 
 		return [packet1, packet2]
-	}
-
-	private flipCoordinates(x: number, y: number): { x: number; y: number } {
-		return { x: this.ICON_SIZE - x - 1, y }
 	}
 }

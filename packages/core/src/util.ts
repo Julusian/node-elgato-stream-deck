@@ -1,28 +1,44 @@
 import { InternalFillImageOptions } from './models/base'
 
+export interface FillImageTargetOptions {
+	colorMode: 'bgr' | 'rgba'
+	xFlip?: boolean
+	yFlip?: boolean
+	rotate?: boolean
+}
+
 export function imageToByteArray(
 	imageBuffer: Buffer,
 	sourceOptions: InternalFillImageOptions,
+	targetOptions: FillImageTargetOptions,
 	destPadding: number,
-	transformCoordinates: (x: number, y: number) => { x: number; y: number },
-	colorMode: 'bgr' | 'rgba',
 	imageSize: number
 ): Buffer {
-	const byteBuffer = Buffer.alloc(destPadding + imageSize * imageSize * colorMode.length)
+	const byteBuffer = Buffer.alloc(destPadding + imageSize * imageSize * targetOptions.colorMode.length)
 
-	const flipColours = sourceOptions.format.substring(0, 3) !== colorMode.substring(0, 3)
+	const flipColours = sourceOptions.format.substring(0, 3) !== targetOptions.colorMode.substring(0, 3)
 
 	for (let y = 0; y < imageSize; y++) {
-		const rowOffset = destPadding + imageSize * colorMode.length * y
+		const rowOffset = destPadding + imageSize * targetOptions.colorMode.length * y
 		for (let x = 0; x < imageSize; x++) {
-			const { x: x2, y: y2 } = transformCoordinates(x, y)
+			// Apply x/y flips
+			let x2 = targetOptions.xFlip ? imageSize - x - 1 : x
+			let y2 = targetOptions.yFlip ? imageSize - y - 1 : y
+
+			if (targetOptions.rotate) {
+				// Swap x and y
+				const tmpX = x2
+				x2 = y2
+				y2 = tmpX
+			}
+
 			const srcOffset = y2 * sourceOptions.stride + sourceOptions.offset + x2 * sourceOptions.format.length
 
 			const red = imageBuffer.readUInt8(srcOffset)
 			const green = imageBuffer.readUInt8(srcOffset + 1)
 			const blue = imageBuffer.readUInt8(srcOffset + 2)
 
-			const targetOffset = rowOffset + x * colorMode.length
+			const targetOffset = rowOffset + x * targetOptions.colorMode.length
 			if (flipColours) {
 				byteBuffer.writeUInt8(blue, targetOffset)
 				byteBuffer.writeUInt8(green, targetOffset + 1)
@@ -32,7 +48,7 @@ export function imageToByteArray(
 				byteBuffer.writeUInt8(green, targetOffset + 1)
 				byteBuffer.writeUInt8(blue, targetOffset + 2)
 			}
-			if (colorMode.length === 4) {
+			if (targetOptions.colorMode.length === 4) {
 				byteBuffer.writeUInt8(255, targetOffset + 3)
 			}
 		}
