@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { mocked } from 'ts-jest/utils'
+import { mocked } from 'jest-mock'
 import { readFixtureJSON } from './helpers'
 
 const iconSize = 96
