@@ -1,4 +1,5 @@
 import { InternalFillImageOptions } from './models/base'
+import { hello } from '../../../wasm/pkg/streamdeck_wasm'
 
 export interface FillImageTargetOptions {
 	colorMode: 'bgr' | 'rgba'
@@ -15,6 +16,22 @@ export function imageToByteArray(
 	imageSize: number
 ): Buffer {
 	const byteBuffer = Buffer.alloc(destPadding + imageSize * imageSize * targetOptions.colorMode.length)
+
+	hello(
+		imageBuffer,
+		byteBuffer,
+		sourceOptions.format,
+		sourceOptions.stride,
+		sourceOptions.offset,
+		targetOptions.colorMode,
+		destPadding,
+		targetOptions.xFlip || false,
+		targetOptions.yFlip || false,
+		targetOptions.rotate || false,
+		imageSize
+	)
+
+	return byteBuffer
 
 	const flipColours = sourceOptions.format.substring(0, 3) !== targetOptions.colorMode.substring(0, 3)
 
