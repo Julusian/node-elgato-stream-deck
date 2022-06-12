@@ -4,9 +4,9 @@ import { mocked } from 'jest-mock'
 import { DummyHID } from '../__mocks__/hid'
 
 jest.mock('node-hid')
-import { devicesAsync, HID } from 'node-hid'
+import { devicesAsync, openAsyncHIDDevice } from 'node-hid'
 // Forcing path to be string, as there are multiple constructor options, we require the string one
-mocked(HID).mockImplementation((path: string | number) => new DummyHID(path as string))
+mocked(openAsyncHIDDevice).mockImplementation(async (path: string | number) => new DummyHID(path as string))
 
 // Must be required after we register a mock for `node-hid`.
 import { getStreamDeckInfo, listStreamDecks, openStreamDeck } from '../'

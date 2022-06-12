@@ -1,7 +1,7 @@
 /* eslint-disable jest/no-standalone-expect */
 import { EventEmitter } from 'events'
-import type { HID } from 'node-hid'
-export class DummyHID extends EventEmitter implements HID {
+import type { HIDAsync } from 'node-hid'
+export class DummyHID extends EventEmitter implements HIDAsync {
 	public path: string
 
 	constructor(devicePath: string) {
@@ -9,25 +9,19 @@ export class DummyHID extends EventEmitter implements HID {
 		expect(typeof devicePath).toEqual('string')
 		this.path = devicePath
 	}
-	public close(): void {
+	public async close(): Promise<void> {
 		throw new Error('Not implemented')
 	}
 	public pause(): void {
 		throw new Error('Not implemented')
 	}
-	public read(_callback: (err: any, data: number[]) => void): void {
+	public async read(): Promise<Buffer | undefined> {
 		throw new Error('Not implemented')
 	}
-	public readSync(): number[] {
+	public async sendFeatureReport(_data: number[]): Promise<number> {
 		throw new Error('Not implemented')
 	}
-	public readTimeout(_timeOut: number): number[] {
-		throw new Error('Not implemented')
-	}
-	public sendFeatureReport(_data: number[]): number {
-		throw new Error('Not implemented')
-	}
-	public getFeatureReport(_reportId: number, _reportLength: number): number[] {
+	public async getFeatureReport(_reportId: number, _reportLength: number): Promise<Buffer> {
 		throw new Error('Not implemented')
 	}
 	public resume(): void {
@@ -36,13 +30,13 @@ export class DummyHID extends EventEmitter implements HID {
 	// on (event: string, handler: (value: any) => void) {
 	// 	throw new Error('Not implemented')
 	// }
-	public write(_values: number[]): number {
+	public async write(_values: number[]): Promise<number> {
 		throw new Error('Not implemented')
 	}
 	public setDriverType(_type: string): void {
 		throw new Error('Not implemented')
 	}
-	public setNonBlocking(_no_block: boolean): void {
+	public async setNonBlocking(_no_block: boolean): Promise<void> {
 		throw new Error('Method not implemented.')
 	}
 }

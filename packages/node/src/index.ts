@@ -89,6 +89,8 @@ export async function openStreamDeck(
 
 	const hidDevice = await HID.openAsyncHIDDevice(foundDevices[0].path)
 
+	// TODO - can we determine what the device is onceit is opened? Save having to do the devices search above
+
 	const device = new NodeHIDDevice(hidDevice)
 	const rawSteamdeck = new model.class(device, options || {})
 	return new StreamDeckNode(rawSteamdeck, userOptions?.resetToLogoOnClose ?? false)
