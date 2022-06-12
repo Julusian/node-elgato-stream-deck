@@ -4,7 +4,7 @@ import { mocked } from 'jest-mock'
 import { DummyHID } from '../__mocks__/hid'
 
 jest.mock('node-hid')
-import { devices, HID } from 'node-hid'
+import { devicesAsync, HID } from 'node-hid'
 // Forcing path to be string, as there are multiple constructor options, we require the string one
 mocked(HID).mockImplementation((path: string | number) => new DummyHID(path as string))
 
@@ -12,13 +12,13 @@ mocked(HID).mockImplementation((path: string | number) => new DummyHID(path as s
 import { getStreamDeckInfo, listStreamDecks, openStreamDeck } from '../'
 
 describe('StreamDeck Devices', () => {
-	test('no devices', () => {
-		mocked(devices).mockImplementation(() => [])
+	test('no devices', async () => {
+		mocked(devicesAsync).mockImplementation(async () => [])
 
-		expect(listStreamDecks()).toEqual([])
+		await expect(listStreamDecks()).resolves.toEqual([])
 	})
-	test('some devices', () => {
-		mocked(devices).mockImplementation(() => [
+	test('some devices', async () => {
+		mocked(devicesAsync).mockImplementation(async () => [
 			{
 				productId: 0x0060,
 				vendorId: 0x0fd9,
@@ -58,7 +58,7 @@ describe('StreamDeck Devices', () => {
 			},
 		])
 
-		expect(listStreamDecks()).toEqual([
+		await expect(listStreamDecks()).resolves.toEqual([
 			{
 				model: 'original',
 				path: 'path-original',
@@ -76,8 +76,8 @@ describe('StreamDeck Devices', () => {
 			},
 		])
 	})
-	test('info for bad path', () => {
-		mocked(devices).mockImplementation(() => [
+	test('info for bad path', async () => {
+		mocked(devicesAsync).mockImplementation(async () => [
 			{
 				productId: 0x0060,
 				vendorId: 0x0fd9,
@@ -95,14 +95,14 @@ describe('StreamDeck Devices', () => {
 			},
 		])
 
-		const info = getStreamDeckInfo('not-a-real-path')
+		const info = await getStreamDeckInfo('not-a-real-path')
 		expect(info).toBeFalsy()
 
-		const info2 = getStreamDeckInfo('path-bad-product')
+		const info2 = await getStreamDeckInfo('path-bad-product')
 		expect(info2).toBeFalsy()
 	})
-	test('info for good path', () => {
-		mocked(devices).mockImplementation(() => [
+	test('info for good path', async () => {
+		mocked(devicesAsync).mockImplementation(async () => [
 			{
 				productId: 0x0060,
 				vendorId: 0x0fd9,
@@ -121,15 +121,15 @@ describe('StreamDeck Devices', () => {
 			},
 		])
 
-		const info2 = getStreamDeckInfo('path-original2')
+		const info2 = await getStreamDeckInfo('path-original2')
 		expect(info2).toEqual({
 			model: 'original',
 			path: 'path-original2',
 			serialNumber: 'some-number-again',
 		})
 	})
-	test('create for bad path', () => {
-		mocked(devices).mockImplementation(() => [
+	test('create for bad path', async () => {
+		mocked(devicesAsync).mockImplementation(async () => [
 			{
 				productId: 0x0060,
 				vendorId: 0x0fd9,
@@ -147,11 +147,11 @@ describe('StreamDeck Devices', () => {
 			},
 		])
 
-		expect(() => openStreamDeck('not-a-real-path')).toThrowError(
+		await expect(openStreamDeck('not-a-real-path')).rejects.toThrowError(
 			new Error(`Device "not-a-real-path" was not found`)
 		)
 
-		expect(() => openStreamDeck('path-bad-product')).toThrowError(
+		await expect(openStreamDeck('path-bad-product')).rejects.toThrowError(
 			new Error(`Device "path-bad-product" was not found`)
 		)
 	})

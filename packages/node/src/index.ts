@@ -14,9 +14,9 @@ export interface OpenStreamDeckOptionsNode extends OpenStreamDeckOptions {
 /**
  * Scan for and list detected devices
  */
-export function listStreamDecks(): StreamDeckDeviceInfo[] {
+export async function listStreamDecks(): Promise<StreamDeckDeviceInfo[]> {
 	const devices: StreamDeckDeviceInfo[] = []
-	for (const dev of HID.devices()) {
+	for (const dev of await HID.devicesAsync()) {
 		const info = getStreamDeckDeviceInfo(dev)
 		if (info) devices.push(info)
 	}
@@ -43,8 +43,9 @@ export function getStreamDeckDeviceInfo(dev: HID.Device): StreamDeckDeviceInfo |
 /**
  * Get the info of a device if the given path is a streamdeck
  */
-export function getStreamDeckInfo(path: string): StreamDeckDeviceInfo | undefined {
-	return listStreamDecks().find((dev) => dev.path === path)
+export async function getStreamDeckInfo(path: string): Promise<StreamDeckDeviceInfo | undefined> {
+	const allDevices = await listStreamDecks()
+	return allDevices.find((dev) => dev.path === path)
 }
 
 /**
@@ -52,8 +53,11 @@ export function getStreamDeckInfo(path: string): StreamDeckDeviceInfo | undefine
  * @param devicePath The path of the device to open. If not set, the first will be used
  * @param userOptions Options to customise the device behvaiour
  */
-export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeckOptionsNode): StreamDeck {
-	let foundDevices = listStreamDecks()
+export async function openStreamDeck(
+	devicePath?: string,
+	userOptions?: OpenStreamDeckOptionsNode
+): Promise<StreamDeck> {
+	let foundDevices = await listStreamDecks()
 	if (devicePath) {
 		foundDevices = foundDevices.filter((d) => d.path === devicePath)
 	}
@@ -83,7 +87,9 @@ export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeck
 		...userOptions,
 	}
 
-	const device = new NodeHIDDevice(foundDevices[0])
+	const hidDevice = await HID.openAsyncHIDDevice(foundDevices[0].path)
+
+	const device = new NodeHIDDevice(hidDevice)
 	const rawSteamdeck = new model.class(device, options || {})
 	return new StreamDeckNode(rawSteamdeck, userOptions?.resetToLogoOnClose ?? false)
 }

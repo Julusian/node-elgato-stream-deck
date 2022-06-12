@@ -20,12 +20,12 @@ export interface StreamDeckDeviceInfo {
  */
 export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 	public dataKeyOffset?: number
-	private device: HID.HID
+	private device: HID.HIDAsync
 
-	constructor(deviceInfo: StreamDeckDeviceInfo) {
+	constructor(device: HID.HIDAsync) {
 		super()
 
-		this.device = new HID.HID(deviceInfo.path)
+		this.device = device
 		this.device.on('error', (error) => this.emit('error', error))
 
 		this.device.on('data', (data: Buffer) => {
@@ -38,18 +38,20 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 	}
 
 	public async close(): Promise<void> {
-		this.device.close()
+		await this.device.close()
 	}
 
 	public async sendFeatureReport(data: Buffer): Promise<void> {
-		this.device.sendFeatureReport(data)
+		await this.device.sendFeatureReport(data)
 	}
 	public async getFeatureReport(reportId: number, reportLength: number): Promise<Buffer> {
-		return Buffer.from(this.device.getFeatureReport(reportId, reportLength))
+		return this.device.getFeatureReport(reportId, reportLength)
 	}
 	public async sendReports(buffers: Buffer[]): Promise<void> {
+		const ps: Promise<any>[] = []
 		for (const data of buffers) {
-			this.device.write(data)
+			ps.push(this.device.write(data))
 		}
+		await Promise.all(ps)
 	}
 }
