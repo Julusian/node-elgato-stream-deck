@@ -32,7 +32,8 @@ for (let aaa = 0; aaa < 10; aaa++) {
 	const start2 = Date.now()
 	for (let i = 0; i < count; i++) {
 		const b = Buffer.alloc(72 * 72 * 3)
-		v = wasm.hello(buf, b, 'rgba', 72 * 3, 0, 'bgr', 0, true, true, true, 72)
+		// v = wasm.hello(buf, b, 'rgba', 72 * 3, 0, 'bgr', 0, true, true, true, 72)
+		v = wasm.hello(buf, b, 72 * 3, 0, 0, true, false, true, true, true, 72)
 	}
 	const done2 = Date.now()
 	console.log(`wasm took: ${done2 - start2}ms over ${count} samples`)

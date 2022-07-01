@@ -1,5 +1,4 @@
-use core::result::Result;
-// use js_sys::Error;
+// use js_sys::Uint8Array;
 use wasm_bindgen::prelude::*;
 // use wasm_bindgen::throw_str;
 
@@ -7,11 +6,11 @@ use wasm_bindgen::prelude::*;
 pub fn hello(
 	src: &[u8],
 	dest: &mut [u8],
-	source_format: &str,
 	source_stride: usize,
 	source_offset: usize,
-	target_format: &str,
 	target_offset: usize,
+	flip_colours: bool,
+	add_alpha: bool,
 	x_flip: bool,
 	y_flip: bool,
 	rotate: bool,
@@ -24,8 +23,8 @@ pub fn hello(
 	// TODO - check buffer lengths!
 
 	// const flipColours = sourceOptions.format.substring(0, 3) !== targetOptions.colorMode.substring(0, 3)
-	let flip_colours = source_format[0..3].ne(&target_format[0..3]);
-	let target_format_len = target_format.len();
+// 	let flip_colours = source_format[0..3].ne(&target_format[0..3]);
+	let target_format_len = if add_alpha {4} else {3};// target_format.len();
 
 	for y in 0..image_size {
 		let row_offset = target_offset + image_size * target_format_len * y;
@@ -65,7 +64,7 @@ pub fn hello(
 				dest[target_offset + 2] = blue;
 			}
 
-			if target_format.len() == 4 {
+			if add_alpha {
 				dest[target_offset + 3] = 255;
 			}
 		}
