@@ -1,14 +1,7 @@
-import { InternalFillImageOptions } from './models/base'
-import { hello } from '../../../wasm/pkg/streamdeck_wasm'
+import { InternalFillImageOptions } from '../models/base'
+import { FillImageTargetOptions } from '../image/options'
 
-export interface FillImageTargetOptions {
-	colorMode: 'bgr' | 'rgba'
-	xFlip?: boolean
-	yFlip?: boolean
-	rotate?: boolean
-}
-
-export function imageToByteArray(
+export function jsImageToByteArray(
 	imageBuffer: Buffer,
 	sourceOptions: InternalFillImageOptions,
 	targetOptions: FillImageTargetOptions,
@@ -16,22 +9,6 @@ export function imageToByteArray(
 	imageSize: number
 ): Buffer {
 	const byteBuffer = Buffer.alloc(destPadding + imageSize * imageSize * targetOptions.colorMode.length)
-
-	hello(
-		imageBuffer,
-		byteBuffer,
-		sourceOptions.format,
-		sourceOptions.stride,
-		sourceOptions.offset,
-		targetOptions.colorMode,
-		destPadding,
-		targetOptions.xFlip || false,
-		targetOptions.yFlip || false,
-		targetOptions.rotate || false,
-		imageSize
-	)
-
-	return byteBuffer
 
 	const flipColours = sourceOptions.format.substring(0, 3) !== targetOptions.colorMode.substring(0, 3)
 
@@ -72,29 +49,4 @@ export function imageToByteArray(
 	}
 
 	return byteBuffer
-}
-
-export const BMP_HEADER_LENGTH = 54
-export function writeBMPHeader(buf: Buffer, iconSize: number, iconBytes: number, imagePPM: number): void {
-	// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
-
-	// Bitmap file header
-	buf.write('BM')
-	buf.writeUInt32LE(iconBytes + 54, 2)
-	buf.writeInt16LE(0, 6)
-	buf.writeInt16LE(0, 8)
-	buf.writeUInt32LE(54, 10) // Full header size
-
-	// DIB header (BITMAPINFOHEADER)
-	buf.writeUInt32LE(40, 14) // DIB header size
-	buf.writeInt32LE(iconSize, 18)
-	buf.writeInt32LE(iconSize, 22)
-	buf.writeInt16LE(1, 26) // Color planes
-	buf.writeInt16LE(24, 28) // Bit depth
-	buf.writeInt32LE(0, 30) // Compression
-	buf.writeInt32LE(iconBytes, 34) // Image size
-	buf.writeInt32LE(imagePPM, 38) // Horizontal resolution ppm
-	buf.writeInt32LE(imagePPM, 42) // Vertical resolution ppm
-	buf.writeInt32LE(0, 46) // Colour pallette size
-	buf.writeInt32LE(0, 50) // 'Important' Colour count
 }

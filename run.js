@@ -1,6 +1,8 @@
 /* eslint-disable node/no-unpublished-require */
-const { imageToByteArray } = require('./packages/core/dist/util')
-const wasm = require('./wasm/pkg/streamdeck_wasm')
+const { jsImageToByteArray } = require('./packages/core/dist/image/nodejs')
+// const wasm = require('./wasm/pkg/streamdeck_wasm')
+// const wasm = require('./wasm/wasm2')
+const { wasmImageToByteArray } = require('./packages/core/dist/image/wasm')
 
 const buf = Buffer.alloc(72 * 72 * 4)
 
@@ -9,7 +11,7 @@ for (let aaa = 0; aaa < 10; aaa++) {
 	let v
 	const start = Date.now()
 	for (let i = 0; i < count; i++) {
-		v = imageToByteArray(
+		v = jsImageToByteArray(
 			buf,
 			{
 				format: 'rgba',
@@ -31,9 +33,24 @@ for (let aaa = 0; aaa < 10; aaa++) {
 
 	const start2 = Date.now()
 	for (let i = 0; i < count; i++) {
-		const b = Buffer.alloc(72 * 72 * 3)
+		// const b = Buffer.alloc(72 * 72 * 3)
 		// v = wasm.hello(buf, b, 'rgba', 72 * 3, 0, 'bgr', 0, true, true, true, 72)
-		v = wasm.hello(buf, b, 72 * 3, 0, 0, true, false, true, true, true, 72)
+		v = wasmImageToByteArray(
+			buf,
+			{
+				format: 'rgba',
+				offset: 0,
+				stride: 72 * 3,
+			},
+			{
+				colorMode: 'bgr',
+				rotate: true,
+				xFlip: true,
+				yFlip: true,
+			},
+			0,
+			72
+		)
 	}
 	const done2 = Date.now()
 	console.log(`wasm took: ${done2 - start2}ms over ${count} samples`)
