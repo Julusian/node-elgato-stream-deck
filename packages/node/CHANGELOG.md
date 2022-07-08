@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.5.0-alpha.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.4.0...v5.5.0-alpha.0) (2022-07-08)
+
+
+### Bug Fixes
+
+* support @julusian/jpeg-turbo 2.x ([9a0a718](https://github.com/julusian/node-elgato-stream-deck/commit/9a0a718bab6cd77b8803b5e3e42396183b83d892))
+
+
+
+
+
 # [5.4.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.4.0-alpha.0...v5.4.0) (2022-05-10)
 
 
