@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.0](https://github.com/julusian/node-elgato-stream-deck/compare/v3.4.0...v3.5.0) (2022-07-08)
+
+
+### Features
+
+* mini-rev2 support ([e42dc3f](https://github.com/julusian/node-elgato-stream-deck/commit/e42dc3fa8ba050fc4b9a80111c655774edd43548))
+* mini-rev2 support ([e42dc3f](https://github.com/julusian/node-elgato-stream-deck/commit/e42dc3fa8ba050fc4b9a80111c655774edd43548))
+
 ## [3.4.0](https://github.com/julusian/node-elgato-stream-deck/compare/v3.3.5...v3.4.0) (2021-10-14)
 
 
