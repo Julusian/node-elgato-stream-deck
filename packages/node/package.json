@@ -61,6 +61,6 @@
     "tslib": "^2.4.0"
   },
   "peerDependencies": {
-    "@julusian/jpeg-turbo": "^1.1.2"
+    "@julusian/jpeg-turbo": "^1.1.2 || ^2.0.0-0"
   }
 }
