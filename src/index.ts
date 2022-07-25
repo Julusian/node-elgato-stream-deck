@@ -93,7 +93,7 @@ const models: ModelSpec[] = [
 		id: DeviceModelId.MINIV2,
 		productId: 0x0090,
 		class: StreamDeckMiniV2,
-	}
+	},
 ]
 
 export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeckOptions): StreamDeck {

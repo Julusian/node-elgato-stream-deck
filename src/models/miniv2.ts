@@ -1,18 +1,47 @@
-import { OpenStreamDeckOptions, StreamDeckProperties } from './base'
-import { StreamDeckGen2Base } from './base-gen2'
-import { DeviceModelId, StreamDeckDeviceInfo } from './id'
+import { BMP_HEADER_LENGTH, imageToByteArray, numberArrayToString, writeBMPHeader } from '../util'
+import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties, InternalFillImageOptions } from './base'
+import { DeviceModelId, KeyIndex, StreamDeckDeviceInfo } from './id'
 
 const miniV2Properties: StreamDeckProperties = {
-	MODEL: DeviceModelId.MINIV2,
+	MODEL: DeviceModelId.MINI,
 	COLUMNS: 3,
 	ROWS: 2,
 	ICON_SIZE: 80,
 	KEY_DIRECTION: 'ltr',
-	KEY_DATA_OFFSET: 4
+	KEY_DATA_OFFSET: 1,
 }
 
-export class StreamDeckMiniV2 extends StreamDeckGen2Base {
+export class StreamDeckMiniV2 extends StreamDeckBase {
 	constructor(deviceInfo: StreamDeckDeviceInfo, options: OpenStreamDeckOptions) {
 		super(deviceInfo, options, miniV2Properties)
+	}
+
+	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {
+		return keyIndex
+	}
+
+	protected convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Buffer {
+		const byteBuffer = imageToByteArray(
+			sourceBuffer,
+			sourceOptions,
+			BMP_HEADER_LENGTH,
+			this.rotateCoordinates.bind(this),
+			'bgr',
+			this.ICON_SIZE
+		)
+		writeBMPHeader(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 2835)
+		return byteBuffer
+	}
+
+	protected getFillImagePacketLength(): number {
+		return 1024
+	}
+
+	private rotateCoordinates(x: number, y: number): { x: number; y: number } {
+		return { x: this.ICON_SIZE - y - 1, y: x }
+	}
+
+	public getSerialNumber(): string {
+		return numberArrayToString(this.getFeatureReport(3, 32).slice(5, 17))
 	}
 }
