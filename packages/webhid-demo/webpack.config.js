@@ -1,7 +1,7 @@
 /* eslint-disable node/no-extraneous-require */
 const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const { ProvidePlugin } = require('webpack')
+const { ProvidePlugin, DefinePlugin } = require('webpack')
 
 module.exports = {
 	// Where to fine the source code
@@ -63,6 +63,9 @@ module.exports = {
 		}),
 		new ProvidePlugin({
 			Buffer: ['buffer', 'Buffer'],
+		}),
+		new DefinePlugin({
+			LIB_VERSION: JSON.stringify(process.env.npm_package_version || ''),
 		}),
 	],
 }
