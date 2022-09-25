@@ -4879,6 +4879,12 @@ exports.DEVICE_MODELS = [
         class: models_1.StreamDeckPedal,
     },
     {
+        id: models_1.DeviceModelId.XLV2,
+        type: DeviceModelType.STREAMDECK,
+        productId: 0x008f,
+        class: models_1.StreamDeckXLV2,
+    },
+    {
         id: models_1.DeviceModelId.MINIV2,
         type: DeviceModelType.STREAMDECK,
         productId: 0x0090,
@@ -5256,6 +5262,7 @@ var DeviceModelId;
     DeviceModelId["MINI"] = "mini";
     DeviceModelId["MINIV2"] = "miniv2";
     DeviceModelId["XL"] = "xl";
+    DeviceModelId["XLV2"] = "xlv2";
     DeviceModelId["PEDAL"] = "pedal";
 })(DeviceModelId = exports.DeviceModelId || (exports.DeviceModelId = {}));
 //# sourceMappingURL=id.js.map
@@ -5278,7 +5285,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckPedal = exports.StreamDeckOriginalMK2 = exports.StreamDeckOriginalV2 = exports.StreamDeckXL = exports.StreamDeckMiniV2 = exports.StreamDeckMini = exports.StreamDeckOriginal = void 0;
+exports.StreamDeckPedal = exports.StreamDeckOriginalMK2 = exports.StreamDeckOriginalV2 = exports.StreamDeckXLV2 = exports.StreamDeckXL = exports.StreamDeckMiniV2 = exports.StreamDeckMini = exports.StreamDeckOriginal = void 0;
 __exportStar(__webpack_require__(766), exports);
 var original_1 = __webpack_require__(148);
 Object.defineProperty(exports, "StreamDeckOriginal", ({ enumerable: true, get: function () { return original_1.StreamDeckOriginal; } }));
@@ -5288,6 +5295,8 @@ var miniv2_1 = __webpack_require__(207);
 Object.defineProperty(exports, "StreamDeckMiniV2", ({ enumerable: true, get: function () { return miniv2_1.StreamDeckMiniV2; } }));
 var xl_1 = __webpack_require__(287);
 Object.defineProperty(exports, "StreamDeckXL", ({ enumerable: true, get: function () { return xl_1.StreamDeckXL; } }));
+var xlv2_1 = __webpack_require__(474);
+Object.defineProperty(exports, "StreamDeckXLV2", ({ enumerable: true, get: function () { return xlv2_1.StreamDeckXLV2; } }));
 var originalv2_1 = __webpack_require__(168);
 Object.defineProperty(exports, "StreamDeckOriginalV2", ({ enumerable: true, get: function () { return originalv2_1.StreamDeckOriginalV2; } }));
 var original_mk2_1 = __webpack_require__(51);
@@ -5583,6 +5592,34 @@ class StreamDeckXL extends base_gen2_1.StreamDeckGen2Base {
 }
 exports.StreamDeckXL = StreamDeckXL;
 //# sourceMappingURL=xl.js.map
+
+/***/ }),
+
+/***/ 474:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamDeckXLV2 = void 0;
+const base_gen2_1 = __webpack_require__(679);
+const id_1 = __webpack_require__(766);
+const xlProperties = {
+    MODEL: id_1.DeviceModelId.XLV2,
+    PRODUCT_NAME: 'Streamdeck XL',
+    COLUMNS: 8,
+    ROWS: 4,
+    ICON_SIZE: 96,
+    KEY_DIRECTION: 'ltr',
+    KEY_DATA_OFFSET: 4,
+};
+class StreamDeckXLV2 extends base_gen2_1.StreamDeckGen2Base {
+    constructor(device, options) {
+        super(device, options, xlProperties);
+    }
+}
+exports.StreamDeckXLV2 = StreamDeckXLV2;
+//# sourceMappingURL=xlv2.js.map
 
 /***/ }),
 
@@ -6073,7 +6110,7 @@ const chase_1 = __webpack_require__(888);
 if (true) {
     const elm = document.querySelector('#version_str');
     if (elm) {
-        elm.innerHTML = `v${"5.5.0"}`;
+        elm.innerHTML = `v${"5.6.0-alpha.0"}`;
     }
 }
 function appendLog(str) {
