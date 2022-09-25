@@ -7,5 +7,6 @@ export enum DeviceModelId {
 	MINI = 'mini',
 	MINIV2 = 'miniv2',
 	XL = 'xl',
+	XLV2 = 'xlv2',
 	PEDAL = 'pedal',
 }

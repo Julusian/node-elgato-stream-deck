@@ -7,6 +7,7 @@ import {
 	StreamDeckOriginalV2,
 	StreamDeckOriginalMK2,
 	StreamDeckXL,
+	StreamDeckXLV2,
 	StreamDeckPedal,
 	OpenStreamDeckOptions,
 	StreamDeck,
@@ -75,6 +76,12 @@ export const DEVICE_MODELS: DeviceModelSpec[] = [
 		type: DeviceModelType.PEDAL,
 		productId: 0x0086,
 		class: StreamDeckPedal,
+	},
+	{
+		id: DeviceModelId.XLV2,
+		type: DeviceModelType.STREAMDECK,
+		productId: 0x008f,
+		class: StreamDeckXLV2,
 	},
 	{
 		id: DeviceModelId.MINIV2,
