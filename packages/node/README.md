@@ -17,7 +17,7 @@ This library has nothing to do with the streamdeck software produced by Elgato. 
 
 `$ npm install --save @elgato-stream-deck/node`
 
-`$ npm install --save @julusian/jpeg-turbo@^1.0.1` (Optional)
+`$ npm install --save @julusian/jpeg-turbo@^2.0.0` (Optional)
 
 It is recommended to install `@julusian/jpeg-turbo` to greatly improve performance for writing images to the StreamDeck XL or the Original-v2. Without doing so `jpeg-js` will be used instead, but image transfers will be noticably more cpu intensive and slower. `jpeg-turbo` has prebuilt binaries, but is not installed by default to ensure installation is easy for users who do not need the performance for the XL or the Original-v2.
 
