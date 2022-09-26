@@ -62,5 +62,14 @@
   },
   "peerDependencies": {
     "@julusian/jpeg-turbo": "^1.1.2 || ^2.0.0"
+  },
+  "devDependencies": {
+    "@julusian/jpeg-turbo": "^2.0.0",
+    "@types/node-hid": "^1.3.1",
+    "@types/sharp": "^0.31.0",
+    "rimraf": "^3.0.2",
+    "sharp": "^0.31.0",
+    "typescript": "~4.5",
+    "usb-detection": "^4.14.1"
   }
 }
