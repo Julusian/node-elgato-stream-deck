@@ -440,7 +440,7 @@ __metadata:
     sharp: ^0.31.0
     tslib: ^2.4.0
     typescript: ~4.5
-    usb-detection: ^4.14.1
+    usb: ^2.5.2
   peerDependencies:
     "@julusian/jpeg-turbo": ^1.1.2 || ^2.0.0
   languageName: unknown
@@ -1285,6 +1285,13 @@ __metadata:
   version: 1.0.3
   resolution: "@types/w3c-web-hid@npm:1.0.3"
   checksum: 90ee1eeb2acf5d5ddf0b7acefd4f8aaa7d0175d991c3606a9ad62bdfa7a8de93665f5f6218dc4ecb34ea1d2f3e357813b315f46c1ea6b8aa1693e217e436c9b2
+  languageName: node
+  linkType: hard
+
+"@types/w3c-web-usb@npm:1.0.6":
+  version: 1.0.6
+  resolution: "@types/w3c-web-usb@npm:1.0.6"
+  checksum: 9f30948cb84174fa290066b08274bdfb034d38c6db0976e9a826508732fba04d81e3300bca41ea23b737f1424c51adec5ae810cdf85d5b5a158d5840914f0417
   languageName: node
   linkType: hard
 
@@ -3402,13 +3409,6 @@ __metadata:
   version: 1.8.1
   resolution: "etag@npm:1.8.1"
   checksum: 571aeb3dbe0f2bbd4e4fadbdb44f325fc75335cd5f6f6b6a091e6a06a9f25ed5392f0863c5442acb0646787446e816f13cbfc6edce5b07658541dff573cab1ff
-  languageName: node
-  linkType: hard
-
-"eventemitter2@npm:^5.0.1":
-  version: 5.0.1
-  resolution: "eventemitter2@npm:5.0.1"
-  checksum: 61cb074b8a71d6e0bcbbf3107aa08cede21b5a588858ef5faf6308d868f277eb30c1a65c5da0cb4e35960c6b2d5bcfb42dbfb7d0302decff94b68da368852b14
   languageName: node
   linkType: hard
 
@@ -5677,15 +5677,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nan@npm:^2.15.0":
-  version: 2.16.0
-  resolution: "nan@npm:2.16.0"
-  dependencies:
-    node-gyp: latest
-  checksum: cb16937273ea55b01ea47df244094c12297ce6b29b36e845d349f1f7c268b8d7c5abd126a102c5678a1e1afd0d36bba35ea0cc959e364928ce60561c9306064a
-  languageName: node
-  linkType: hard
-
 "napi-build-utils@npm:^1.0.1":
   version: 1.0.2
   resolution: "napi-build-utils@npm:1.0.2"
@@ -5741,6 +5732,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-addon-api@npm:^4.2.0":
+  version: 4.3.0
+  resolution: "node-addon-api@npm:4.3.0"
+  dependencies:
+    node-gyp: latest
+  checksum: 3de396e23cc209f539c704583e8e99c148850226f6e389a641b92e8967953713228109f919765abc1f4355e801e8f41842f96210b8d61c7dcc10a477002dcf00
+  languageName: node
+  linkType: hard
+
 "node-addon-api@npm:^5.0.0":
   version: 5.0.0
   resolution: "node-addon-api@npm:5.0.0"
@@ -5761,6 +5761,17 @@ __metadata:
   version: 1.3.1
   resolution: "node-forge@npm:1.3.1"
   checksum: 08fb072d3d670599c89a1704b3e9c649ff1b998256737f0e06fbd1a5bf41cae4457ccaee32d95052d80bbafd9ffe01284e078c8071f0267dc9744e51c5ed42a9
+  languageName: node
+  linkType: hard
+
+"node-gyp-build@npm:^4.3.0":
+  version: 4.5.0
+  resolution: "node-gyp-build@npm:4.5.0"
+  bin:
+    node-gyp-build: bin.js
+    node-gyp-build-optional: optional.js
+    node-gyp-build-test: build-test.js
+  checksum: d888bae0fb88335f69af1b57a2294a931c5042f36e413d8d364c992c9ebfa0b96ffe773179a5a2c8f04b73856e8634e09cce108dbb9804396d3cc8c5455ff2db
   languageName: node
   linkType: hard
 
@@ -6274,7 +6285,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prebuild-install@npm:^7.0.1, prebuild-install@npm:^7.1.1":
+"prebuild-install@npm:^7.1.1":
   version: 7.1.1
   resolution: "prebuild-install@npm:7.1.1"
   dependencies:
@@ -7913,16 +7924,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"usb-detection@npm:^4.14.1":
-  version: 4.14.1
-  resolution: "usb-detection@npm:4.14.1"
+"usb@npm:^2.5.2":
+  version: 2.5.2
+  resolution: "usb@npm:2.5.2"
   dependencies:
-    bindings: ^1.5.0
-    eventemitter2: ^5.0.1
-    nan: ^2.15.0
+    "@types/w3c-web-usb": 1.0.6
+    node-addon-api: ^4.2.0
     node-gyp: latest
-    prebuild-install: ^7.0.1
-  checksum: 3fff7b9871470c5092195ad07da5a45c19c7b470e1ed91ef53a9e3c0a93e3e3ccab4b20d39cba90ea440413975b90566f71769f6103ba5b006885b5120cfee64
+    node-gyp-build: ^4.3.0
+  checksum: 703d47c99aff5729d896c3eeb0fe4441d09a3883863551c63580224067467782380794597334d0e443f2f7bd2a2c141fdf205508366e303286dfaca5d8238de1
   languageName: node
   linkType: hard
 

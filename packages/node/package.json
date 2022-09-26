@@ -70,6 +70,6 @@
     "rimraf": "^3.0.2",
     "sharp": "^0.31.0",
     "typescript": "~4.5",
-    "usb-detection": "^4.14.1"
+    "usb": "^2.5.2"
   }
 }

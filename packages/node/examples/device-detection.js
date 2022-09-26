@@ -1,4 +1,4 @@
-const usbDetect = require('usb-detection')
+const { usb } = require('usb')
 const { listStreamDecks, openStreamDeck } = require('../dist/index')
 const streamDecks = {}
 
@@ -36,12 +36,14 @@ function refresh() {
 }
 refresh()
 
-usbDetect.startMonitoring()
-
-usbDetect.on('add:4057', function () {
-	refresh()
+usb.on('attach', function (e) {
+	if (e.deviceDescriptor.idVendor === 0x0fd9) {
+		refresh()
+	}
 })
-usbDetect.on('remove:4057', function (device) {
-	console.log(`${JSON.stringify(device)} was removed`)
-	refresh()
+usb.on('detach', function (e) {
+	if (e.deviceDescriptor.idVendor === 0x0fd9) {
+		console.log(`${JSON.stringify(e.deviceDescriptor)} was removed`)
+		refresh()
+	}
 })
