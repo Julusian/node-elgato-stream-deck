@@ -5,7 +5,7 @@ const { openStreamDeck } = require('../dist/index')
 
 console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the second image.')
 ;(async () => {
-	const streamDeck = openStreamDeck()
+	const streamDeck = await openStreamDeck()
 	await streamDeck.clearPanel()
 
 	const bmpImgField = await Jimp.read(path.resolve(__dirname, 'fixtures/sunny_field.png')).then((img) => {

@@ -4,7 +4,7 @@ const jpegJS = require('jpeg-js')
 const { openStreamDeck } = require('../dist/index')
 
 ;(async () => {
-	const streamDeck = openStreamDeck()
+	const streamDeck = await openStreamDeck()
 	streamDeck.clearPanel()
 
 	const rawFile = fs.readFileSync(path.resolve(__dirname, `fixtures/github_logo_${streamDeck.ICON_SIZE}.jpg`))

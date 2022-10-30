@@ -87,7 +87,7 @@ export async function openStreamDeck(
 		...userOptions,
 	}
 
-	const hidDevice = await HID.openAsyncHIDDevice(foundDevices[0].path)
+	const hidDevice = await HID.HIDAsync.open(foundDevices[0].path)
 
 	// TODO - can we determine what the device is onceit is opened? Save having to do the devices search above
 
