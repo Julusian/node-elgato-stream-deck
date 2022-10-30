@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.6.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.6.0-alpha.0...v5.6.0) (2022-09-30)
+
+**Note:** Version bump only for package elgato-stream-deck-packages
+
+
+
+
+
+# [5.6.0-alpha.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.5.0...v5.6.0-alpha.0) (2022-09-25)
+
+**Note:** Version bump only for package elgato-stream-deck-packages
+
+
+
+
+
+# [5.5.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.5.0-alpha.1...v5.5.0) (2022-07-25)
+
+**Note:** Version bump only for package elgato-stream-deck-packages
+
+
+
+
+
+# [5.5.0-alpha.1](https://github.com/julusian/node-elgato-stream-deck/compare/v5.5.0-alpha.0...v5.5.0-alpha.1) (2022-07-25)
+
+
+### Bug Fixes
+
+* mini-v2 ([b5bce79](https://github.com/julusian/node-elgato-stream-deck/commit/b5bce799c8b46f4d882e6b80e073445be3261b8b))
+
+
+
+
+
+# [5.5.0-alpha.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.4.0...v5.5.0-alpha.0) (2022-07-08)
+
+
+### Bug Fixes
+
+* optimise coordinate manipulation for buffers ([4ca3b66](https://github.com/julusian/node-elgato-stream-deck/commit/4ca3b66a03b17c1d495a726d89a90a3890b23ddc))
+* support @julusian/jpeg-turbo 2.x ([9a0a718](https://github.com/julusian/node-elgato-stream-deck/commit/9a0a718bab6cd77b8803b5e3e42396183b83d892))
+
+
+### Features
+
+* implement mini-v2 ([4993389](https://github.com/julusian/node-elgato-stream-deck/commit/49933898efb8772a008f8427eca15d4a1b20448d))
+
+
+
+
+
 # [5.4.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.4.0-alpha.0...v5.4.0) (2022-05-10)
 
 

@@ -2,14 +2,16 @@ import { HIDDevice } from './device'
 import {
 	DeviceModelId,
 	StreamDeckMini,
+	StreamDeckMiniV2,
 	StreamDeckOriginal,
 	StreamDeckOriginalV2,
 	StreamDeckOriginalMK2,
 	StreamDeckXL,
+	StreamDeckXLV2,
+	StreamDeckPedal,
 	OpenStreamDeckOptions,
 	StreamDeck,
 } from './models'
-import { StreamDeckPedal } from './models/pedal'
 
 export { HIDDevice } from './device'
 export {
@@ -74,5 +76,17 @@ export const DEVICE_MODELS: DeviceModelSpec[] = [
 		type: DeviceModelType.PEDAL,
 		productId: 0x0086,
 		class: StreamDeckPedal,
+	},
+	{
+		id: DeviceModelId.XLV2,
+		type: DeviceModelType.STREAMDECK,
+		productId: 0x008f,
+		class: StreamDeckXLV2,
+	},
+	{
+		id: DeviceModelId.MINIV2,
+		type: DeviceModelType.STREAMDECK,
+		productId: 0x0090,
+		class: StreamDeckMiniV2,
 	},
 ]

@@ -8,7 +8,7 @@ if ('DEVSERVER_FLAGS' in process.env) {
 try {
 	console.log('Starting watchers')
 	// Now run everything
-	const r = await concurrently(
+	const r = concurrently(
 		[
 			{
 				command: 'yarn workspace @elgato-stream-deck/core build:main --watch',
