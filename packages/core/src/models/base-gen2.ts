@@ -1,5 +1,5 @@
 import { HIDDevice } from '../device'
-import { imageToByteArray } from '../util'
+import { imageToByteArray } from '../image'
 import {
 	EncodeJPEGHelper,
 	InternalFillImageOptions,
