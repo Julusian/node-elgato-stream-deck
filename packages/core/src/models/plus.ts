@@ -104,17 +104,31 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 				break
 			case 0x01: // rotate
 				for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
-					switch (data[4 + keyIndex]) {
-						case 0x01: // Right
-							this.emit('rotateRight', keyIndex)
-							break
-						case 0xff: // Left
-							this.emit('rotateLeft', keyIndex)
-							break
+					const value = data[4 + keyIndex]
+					if (value === 0) {
+						// Ignore
+					} else if (value < 0x7f) {
+						this.emit('rotateRight', keyIndex)
+					} else {
+						this.emit('rotateLeft', keyIndex)
 					}
 				}
 				break
 		}
+	}
+
+	public async clearPanel(): Promise<void> {
+		const clearButtons = super.clearPanel()
+
+		const lcdSize = this.LCD_STRIP_SIZE
+		const buffer = Buffer.alloc(lcdSize.width * lcdSize.height * 4)
+		const clearLcd = this.fillLcdRegion(0, 0, buffer, {
+			format: 'rgba',
+			width: lcdSize.width,
+			height: lcdSize.height,
+		})
+
+		await Promise.all([clearButtons, clearLcd])
 	}
 
 	public override async fillEncoderLcd(
