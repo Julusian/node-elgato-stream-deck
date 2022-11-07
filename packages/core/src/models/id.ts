@@ -1,5 +1,7 @@
 export type KeyIndex = number
 
+export type EncoderIndex = number
+
 export enum DeviceModelId {
 	ORIGINAL = 'original',
 	ORIGINALV2 = 'originalv2',

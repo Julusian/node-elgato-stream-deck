@@ -10,7 +10,7 @@ const xlProperties: StreamDeckProperties = {
 	ROWS: 4,
 	ICON_SIZE: 96,
 	KEY_DIRECTION: 'ltr',
-	KEY_DATA_OFFSET: 4,
+	KEY_DATA_OFFSET: 3,
 }
 
 export class StreamDeckXL extends StreamDeckGen2Base {

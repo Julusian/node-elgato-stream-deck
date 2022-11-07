@@ -7,7 +7,6 @@ import Queue from 'p-queue'
  * This translates it into the common format expected by @elgato-stream-deck/core
  */
 export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
-	public dataKeyOffset?: number
 	private readonly device: HIDDevice
 
 	private readonly reportQueue = new Queue({ concurrency: 1 })
@@ -22,8 +21,7 @@ export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 			// Button press
 			if (event.reportId === 0x01) {
 				const data = new Uint8Array(event.data.buffer)
-				const offset = this.dataKeyOffset || 1
-				const buttons = Array.from(data).slice(offset - 1, data.length - 1)
+				const buttons = data.subarray(0, data.length - 1)
 				this.emit('input', buttons)
 			}
 		})

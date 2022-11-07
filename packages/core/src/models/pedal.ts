@@ -10,7 +10,7 @@ const pedalProperties: StreamDeckProperties = {
 	ROWS: 1,
 	ICON_SIZE: 0,
 	KEY_DIRECTION: 'ltr',
-	KEY_DATA_OFFSET: 4,
+	KEY_DATA_OFFSET: 3,
 }
 
 export class StreamDeckPedal extends StreamDeckInputBase {

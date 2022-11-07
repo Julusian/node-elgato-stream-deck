@@ -1,5 +1,5 @@
 import * as EventEmitter from 'eventemitter3'
-import { DeviceModelId, KeyIndex } from './id'
+import { DeviceModelId, EncoderIndex, KeyIndex } from './id'
 
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
@@ -10,6 +10,9 @@ export type StreamDeckEvents = {
 	down: [key: KeyIndex]
 	up: [key: KeyIndex]
 	error: [err: unknown]
+	rotateLeft: [encoder: EncoderIndex]
+	rotateRight: [encoder: EncoderIndex]
+	lcdPress: [encoder: EncoderIndex, x: number, y: number]
 }
 
 export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
@@ -19,6 +22,11 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	readonly KEY_COLUMNS: number
 	/** The number of rows on this streamdeck */
 	readonly KEY_ROWS: number
+
+	/** The number of encoders on this streamdeck (if any) */
+	readonly NUM_ENCODERS: number
+	/** The size of the lcd on this streamdeck (if any) */
+	readonly LCD_STRIP_SIZE: { x: number; y: number } | undefined
 
 	/** The horizontal/vertical resolution of the buttons */
 	readonly ICON_SIZE: number

@@ -23,6 +23,12 @@ export class StreamDeckProxy implements StreamDeck {
 	public get KEY_ROWS(): number {
 		return this.device.KEY_ROWS
 	}
+	public get NUM_ENCODERS(): number {
+		return this.device.NUM_ENCODERS
+	}
+	public get LCD_STRIP_SIZE(): { x: number; y: number } | undefined {
+		return this.device.LCD_STRIP_SIZE
+	}
 	public get ICON_SIZE(): number {
 		return this.device.ICON_SIZE
 	}

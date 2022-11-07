@@ -10,7 +10,7 @@ const origV2Properties: StreamDeckProperties = {
 	ROWS: 3,
 	ICON_SIZE: 72,
 	KEY_DIRECTION: 'ltr',
-	KEY_DATA_OFFSET: 4,
+	KEY_DATA_OFFSET: 3,
 }
 
 export class StreamDeckOriginalV2 extends StreamDeckGen2Base {

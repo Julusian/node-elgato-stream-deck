@@ -38,6 +38,13 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 		return this.deviceProperties.ROWS
 	}
 
+	get NUM_ENCODERS(): number {
+		return 0 // TODO
+	}
+	get LCD_STRIP_SIZE(): { x: number; y: number } | undefined {
+		return undefined // TODO
+	}
+
 	get ICON_SIZE(): number {
 		return this.deviceProperties.ICON_SIZE
 	}
@@ -68,26 +75,29 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 
 		this.keyState = new Array<boolean>(this.NUM_KEYS).fill(false)
 
-		this.device.dataKeyOffset = properties.KEY_DATA_OFFSET
-		this.device.on('input', (data) => {
-			for (let i = 0; i < this.NUM_KEYS; i++) {
-				const keyPressed = Boolean(data[i])
-				const keyIndex = this.transformKeyIndex(i)
-				const stateChanged = keyPressed !== this.keyState[keyIndex]
-				if (stateChanged) {
-					this.keyState[keyIndex] = keyPressed
-					if (keyPressed) {
-						this.emit('down', keyIndex)
-					} else {
-						this.emit('up', keyIndex)
-					}
-				}
-			}
-		})
+		// this.device.dataKeyOffset = properties.KEY_DATA_OFFSET
+		this.device.on('input', (data: Uint8Array) => this.handleInputBuffer(data))
 
 		this.device.on('error', (err) => {
 			this.emit('error', err)
 		})
+	}
+
+	protected handleInputBuffer(data: Uint8Array): void {
+		const keyData = data.subarray(this.deviceProperties.KEY_DATA_OFFSET || 0, data.length - 1)
+		for (let i = 0; i < this.NUM_KEYS; i++) {
+			const keyPressed = Boolean(keyData[i])
+			const keyIndex = this.transformKeyIndex(i)
+			const stateChanged = keyPressed !== this.keyState[keyIndex]
+			if (stateChanged) {
+				this.keyState[keyIndex] = keyPressed
+				if (keyPressed) {
+					this.emit('down', keyIndex)
+				} else {
+					this.emit('up', keyIndex)
+				}
+			}
+		}
 	}
 
 	public checkValidKeyIndex(keyIndex: KeyIndex): void {
