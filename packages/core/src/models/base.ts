@@ -39,10 +39,12 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	}
 
 	get NUM_ENCODERS(): number {
-		return 0 // TODO
+		// Overridden by models which support this
+		return 0
 	}
-	get LCD_STRIP_SIZE(): { x: number; y: number } | undefined {
-		return undefined // TODO
+	get LCD_STRIP_SIZE(): { width: number; height: number } | undefined {
+		// Overridden by models which support this
+		return undefined
 	}
 
 	get ICON_SIZE(): number {

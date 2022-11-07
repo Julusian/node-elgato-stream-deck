@@ -12,8 +12,8 @@ import {
  * Base class for generation 2 hardware (starting with the xl)
  */
 export abstract class StreamDeckGen2Base extends StreamDeckBase {
-	private encodeJPEG: EncodeJPEGHelper
-	private xyFlip: boolean
+	protected readonly encodeJPEG: EncodeJPEGHelper
+	protected readonly xyFlip: boolean
 
 	constructor(
 		device: HIDDevice,

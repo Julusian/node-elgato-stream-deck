@@ -1,5 +1,7 @@
+import { imageToByteArray } from '../util'
+import { FillImageOptions } from '.'
 import { HIDDevice } from '../device'
-import { OpenStreamDeckOptions, StreamDeckProperties } from './base'
+import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
 import { StreamDeckGen2Base } from './base-gen2'
 import { DeviceModelId } from './id'
 
@@ -26,6 +28,10 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		return 4
 	}
 
+	public get LCD_STRIP_SIZE(): { width: number; height: number } {
+		return { width: 800, height: 100 }
+	}
+
 	protected handleInputBuffer(data: Uint8Array): void {
 		const inputType = data[0]
 		switch (inputType) {
@@ -37,7 +43,6 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 				// TODO
 				break
 			case 0x03: // Encoder
-				console.log(data)
 				switch (data[3]) {
 					case 0x00: // press/release
 						for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
@@ -70,4 +75,83 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 				break
 		}
 	}
+
+	public async fillLcdRegion(
+		x: number,
+		y: number,
+		imageBuffer: Buffer,
+		sourceOptions: FillLcdImageOptions
+	): Promise<void> {
+		// Basic bounds checking
+		const maxSize = this.LCD_STRIP_SIZE
+		if (x < 0 || x + sourceOptions.width > maxSize.width) {
+			throw new TypeError(`Image will not fit within the lcd strip`)
+		}
+		if (y < 0 || y + sourceOptions.height > maxSize.height) {
+			throw new TypeError(`Image will not fit within the lcd strip`)
+		}
+
+		const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions)
+
+		const packets = this.generateFillLcdWrites(x, y, byteBuffer, sourceOptions)
+		await this.device.sendReports(packets)
+	}
+
+	protected async convertFillLcdBuffer(sourceBuffer: Buffer, sourceOptions: FillLcdImageOptions): Promise<Buffer> {
+		const byteBuffer = imageToByteArray(
+			sourceBuffer,
+			sourceOptions,
+			{ colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip },
+			0,
+			sourceOptions.width,
+			sourceOptions.height
+		)
+
+		return this.encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height)
+	}
+
+	protected generateFillLcdWrites(
+		x: number,
+		y: number,
+		byteBuffer: Buffer,
+		sourceOptions: FillLcdImageOptions
+	): Buffer[] {
+		const MAX_PACKET_SIZE = 1024 // this.getFillImagePacketLength()
+		const PACKET_HEADER_LENGTH = 16
+		const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH
+
+		const result: Buffer[] = []
+
+		let remainingBytes = byteBuffer.length
+		for (let part = 0; remainingBytes > 0; part++) {
+			const packet = Buffer.alloc(MAX_PACKET_SIZE)
+
+			const byteCount = Math.min(remainingBytes, MAX_PAYLOAD_SIZE)
+			packet.writeUInt8(0x02, 0)
+			packet.writeUInt8(0x0c, 1)
+			packet.writeUInt16LE(x, 2)
+			packet.writeUInt16LE(y, 4)
+			packet.writeUInt16LE(sourceOptions.width, 6)
+			packet.writeUInt16LE(sourceOptions.height, 8)
+			packet.writeUInt8(remainingBytes <= MAX_PAYLOAD_SIZE ? 1 : 0, 10) // Is last
+			packet.writeUInt16LE(part, 11)
+			packet.writeUInt16LE(byteCount, 13)
+
+			const byteOffset = byteBuffer.length - remainingBytes
+			remainingBytes -= byteCount
+			byteBuffer.copy(packet, PACKET_HEADER_LENGTH, byteOffset, byteOffset + byteCount)
+
+			result.push(packet)
+		}
+
+		return result
+	}
+}
+
+interface FillLcdImageOptions extends FillImageOptions {
+	offset: number
+	stride: number
+
+	width: number
+	height: number
 }

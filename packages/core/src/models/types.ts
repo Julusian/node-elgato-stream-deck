@@ -28,7 +28,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	/** The number of encoders on this streamdeck (if any) */
 	readonly NUM_ENCODERS: number
 	/** The size of the lcd on this streamdeck (if any) */
-	readonly LCD_STRIP_SIZE: { x: number; y: number } | undefined
+	readonly LCD_STRIP_SIZE: { width: number; height: number } | undefined
 
 	/** The horizontal/vertical resolution of the buttons */
 	readonly ICON_SIZE: number

@@ -26,7 +26,7 @@ export class StreamDeckProxy implements StreamDeck {
 	public get NUM_ENCODERS(): number {
 		return this.device.NUM_ENCODERS
 	}
-	public get LCD_STRIP_SIZE(): { x: number; y: number } | undefined {
+	public get LCD_STRIP_SIZE(): { width: number; height: number } | undefined {
 		return this.device.LCD_STRIP_SIZE
 	}
 	public get ICON_SIZE(): number {
@@ -78,6 +78,10 @@ export class StreamDeckProxy implements StreamDeck {
 	}
 	public async getSerialNumber(): Promise<string> {
 		return this.device.getSerialNumber()
+	}
+
+	public fillLcdRegion(...args: any[]): Promise<any> {
+		return this.device.fillLcdRegion(...args)
 	}
 
 	/**
