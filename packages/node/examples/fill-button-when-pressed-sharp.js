@@ -71,8 +71,14 @@ const { openStreamDeck } = require('../dist/index')
 	streamDeck.on('rotateRight', (index) => {
 		console.log('Encoder right #%d', index)
 	})
-	streamDeck.on('lcdPress', (index, x, y) => {
-		console.log('lcd press #%d (%d, %d)', index, x, y)
+	streamDeck.on('lcdShortPress', (index, pos) => {
+		console.log('lcd short press #%d (%d, %d)', index, pos.x, pos.y)
+	})
+	streamDeck.on('lcdLongPress', (index, pos) => {
+		console.log('lcd long press #%d (%d, %d)', index, pos.x, pos.y)
+	})
+	streamDeck.on('lcdSwipe', (index, index2, pos, pos2) => {
+		console.log('lcd swipe #%d->#%d (%d, %d)->(%d, %d)', index, index2, pos.x, pos.y, pos2.x, pos2.y)
 	})
 
 	streamDeck.on('error', (error) => {

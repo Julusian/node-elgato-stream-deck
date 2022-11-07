@@ -1,5 +1,5 @@
 import { imageToByteArray } from '../util'
-import { FillImageOptions, FillLcdImageOptions, LcdSegmentSize } from './types'
+import { FillImageOptions, FillLcdImageOptions, LcdPosition, LcdSegmentSize } from './types'
 import { HIDDevice } from '../device'
 import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
 import { StreamDeckGen2Base } from './base-gen2'
@@ -38,6 +38,11 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		return { width: 200, height: 100 }
 	}
 
+	private calculateEncoderForX(x: number): EncoderIndex {
+		const encoderWidth = this.LCD_ENCODER_SIZE.width
+		return Math.floor(x / encoderWidth)
+	}
+
 	protected handleInputBuffer(data: Uint8Array): void {
 		const inputType = data[0]
 		switch (inputType) {
@@ -45,39 +50,69 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 				super.handleInputBuffer(data)
 				break
 			case 0x02: // LCD
-				console.log(data)
-				// TODO
+				this.handleLcdInput(data)
 				break
 			case 0x03: // Encoder
-				switch (data[3]) {
-					case 0x00: // press/release
-						for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
-							const keyPressed = Boolean(data[4 + keyIndex])
-							const stateChanged = keyPressed !== this.#encoderState[keyIndex]
-							if (stateChanged) {
-								this.#encoderState[keyIndex] = keyPressed
-								if (keyPressed) {
-									this.emit('encoderDown', keyIndex)
-								} else {
-									this.emit('encoderUp', keyIndex)
-								}
-							}
-						}
-						break
-					case 0x01: // rotate
-						for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
-							switch (data[4 + keyIndex]) {
-								case 0x01: // Right
-									this.emit('rotateRight', keyIndex)
-									break
-								case 0xff: // Left
-									this.emit('rotateLeft', keyIndex)
-									break
-							}
-						}
-						break
+				this.handleEncoderInput(data)
+				break
+		}
+	}
+
+	private handleLcdInput(data: Uint8Array): void {
+		const buffer = Buffer.from(data)
+		const position: LcdPosition = {
+			x: buffer.readUint16LE(5),
+			y: buffer.readUint16LE(7),
+		}
+		const index = this.calculateEncoderForX(position.x)
+
+		switch (data[3]) {
+			case 0x01: // short press
+				this.emit('lcdShortPress', index, position)
+				break
+			case 0x02: // long press
+				this.emit('lcdLongPress', index, position)
+				break
+			case 0x03: {
+				// swipe
+				const position2: LcdPosition = {
+					x: buffer.readUint16LE(9),
+					y: buffer.readUint16LE(11),
 				}
-				// TODO
+				const index2 = this.calculateEncoderForX(position2.x)
+				this.emit('lcdSwipe', index, index2, position, position2)
+				break
+			}
+		}
+	}
+
+	private handleEncoderInput(data: Uint8Array): void {
+		switch (data[3]) {
+			case 0x00: // press/release
+				for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
+					const keyPressed = Boolean(data[4 + keyIndex])
+					const stateChanged = keyPressed !== this.#encoderState[keyIndex]
+					if (stateChanged) {
+						this.#encoderState[keyIndex] = keyPressed
+						if (keyPressed) {
+							this.emit('encoderDown', keyIndex)
+						} else {
+							this.emit('encoderUp', keyIndex)
+						}
+					}
+				}
+				break
+			case 0x01: // rotate
+				for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
+					switch (data[4 + keyIndex]) {
+						case 0x01: // Right
+							this.emit('rotateRight', keyIndex)
+							break
+						case 0xff: // Left
+							this.emit('rotateLeft', keyIndex)
+							break
+					}
+				}
 				break
 		}
 	}

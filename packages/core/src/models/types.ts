@@ -11,6 +11,11 @@ export interface FillLcdImageOptions extends FillImageOptions {
 	height: number
 }
 
+export interface LcdPosition {
+	x: number
+	y: number
+}
+
 export type StreamDeckEvents = {
 	down: [key: KeyIndex]
 	up: [key: KeyIndex]
@@ -19,7 +24,9 @@ export type StreamDeckEvents = {
 	rotateRight: [encoder: EncoderIndex]
 	encoderDown: [encoder: EncoderIndex]
 	encoderUp: [encoder: EncoderIndex]
-	lcdPress: [encoder: EncoderIndex, x: number, y: number]
+	lcdShortPress: [encoder: EncoderIndex, position: LcdPosition]
+	lcdLongPress: [encoder: EncoderIndex, position: LcdPosition]
+	lcdSwipe: [fromEncoder: EncoderIndex, toEncoder: EncoderIndex, from: LcdPosition, to: LcdPosition]
 }
 
 export interface LcdSegmentSize {
