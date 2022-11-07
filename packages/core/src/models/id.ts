@@ -9,4 +9,5 @@ export enum DeviceModelId {
 	XL = 'xl',
 	XLV2 = 'xlv2',
 	PEDAL = 'pedal',
+	PLUS = 'plus',
 }

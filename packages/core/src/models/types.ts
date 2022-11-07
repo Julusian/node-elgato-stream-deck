@@ -103,10 +103,4 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * Get serial number from Stream Deck
 	 */
 	getSerialNumber(): Promise<string>
-
-	// on(
-	// 	...args:
-	// 		| [event: 'down' | 'up', listener: (keyIndex: KeyIndex) => void]
-	// 		| [event: 'error', listener: (e: unknown) => void]
-	// ): StreamDeck
 }

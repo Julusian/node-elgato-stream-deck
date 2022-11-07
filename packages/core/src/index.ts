@@ -12,6 +12,7 @@ import {
 	OpenStreamDeckOptions,
 	StreamDeck,
 } from './models'
+import { StreamDeckPlus } from './models/plus'
 
 export { HIDDevice } from './device'
 export {
@@ -70,6 +71,12 @@ export const DEVICE_MODELS: DeviceModelSpec[] = [
 		type: DeviceModelType.STREAMDECK,
 		productId: 0x0080,
 		class: StreamDeckOriginalMK2,
+	},
+	{
+		id: DeviceModelId.PLUS,
+		type: DeviceModelType.STREAMDECK,
+		productId: 0x0084,
+		class: StreamDeckPlus,
 	},
 	{
 		id: DeviceModelId.PEDAL,
