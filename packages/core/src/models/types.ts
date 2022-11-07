@@ -6,6 +6,11 @@ export interface FillImageOptions {
 }
 export type FillPanelOptions = FillImageOptions
 
+export interface FillLcdImageOptions extends FillImageOptions {
+	width: number
+	height: number
+}
+
 export type StreamDeckEvents = {
 	down: [key: KeyIndex]
 	up: [key: KeyIndex]
@@ -15,6 +20,11 @@ export type StreamDeckEvents = {
 	encoderDown: [encoder: EncoderIndex]
 	encoderUp: [encoder: EncoderIndex]
 	lcdPress: [encoder: EncoderIndex, x: number, y: number]
+}
+
+export interface LcdSegmentSize {
+	width: number
+	height: number
 }
 
 export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
@@ -27,8 +37,10 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 
 	/** The number of encoders on this streamdeck (if any) */
 	readonly NUM_ENCODERS: number
-	/** The size of the lcd on this streamdeck (if any) */
-	readonly LCD_STRIP_SIZE: { width: number; height: number } | undefined
+	/** The full size of the lcd strip on this streamdeck (if any) */
+	readonly LCD_STRIP_SIZE: LcdSegmentSize | undefined
+	/** The size of the lcd per encoder on this streamdeck (if any) */
+	readonly LCD_ENCODER_SIZE: LcdSegmentSize | undefined
 
 	/** The horizontal/vertical resolution of the buttons */
 	readonly ICON_SIZE: number
@@ -79,6 +91,23 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {Object} options Options to control the write
 	 */
 	fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
+
+	/**
+	 * Fills the lcd strip above an encoder
+	 * @param {number} index The encoder to draw above
+	 * @param {Buffer} imageBuffer The image to write
+	 * @param {Object} sourceOptions Options to control the write
+	 */
+	fillEncoderLcd(index: EncoderIndex, imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
+
+	/**
+	 * Fill a region of the lcd strip, ignoring the boundaries of the encoders
+	 * @param {number} x The x position to draw to
+	 * @param {number} y The y position to draw to
+	 * @param {Buffer} imageBuffer The image to write
+	 * @param {Object} sourceOptions Options to control the write
+	 */
+	fillLcdRegion(x: number, y: number, imageBuffer: Buffer, sourceOptions: FillLcdImageOptions): Promise<void>
 
 	/**
 	 * Clears the given key.

@@ -1,9 +1,10 @@
 import { imageToByteArray } from '../util'
-import { FillImageOptions } from '.'
+import { FillImageOptions, FillLcdImageOptions, LcdSegmentSize } from './types'
 import { HIDDevice } from '../device'
 import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
 import { StreamDeckGen2Base } from './base-gen2'
 import { DeviceModelId } from './id'
+import { EncoderIndex } from '.'
 
 const plusProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.PLUS,
@@ -28,8 +29,13 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		return 4
 	}
 
-	public get LCD_STRIP_SIZE(): { width: number; height: number } {
-		return { width: 800, height: 100 }
+	public get LCD_STRIP_SIZE(): LcdSegmentSize {
+		const size = this.LCD_ENCODER_SIZE
+		size.width *= this.NUM_ENCODERS
+		return size
+	}
+	public get LCD_ENCODER_SIZE(): LcdSegmentSize {
+		return { width: 200, height: 100 }
 	}
 
 	protected handleInputBuffer(data: Uint8Array): void {
@@ -76,7 +82,24 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		}
 	}
 
-	public async fillLcdRegion(
+	public override async fillEncoderLcd(
+		index: EncoderIndex,
+		buffer: Buffer,
+		sourceOptions: FillImageOptions
+	): Promise<void> {
+		if (this.NUM_ENCODERS === 0) throw new Error(`There are no encoders`)
+
+		const size = this.LCD_ENCODER_SIZE
+		const x = index * size.width
+
+		return this.fillLcdRegion(x, 0, buffer, {
+			format: sourceOptions.format,
+			width: size.width,
+			height: size.height,
+		})
+	}
+
+	public override async fillLcdRegion(
 		x: number,
 		y: number,
 		imageBuffer: Buffer,
@@ -91,16 +114,28 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 			throw new TypeError(`Image will not fit within the lcd strip`)
 		}
 
+		const imageSize = sourceOptions.width * sourceOptions.height * sourceOptions.format.length
+		if (imageBuffer.length !== imageSize) {
+			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
+		}
+
+		// A lot of this drawing code is heavily based on the normal button
 		const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions)
 
 		const packets = this.generateFillLcdWrites(x, y, byteBuffer, sourceOptions)
 		await this.device.sendReports(packets)
 	}
 
-	protected async convertFillLcdBuffer(sourceBuffer: Buffer, sourceOptions: FillLcdImageOptions): Promise<Buffer> {
+	private async convertFillLcdBuffer(sourceBuffer: Buffer, sourceOptions: FillLcdImageOptions): Promise<Buffer> {
+		const sourceOptions2: InternalFillImageOptions = {
+			format: sourceOptions.format,
+			offset: 0,
+			stride: sourceOptions.width * sourceOptions.format.length,
+		}
+
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
-			sourceOptions,
+			sourceOptions2,
 			{ colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip },
 			0,
 			sourceOptions.width,
@@ -110,7 +145,7 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		return this.encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height)
 	}
 
-	protected generateFillLcdWrites(
+	private generateFillLcdWrites(
 		x: number,
 		y: number,
 		byteBuffer: Buffer,
@@ -146,12 +181,4 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 
 		return result
 	}
-}
-
-interface FillLcdImageOptions extends FillImageOptions {
-	offset: number
-	stride: number
-
-	width: number
-	height: number
 }
