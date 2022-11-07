@@ -12,6 +12,8 @@ export type StreamDeckEvents = {
 	error: [err: unknown]
 	rotateLeft: [encoder: EncoderIndex]
 	rotateRight: [encoder: EncoderIndex]
+	encoderDown: [encoder: EncoderIndex]
+	encoderUp: [encoder: EncoderIndex]
 	lcdPress: [encoder: EncoderIndex, x: number, y: number]
 }
 
