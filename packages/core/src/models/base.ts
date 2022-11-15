@@ -88,7 +88,6 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 
 		this.keyState = new Array<boolean>(this.NUM_KEYS).fill(false)
 
-		// this.device.dataKeyOffset = properties.KEY_DATA_OFFSET
 		this.device.on('input', (data: Uint8Array) => this.handleInputBuffer(data))
 
 		this.device.on('error', (err) => {
