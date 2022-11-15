@@ -96,7 +96,7 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	}
 
 	protected handleInputBuffer(data: Uint8Array): void {
-		const keyData = data.subarray(this.deviceProperties.KEY_DATA_OFFSET || 0, data.length - 1)
+		const keyData = data.subarray(this.deviceProperties.KEY_DATA_OFFSET || 0)
 		for (let i = 0; i < this.NUM_KEYS; i++) {
 			const keyPressed = Boolean(keyData[i])
 			const keyIndex = this.transformKeyIndex(i)

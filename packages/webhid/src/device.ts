@@ -21,8 +21,7 @@ export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 			// Button press
 			if (event.reportId === 0x01) {
 				const data = new Uint8Array(event.data.buffer)
-				const buttons = data.subarray(0, data.length - 1)
-				this.emit('input', buttons)
+				this.emit('input', data)
 			}
 		})
 	}

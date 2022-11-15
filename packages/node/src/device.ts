@@ -30,7 +30,7 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 		this.device.on('data', (data: Buffer) => {
 			// Button press
 			if (data[0] === 0x01) {
-				const keyData = data.subarray(1, data.length - 1)
+				const keyData = data.subarray(1)
 				this.emit('input', keyData)
 			}
 		})
