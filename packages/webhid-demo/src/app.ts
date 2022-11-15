@@ -1,4 +1,4 @@
-import { requestStreamDecks, getStreamDecks, StreamDeckWeb } from '@elgato-stream-deck/webhid'
+import { requestStreamDecks, getStreamDecks, StreamDeckWeb, LcdPosition } from '@elgato-stream-deck/webhid'
 import { Demo } from './demo/demo'
 import { DomImageDemo } from './demo/dom'
 import { FillWhenPressedDemo } from './demo/fill-when-pressed'
@@ -65,6 +65,30 @@ async function openDevice(device: StreamDeckWeb): Promise<void> {
 		appendLog(`Key ${key} up`)
 		currentDemo.keyUp(device, key).catch(console.error)
 	})
+	device.on('encoderDown', (encoder: number) => {
+		appendLog(`Encoder ${encoder} down`)
+	})
+	device.on('encoderUp', (encoder: number) => {
+		appendLog(`Encoder ${encoder} up`)
+	})
+	device.on('rotateLeft', (encoder: number, amount: number) => {
+		appendLog(`Encoder ${encoder} left (${amount})`)
+	})
+	device.on('rotateRight', (encoder: number, amount: number) => {
+		appendLog(`Encoder ${encoder} right (${amount})`)
+	})
+	device.on('lcdShortPress', (encoder: number, position: LcdPosition) => {
+		appendLog(`LCD short press ${encoder} (${position.x},${position.y})`)
+	})
+	device.on('lcdLongPress', (encoder: number, position: LcdPosition) => {
+		appendLog(`LCD long press ${encoder} (${position.x},${position.y})`)
+	})
+	device.on(
+		'lcdSwipe',
+		(_fromEncoder: number, _toEncoder: number, fromPosition: LcdPosition, toPosition: LcdPosition) => {
+			appendLog(`LCD swipe (${fromPosition.x},${fromPosition.y}) -> (${toPosition.x},${toPosition.y})`)
+		}
+	)
 
 	await currentDemo.start(device)
 

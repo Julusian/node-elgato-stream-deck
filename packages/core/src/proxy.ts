@@ -1,6 +1,7 @@
 import * as EventEmitter from 'eventemitter3'
-import { DeviceModelId, KeyIndex, StreamDeck, FillImageOptions, FillPanelOptions } from './models'
-import { StreamDeckEvents } from './models/types'
+import { DeviceModelId, EncoderIndex, KeyIndex } from './id'
+import { StreamDeck, FillImageOptions, FillPanelOptions } from './types'
+import { FillLcdImageOptions, LcdSegmentSize, StreamDeckEvents } from './types'
 
 /**
  * A minimal proxy around a StreamDeck instance.
@@ -22,6 +23,15 @@ export class StreamDeckProxy implements StreamDeck {
 	}
 	public get KEY_ROWS(): number {
 		return this.device.KEY_ROWS
+	}
+	public get NUM_ENCODERS(): number {
+		return this.device.NUM_ENCODERS
+	}
+	public get LCD_STRIP_SIZE(): LcdSegmentSize | undefined {
+		return this.device.LCD_STRIP_SIZE
+	}
+	public get LCD_ENCODER_SIZE(): LcdSegmentSize | undefined {
+		return this.device.LCD_ENCODER_SIZE
 	}
 	public get ICON_SIZE(): number {
 		return this.device.ICON_SIZE
@@ -72,6 +82,23 @@ export class StreamDeckProxy implements StreamDeck {
 	}
 	public async getSerialNumber(): Promise<string> {
 		return this.device.getSerialNumber()
+	}
+
+	public async fillEncoderLcd(
+		index: EncoderIndex,
+		imageBuffer: Buffer,
+		sourceOptions: FillImageOptions
+	): Promise<void> {
+		return this.device.fillEncoderLcd(index, imageBuffer, sourceOptions)
+	}
+
+	public async fillLcdRegion(
+		x: number,
+		y: number,
+		imageBuffer: Buffer,
+		sourceOptions: FillLcdImageOptions
+	): Promise<void> {
+		return this.device.fillLcdRegion(x, y, imageBuffer, sourceOptions)
 	}
 
 	/**

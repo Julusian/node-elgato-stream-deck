@@ -23,9 +23,9 @@ export class ChaseDemo implements Demo {
 				ctx.font = `${canvas.height * 0.8}px "Arial"`
 				ctx.strokeStyle = 'blue'
 				ctx.lineWidth = 1
-				ctx.strokeText(n.toString(), 8, 60, canvas.width * 0.8)
+				ctx.strokeText(n.toString(), 8, canvas.height * 0.9, canvas.width * 0.8)
 				ctx.fillStyle = 'white'
-				ctx.fillText(n.toString(), 8, 60, canvas.width * 0.8)
+				ctx.fillText(n.toString(), 8, canvas.height * 0.9, canvas.width * 0.8)
 
 				const id = ctx.getImageData(0, 0, canvas.width, canvas.height)
 				ps.push(device.fillKeyBuffer(i, Buffer.from(id.data), { format: 'rgba' }))

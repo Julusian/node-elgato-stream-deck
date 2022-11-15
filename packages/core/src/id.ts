@@ -1,5 +1,7 @@
 export type KeyIndex = number
 
+export type EncoderIndex = number
+
 export enum DeviceModelId {
 	ORIGINAL = 'original',
 	ORIGINALV2 = 'originalv2',
@@ -9,4 +11,5 @@ export enum DeviceModelId {
 	XL = 'xl',
 	XLV2 = 'xlv2',
 	PEDAL = 'pedal',
+	PLUS = 'plus',
 }

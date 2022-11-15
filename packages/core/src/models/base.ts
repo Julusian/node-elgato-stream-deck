@@ -1,9 +1,15 @@
 import * as EventEmitter from 'eventemitter3'
 
 import { HIDDevice } from '../device'
-import { DeviceModelId } from '../models'
-import { KeyIndex } from './id'
-import { FillImageOptions, FillPanelOptions, StreamDeck, StreamDeckEvents } from './types'
+import { DeviceModelId, EncoderIndex, KeyIndex } from '../id'
+import {
+	FillImageOptions,
+	FillLcdImageOptions,
+	FillPanelOptions,
+	LcdSegmentSize,
+	StreamDeck,
+	StreamDeckEvents,
+} from '../types'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
@@ -38,6 +44,19 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 		return this.deviceProperties.ROWS
 	}
 
+	get NUM_ENCODERS(): number {
+		// Overridden by models which support this
+		return 0
+	}
+	get LCD_STRIP_SIZE(): LcdSegmentSize | undefined {
+		// Overridden by models which support this
+		return undefined
+	}
+	public get LCD_ENCODER_SIZE(): LcdSegmentSize | undefined {
+		// Overridden by models which support this
+		return undefined
+	}
+
 	get ICON_SIZE(): number {
 		return this.deviceProperties.ICON_SIZE
 	}
@@ -68,26 +87,28 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 
 		this.keyState = new Array<boolean>(this.NUM_KEYS).fill(false)
 
-		this.device.dataKeyOffset = properties.KEY_DATA_OFFSET
-		this.device.on('input', (data) => {
-			for (let i = 0; i < this.NUM_KEYS; i++) {
-				const keyPressed = Boolean(data[i])
-				const keyIndex = this.transformKeyIndex(i)
-				const stateChanged = keyPressed !== this.keyState[keyIndex]
-				if (stateChanged) {
-					this.keyState[keyIndex] = keyPressed
-					if (keyPressed) {
-						this.emit('down', keyIndex)
-					} else {
-						this.emit('up', keyIndex)
-					}
-				}
-			}
-		})
+		this.device.on('input', (data: Uint8Array) => this.handleInputBuffer(data))
 
 		this.device.on('error', (err) => {
 			this.emit('error', err)
 		})
+	}
+
+	protected handleInputBuffer(data: Uint8Array): void {
+		const keyData = data.subarray(this.deviceProperties.KEY_DATA_OFFSET || 0)
+		for (let i = 0; i < this.NUM_KEYS; i++) {
+			const keyPressed = Boolean(keyData[i])
+			const keyIndex = this.transformKeyIndex(i)
+			const stateChanged = keyPressed !== this.keyState[keyIndex]
+			if (stateChanged) {
+				this.keyState[keyIndex] = keyPressed
+				if (keyPressed) {
+					this.emit('down', keyIndex)
+				} else {
+					this.emit('up', keyIndex)
+				}
+			}
+		}
 	}
 
 	public checkValidKeyIndex(keyIndex: KeyIndex): void {
@@ -114,6 +135,22 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	public abstract fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
 	public abstract fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void>
 	public abstract fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
+
+	public async fillEncoderLcd(
+		_index: EncoderIndex,
+		_buffer: Buffer,
+		_sourceOptions: FillImageOptions
+	): Promise<void> {
+		throw new Error('Not supported for this model')
+	}
+	public async fillLcdRegion(
+		_x: number,
+		_y: number,
+		_imageBuffer: Buffer,
+		_sourceOptions: FillLcdImageOptions
+	): Promise<void> {
+		throw new Error('Not supported for this model')
+	}
 
 	public abstract clearKey(keyIndex: KeyIndex): Promise<void>
 	public abstract clearPanel(): Promise<void>
