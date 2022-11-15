@@ -104,13 +104,12 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 				break
 			case 0x01: // rotate
 				for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
-					const value = data[4 + keyIndex]
-					if (value === 0) {
-						// Ignore
-					} else if (value < 0x7f) {
-						this.emit('rotateRight', keyIndex)
-					} else {
-						this.emit('rotateLeft', keyIndex)
+					const intArray = new Int8Array(data.buffer, data.byteOffset, data.byteLength)
+					const value = intArray[4 + keyIndex]
+					if (value > 0) {
+						this.emit('rotateRight', keyIndex, value)
+					} else if (value < 0) {
+						this.emit('rotateLeft', keyIndex, -value)
 					}
 				}
 				break

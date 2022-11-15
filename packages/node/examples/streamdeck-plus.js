@@ -46,11 +46,11 @@ const { openStreamDeck, DeviceModelId } = require('../dist/index')
 	streamDeck.on('encoderUp', (index) => {
 		console.log('Encoder up #%d', index)
 	})
-	streamDeck.on('rotateLeft', (index) => {
-		console.log('Encoder left #%d', index)
+	streamDeck.on('rotateLeft', (index, amount) => {
+		console.log('Encoder left #%d (%d)', index, amount)
 	})
-	streamDeck.on('rotateRight', (index) => {
-		console.log('Encoder right #%d', index)
+	streamDeck.on('rotateRight', (index, amount) => {
+		console.log('Encoder right #%d (%d)', index, amount)
 	})
 	streamDeck.on('lcdShortPress', (index, pos) => {
 		console.log('lcd short press #%d (%d, %d)', index, pos.x, pos.y)
