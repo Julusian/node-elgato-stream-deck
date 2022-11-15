@@ -78,10 +78,10 @@ export class StreamDeckProxy implements StreamDeck {
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		return this.device.fillKeyColor(keyIndex, r, g, b)
 	}
-	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
+	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Uint8Array, options?: FillImageOptions): Promise<void> {
 		return this.device.fillKeyBuffer(keyIndex, imageBuffer, options)
 	}
-	public async fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void> {
+	public async fillPanelBuffer(imageBuffer: Uint8Array, options?: FillPanelOptions): Promise<void> {
 		return this.device.fillPanelBuffer(imageBuffer, options)
 	}
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
@@ -109,7 +109,7 @@ export class StreamDeckProxy implements StreamDeck {
 
 	public async fillEncoderLcd(
 		index: EncoderIndex,
-		imageBuffer: Buffer,
+		imageBuffer: Uint8Array,
 		sourceOptions: FillImageOptions
 	): Promise<void> {
 		return this.device.fillEncoderLcd(index, imageBuffer, sourceOptions)
@@ -118,7 +118,7 @@ export class StreamDeckProxy implements StreamDeck {
 	public async fillLcdRegion(
 		x: number,
 		y: number,
-		imageBuffer: Buffer,
+		imageBuffer: Uint8Array,
 		sourceOptions: FillLcdImageOptions
 	): Promise<void> {
 		return this.device.fillLcdRegion(x, y, imageBuffer, sourceOptions)

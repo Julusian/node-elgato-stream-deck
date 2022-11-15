@@ -24,11 +24,11 @@ const DEFAULT_QUALITY = 95
  * @param height Hieght of the image
  */
 export async function encodeJPEG(
-	buffer: Buffer,
+	buffer: Uint8Array,
 	width: number,
 	height: number,
 	options: JPEGEncodeOptions | undefined
-): Promise<Buffer> {
+): Promise<Uint8Array> {
 	try {
 		// Try using jpeg-turbo if it is available
 		if (jpegTurbo && jpegTurbo.bufferSize && !!jpegTurbo.compressSync) {

@@ -10,7 +10,7 @@ describe('jpeg-encoding', () => {
 		// jest.resetModules()
 	})
 
-	function addAlphaChannel(raw: Buffer): Buffer {
+	function addAlphaChannel(raw: Uint8Array): Uint8Array {
 		const pixels = raw.length / 3
 		const res = Buffer.alloc(pixels * 4)
 
@@ -27,7 +27,7 @@ describe('jpeg-encoding', () => {
 		// Mock jpeg-js so we can see if it got used instead of jpeg-turbo
 		jest.doMock('jpeg-js')
 		const jpegJS: typeof import('jpeg-js') = require('jpeg-js')
-		mocked(jpegJS.encode).mockImplementation((src) => ({ ...src, data: Buffer.alloc(100) }))
+		mocked(jpegJS.encode).mockImplementation((src) => ({ ...src, data: Uint8Array.alloc(100) }))
 
 		const { encodeJPEG } = require('../jpeg') as typeof import('../jpeg')
 

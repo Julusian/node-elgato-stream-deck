@@ -8,13 +8,13 @@ export interface FillImageTargetOptions {
 }
 
 export function transformImageBuffer(
-	imageBuffer: Buffer,
+	imageBuffer: Uint8Array,
 	sourceOptions: InternalFillImageOptions,
 	targetOptions: FillImageTargetOptions,
 	destPadding: number,
 	imageWidth: number,
 	imageHeight?: number
-): Buffer {
+): Uint8Array {
 	if (!imageHeight) imageHeight = imageWidth
 
 	const byteBuffer = Buffer.alloc(destPadding + imageWidth * imageHeight * targetOptions.colorMode.length)
@@ -37,9 +37,9 @@ export function transformImageBuffer(
 
 			const srcOffset = y2 * sourceOptions.stride + sourceOptions.offset + x2 * sourceOptions.format.length
 
-			const red = imageBuffer.readUInt8(srcOffset)
-			const green = imageBuffer.readUInt8(srcOffset + 1)
-			const blue = imageBuffer.readUInt8(srcOffset + 2)
+			const red = imageBuffer[srcOffset]
+			const green = imageBuffer[srcOffset + 1]
+			const blue = imageBuffer[srcOffset + 2]
 
 			const targetOffset = rowOffset + x * targetOptions.colorMode.length
 			if (flipColours) {
@@ -61,7 +61,7 @@ export function transformImageBuffer(
 }
 
 export const BMP_HEADER_LENGTH = 54
-export function writeBMPHeader(buf: Buffer, iconSize: number, iconBytes: number, imagePPM: number): void {
+export function writeBMPHeader(buf: Uint8Array, iconSize: number, iconBytes: number, imagePPM: number): void {
 	// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
 
 	// Bitmap file header

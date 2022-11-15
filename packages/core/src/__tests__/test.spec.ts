@@ -10,7 +10,7 @@ import { DummyHID } from './hid'
 import { EncodeJPEGHelper } from '../models/base'
 
 function openStreamDeck(path: string, deviceModel: DeviceModelId, userOptions?: OpenStreamDeckOptions): StreamDeck {
-	const encodeJpegMock: jest.MockedFunction<EncodeJPEGHelper> = jest.fn((_b: Buffer, _w: number, _h: number) => {
+	const encodeJpegMock: jest.MockedFunction<EncodeJPEGHelper> = jest.fn((_b: Uint8Array, _w: number, _h: number) => {
 		throw new Error('Not implemented')
 	})
 	const options: Required<OpenStreamDeckOptions> = {
@@ -115,7 +115,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 
 		test('firmwareVersion', async () => {
 			const device = getDevice()
-			device.getFeatureReport = async (): Promise<Buffer> => {
+			device.getFeatureReport = async (): Promise<Uint8Array> => {
 				return Buffer.from([4, 85, 170, 212, 4, 49, 46, 48, 46, 49, 55, 48, 49, 51, 51, 0, 0])
 			}
 
@@ -125,7 +125,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 
 		test('serialNumber', async () => {
 			const device = getDevice()
-			device.getFeatureReport = async (): Promise<Buffer> => {
+			device.getFeatureReport = async (): Promise<Uint8Array> => {
 				return Buffer.from([3, 85, 170, 211, 3, 65, 76, 51, 55, 71, 49, 65, 48, 50, 56, 52, 48])
 			}
 
@@ -167,7 +167,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 
 		test('firmwareVersion-jpeg', async () => {
 			const device = getDevice()
-			device.getFeatureReport = async (): Promise<Buffer> => {
+			device.getFeatureReport = async (): Promise<Uint8Array> => {
 				// prettier-ignore
 				return Buffer.from([ 5, 12, 254, 90, 239, 250, 49, 46, 48, 48, 46, 48, 48, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ])
 			}
@@ -178,7 +178,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 
 		test('serialNumber-jpeg', async () => {
 			const device = getDevice()
-			device.getFeatureReport = async (): Promise<Buffer> => {
+			device.getFeatureReport = async (): Promise<Uint8Array> => {
 				// prettier-ignore
 				return Buffer.from([ 6, 12, 67, 76, 49, 56, 73, 49, 65, 48, 48, 57, 49, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ])
 			}
@@ -589,7 +589,7 @@ describe('StreamDeck XL', () => {
 
 	test('firmwareVersion', async () => {
 		const device = getDevice()
-		device.getFeatureReport = async (): Promise<Buffer> => {
+		device.getFeatureReport = async (): Promise<Uint8Array> => {
 			// prettier-ignore
 			return Buffer.from([ 5, 12, 254, 90, 239, 250, 49, 46, 48, 48, 46, 48, 48, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ])
 		}
@@ -600,7 +600,7 @@ describe('StreamDeck XL', () => {
 
 	test('serialNumber', async () => {
 		const device = getDevice()
-		device.getFeatureReport = async (): Promise<Buffer> => {
+		device.getFeatureReport = async (): Promise<Uint8Array> => {
 			// prettier-ignore
 			return Buffer.from([ 6, 12, 67, 76, 49, 56, 73, 49, 65, 48, 48, 57, 49, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ])
 		}
@@ -611,7 +611,7 @@ describe('StreamDeck XL', () => {
 
 	test('fillImage', async () => {
 		const device = getDevice()
-		device.encodeJPEG.mockImplementationOnce(async (buffer: Buffer) => {
+		device.encodeJPEG.mockImplementationOnce(async (buffer: Uint8Array) => {
 			const start = buffer.length / 8
 			return buffer.subarray(start, start * 2)
 		})
@@ -664,7 +664,7 @@ describe('StreamDeck Original V2', () => {
 
 	test('fillImage', async () => {
 		const device = getDevice()
-		device.encodeJPEG.mockImplementationOnce(async (buffer: Buffer) => {
+		device.encodeJPEG.mockImplementationOnce(async (buffer: Uint8Array) => {
 			const start = buffer.length / 8
 			return buffer.subarray(start, start * 2)
 		})

@@ -135,7 +135,7 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 
 	public override async fillEncoderLcd(
 		index: EncoderIndex,
-		buffer: Buffer,
+		buffer: Uint8Array,
 		sourceOptions: FillImageOptions
 	): Promise<void> {
 		if (this.NUM_ENCODERS === 0) throw new Error(`There are no encoders`)
@@ -153,7 +153,7 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 	public override async fillLcdRegion(
 		x: number,
 		y: number,
-		imageBuffer: Buffer,
+		imageBuffer: Uint8Array,
 		sourceOptions: FillLcdImageOptions
 	): Promise<void> {
 		// Basic bounds checking
@@ -177,7 +177,10 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		await this.device.sendReports(packets)
 	}
 
-	private async convertFillLcdBuffer(sourceBuffer: Buffer, sourceOptions: FillLcdImageOptions): Promise<Buffer> {
+	private async convertFillLcdBuffer(
+		sourceBuffer: Uint8Array,
+		sourceOptions: FillLcdImageOptions
+	): Promise<Uint8Array> {
 		const sourceOptions2: InternalFillImageOptions = {
 			format: sourceOptions.format,
 			offset: 0,

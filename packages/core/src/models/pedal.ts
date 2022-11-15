@@ -49,10 +49,14 @@ export class StreamDeckPedal extends StreamDeckInputBase {
 	public async fillKeyColor(_keyIndex: number, _r: number, _g: number, _b: number): Promise<void> {
 		// Not supported
 	}
-	public async fillKeyBuffer(_keyIndex: number, _imageBuffer: Buffer, _options?: FillImageOptions): Promise<void> {
+	public async fillKeyBuffer(
+		_keyIndex: number,
+		_imageBuffer: Uint8Array,
+		_options?: FillImageOptions
+	): Promise<void> {
 		// Not supported
 	}
-	public async fillPanelBuffer(_imageBuffer: Buffer, _options?: FillPanelOptions): Promise<void> {
+	public async fillPanelBuffer(_imageBuffer: Uint8Array, _options?: FillPanelOptions): Promise<void> {
 		// Not supported
 	}
 	public async clearKey(_keyIndex: number): Promise<void> {

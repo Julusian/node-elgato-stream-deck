@@ -4,7 +4,7 @@ import { StreamdeckImageHeaderGenerator, StreamdeckImageWriter, StreamdeckImageW
 export class StreamdeckOriginalImageWriter implements StreamdeckImageWriter {
 	private readonly headerGenerator = new StreamdeckGen1ImageHeaderGenerator()
 
-	public generateFillImageWrites(props: StreamdeckImageWriterProps, byteBuffer: Buffer): Buffer[] {
+	public generateFillImageWrites(props: StreamdeckImageWriterProps, byteBuffer: Uint8Array): Uint8Array[] {
 		const MAX_PACKET_SIZE = 8191
 		const PACKET_HEADER_LENGTH = this.headerGenerator.getFillImageCommandHeaderLength()
 
@@ -33,12 +33,12 @@ export class StreamdeckDefaultImageWriter<TProps = StreamdeckImageWriterProps>
 		this.headerGenerator = headerGenerator
 	}
 
-	public generateFillImageWrites(props: TProps, byteBuffer: Buffer): Buffer[] {
+	public generateFillImageWrites(props: TProps, byteBuffer: Uint8Array): Uint8Array[] {
 		const MAX_PACKET_SIZE = 1024
 		const PACKET_HEADER_LENGTH = this.headerGenerator.getFillImageCommandHeaderLength()
 		const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH
 
-		const result: Buffer[] = []
+		const result: Uint8Array[] = []
 
 		let remainingBytes = byteBuffer.length
 		for (let part = 0; remainingBytes > 0; part++) {

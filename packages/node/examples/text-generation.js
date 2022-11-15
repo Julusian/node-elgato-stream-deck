@@ -12,7 +12,7 @@ openStreamDeck().then((streamDeck) => {
 			const finalBuffer = await sharp(path.resolve(__dirname, `fixtures/github_logo_${streamDeck.ICON_SIZE}.jpg`))
 				.composite([
 					{
-						input: Buffer.from(
+						input: Uint8Array.from(
 							`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${streamDeck.ICON_SIZE} ${
 								streamDeck.ICON_SIZE
 							}" version="1.1">
