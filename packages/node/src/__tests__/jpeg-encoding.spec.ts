@@ -15,7 +15,7 @@ describe('jpeg-encoding', () => {
 		const res = Buffer.alloc(pixels * 4)
 
 		for (let i = 0; i < pixels; i++) {
-			res.set(raw.slice(i * 3, i * 3 + 3), i * 4)
+			res.set(raw.subarray(i * 3, i * 3 + 3), i * 4)
 		}
 
 		return res

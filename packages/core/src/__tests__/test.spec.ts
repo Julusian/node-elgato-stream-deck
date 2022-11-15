@@ -607,7 +607,7 @@ describe('StreamDeck XL', () => {
 		const device = getDevice()
 		device.encodeJPEG.mockImplementationOnce(async (buffer: Buffer) => {
 			const start = buffer.length / 8
-			return buffer.slice(start, start * 2)
+			return buffer.subarray(start, start * 2)
 		})
 
 		const writeFn: jest.Mock<Promise<void>, [Buffer[]]> = (device.sendReports = jest.fn())
@@ -660,7 +660,7 @@ describe('StreamDeck Original V2', () => {
 		const device = getDevice()
 		device.encodeJPEG.mockImplementationOnce(async (buffer: Buffer) => {
 			const start = buffer.length / 8
-			return buffer.slice(start, start * 2)
+			return buffer.subarray(start, start * 2)
 		})
 
 		const writeFn: jest.Mock<Promise<void>, [Buffer[]]> = (device.sendReports = jest.fn())
