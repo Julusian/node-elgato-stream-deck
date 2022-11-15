@@ -16,7 +16,7 @@
     "graduate": "yarn bump --conventional-graduate",
     "publish2": "yarn build && lerna publish from-package --pre-dist-tag next",
     "validate:dependencies": "yarn audit && yarn license-validate",
-    "license-validate": "yarn sofie-licensecheck --allowPackages \"@elgato-stream-deck/webhid-demo@$(node -p \"require('./packages/webhid-demo/package.json').version\");caniuse-lite@1.0.30001370\""
+    "license-validate": "yarn sofie-licensecheck --allowPackages \"@elgato-stream-deck/webhid-demo@$(node -p \"require('./packages/webhid-demo/package.json').version\");caniuse-lite@1.0.30001427\""
   },
   "lint-staged": {
     "*.{css,json,md,scss}": [
