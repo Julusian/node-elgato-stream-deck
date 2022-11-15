@@ -1,7 +1,7 @@
 import { HIDDevice } from '../device'
 import { OpenStreamDeckOptions, StreamDeckProperties } from './base'
 import { StreamDeckGen2Base } from './base-gen2'
-import { DeviceModelId } from './id'
+import { DeviceModelId } from '../id'
 
 const xlProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.XL,

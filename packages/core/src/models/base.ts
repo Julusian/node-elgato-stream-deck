@@ -1,8 +1,7 @@
 import * as EventEmitter from 'eventemitter3'
 
 import { HIDDevice } from '../device'
-import { DeviceModelId } from '../models'
-import { EncoderIndex, KeyIndex } from './id'
+import { DeviceModelId, EncoderIndex, KeyIndex } from '../id'
 import {
 	FillImageOptions,
 	FillLcdImageOptions,
@@ -10,7 +9,7 @@ import {
 	LcdSegmentSize,
 	StreamDeck,
 	StreamDeckEvents,
-} from './types'
+} from '../types'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 

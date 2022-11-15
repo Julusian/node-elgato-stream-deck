@@ -1,10 +1,9 @@
-import { requestStreamDecks, getStreamDecks, StreamDeckWeb } from '@elgato-stream-deck/webhid'
+import { requestStreamDecks, getStreamDecks, StreamDeckWeb, LcdPosition } from '@elgato-stream-deck/webhid'
 import { Demo } from './demo/demo'
 import { DomImageDemo } from './demo/dom'
 import { FillWhenPressedDemo } from './demo/fill-when-pressed'
 import { RapidFillDemo } from './demo/rapid-fill'
 import { ChaseDemo } from './demo/chase'
-import { LcdPosition } from '@elgato-stream-deck/core/dist/models/types'
 
 declare const LIB_VERSION: any
 if (LIB_VERSION) {

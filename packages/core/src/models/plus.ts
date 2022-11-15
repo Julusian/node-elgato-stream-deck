@@ -1,10 +1,9 @@
 import { imageToByteArray } from '../util'
-import { FillImageOptions, FillLcdImageOptions, LcdPosition, LcdSegmentSize } from './types'
+import { FillImageOptions, FillLcdImageOptions, LcdPosition, LcdSegmentSize } from '../types'
 import { HIDDevice } from '../device'
 import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
 import { StreamDeckGen2Base } from './base-gen2'
-import { DeviceModelId } from './id'
-import { EncoderIndex } from '.'
+import { DeviceModelId, EncoderIndex } from '../id'
 
 const plusProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.PLUS,

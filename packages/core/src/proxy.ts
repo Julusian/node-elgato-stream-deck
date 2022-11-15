@@ -1,6 +1,7 @@
 import * as EventEmitter from 'eventemitter3'
-import { DeviceModelId, KeyIndex, StreamDeck, FillImageOptions, FillPanelOptions, EncoderIndex } from './models'
-import { FillLcdImageOptions, LcdSegmentSize, StreamDeckEvents } from './models/types'
+import { DeviceModelId, EncoderIndex, KeyIndex } from './id'
+import { StreamDeck, FillImageOptions, FillPanelOptions } from './types'
+import { FillLcdImageOptions, LcdSegmentSize, StreamDeckEvents } from './types'
 
 /**
  * A minimal proxy around a StreamDeck instance.

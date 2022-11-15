@@ -1,7 +1,7 @@
 import { HIDDevice } from '../device'
 import { OpenStreamDeckOptions, StreamDeckInputBase, StreamDeckProperties } from './base'
-import { DeviceModelId } from './id'
-import { FillImageOptions, FillPanelOptions } from './types'
+import { DeviceModelId } from '../id'
+import { FillImageOptions, FillPanelOptions } from '../types'
 
 const pedalProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.PEDAL,

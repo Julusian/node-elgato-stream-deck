@@ -3,7 +3,7 @@ import { WebHIDDevice } from './device'
 import { encodeJPEG } from './jpeg'
 import { StreamDeckWeb } from './wrapper'
 
-export { DeviceModelId, KeyIndex, StreamDeck } from '@elgato-stream-deck/core'
+export { DeviceModelId, KeyIndex, StreamDeck, LcdPosition } from '@elgato-stream-deck/core'
 export { StreamDeckWeb } from './wrapper'
 
 /**
