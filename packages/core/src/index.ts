@@ -1,6 +1,6 @@
 import { HIDDevice } from './device'
+import { DeviceModelId } from './id'
 import {
-	DeviceModelId,
 	StreamDeckMini,
 	StreamDeckMiniV2,
 	StreamDeckOriginal,
@@ -10,18 +10,14 @@ import {
 	StreamDeckXLV2,
 	StreamDeckPedal,
 	OpenStreamDeckOptions,
-	StreamDeck,
 } from './models'
+import { StreamDeckPlus } from './models/plus'
+import { StreamDeck } from './types'
 
+export * from './types'
+export * from './id'
 export { HIDDevice } from './device'
-export {
-	DeviceModelId,
-	KeyIndex,
-	StreamDeck,
-	OpenStreamDeckOptions,
-	FillImageOptions,
-	FillPanelOptions,
-} from './models'
+export { OpenStreamDeckOptions } from './models'
 export { StreamDeckProxy } from './proxy'
 
 /** Elgato vendor id */
@@ -70,6 +66,12 @@ export const DEVICE_MODELS: DeviceModelSpec[] = [
 		type: DeviceModelType.STREAMDECK,
 		productId: 0x0080,
 		class: StreamDeckOriginalMK2,
+	},
+	{
+		id: DeviceModelId.PLUS,
+		type: DeviceModelType.STREAMDECK,
+		productId: 0x0084,
+		class: StreamDeckPlus,
 	},
 	{
 		id: DeviceModelId.PEDAL,

@@ -12,18 +12,21 @@ export function imageToByteArray(
 	sourceOptions: InternalFillImageOptions,
 	targetOptions: FillImageTargetOptions,
 	destPadding: number,
-	imageSize: number
+	imageWidth: number,
+	imageHeight?: number
 ): Buffer {
-	const byteBuffer = Buffer.alloc(destPadding + imageSize * imageSize * targetOptions.colorMode.length)
+	if (!imageHeight) imageHeight = imageWidth
+
+	const byteBuffer = Buffer.alloc(destPadding + imageWidth * imageHeight * targetOptions.colorMode.length)
 
 	const flipColours = sourceOptions.format.substring(0, 3) !== targetOptions.colorMode.substring(0, 3)
 
-	for (let y = 0; y < imageSize; y++) {
-		const rowOffset = destPadding + imageSize * targetOptions.colorMode.length * y
-		for (let x = 0; x < imageSize; x++) {
+	for (let y = 0; y < imageHeight; y++) {
+		const rowOffset = destPadding + imageWidth * targetOptions.colorMode.length * y
+		for (let x = 0; x < imageWidth; x++) {
 			// Apply x/y flips
-			let x2 = targetOptions.xFlip ? imageSize - x - 1 : x
-			let y2 = targetOptions.yFlip ? imageSize - y - 1 : y
+			let x2 = targetOptions.xFlip ? imageWidth - x - 1 : x
+			let y2 = targetOptions.yFlip ? imageHeight - y - 1 : y
 
 			if (targetOptions.rotate) {
 				// Swap x and y

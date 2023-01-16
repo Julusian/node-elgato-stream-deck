@@ -12,12 +12,19 @@ import {
  * Base class for generation 2 hardware (starting with the xl)
  */
 export abstract class StreamDeckGen2Base extends StreamDeckBase {
-	private encodeJPEG: EncodeJPEGHelper
+	protected readonly encodeJPEG: EncodeJPEGHelper
+	protected readonly xyFlip: boolean
 
-	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>, properties: StreamDeckProperties) {
+	constructor(
+		device: HIDDevice,
+		options: Required<OpenStreamDeckOptions>,
+		properties: StreamDeckProperties,
+		disableXYFlip?: boolean
+	) {
 		super(device, options, properties)
 
 		this.encodeJPEG = options.encodeJPEG
+		this.xyFlip = !disableXYFlip
 	}
 
 	/**
@@ -91,7 +98,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		const byteBuffer = imageToByteArray(
 			sourceBuffer,
 			sourceOptions,
-			{ colorMode: 'rgba', xFlip: true, yFlip: true },
+			{ colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip },
 			0,
 			this.ICON_SIZE
 		)

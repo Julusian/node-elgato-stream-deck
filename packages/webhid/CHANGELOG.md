@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.7.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.6.0-alpha.0...v5.7.0) (2022-11-15)
+
+
+### Features
+
+* streamdeck plus ([#59](https://github.com/julusian/node-elgato-stream-deck/issues/59)) ([37479d8](https://github.com/julusian/node-elgato-stream-deck/commit/37479d8a14bffe6eb421164bbaad1161dc302502))
+
+
+### Reverts
+
+* Revert "chore: switch to yarn3" ([45f6137](https://github.com/julusian/node-elgato-stream-deck/commit/45f613755a274c350b7819d30856cf7aa27f27e3))
+
+
+
+
+
 # [5.6.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.6.0-alpha.0...v5.6.0) (2022-09-30)
 
 **Note:** Version bump only for package @elgato-stream-deck/webhid
