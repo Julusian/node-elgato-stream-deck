@@ -15,12 +15,14 @@ export interface OpenStreamDeckOptionsNode extends OpenStreamDeckOptions {
  * Scan for and list detected devices
  */
 export function listStreamDecks(): StreamDeckDeviceInfo[] {
-	const devices: StreamDeckDeviceInfo[] = []
+	const devices: Record<string, StreamDeckDeviceInfo> = {}
 	for (const dev of HID.devices()) {
-		const info = getStreamDeckDeviceInfo(dev)
-		if (info) devices.push(info)
+		if (dev.path && !devices[dev.path]) {
+			const info = getStreamDeckDeviceInfo(dev)
+			if (info) devices[dev.path] = info
+		}
 	}
-	return devices
+	return Object.values(devices)
 }
 
 /**
