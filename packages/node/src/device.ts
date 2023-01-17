@@ -1,6 +1,6 @@
 import type { DeviceModelId, HIDDevice } from '@elgato-stream-deck/core'
 import { EventEmitter } from 'events'
-import type { HIDAsync } from 'node-hid'
+import type { HIDAsync, HID } from 'node-hid'
 
 /**
  * Information about a found streamdeck
@@ -52,5 +52,43 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 			ps.push(this.device.write(data))
 		}
 		await Promise.all(ps)
+	}
+}
+
+/**
+ * HACK sync implementation
+ */
+export class NodeHIDSyncDevice extends EventEmitter implements HIDDevice {
+	private device: HID
+
+	constructor(device: HID) {
+		super()
+
+		this.device = device
+		this.device.on('error', (error) => this.emit('error', error))
+
+		this.device.on('data', (data: Buffer) => {
+			// Button press
+			if (data[0] === 0x01) {
+				const keyData = data.subarray(1)
+				this.emit('input', keyData)
+			}
+		})
+	}
+
+	public async close(): Promise<void> {
+		this.device.close()
+	}
+
+	public async sendFeatureReport(data: Buffer): Promise<void> {
+		this.device.sendFeatureReport(data)
+	}
+	public async getFeatureReport(reportId: number, reportLength: number): Promise<Buffer> {
+		return Buffer.from(this.device.getFeatureReport(reportId, reportLength))
+	}
+	public async sendReports(buffers: Buffer[]): Promise<void> {
+		for (const data of buffers) {
+			this.device.write(data)
+		}
 	}
 }

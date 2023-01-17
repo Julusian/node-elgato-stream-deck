@@ -1,6 +1,6 @@
-import { DEVICE_MODELS, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from '@elgato-stream-deck/core'
+import { DEVICE_MODELS, HIDDevice, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from '@elgato-stream-deck/core'
 import * as HID from 'node-hid'
-import { NodeHIDDevice, StreamDeckDeviceInfo } from './device'
+import { NodeHIDDevice, NodeHIDSyncDevice, StreamDeckDeviceInfo } from './device'
 import { encodeJPEG, JPEGEncodeOptions } from './jpeg'
 import { StreamDeckNode } from './wrapper'
 
@@ -9,6 +9,9 @@ export { DeviceModelId, KeyIndex, StreamDeck } from '@elgato-stream-deck/core'
 export interface OpenStreamDeckOptionsNode extends OpenStreamDeckOptions {
 	jpegOptions?: JPEGEncodeOptions
 	resetToLogoOnClose?: boolean
+
+	/** @deprecated */
+	hackUseSync?: boolean
 }
 
 /**
@@ -89,11 +92,17 @@ export async function openStreamDeck(
 		...userOptions,
 	}
 
-	const hidDevice = await HID.openAsyncHIDDevice(foundDevices[0].path)
+	let device: HIDDevice
+	if (userOptions?.hackUseSync) {
+		const hidDevice = new HID.HID(foundDevices[0].path)
+		device = new NodeHIDSyncDevice(hidDevice)
+	} else {
+		const hidDevice = await HID.openAsyncHIDDevice(foundDevices[0].path)
+		device = new NodeHIDDevice(hidDevice)
+	}
 
 	// TODO - can we determine what the device is onceit is opened? Save having to do the devices search above
 
-	const device = new NodeHIDDevice(hidDevice)
 	const rawSteamdeck = new model.class(device, options || {})
 	return new StreamDeckNode(rawSteamdeck, userOptions?.resetToLogoOnClose ?? false)
 }
