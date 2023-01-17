@@ -1,6 +1,6 @@
 {
   "name": "@elgato-stream-deck/webhid",
-  "version": "5.7.1",
+  "version": "6.0.0-async-test.1",
   "description": "An npm module for interfacing with the Elgato Stream Deck in the browser",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -36,7 +36,7 @@
     "dist"
   ],
   "dependencies": {
-    "@elgato-stream-deck/core": "5.7.0",
+    "@elgato-stream-deck/core": "6.0.0-async-test.1",
     "@types/w3c-web-hid": "^1.0.3",
     "p-queue": "^6.6.2",
     "tslib": "^2.4.0"
