@@ -15,12 +15,14 @@ export interface OpenStreamDeckOptionsNode extends OpenStreamDeckOptions {
  * Scan for and list detected devices
  */
 export async function listStreamDecks(): Promise<StreamDeckDeviceInfo[]> {
-	const devices: StreamDeckDeviceInfo[] = []
+	const devices: Record<string, StreamDeckDeviceInfo> = {}
 	for (const dev of await HID.devicesAsync()) {
-		const info = getStreamDeckDeviceInfo(dev)
-		if (info) devices.push(info)
+		if (dev.path && !devices[dev.path]) {
+			const info = getStreamDeckDeviceInfo(dev)
+			if (info) devices[dev.path] = info
+		}
 	}
-	return devices
+	return Object.values(devices)
 }
 
 /**
@@ -87,7 +89,7 @@ export async function openStreamDeck(
 		...userOptions,
 	}
 
-	const hidDevice = await HID.HIDAsync.open(foundDevices[0].path)
+	const hidDevice = await HID.openAsyncHIDDevice(foundDevices[0].path)
 
 	// TODO - can we determine what the device is onceit is opened? Save having to do the devices search above
 

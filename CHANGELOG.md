@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.7.2](https://github.com/julusian/node-elgato-stream-deck/compare/v5.7.1...v5.7.2) (2023-01-17)
+
+
+### Bug Fixes
+
+* **node:** avoid duplicates in `listStreamDecks` [#32](https://github.com/julusian/node-elgato-stream-deck/issues/32) ([660eb39](https://github.com/julusian/node-elgato-stream-deck/commit/660eb39b3ed19febd2c95074a43034ca1b9e9dd3))
+
+
+
+
+
+## [5.7.1](https://github.com/julusian/node-elgato-stream-deck/compare/v5.7.0...v5.7.1) (2023-01-17)
+
+
+### Bug Fixes
+
+* **webhid:** Ignore hid devices which are non-streamdeck [#60](https://github.com/julusian/node-elgato-stream-deck/issues/60) ([b212d4e](https://github.com/julusian/node-elgato-stream-deck/commit/b212d4e5d240c95995c90fb91185206d90da2aa2))
+
+
+
+
+
 # [5.7.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.6.0-alpha.0...v5.7.0) (2022-11-15)
 
 
