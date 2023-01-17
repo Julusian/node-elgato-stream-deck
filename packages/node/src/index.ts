@@ -101,6 +101,7 @@ export async function openStreamDeck(
 		device = new NodeHIDDevice(hidDevice)
 	}
 
+	// HACK - needed a change
 	// TODO - can we determine what the device is onceit is opened? Save having to do the devices search above
 
 	const rawSteamdeck = new model.class(device, options)
