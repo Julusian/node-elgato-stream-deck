@@ -6054,10 +6054,10 @@ node-gyp@^9.0.0:
     tar "^6.1.2"
     which "^2.0.2"
 
-"node-hid@npm:@julusian/hid@2.5.0-1":
-  version "2.5.0-1"
-  resolved "https://registry.yarnpkg.com/@julusian/hid/-/hid-2.5.0-1.tgz#cfaae33361fc834836512b8c263a67c3fa30dd9d"
-  integrity sha512-jIrrKikSGLtoTSTKC3/2ymtq1CgxxPiM/Rm6xBXbKCqt28hGhaQTVbGbLsZmAA2NnKidB4oeYstm/50XaK53Vg==
+"node-hid@npm:@julusian/hid@^2.5.0-3":
+  version "2.5.0-3"
+  resolved "https://registry.yarnpkg.com/@julusian/hid/-/hid-2.5.0-3.tgz#4d0a1aabef8a47b79a3ccdb30fc5b53e8618f5e1"
+  integrity sha512-BXL3QbgWvtuFPY8lMwBQ6CwDBeU/WJDedOhe5Y9QGf2ibwdbSMMLRfdFGUqeVgoO5YcyvUqXTM6oighswc3yVg==
   dependencies:
     node-addon-api "^3.2.1"
     pkg-prebuilds "^0.1.0"

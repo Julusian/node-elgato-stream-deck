@@ -57,7 +57,7 @@
   "dependencies": {
     "@elgato-stream-deck/core": "6.0.0-async-test.1",
     "jpeg-js": "^0.4.2",
-    "node-hid": "npm:@julusian/hid@2.5.0-1",
+    "node-hid": "npm:@julusian/hid@^2.5.0-3",
     "tslib": "^2.4.0"
   },
   "peerDependencies": {
