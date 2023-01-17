@@ -1,6 +1,6 @@
 {
   "name": "@elgato-stream-deck/node",
-  "version": "6.0.0-async-test.1",
+  "version": "6.0.0-async-test.2",
   "description": "An npm module for interfacing with the Elgato Stream Deck in node",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
