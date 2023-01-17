@@ -12,17 +12,15 @@ export { StreamDeckWeb } from './wrapper'
  */
 export async function requestStreamDecks(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb[]> {
 	// TODO - error handling
-	return navigator.hid
-		.requestDevice({
-			filters: [
-				{
-					vendorId: VENDOR_ID,
-				},
-			],
-		})
-		.then(async (browserDevices) => {
-			return Promise.all(browserDevices.map(async (dev) => openDevice(dev, options)))
-		})
+	const browserDevices = await navigator.hid.requestDevice({
+		filters: [
+			{
+				vendorId: VENDOR_ID,
+			},
+		],
+	})
+
+	return Promise.all(browserDevices.map(async (dev) => openDevice(dev, options)))
 }
 
 /**
@@ -31,10 +29,14 @@ export async function requestStreamDecks(options?: OpenStreamDeckOptions): Promi
  * @param options Options to customise the device behvaiour
  */
 export async function getStreamDecks(options?: OpenStreamDeckOptions): Promise<StreamDeckWeb[]> {
-	// TODO - error handling
-	return navigator.hid.getDevices().then(async (browserDevices) => {
-		return Promise.all(browserDevices.map(async (dev) => openDevice(dev, options)))
-	})
+	const browserDevices = await navigator.hid.getDevices()
+	const validDevices = browserDevices.filter((d) => d.vendorId === VENDOR_ID)
+
+	const resultDevices = await Promise.all(
+		validDevices.map(async (dev) => openDevice(dev, options).catch((_) => null)) // Ignore failures
+	)
+
+	return resultDevices.filter((v): v is StreamDeckWeb => !!v)
 }
 
 /**
@@ -50,14 +52,6 @@ export async function openDevice(
 	if (!model) {
 		throw new Error('Stream Deck is of unexpected type.')
 	}
-
-	// if (model.id === DeviceModelId.ORIGINAL) {
-	// 	const browser = detect()
-	// 	if (browser && browser.os === 'Linux') {
-	// 		// See https://github.com/node-hid/node-hid/issues/249 for more info.
-	// 		throw new Error('This is not supported on linux')
-	// 	}
-	// }
 
 	await browserDevice.open()
 
