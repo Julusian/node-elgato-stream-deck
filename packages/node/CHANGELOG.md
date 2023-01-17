@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-async-test.3](https://github.com/julusian/node-elgato-stream-deck/compare/v6.0.0-async-test.2...v6.0.0-async-test.3) (2023-01-17)
+
+
+### Bug Fixes
+
+* bump ([4e8eb0d](https://github.com/julusian/node-elgato-stream-deck/commit/4e8eb0d6d1a36388c44b1ece615571277dfd9856))
+
+
+
+
+
 # [6.0.0-async-test.2](https://github.com/julusian/node-elgato-stream-deck/compare/v6.0.0-async-test.1...v6.0.0-async-test.2) (2023-01-17)
 
 **Note:** Version bump only for package @elgato-stream-deck/node
