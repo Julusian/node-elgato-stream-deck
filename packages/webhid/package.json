@@ -39,9 +39,9 @@
     "@elgato-stream-deck/core": "5.7.0",
     "@types/w3c-web-hid": "^1.0.3",
     "p-queue": "^6.6.2",
-    "tslib": "^2.4.0"
+    "tslib": "^2.5.0"
   },
   "engines": {
-    "node": ">=10.10"
+    "node": ">=12.18"
   }
 }
