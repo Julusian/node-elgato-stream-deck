@@ -3123,7 +3123,7 @@ function eventTargetAgnosticAddListener(emitter, name, listener, flags) {
 
 /***/ }),
 
-/***/ 688:
+/***/ 771:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -3142,37 +3142,6 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 ;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/util.js
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-const WOFF = 'application/font-woff';
-const JPEG = 'image/jpeg';
-const mimes = {
-    woff: WOFF,
-    woff2: WOFF,
-    ttf: 'application/font-truetype',
-    eot: 'application/vnd.ms-fontobject',
-    png: 'image/png',
-    jpg: JPEG,
-    jpeg: JPEG,
-    gif: 'image/gif',
-    tiff: 'image/tiff',
-    svg: 'image/svg+xml',
-};
-function getExtension(url) {
-    const match = /\.([^./]*?)$/g.exec(url);
-    return match ? match[1] : '';
-}
-function getMimeType(url) {
-    const extension = getExtension(url).toLowerCase();
-    return mimes[extension] || '';
-}
 function resolveUrl(url, baseUrl) {
     // url is absolute already
     if (url.match(/^[a-z]+:\/\//i)) {
@@ -3197,39 +3166,35 @@ function resolveUrl(url, baseUrl) {
     a.href = url;
     return a.href;
 }
-function isDataUrl(url) {
-    return url.search(/^(data:)/) !== -1;
-}
-function makeDataUrl(content, mimeType) {
-    return `data:${mimeType};base64,${content}`;
-}
-function parseDataUrlContent(dataURL) {
-    return dataURL.split(/,/)[1];
-}
-const uuid = (function uuid() {
+const uuid = (() => {
     // generate uuid for className of pseudo elements.
     // We should not use GUIDs, otherwise pseudo elements sometimes cannot be captured.
     let counter = 0;
     // ref: http://stackoverflow.com/a/6248722/2519373
     const random = () => 
     // eslint-disable-next-line no-bitwise
-    `0000${((Math.random() * Math.pow(36, 4)) << 0).toString(36)}`.slice(-4);
+    `0000${((Math.random() * 36 ** 4) << 0).toString(36)}`.slice(-4);
     return () => {
         counter += 1;
         return `u${random()}${counter}`;
     };
 })();
-const delay = (ms) => (args) => new Promise((resolve) => setTimeout(() => resolve(args), ms));
+function delay(ms) {
+    return (args) => new Promise((resolve) => {
+        setTimeout(() => resolve(args), ms);
+    });
+}
 function toArray(arrayLike) {
     const arr = [];
-    for (let i = 0, l = arrayLike.length; i < l; i += 1) {
+    for (let i = 0, l = arrayLike.length; i < l; i++) {
         arr.push(arrayLike[i]);
     }
     return arr;
 }
 function px(node, styleProperty) {
-    const val = window.getComputedStyle(node).getPropertyValue(styleProperty);
-    return parseFloat(val.replace('px', ''));
+    const win = node.ownerDocument.defaultView || window;
+    const val = win.getComputedStyle(node).getPropertyValue(styleProperty);
+    return val ? parseFloat(val.replace('px', '')) : 0;
 }
 function getNodeWidth(node) {
     const leftBorder = px(node, 'border-left-width');
@@ -3240,6 +3205,11 @@ function getNodeHeight(node) {
     const topBorder = px(node, 'border-top-width');
     const bottomBorder = px(node, 'border-bottom-width');
     return node.clientHeight + topBorder + bottomBorder;
+}
+function getImageSize(targetNode, options = {}) {
+    const width = options.width || getNodeWidth(targetNode);
+    const height = options.height || getNodeHeight(targetNode);
+    return { width, height };
 }
 function getPixelRatio() {
     let ratio;
@@ -3261,128 +3231,96 @@ function getPixelRatio() {
     }
     return ratio || window.devicePixelRatio || 1;
 }
-function canvasToBlob(canvas) {
+// @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#maximum_canvas_size
+const canvasDimensionLimit = 16384;
+function checkCanvasDimensions(canvas) {
+    if (canvas.width > canvasDimensionLimit ||
+        canvas.height > canvasDimensionLimit) {
+        if (canvas.width > canvasDimensionLimit &&
+            canvas.height > canvasDimensionLimit) {
+            if (canvas.width > canvas.height) {
+                canvas.height *= canvasDimensionLimit / canvas.width;
+                canvas.width = canvasDimensionLimit;
+            }
+            else {
+                canvas.width *= canvasDimensionLimit / canvas.height;
+                canvas.height = canvasDimensionLimit;
+            }
+        }
+        else if (canvas.width > canvasDimensionLimit) {
+            canvas.height *= canvasDimensionLimit / canvas.width;
+            canvas.width = canvasDimensionLimit;
+        }
+        else {
+            canvas.width *= canvasDimensionLimit / canvas.height;
+            canvas.height = canvasDimensionLimit;
+        }
+    }
+}
+function canvasToBlob(canvas, options = {}) {
     if (canvas.toBlob) {
-        return new Promise((resolve) => canvas.toBlob(resolve));
+        return new Promise((resolve) => {
+            canvas.toBlob(resolve, options.type ? options.type : 'image/png', options.quality ? options.quality : 1);
+        });
     }
     return new Promise((resolve) => {
-        const binaryString = window.atob(canvas.toDataURL().split(',')[1]);
+        const binaryString = window.atob(canvas
+            .toDataURL(options.type ? options.type : undefined, options.quality ? options.quality : undefined)
+            .split(',')[1]);
         const len = binaryString.length;
         const binaryArray = new Uint8Array(len);
         for (let i = 0; i < len; i += 1) {
             binaryArray[i] = binaryString.charCodeAt(i);
         }
-        resolve(new Blob([binaryArray], { type: 'image/png' }));
+        resolve(new Blob([binaryArray], {
+            type: options.type ? options.type : 'image/png',
+        }));
     });
 }
 function createImage(url) {
     return new Promise((resolve, reject) => {
         const img = new Image();
+        img.decode = () => resolve(img);
         img.onload = () => resolve(img);
         img.onerror = reject;
         img.crossOrigin = 'anonymous';
-        img.decoding = 'sync';
+        img.decoding = 'async';
         img.src = url;
     });
 }
-function svgToDataURL(svg) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return Promise.resolve()
-            .then(() => new XMLSerializer().serializeToString(svg))
-            .then(encodeURIComponent)
-            .then((html) => `data:image/svg+xml;charset=utf-8,${html}`);
-    });
+async function svgToDataURL(svg) {
+    return Promise.resolve()
+        .then(() => new XMLSerializer().serializeToString(svg))
+        .then(encodeURIComponent)
+        .then((html) => `data:image/svg+xml;charset=utf-8,${html}`);
 }
-function nodeToDataURL(node, width, height) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const xmlns = 'http://www.w3.org/2000/svg';
-        const svg = document.createElementNS(xmlns, 'svg');
-        const foreignObject = document.createElementNS(xmlns, 'foreignObject');
-        svg.setAttribute('width', `${width}`);
-        svg.setAttribute('height', `${height}`);
-        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-        foreignObject.setAttribute('width', '100%');
-        foreignObject.setAttribute('height', '100%');
-        foreignObject.setAttribute('x', '0');
-        foreignObject.setAttribute('y', '0');
-        foreignObject.setAttribute('externalResourcesRequired', 'true');
-        svg.appendChild(foreignObject);
-        foreignObject.appendChild(node);
-        return svgToDataURL(svg);
-    });
+async function nodeToDataURL(node, width, height) {
+    const xmlns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(xmlns, 'svg');
+    const foreignObject = document.createElementNS(xmlns, 'foreignObject');
+    svg.setAttribute('width', `${width}`);
+    svg.setAttribute('height', `${height}`);
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    foreignObject.setAttribute('width', '100%');
+    foreignObject.setAttribute('height', '100%');
+    foreignObject.setAttribute('x', '0');
+    foreignObject.setAttribute('y', '0');
+    foreignObject.setAttribute('externalResourcesRequired', 'true');
+    svg.appendChild(foreignObject);
+    foreignObject.appendChild(node);
+    return svgToDataURL(svg);
 }
+const isInstanceOfElement = (node, instance) => {
+    if (node instanceof instance)
+        return true;
+    const nodePrototype = Object.getPrototypeOf(node);
+    if (nodePrototype === null)
+        return false;
+    return (nodePrototype.constructor.name === instance.name ||
+        isInstanceOfElement(nodePrototype, instance));
+};
 //# sourceMappingURL=util.js.map
-;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/getBlobFromURL.js
-
-const cache = {};
-function getCacheKey(url) {
-    let key = url.replace(/\?.*/, '');
-    // font resourse
-    if (/ttf|otf|eot|woff2?/i.test(key)) {
-        key = key.replace(/.*\//, '');
-    }
-    return key;
-}
-function getBlobFromURL(url, options) {
-    const cacheKey = getCacheKey(url);
-    if (cache[cacheKey] != null) {
-        return cache[cacheKey];
-    }
-    // cache bypass so we dont have CORS issues with cached images
-    // ref: https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#Bypassing_the_cache
-    if (options.cacheBust) {
-        // eslint-disable-next-line no-param-reassign
-        url += (/\?/.test(url) ? '&' : '?') + new Date().getTime();
-    }
-    const failed = (reason) => {
-        let placeholder = '';
-        if (options.imagePlaceholder) {
-            const parts = options.imagePlaceholder.split(/,/);
-            if (parts && parts[1]) {
-                placeholder = parts[1];
-            }
-        }
-        let msg = `Failed to fetch resource: ${url}`;
-        if (reason) {
-            msg = typeof reason === 'string' ? reason : reason.message;
-        }
-        if (msg) {
-            console.error(msg);
-        }
-        return {
-            blob: placeholder,
-            contentType: '',
-        };
-    };
-    const deferred = window
-        .fetch(url)
-        .then((res) => 
-    // eslint-disable-next-line promise/no-nesting
-    res.blob().then((blob) => ({
-        blob,
-        contentType: res.headers.get('Content-Type') || '',
-    })))
-        .then(({ blob, contentType }) => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve({
-            contentType,
-            blob: reader.result,
-        });
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-    }))
-        .then(({ blob, contentType }) => ({
-        contentType,
-        blob: parseDataUrlContent(blob),
-    }))
-        // on failed
-        .catch(failed);
-    // cache result
-    cache[cacheKey] = deferred;
-    return deferred;
-}
-//# sourceMappingURL=getBlobFromURL.js.map
-;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/clonePseudoElements.js
+;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/clone-pseudos.js
 
 function formatCSSText(style) {
     const content = style.getPropertyValue('content');
@@ -3425,132 +3363,296 @@ function clonePseudoElements(nativeNode, clonedNode) {
     clonePseudoElement(nativeNode, clonedNode, ':before');
     clonePseudoElement(nativeNode, clonedNode, ':after');
 }
-//# sourceMappingURL=clonePseudoElements.js.map
-;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/cloneNode.js
-var cloneNode_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
+//# sourceMappingURL=clone-pseudos.js.map
+;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/mimes.js
+const WOFF = 'application/font-woff';
+const JPEG = 'image/jpeg';
+const mimes = {
+    woff: WOFF,
+    woff2: WOFF,
+    ttf: 'application/font-truetype',
+    eot: 'application/vnd.ms-fontobject',
+    png: 'image/png',
+    jpg: JPEG,
+    jpeg: JPEG,
+    gif: 'image/gif',
+    tiff: 'image/tiff',
+    svg: 'image/svg+xml',
+    webp: 'image/webp',
 };
-
-
-
-function cloneCanvasElement(node) {
-    return cloneNode_awaiter(this, void 0, void 0, function* () {
-        const dataURL = node.toDataURL();
-        if (dataURL === 'data:,') {
-            return Promise.resolve(node.cloneNode(false));
+function getExtension(url) {
+    const match = /\.([^./]*?)$/g.exec(url);
+    return match ? match[1] : '';
+}
+function getMimeType(url) {
+    const extension = getExtension(url).toLowerCase();
+    return mimes[extension] || '';
+}
+//# sourceMappingURL=mimes.js.map
+;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/dataurl.js
+function getContentFromDataUrl(dataURL) {
+    return dataURL.split(/,/)[1];
+}
+function isDataUrl(url) {
+    return url.search(/^(data:)/) !== -1;
+}
+function makeDataUrl(content, mimeType) {
+    return `data:${mimeType};base64,${content}`;
+}
+async function fetchAsDataURL(url, init, process) {
+    const res = await fetch(url, init);
+    if (res.status === 404) {
+        throw new Error(`Resource "${res.url}" not found`);
+    }
+    const blob = await res.blob();
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onloadend = () => {
+            try {
+                resolve(process({ res, result: reader.result }));
+            }
+            catch (error) {
+                reject(error);
+            }
+        };
+        reader.readAsDataURL(blob);
+    });
+}
+const cache = {};
+function getCacheKey(url, contentType, includeQueryParams) {
+    let key = url.replace(/\?.*/, '');
+    if (includeQueryParams) {
+        key = url;
+    }
+    // font resource
+    if (/ttf|otf|eot|woff2?/i.test(key)) {
+        key = key.replace(/.*\//, '');
+    }
+    return contentType ? `[${contentType}]${key}` : key;
+}
+async function resourceToDataURL(resourceUrl, contentType, options) {
+    const cacheKey = getCacheKey(resourceUrl, contentType, options.includeQueryParams);
+    if (cache[cacheKey] != null) {
+        return cache[cacheKey];
+    }
+    // ref: https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#Bypassing_the_cache
+    if (options.cacheBust) {
+        // eslint-disable-next-line no-param-reassign
+        resourceUrl += (/\?/.test(resourceUrl) ? '&' : '?') + new Date().getTime();
+    }
+    let dataURL;
+    try {
+        const content = await fetchAsDataURL(resourceUrl, options.fetchRequestInit, ({ res, result }) => {
+            if (!contentType) {
+                // eslint-disable-next-line no-param-reassign
+                contentType = res.headers.get('Content-Type') || '';
+            }
+            return getContentFromDataUrl(result);
+        });
+        dataURL = makeDataUrl(content, contentType);
+    }
+    catch (error) {
+        dataURL = options.imagePlaceholder || '';
+        let msg = `Failed to fetch resource: ${resourceUrl}`;
+        if (error) {
+            msg = typeof error === 'string' ? error : error.message;
         }
+        if (msg) {
+            console.warn(msg);
+        }
+    }
+    cache[cacheKey] = dataURL;
+    return dataURL;
+}
+//# sourceMappingURL=dataurl.js.map
+;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/clone-node.js
+
+
+
+
+async function cloneCanvasElement(canvas) {
+    const dataURL = canvas.toDataURL();
+    if (dataURL === 'data:,') {
+        return canvas.cloneNode(false);
+    }
+    return createImage(dataURL);
+}
+async function cloneVideoElement(video, options) {
+    if (video.currentSrc) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = video.clientWidth;
+        canvas.height = video.clientHeight;
+        ctx === null || ctx === void 0 ? void 0 : ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataURL = canvas.toDataURL();
         return createImage(dataURL);
-    });
+    }
+    const poster = video.poster;
+    const contentType = getMimeType(poster);
+    const dataURL = await resourceToDataURL(poster, contentType, options);
+    return createImage(dataURL);
 }
-function cloneVideoElement(node, options) {
-    return cloneNode_awaiter(this, void 0, void 0, function* () {
-        return Promise.resolve(node.poster)
-            .then((url) => getBlobFromURL(url, options))
-            .then((data) => makeDataUrl(data.blob, getMimeType(node.poster) || data.contentType))
-            .then((dataURL) => createImage(dataURL));
-    });
+async function cloneIFrameElement(iframe) {
+    var _a;
+    try {
+        if ((_a = iframe === null || iframe === void 0 ? void 0 : iframe.contentDocument) === null || _a === void 0 ? void 0 : _a.body) {
+            return (await cloneNode(iframe.contentDocument.body, {}, true));
+        }
+    }
+    catch (_b) {
+        // Failed to clone iframe
+    }
+    return iframe.cloneNode(false);
 }
-function cloneSingleNode(node, options) {
-    return cloneNode_awaiter(this, void 0, void 0, function* () {
-        if (node instanceof HTMLCanvasElement) {
-            return cloneCanvasElement(node);
-        }
-        if (node instanceof HTMLVideoElement && node.poster) {
-            return cloneVideoElement(node, options);
-        }
-        return Promise.resolve(node.cloneNode(false));
-    });
+async function cloneSingleNode(node, options) {
+    if (isInstanceOfElement(node, HTMLCanvasElement)) {
+        return cloneCanvasElement(node);
+    }
+    if (isInstanceOfElement(node, HTMLVideoElement)) {
+        return cloneVideoElement(node, options);
+    }
+    if (isInstanceOfElement(node, HTMLIFrameElement)) {
+        return cloneIFrameElement(node);
+    }
+    return node.cloneNode(false);
 }
 const isSlotElement = (node) => node.tagName != null && node.tagName.toUpperCase() === 'SLOT';
-function cloneChildren(nativeNode, clonedNode, options) {
-    var _a;
-    return cloneNode_awaiter(this, void 0, void 0, function* () {
-        const children = isSlotElement(nativeNode) && nativeNode.assignedNodes
-            ? toArray(nativeNode.assignedNodes())
-            : toArray(((_a = nativeNode.shadowRoot) !== null && _a !== void 0 ? _a : nativeNode).childNodes);
-        if (children.length === 0 || nativeNode instanceof HTMLVideoElement) {
-            return Promise.resolve(clonedNode);
-        }
-        return children
-            .reduce((deferred, child) => deferred
-            // eslint-disable-next-line no-use-before-define
-            .then(() => cloneNode(child, options))
-            .then((clonedChild) => {
-            // eslint-disable-next-line promise/always-return
-            if (clonedChild) {
-                clonedNode.appendChild(clonedChild);
-            }
-        }), Promise.resolve())
-            .then(() => clonedNode);
-    });
-}
-function cloneCSSStyle(nativeNode, clonedNode) {
-    const source = window.getComputedStyle(nativeNode);
-    const target = clonedNode.style;
-    if (!target) {
-        return;
+async function cloneChildren(nativeNode, clonedNode, options) {
+    var _a, _b;
+    let children = [];
+    if (isSlotElement(nativeNode) && nativeNode.assignedNodes) {
+        children = toArray(nativeNode.assignedNodes());
     }
-    if (source.cssText) {
-        target.cssText = source.cssText;
+    else if (isInstanceOfElement(nativeNode, HTMLIFrameElement) &&
+        ((_a = nativeNode.contentDocument) === null || _a === void 0 ? void 0 : _a.body)) {
+        children = toArray(nativeNode.contentDocument.body.childNodes);
     }
     else {
-        toArray(source).forEach((name) => {
-            target.setProperty(name, source.getPropertyValue(name), source.getPropertyPriority(name));
+        children = toArray(((_b = nativeNode.shadowRoot) !== null && _b !== void 0 ? _b : nativeNode).childNodes);
+    }
+    if (children.length === 0 ||
+        isInstanceOfElement(nativeNode, HTMLVideoElement)) {
+        return clonedNode;
+    }
+    await children.reduce((deferred, child) => deferred
+        .then(() => cloneNode(child, options))
+        .then((clonedChild) => {
+        if (clonedChild) {
+            clonedNode.appendChild(clonedChild);
+        }
+    }), Promise.resolve());
+    return clonedNode;
+}
+function cloneCSSStyle(nativeNode, clonedNode) {
+    const targetStyle = clonedNode.style;
+    if (!targetStyle) {
+        return;
+    }
+    const sourceStyle = window.getComputedStyle(nativeNode);
+    if (sourceStyle.cssText) {
+        targetStyle.cssText = sourceStyle.cssText;
+        targetStyle.transformOrigin = sourceStyle.transformOrigin;
+    }
+    else {
+        toArray(sourceStyle).forEach((name) => {
+            let value = sourceStyle.getPropertyValue(name);
+            if (name === 'font-size' && value.endsWith('px')) {
+                const reducedFont = Math.floor(parseFloat(value.substring(0, value.length - 2))) - 0.1;
+                value = `${reducedFont}px`;
+            }
+            if (isInstanceOfElement(nativeNode, HTMLIFrameElement) &&
+                name === 'display' &&
+                value === 'inline') {
+                value = 'block';
+            }
+            if (name === 'd' && clonedNode.getAttribute('d')) {
+                value = `path(${clonedNode.getAttribute('d')})`;
+            }
+            targetStyle.setProperty(name, value, sourceStyle.getPropertyPriority(name));
         });
     }
 }
 function cloneInputValue(nativeNode, clonedNode) {
-    if (nativeNode instanceof HTMLTextAreaElement) {
+    if (isInstanceOfElement(nativeNode, HTMLTextAreaElement)) {
         clonedNode.innerHTML = nativeNode.value;
     }
-    if (nativeNode instanceof HTMLInputElement) {
+    if (isInstanceOfElement(nativeNode, HTMLInputElement)) {
         clonedNode.setAttribute('value', nativeNode.value);
     }
 }
+function cloneSelectValue(nativeNode, clonedNode) {
+    if (isInstanceOfElement(nativeNode, HTMLSelectElement)) {
+        const clonedSelect = clonedNode;
+        const selectedOption = Array.from(clonedSelect.children).find((child) => nativeNode.value === child.getAttribute('value'));
+        if (selectedOption) {
+            selectedOption.setAttribute('selected', '');
+        }
+    }
+}
 function decorate(nativeNode, clonedNode) {
-    return cloneNode_awaiter(this, void 0, void 0, function* () {
-        if (!(clonedNode instanceof Element)) {
-            return Promise.resolve(clonedNode);
-        }
-        return Promise.resolve()
-            .then(() => cloneCSSStyle(nativeNode, clonedNode))
-            .then(() => clonePseudoElements(nativeNode, clonedNode))
-            .then(() => cloneInputValue(nativeNode, clonedNode))
-            .then(() => clonedNode);
-    });
+    if (isInstanceOfElement(clonedNode, Element)) {
+        cloneCSSStyle(nativeNode, clonedNode);
+        clonePseudoElements(nativeNode, clonedNode);
+        cloneInputValue(nativeNode, clonedNode);
+        cloneSelectValue(nativeNode, clonedNode);
+    }
+    return clonedNode;
 }
-function cloneNode(node, options, isRoot) {
-    return cloneNode_awaiter(this, void 0, void 0, function* () {
-        if (!isRoot && options.filter && !options.filter(node)) {
-            return Promise.resolve(null);
+async function ensureSVGSymbols(clone, options) {
+    const uses = clone.querySelectorAll ? clone.querySelectorAll('use') : [];
+    if (uses.length === 0) {
+        return clone;
+    }
+    const processedDefs = {};
+    for (let i = 0; i < uses.length; i++) {
+        const use = uses[i];
+        const id = use.getAttribute('xlink:href');
+        if (id) {
+            const exist = clone.querySelector(id);
+            const definition = document.querySelector(id);
+            if (!exist && definition && !processedDefs[id]) {
+                // eslint-disable-next-line no-await-in-loop
+                processedDefs[id] = (await cloneNode(definition, options, true));
+            }
         }
-        return Promise.resolve(node)
-            .then((clonedNode) => cloneSingleNode(clonedNode, options))
-            .then((clonedNode) => cloneChildren(node, clonedNode, options))
-            .then((clonedNode) => decorate(node, clonedNode));
-    });
+    }
+    const nodes = Object.values(processedDefs);
+    if (nodes.length) {
+        const ns = 'http://www.w3.org/1999/xhtml';
+        const svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('xmlns', ns);
+        svg.style.position = 'absolute';
+        svg.style.width = '0';
+        svg.style.height = '0';
+        svg.style.overflow = 'hidden';
+        svg.style.display = 'none';
+        const defs = document.createElementNS(ns, 'defs');
+        svg.appendChild(defs);
+        for (let i = 0; i < nodes.length; i++) {
+            defs.appendChild(nodes[i]);
+        }
+        clone.appendChild(svg);
+    }
+    return clone;
 }
-//# sourceMappingURL=cloneNode.js.map
-;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/embedResources.js
-var embedResources_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+async function cloneNode(node, options, isRoot) {
+    if (!isRoot && options.filter && !options.filter(node)) {
+        return null;
+    }
+    return Promise.resolve(node)
+        .then((clonedNode) => cloneSingleNode(clonedNode, options))
+        .then((clonedNode) => cloneChildren(node, clonedNode, options))
+        .then((clonedNode) => decorate(node, clonedNode))
+        .then((clonedNode) => ensureSVGSymbols(clonedNode, options));
+}
+//# sourceMappingURL=clone-node.js.map
+;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/embed-resources.js
+
 
 
 const URL_REGEX = /url\((['"]?)([^'"]+?)\1\)/g;
-const URL_WITH_FORMAT_REGEX = /url\([^)]+\)\s*format\((["'])([^"']+)\1\)/g;
+const URL_WITH_FORMAT_REGEX = /url\([^)]+\)\s*format\((["']?)([^"']+)\1\)/g;
 const FONT_SRC_REGEX = /src:\s*(?:url\([^)]+\)\s*format\([^)]+\)[,;]\s*)+/g;
 function toRegex(url) {
     // eslint-disable-next-line no-useless-escape
@@ -3558,25 +3660,31 @@ function toRegex(url) {
     return new RegExp(`(url\\(['"]?)(${escaped})(['"]?\\))`, 'g');
 }
 function parseURLs(cssText) {
-    const result = [];
+    const urls = [];
     cssText.replace(URL_REGEX, (raw, quotation, url) => {
-        result.push(url);
+        urls.push(url);
         return raw;
     });
-    return result.filter((url) => !isDataUrl(url));
+    return urls.filter((url) => !isDataUrl(url));
 }
-function embedResources_embed(cssText, resourceURL, baseURL, options, get) {
-    const resolvedURL = baseURL ? resolveUrl(resourceURL, baseURL) : resourceURL;
-    return Promise.resolve(resolvedURL)
-        .then((url) => get ? get(url) : getBlobFromURL(url, options))
-        .then((data) => {
-        if (typeof data === 'string') {
-            return makeDataUrl(data, getMimeType(resourceURL));
+async function embed_resources_embed(cssText, resourceURL, baseURL, options, getContentFromUrl) {
+    try {
+        const resolvedURL = baseURL ? resolveUrl(resourceURL, baseURL) : resourceURL;
+        const contentType = getMimeType(resourceURL);
+        let dataURL;
+        if (getContentFromUrl) {
+            const content = await getContentFromUrl(resolvedURL);
+            dataURL = makeDataUrl(content, contentType);
         }
-        return makeDataUrl(data.blob, getMimeType(resourceURL) || data.contentType);
-    })
-        .then((dataURL) => cssText.replace(toRegex(resourceURL), `$1${dataURL}$3`))
-        .then((content) => content, () => resolvedURL);
+        else {
+            dataURL = await resourceToDataURL(resolvedURL, contentType, options);
+        }
+        return cssText.replace(toRegex(resourceURL), `$1${dataURL}$3`);
+    }
+    catch (error) {
+        // pass
+    }
+    return cssText;
 }
 function filterPreferredFontFormat(str, { preferredFontFormat }) {
     return !preferredFontFormat
@@ -3597,97 +3705,81 @@ function filterPreferredFontFormat(str, { preferredFontFormat }) {
 function shouldEmbed(url) {
     return url.search(URL_REGEX) !== -1;
 }
-function embedResources(cssText, baseUrl, options) {
-    return embedResources_awaiter(this, void 0, void 0, function* () {
-        if (!shouldEmbed(cssText)) {
-            return Promise.resolve(cssText);
-        }
-        const filteredCSSText = filterPreferredFontFormat(cssText, options);
-        return Promise.resolve(filteredCSSText)
-            .then(parseURLs)
-            .then((urls) => urls.reduce((deferred, url) => 
-        // eslint-disable-next-line promise/no-nesting
-        deferred.then((css) => embedResources_embed(css, url, baseUrl, options)), Promise.resolve(filteredCSSText)));
-    });
+async function embedResources(cssText, baseUrl, options) {
+    if (!shouldEmbed(cssText)) {
+        return cssText;
+    }
+    const filteredCSSText = filterPreferredFontFormat(cssText, options);
+    const urls = parseURLs(filteredCSSText);
+    return urls.reduce((deferred, url) => deferred.then((css) => embed_resources_embed(css, url, baseUrl, options)), Promise.resolve(filteredCSSText));
 }
-//# sourceMappingURL=embedResources.js.map
-;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/embedImages.js
-var embedImages_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+//# sourceMappingURL=embed-resources.js.map
+;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/embed-images.js
 
 
 
-function embedBackground(clonedNode, options) {
+
+async function embedProp(propName, node, options) {
     var _a;
-    return embedImages_awaiter(this, void 0, void 0, function* () {
-        const background = (_a = clonedNode.style) === null || _a === void 0 ? void 0 : _a.getPropertyValue('background');
-        if (!background) {
-            return Promise.resolve(clonedNode);
+    const propValue = (_a = node.style) === null || _a === void 0 ? void 0 : _a.getPropertyValue(propName);
+    if (propValue) {
+        const cssString = await embedResources(propValue, null, options);
+        node.style.setProperty(propName, cssString, node.style.getPropertyPriority(propName));
+        return true;
+    }
+    return false;
+}
+async function embedBackground(clonedNode, options) {
+    if (!(await embedProp('background', clonedNode, options))) {
+        await embedProp('background-image', clonedNode, options);
+    }
+    if (!(await embedProp('mask', clonedNode, options))) {
+        await embedProp('mask-image', clonedNode, options);
+    }
+}
+async function embedImageNode(clonedNode, options) {
+    const isImageElement = isInstanceOfElement(clonedNode, HTMLImageElement);
+    if (!(isImageElement && !isDataUrl(clonedNode.src)) &&
+        !(isInstanceOfElement(clonedNode, SVGImageElement) &&
+            !isDataUrl(clonedNode.href.baseVal))) {
+        return;
+    }
+    const url = isImageElement ? clonedNode.src : clonedNode.href.baseVal;
+    const dataURL = await resourceToDataURL(url, getMimeType(url), options);
+    await new Promise((resolve, reject) => {
+        clonedNode.onload = resolve;
+        clonedNode.onerror = reject;
+        const image = clonedNode;
+        if (image.decode) {
+            image.decode = resolve;
         }
-        return Promise.resolve(background)
-            .then((cssString) => embedResources(cssString, null, options))
-            .then((cssString) => {
-            clonedNode.style.setProperty('background', cssString, clonedNode.style.getPropertyPriority('background'));
-            return clonedNode;
-        });
-    });
-}
-function embedImageNode(clonedNode, options) {
-    return embedImages_awaiter(this, void 0, void 0, function* () {
-        if (!(clonedNode instanceof HTMLImageElement && !isDataUrl(clonedNode.src)) &&
-            !(clonedNode instanceof SVGImageElement &&
-                !isDataUrl(clonedNode.href.baseVal))) {
-            return Promise.resolve(clonedNode);
+        if (image.loading === 'lazy') {
+            image.loading = 'eager';
         }
-        const src = clonedNode instanceof HTMLImageElement
-            ? clonedNode.src
-            : clonedNode.href.baseVal;
-        return Promise.resolve(src)
-            .then((url) => getBlobFromURL(url, options))
-            .then((data) => makeDataUrl(data.blob, getMimeType(src) || data.contentType))
-            .then((dataURL) => new Promise((resolve, reject) => {
-            clonedNode.onload = resolve;
-            clonedNode.onerror = reject;
-            if (clonedNode instanceof HTMLImageElement) {
-                clonedNode.srcset = '';
-                clonedNode.src = dataURL;
-            }
-            else {
-                clonedNode.href.baseVal = dataURL;
-            }
-        }))
-            .then(() => clonedNode, () => clonedNode);
-    });
-}
-function embedChildren(clonedNode, options) {
-    return embedImages_awaiter(this, void 0, void 0, function* () {
-        const children = toArray(clonedNode.childNodes);
-        // eslint-disable-next-line no-use-before-define
-        const deferreds = children.map((child) => embedImages(child, options));
-        return Promise.all(deferreds).then(() => clonedNode);
-    });
-}
-function embedImages(clonedNode, options) {
-    return embedImages_awaiter(this, void 0, void 0, function* () {
-        if (!(clonedNode instanceof Element)) {
-            return Promise.resolve(clonedNode);
+        if (isImageElement) {
+            clonedNode.srcset = '';
+            clonedNode.src = dataURL;
         }
-        return Promise.resolve(clonedNode)
-            .then((node) => embedBackground(node, options))
-            .then((node) => embedImageNode(node, options))
-            .then((node) => embedChildren(node, options));
+        else {
+            clonedNode.href.baseVal = dataURL;
+        }
     });
 }
-//# sourceMappingURL=embedImages.js.map
-;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/applyStyleWithOptions.js
-function applyStyleWithOptions(node, options) {
+async function embedChildren(clonedNode, options) {
+    const children = toArray(clonedNode.childNodes);
+    const deferreds = children.map((child) => embedImages(child, options));
+    await Promise.all(deferreds).then(() => clonedNode);
+}
+async function embedImages(clonedNode, options) {
+    if (isInstanceOfElement(clonedNode, Element)) {
+        await embedBackground(clonedNode, options);
+        await embedImageNode(clonedNode, options);
+        await embedChildren(clonedNode, options);
+    }
+}
+//# sourceMappingURL=embed-images.js.map
+;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/apply-style.js
+function applyStyle(node, options) {
     const { style } = node;
     if (options.backgroundColor) {
         style.backgroundColor = options.backgroundColor;
@@ -3706,62 +3798,38 @@ function applyStyleWithOptions(node, options) {
     }
     return node;
 }
-//# sourceMappingURL=applyStyleWithOptions.js.map
-;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/embedWebFonts.js
-var embedWebFonts_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+//# sourceMappingURL=apply-style.js.map
+;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/embed-webfonts.js
+
 
 
 const cssFetchCache = {};
-function fetchCSS(url) {
-    const cache = cssFetchCache[url];
+async function fetchCSS(url) {
+    let cache = cssFetchCache[url];
     if (cache != null) {
         return cache;
     }
-    const deferred = window.fetch(url).then((res) => ({
-        url,
-        cssText: res.text(),
-    }));
-    cssFetchCache[url] = deferred;
-    return deferred;
+    const res = await fetch(url);
+    const cssText = await res.text();
+    cache = { url, cssText };
+    cssFetchCache[url] = cache;
+    return cache;
 }
-function embedFonts(meta) {
-    return embedWebFonts_awaiter(this, void 0, void 0, function* () {
-        return meta.cssText.then((raw) => {
-            let cssText = raw;
-            const regexUrl = /url\(["']?([^"')]+)["']?\)/g;
-            const fontLocs = cssText.match(/url\([^)]+\)/g) || [];
-            const loadFonts = fontLocs.map((location) => {
-                let url = location.replace(regexUrl, '$1');
-                if (!url.startsWith('https://')) {
-                    url = new URL(url, meta.url).href;
-                }
-                // eslint-disable-next-line promise/no-nesting
-                return window
-                    .fetch(url)
-                    .then((res) => res.blob())
-                    .then((blob) => new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        // Side Effect
-                        cssText = cssText.replace(location, `url(${reader.result})`);
-                        resolve([location, reader.result]);
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(blob);
-                }));
-            });
-            // eslint-disable-next-line promise/no-nesting
-            return Promise.all(loadFonts).then(() => cssText);
+async function embedFonts(data, options) {
+    let cssText = data.cssText;
+    const regexUrl = /url\(["']?([^"')]+)["']?\)/g;
+    const fontLocs = cssText.match(/url\([^)]+\)/g) || [];
+    const loadFonts = fontLocs.map(async (loc) => {
+        let url = loc.replace(regexUrl, '$1');
+        if (!url.startsWith('https://')) {
+            url = new URL(url, data.url).href;
+        }
+        return fetchAsDataURL(url, options.fetchRequestInit, ({ result }) => {
+            cssText = cssText.replace(loc, `url(${result})`);
+            return [loc, result];
         });
     });
+    return Promise.all(loadFonts).then(() => cssText);
 }
 function parseCSS(source) {
     if (source == null) {
@@ -3771,6 +3839,7 @@ function parseCSS(source) {
     const commentsRegex = /(\/\*[\s\S]*?\*\/)/gi;
     // strip out comments
     let cssText = source.replace(commentsRegex, '');
+    // eslint-disable-next-line prefer-regex-literals
     const keyframesRegex = new RegExp('((@.*?keyframes [\\s\\S]*?){([\\s\\S]*?}\\s*?)})', 'gi');
     // eslint-disable-next-line no-constant-condition
     while (true) {
@@ -3806,72 +3875,70 @@ function parseCSS(source) {
     }
     return result;
 }
-function getCSSRules(styleSheets) {
-    return embedWebFonts_awaiter(this, void 0, void 0, function* () {
-        const ret = [];
-        const deferreds = [];
-        // First loop inlines imports
+async function getCSSRules(styleSheets, options) {
+    const ret = [];
+    const deferreds = [];
+    // First loop inlines imports
+    styleSheets.forEach((sheet) => {
+        if ('cssRules' in sheet) {
+            try {
+                toArray(sheet.cssRules || []).forEach((item, index) => {
+                    if (item.type === CSSRule.IMPORT_RULE) {
+                        let importIndex = index + 1;
+                        const url = item.href;
+                        const deferred = fetchCSS(url)
+                            .then((metadata) => embedFonts(metadata, options))
+                            .then((cssText) => parseCSS(cssText).forEach((rule) => {
+                            try {
+                                sheet.insertRule(rule, rule.startsWith('@import')
+                                    ? (importIndex += 1)
+                                    : sheet.cssRules.length);
+                            }
+                            catch (error) {
+                                console.error('Error inserting rule from remote css', {
+                                    rule,
+                                    error,
+                                });
+                            }
+                        }))
+                            .catch((e) => {
+                            console.error('Error loading remote css', e.toString());
+                        });
+                        deferreds.push(deferred);
+                    }
+                });
+            }
+            catch (e) {
+                const inline = styleSheets.find((a) => a.href == null) || document.styleSheets[0];
+                if (sheet.href != null) {
+                    deferreds.push(fetchCSS(sheet.href)
+                        .then((metadata) => embedFonts(metadata, options))
+                        .then((cssText) => parseCSS(cssText).forEach((rule) => {
+                        inline.insertRule(rule, sheet.cssRules.length);
+                    }))
+                        .catch((err) => {
+                        console.error('Error loading remote stylesheet', err);
+                    }));
+                }
+                console.error('Error inlining remote css file', e);
+            }
+        }
+    });
+    return Promise.all(deferreds).then(() => {
+        // Second loop parses rules
         styleSheets.forEach((sheet) => {
             if ('cssRules' in sheet) {
                 try {
-                    toArray(sheet.cssRules).forEach((item, index) => {
-                        if (item.type === CSSRule.IMPORT_RULE) {
-                            let importIndex = index + 1;
-                            const url = item.href;
-                            const deferred = fetchCSS(url)
-                                .then((metadata) => (metadata ? embedFonts(metadata) : ''))
-                                .then((cssText) => parseCSS(cssText).forEach((rule) => {
-                                try {
-                                    sheet.insertRule(rule, rule.startsWith('@import')
-                                        ? (importIndex += 1)
-                                        : sheet.cssRules.length);
-                                }
-                                catch (error) {
-                                    console.error('Error inserting rule from remote css', {
-                                        rule,
-                                        error,
-                                    });
-                                }
-                            }))
-                                .catch((e) => {
-                                console.error('Error loading remote css', e.toString());
-                            });
-                            deferreds.push(deferred);
-                        }
+                    toArray(sheet.cssRules || []).forEach((item) => {
+                        ret.push(item);
                     });
                 }
                 catch (e) {
-                    const inline = styleSheets.find((a) => a.href == null) || document.styleSheets[0];
-                    if (sheet.href != null) {
-                        deferreds.push(fetchCSS(sheet.href)
-                            .then((metadata) => (metadata ? embedFonts(metadata) : ''))
-                            .then((cssText) => parseCSS(cssText).forEach((rule) => {
-                            inline.insertRule(rule, sheet.cssRules.length);
-                        }))
-                            .catch((err) => {
-                            console.error('Error loading remote stylesheet', err.toString());
-                        }));
-                    }
-                    console.error('Error inlining remote css file', e.toString());
+                    console.error(`Error while reading CSS rules from ${sheet.href}`, e);
                 }
             }
         });
-        return Promise.all(deferreds).then(() => {
-            // Second loop parses rules
-            styleSheets.forEach((sheet) => {
-                if ('cssRules' in sheet) {
-                    try {
-                        toArray(sheet.cssRules).forEach((item) => {
-                            ret.push(item);
-                        });
-                    }
-                    catch (e) {
-                        console.error(`Error while reading CSS rules from ${sheet.href}`, e.toString());
-                    }
-                }
-            });
-            return ret;
-        });
+        return ret;
     });
 }
 function getWebFontRules(cssRules) {
@@ -3879,160 +3946,100 @@ function getWebFontRules(cssRules) {
         .filter((rule) => rule.type === CSSRule.FONT_FACE_RULE)
         .filter((rule) => shouldEmbed(rule.style.getPropertyValue('src')));
 }
-function parseWebFontRules(node) {
-    return embedWebFonts_awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            if (node.ownerDocument == null) {
-                reject(new Error('Provided element is not within a Document'));
-            }
-            resolve(toArray(node.ownerDocument.styleSheets));
-        })
-            .then((styleSheets) => getCSSRules(styleSheets))
-            .then(getWebFontRules);
-    });
+async function parseWebFontRules(node, options) {
+    if (node.ownerDocument == null) {
+        throw new Error('Provided element is not within a Document');
+    }
+    const styleSheets = toArray(node.ownerDocument.styleSheets);
+    const cssRules = await getCSSRules(styleSheets, options);
+    return getWebFontRules(cssRules);
 }
-function getWebFontCSS(node, options) {
-    return embedWebFonts_awaiter(this, void 0, void 0, function* () {
-        return parseWebFontRules(node)
-            .then((rules) => Promise.all(rules.map((rule) => {
-            const baseUrl = rule.parentStyleSheet
-                ? rule.parentStyleSheet.href
-                : null;
-            return embedResources(rule.cssText, baseUrl, options);
-        })))
-            .then((cssTexts) => cssTexts.join('\n'));
-    });
+async function getWebFontCSS(node, options) {
+    const rules = await parseWebFontRules(node, options);
+    const cssTexts = await Promise.all(rules.map((rule) => {
+        const baseUrl = rule.parentStyleSheet ? rule.parentStyleSheet.href : null;
+        return embedResources(rule.cssText, baseUrl, options);
+    }));
+    return cssTexts.join('\n');
 }
-function embedWebFonts(clonedNode, options) {
-    return embedWebFonts_awaiter(this, void 0, void 0, function* () {
-        return (options.fontEmbedCSS != null
-            ? Promise.resolve(options.fontEmbedCSS)
-            : getWebFontCSS(clonedNode, options)).then((cssText) => {
-            const styleNode = document.createElement('style');
-            const sytleContent = document.createTextNode(cssText);
-            styleNode.appendChild(sytleContent);
-            if (clonedNode.firstChild) {
-                clonedNode.insertBefore(styleNode, clonedNode.firstChild);
-            }
-            else {
-                clonedNode.appendChild(styleNode);
-            }
-            return clonedNode;
-        });
-    });
-}
-//# sourceMappingURL=embedWebFonts.js.map
-;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/index.js
-var es_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-
-
-
-
-
-function getImageSize(node, options = {}) {
-    const width = options.width || getNodeWidth(node);
-    const height = options.height || getNodeHeight(node);
-    return { width, height };
-}
-function toSvg(node, options = {}) {
-    return es_awaiter(this, void 0, void 0, function* () {
-        const { width, height } = getImageSize(node, options);
-        return Promise.resolve(node)
-            .then((nativeNode) => cloneNode(nativeNode, options, true))
-            .then((clonedNode) => embedWebFonts(clonedNode, options))
-            .then((clonedNode) => embedImages(clonedNode, options))
-            .then((clonedNode) => applyStyleWithOptions(clonedNode, options))
-            .then((clonedNode) => nodeToDataURL(clonedNode, width, height));
-    });
-}
-const dimensionCanvasLimit = 16384; // as per https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#maximum_canvas_size
-function checkCanvasDimensions(canvas) {
-    if (canvas.width > dimensionCanvasLimit ||
-        canvas.height > dimensionCanvasLimit) {
-        if (canvas.width > dimensionCanvasLimit &&
-            canvas.height > dimensionCanvasLimit) {
-            if (canvas.width > canvas.height) {
-                canvas.height *= dimensionCanvasLimit / canvas.width;
-                canvas.width = dimensionCanvasLimit;
-            }
-            else {
-                canvas.width *= dimensionCanvasLimit / canvas.height;
-                canvas.height = dimensionCanvasLimit;
-            }
-        }
-        else if (canvas.width > dimensionCanvasLimit) {
-            canvas.height *= dimensionCanvasLimit / canvas.width;
-            canvas.width = dimensionCanvasLimit;
+async function embedWebFonts(clonedNode, options) {
+    const cssText = options.fontEmbedCSS != null
+        ? options.fontEmbedCSS
+        : options.skipFonts
+            ? null
+            : await getWebFontCSS(clonedNode, options);
+    if (cssText) {
+        const styleNode = document.createElement('style');
+        const sytleContent = document.createTextNode(cssText);
+        styleNode.appendChild(sytleContent);
+        if (clonedNode.firstChild) {
+            clonedNode.insertBefore(styleNode, clonedNode.firstChild);
         }
         else {
-            canvas.width *= dimensionCanvasLimit / canvas.height;
-            canvas.height = dimensionCanvasLimit;
+            clonedNode.appendChild(styleNode);
         }
     }
 }
-function toCanvas(node, options = {}) {
-    return es_awaiter(this, void 0, void 0, function* () {
-        return toSvg(node, options)
-            .then(createImage)
-            .then((img) => {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            const ratio = options.pixelRatio || getPixelRatio();
-            const { width, height } = getImageSize(node, options);
-            const canvasWidth = options.canvasWidth || width;
-            const canvasHeight = options.canvasHeight || height;
-            canvas.width = canvasWidth * ratio;
-            canvas.height = canvasHeight * ratio;
-            if (!options.skipAutoScale) {
-                checkCanvasDimensions(canvas);
-            }
-            canvas.style.width = `${canvasWidth}`;
-            canvas.style.height = `${canvasHeight}`;
-            if (options.backgroundColor) {
-                context.fillStyle = options.backgroundColor;
-                context.fillRect(0, 0, canvas.width, canvas.height);
-            }
-            context.drawImage(img, 0, 0, canvas.width, canvas.height);
-            return canvas;
-        });
-    });
+//# sourceMappingURL=embed-webfonts.js.map
+;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/index.js
+
+
+
+
+
+async function toSvg(node, options = {}) {
+    const { width, height } = getImageSize(node, options);
+    const clonedNode = (await cloneNode(node, options, true));
+    await embedWebFonts(clonedNode, options);
+    await embedImages(clonedNode, options);
+    applyStyle(clonedNode, options);
+    const datauri = await nodeToDataURL(clonedNode, width, height);
+    return datauri;
 }
-function toPixelData(node, options = {}) {
-    return es_awaiter(this, void 0, void 0, function* () {
-        const { width, height } = getImageSize(node, options);
-        return toCanvas(node, options).then((canvas) => {
-            const ctx = canvas.getContext('2d');
-            return ctx.getImageData(0, 0, width, height).data;
-        });
-    });
+async function toCanvas(node, options = {}) {
+    const { width, height } = getImageSize(node, options);
+    const svg = await toSvg(node, options);
+    const img = await createImage(svg);
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    const ratio = options.pixelRatio || getPixelRatio();
+    const canvasWidth = options.canvasWidth || width;
+    const canvasHeight = options.canvasHeight || height;
+    canvas.width = canvasWidth * ratio;
+    canvas.height = canvasHeight * ratio;
+    if (!options.skipAutoScale) {
+        checkCanvasDimensions(canvas);
+    }
+    canvas.style.width = `${canvasWidth}`;
+    canvas.style.height = `${canvasHeight}`;
+    if (options.backgroundColor) {
+        context.fillStyle = options.backgroundColor;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas;
 }
-function toPng(node, options = {}) {
-    return es_awaiter(this, void 0, void 0, function* () {
-        return toCanvas(node, options).then((canvas) => canvas.toDataURL());
-    });
+async function toPixelData(node, options = {}) {
+    const { width, height } = getImageSize(node, options);
+    const canvas = await toCanvas(node, options);
+    const ctx = canvas.getContext('2d');
+    return ctx.getImageData(0, 0, width, height).data;
 }
-function toJpeg(node, options = {}) {
-    return es_awaiter(this, void 0, void 0, function* () {
-        return toCanvas(node, options).then((canvas) => canvas.toDataURL('image/jpeg', options.quality || 1));
-    });
+async function toPng(node, options = {}) {
+    const canvas = await toCanvas(node, options);
+    return canvas.toDataURL();
 }
-function toBlob(node, options = {}) {
-    return es_awaiter(this, void 0, void 0, function* () {
-        return toCanvas(node, options).then(canvasToBlob);
-    });
+async function toJpeg(node, options = {}) {
+    const canvas = await toCanvas(node, options);
+    return canvas.toDataURL('image/jpeg', options.quality || 1);
 }
-function getFontEmbedCSS(node, options = {}) {
-    return es_awaiter(this, void 0, void 0, function* () {
-        return getWebFontCSS(node, options);
-    });
+async function toBlob(node, options = {}) {
+    const canvas = await toCanvas(node, options);
+    const blob = await canvasToBlob(canvas);
+    return blob;
+}
+async function getFontEmbedCSS(node, options = {}) {
+    return getWebFontCSS(node, options);
 }
 //# sourceMappingURL=index.js.map
 
@@ -4601,9 +4608,9 @@ class ChaseDemo {
                 ctx.font = `${canvas.height * 0.8}px "Arial"`;
                 ctx.strokeStyle = 'blue';
                 ctx.lineWidth = 1;
-                ctx.strokeText(n.toString(), 8, 60, canvas.width * 0.8);
+                ctx.strokeText(n.toString(), 8, canvas.height * 0.9, canvas.width * 0.8);
                 ctx.fillStyle = 'white';
-                ctx.fillText(n.toString(), 8, 60, canvas.width * 0.8);
+                ctx.fillText(n.toString(), 8, canvas.height * 0.9, canvas.width * 0.8);
                 const id = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 ps.push(device.fillKeyBuffer(i, Buffer.from(id.data), { format: 'rgba' }));
                 ctx.restore();
@@ -4665,7 +4672,7 @@ exports.ChaseDemo = ChaseDemo;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DomImageDemo = void 0;
-const html_to_image_1 = __webpack_require__(688);
+const html_to_image_1 = __webpack_require__(771);
 function getRandomColor() {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -4821,16 +4828,55 @@ exports.RapidFillDemo = RapidFillDemo;
 
 /***/ }),
 
-/***/ 613:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 663:
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DEVICE_MODELS = exports.DeviceModelType = exports.VENDOR_ID = exports.StreamDeckProxy = exports.DeviceModelId = void 0;
+exports.DeviceModelId = void 0;
+var DeviceModelId;
+(function (DeviceModelId) {
+    DeviceModelId["ORIGINAL"] = "original";
+    DeviceModelId["ORIGINALV2"] = "originalv2";
+    DeviceModelId["ORIGINALMK2"] = "original-mk2";
+    DeviceModelId["MINI"] = "mini";
+    DeviceModelId["MINIV2"] = "miniv2";
+    DeviceModelId["XL"] = "xl";
+    DeviceModelId["XLV2"] = "xlv2";
+    DeviceModelId["PEDAL"] = "pedal";
+    DeviceModelId["PLUS"] = "plus";
+})(DeviceModelId = exports.DeviceModelId || (exports.DeviceModelId = {}));
+//# sourceMappingURL=id.js.map
+
+/***/ }),
+
+/***/ 613:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DEVICE_MODELS = exports.DeviceModelType = exports.VENDOR_ID = exports.StreamDeckProxy = void 0;
+const id_1 = __webpack_require__(663);
 const models_1 = __webpack_require__(567);
-var models_2 = __webpack_require__(567);
-Object.defineProperty(exports, "DeviceModelId", ({ enumerable: true, get: function () { return models_2.DeviceModelId; } }));
+const plus_1 = __webpack_require__(914);
+__exportStar(__webpack_require__(456), exports);
+__exportStar(__webpack_require__(663), exports);
 var proxy_1 = __webpack_require__(922);
 Object.defineProperty(exports, "StreamDeckProxy", ({ enumerable: true, get: function () { return proxy_1.StreamDeckProxy; } }));
 /** Elgato vendor id */
@@ -4843,49 +4889,55 @@ var DeviceModelType;
 /** List of all the known models, and the classes to use them */
 exports.DEVICE_MODELS = [
     {
-        id: models_1.DeviceModelId.ORIGINAL,
+        id: id_1.DeviceModelId.ORIGINAL,
         type: DeviceModelType.STREAMDECK,
         productId: 0x0060,
         class: models_1.StreamDeckOriginal,
     },
     {
-        id: models_1.DeviceModelId.MINI,
+        id: id_1.DeviceModelId.MINI,
         type: DeviceModelType.STREAMDECK,
         productId: 0x0063,
         class: models_1.StreamDeckMini,
     },
     {
-        id: models_1.DeviceModelId.XL,
+        id: id_1.DeviceModelId.XL,
         type: DeviceModelType.STREAMDECK,
         productId: 0x006c,
         class: models_1.StreamDeckXL,
     },
     {
-        id: models_1.DeviceModelId.ORIGINALV2,
+        id: id_1.DeviceModelId.ORIGINALV2,
         type: DeviceModelType.STREAMDECK,
         productId: 0x006d,
         class: models_1.StreamDeckOriginalV2,
     },
     {
-        id: models_1.DeviceModelId.ORIGINALMK2,
+        id: id_1.DeviceModelId.ORIGINALMK2,
         type: DeviceModelType.STREAMDECK,
         productId: 0x0080,
         class: models_1.StreamDeckOriginalMK2,
     },
     {
-        id: models_1.DeviceModelId.PEDAL,
+        id: id_1.DeviceModelId.PLUS,
+        type: DeviceModelType.STREAMDECK,
+        productId: 0x0084,
+        class: plus_1.StreamDeckPlus,
+    },
+    {
+        id: id_1.DeviceModelId.PEDAL,
         type: DeviceModelType.PEDAL,
         productId: 0x0086,
         class: models_1.StreamDeckPedal,
     },
     {
-        id: models_1.DeviceModelId.XLV2,
+        id: id_1.DeviceModelId.XLV2,
         type: DeviceModelType.STREAMDECK,
         productId: 0x008f,
         class: models_1.StreamDeckXLV2,
     },
     {
-        id: models_1.DeviceModelId.MINIV2,
+        id: id_1.DeviceModelId.MINIV2,
         type: DeviceModelType.STREAMDECK,
         productId: 0x0090,
         class: models_1.StreamDeckMiniV2,
@@ -4966,9 +5018,10 @@ const base_1 = __webpack_require__(576);
  * Base class for generation 2 hardware (starting with the xl)
  */
 class StreamDeckGen2Base extends base_1.StreamDeckBase {
-    constructor(device, options, properties) {
+    constructor(device, options, properties, disableXYFlip) {
         super(device, options, properties);
         this.encodeJPEG = options.encodeJPEG;
+        this.xyFlip = !disableXYFlip;
     }
     /**
      * Sets the brightness of the keys on the Stream Deck
@@ -5024,7 +5077,7 @@ class StreamDeckGen2Base extends base_1.StreamDeckBase {
         return 1024;
     }
     async convertFillImage(sourceBuffer, sourceOptions) {
-        const byteBuffer = (0, util_1.imageToByteArray)(sourceBuffer, sourceOptions, { colorMode: 'rgba', xFlip: true, yFlip: true }, 0, this.ICON_SIZE);
+        const byteBuffer = (0, util_1.imageToByteArray)(sourceBuffer, sourceOptions, { colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip }, 0, this.ICON_SIZE);
         return this.encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE);
     }
 }
@@ -5043,32 +5096,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckBase = exports.StreamDeckInputBase = void 0;
 const EventEmitter = __webpack_require__(399);
 class StreamDeckInputBase extends EventEmitter {
-    constructor(device, _options, properties) {
-        super();
-        this.deviceProperties = properties;
-        this.device = device;
-        this.keyState = new Array(this.NUM_KEYS).fill(false);
-        this.device.dataKeyOffset = properties.KEY_DATA_OFFSET;
-        this.device.on('input', (data) => {
-            for (let i = 0; i < this.NUM_KEYS; i++) {
-                const keyPressed = Boolean(data[i]);
-                const keyIndex = this.transformKeyIndex(i);
-                const stateChanged = keyPressed !== this.keyState[keyIndex];
-                if (stateChanged) {
-                    this.keyState[keyIndex] = keyPressed;
-                    if (keyPressed) {
-                        this.emit('down', keyIndex);
-                    }
-                    else {
-                        this.emit('up', keyIndex);
-                    }
-                }
-            }
-        });
-        this.device.on('error', (err) => {
-            this.emit('error', err);
-        });
-    }
     get NUM_KEYS() {
         return this.KEY_COLUMNS * this.KEY_ROWS;
     }
@@ -5077,6 +5104,18 @@ class StreamDeckInputBase extends EventEmitter {
     }
     get KEY_ROWS() {
         return this.deviceProperties.ROWS;
+    }
+    get NUM_ENCODERS() {
+        // Overridden by models which support this
+        return 0;
+    }
+    get LCD_STRIP_SIZE() {
+        // Overridden by models which support this
+        return undefined;
+    }
+    get LCD_ENCODER_SIZE() {
+        // Overridden by models which support this
+        return undefined;
     }
     get ICON_SIZE() {
         return this.deviceProperties.ICON_SIZE;
@@ -5093,6 +5132,33 @@ class StreamDeckInputBase extends EventEmitter {
     get PRODUCT_NAME() {
         return this.deviceProperties.PRODUCT_NAME;
     }
+    constructor(device, _options, properties) {
+        super();
+        this.deviceProperties = properties;
+        this.device = device;
+        this.keyState = new Array(this.NUM_KEYS).fill(false);
+        this.device.on('input', (data) => this.handleInputBuffer(data));
+        this.device.on('error', (err) => {
+            this.emit('error', err);
+        });
+    }
+    handleInputBuffer(data) {
+        const keyData = data.subarray(this.deviceProperties.KEY_DATA_OFFSET || 0);
+        for (let i = 0; i < this.NUM_KEYS; i++) {
+            const keyPressed = Boolean(keyData[i]);
+            const keyIndex = this.transformKeyIndex(i);
+            const stateChanged = keyPressed !== this.keyState[keyIndex];
+            if (stateChanged) {
+                this.keyState[keyIndex] = keyPressed;
+                if (keyPressed) {
+                    this.emit('down', keyIndex);
+                }
+                else {
+                    this.emit('up', keyIndex);
+                }
+            }
+        }
+    }
     checkValidKeyIndex(keyIndex) {
         if (keyIndex < 0 || keyIndex >= this.NUM_KEYS) {
             throw new TypeError(`Expected a valid keyIndex 0 - ${this.NUM_KEYS - 1}`);
@@ -5103,6 +5169,12 @@ class StreamDeckInputBase extends EventEmitter {
     }
     transformKeyIndex(keyIndex) {
         return keyIndex;
+    }
+    async fillEncoderLcd(_index, _buffer, _sourceOptions) {
+        throw new Error('Not supported for this model');
+    }
+    async fillLcdRegion(_x, _y, _imageBuffer, _sourceOptions) {
+        throw new Error('Not supported for this model');
     }
 }
 exports.StreamDeckInputBase = StreamDeckInputBase;
@@ -5247,46 +5319,13 @@ exports.StreamDeckBase = StreamDeckBase;
 
 /***/ }),
 
-/***/ 766:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DeviceModelId = void 0;
-var DeviceModelId;
-(function (DeviceModelId) {
-    DeviceModelId["ORIGINAL"] = "original";
-    DeviceModelId["ORIGINALV2"] = "originalv2";
-    DeviceModelId["ORIGINALMK2"] = "original-mk2";
-    DeviceModelId["MINI"] = "mini";
-    DeviceModelId["MINIV2"] = "miniv2";
-    DeviceModelId["XL"] = "xl";
-    DeviceModelId["XLV2"] = "xlv2";
-    DeviceModelId["PEDAL"] = "pedal";
-})(DeviceModelId = exports.DeviceModelId || (exports.DeviceModelId = {}));
-//# sourceMappingURL=id.js.map
-
-/***/ }),
-
 /***/ 567:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckPedal = exports.StreamDeckOriginalMK2 = exports.StreamDeckOriginalV2 = exports.StreamDeckXLV2 = exports.StreamDeckXL = exports.StreamDeckMiniV2 = exports.StreamDeckMini = exports.StreamDeckOriginal = void 0;
-__exportStar(__webpack_require__(766), exports);
+exports.StreamDeckPlus = exports.StreamDeckPedal = exports.StreamDeckOriginalMK2 = exports.StreamDeckOriginalV2 = exports.StreamDeckXLV2 = exports.StreamDeckXL = exports.StreamDeckMiniV2 = exports.StreamDeckMini = exports.StreamDeckOriginal = void 0;
 var original_1 = __webpack_require__(148);
 Object.defineProperty(exports, "StreamDeckOriginal", ({ enumerable: true, get: function () { return original_1.StreamDeckOriginal; } }));
 var mini_1 = __webpack_require__(758);
@@ -5303,6 +5342,8 @@ var original_mk2_1 = __webpack_require__(51);
 Object.defineProperty(exports, "StreamDeckOriginalMK2", ({ enumerable: true, get: function () { return original_mk2_1.StreamDeckOriginalMK2; } }));
 var pedal_1 = __webpack_require__(266);
 Object.defineProperty(exports, "StreamDeckPedal", ({ enumerable: true, get: function () { return pedal_1.StreamDeckPedal; } }));
+var plus_1 = __webpack_require__(914);
+Object.defineProperty(exports, "StreamDeckPlus", ({ enumerable: true, get: function () { return plus_1.StreamDeckPlus; } }));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -5316,7 +5357,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckMini = void 0;
 const util_1 = __webpack_require__(764);
 const base_gen1_1 = __webpack_require__(882);
-const id_1 = __webpack_require__(766);
+const id_1 = __webpack_require__(663);
 const miniProperties = {
     MODEL: id_1.DeviceModelId.MINI,
     PRODUCT_NAME: 'Streamdeck Mini',
@@ -5324,7 +5365,7 @@ const miniProperties = {
     ROWS: 2,
     ICON_SIZE: 80,
     KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 1,
+    KEY_DATA_OFFSET: 0,
 };
 class StreamDeckMini extends base_gen1_1.StreamDeckGen1Base {
     constructor(device, options) {
@@ -5353,7 +5394,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckMiniV2 = void 0;
 const util_1 = __webpack_require__(764);
 const base_gen1_1 = __webpack_require__(882);
-const id_1 = __webpack_require__(766);
+const id_1 = __webpack_require__(663);
 const miniV2Properties = {
     MODEL: id_1.DeviceModelId.MINIV2,
     PRODUCT_NAME: 'Streamdeck Mini',
@@ -5361,7 +5402,7 @@ const miniV2Properties = {
     ROWS: 2,
     ICON_SIZE: 80,
     KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 1,
+    KEY_DATA_OFFSET: 0,
 };
 class StreamDeckMiniV2 extends base_gen1_1.StreamDeckGen1Base {
     constructor(device, options) {
@@ -5393,7 +5434,7 @@ exports.StreamDeckMiniV2 = StreamDeckMiniV2;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckOriginalMK2 = void 0;
 const base_gen2_1 = __webpack_require__(679);
-const id_1 = __webpack_require__(766);
+const id_1 = __webpack_require__(663);
 const origMK2Properties = {
     MODEL: id_1.DeviceModelId.ORIGINALMK2,
     PRODUCT_NAME: 'Streamdeck MK2',
@@ -5401,7 +5442,7 @@ const origMK2Properties = {
     ROWS: 3,
     ICON_SIZE: 72,
     KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 4,
+    KEY_DATA_OFFSET: 3,
 };
 class StreamDeckOriginalMK2 extends base_gen2_1.StreamDeckGen2Base {
     constructor(device, options) {
@@ -5423,7 +5464,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckOriginal = void 0;
 const util_1 = __webpack_require__(764);
 const base_gen1_1 = __webpack_require__(882);
-const id_1 = __webpack_require__(766);
+const id_1 = __webpack_require__(663);
 const originalProperties = {
     MODEL: id_1.DeviceModelId.ORIGINAL,
     PRODUCT_NAME: 'Streamdeck',
@@ -5431,7 +5472,7 @@ const originalProperties = {
     ROWS: 3,
     ICON_SIZE: 72,
     KEY_DIRECTION: 'rtl',
-    KEY_DATA_OFFSET: 1,
+    KEY_DATA_OFFSET: 0,
 };
 class StreamDeckOriginal extends base_gen1_1.StreamDeckGen1Base {
     constructor(device, options) {
@@ -5484,7 +5525,7 @@ exports.StreamDeckOriginal = StreamDeckOriginal;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckOriginalV2 = void 0;
 const base_gen2_1 = __webpack_require__(679);
-const id_1 = __webpack_require__(766);
+const id_1 = __webpack_require__(663);
 const origV2Properties = {
     MODEL: id_1.DeviceModelId.ORIGINALV2,
     PRODUCT_NAME: 'Streamdeck',
@@ -5492,7 +5533,7 @@ const origV2Properties = {
     ROWS: 3,
     ICON_SIZE: 72,
     KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 4,
+    KEY_DATA_OFFSET: 3,
 };
 class StreamDeckOriginalV2 extends base_gen2_1.StreamDeckGen2Base {
     constructor(device, options) {
@@ -5512,7 +5553,7 @@ exports.StreamDeckOriginalV2 = StreamDeckOriginalV2;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckPedal = void 0;
 const base_1 = __webpack_require__(576);
-const id_1 = __webpack_require__(766);
+const id_1 = __webpack_require__(663);
 const pedalProperties = {
     MODEL: id_1.DeviceModelId.PEDAL,
     PRODUCT_NAME: 'Streamdeck Pedal',
@@ -5520,7 +5561,7 @@ const pedalProperties = {
     ROWS: 1,
     ICON_SIZE: 0,
     KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 4,
+    KEY_DATA_OFFSET: 3,
 };
 class StreamDeckPedal extends base_1.StreamDeckInputBase {
     constructor(device, options) {
@@ -5567,6 +5608,211 @@ exports.StreamDeckPedal = StreamDeckPedal;
 
 /***/ }),
 
+/***/ 914:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+/* provided dependency */ var Buffer = __webpack_require__(291)["lW"];
+
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var _StreamDeckPlus_encoderState;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamDeckPlus = void 0;
+const util_1 = __webpack_require__(764);
+const base_gen2_1 = __webpack_require__(679);
+const id_1 = __webpack_require__(663);
+const plusProperties = {
+    MODEL: id_1.DeviceModelId.PLUS,
+    PRODUCT_NAME: 'Streamdeck +',
+    COLUMNS: 4,
+    ROWS: 2,
+    ICON_SIZE: 120,
+    KEY_DIRECTION: 'ltr',
+    KEY_DATA_OFFSET: 3,
+};
+class StreamDeckPlus extends base_gen2_1.StreamDeckGen2Base {
+    constructor(device, options) {
+        super(device, options, plusProperties, true);
+        _StreamDeckPlus_encoderState.set(this, void 0);
+        __classPrivateFieldSet(this, _StreamDeckPlus_encoderState, new Array(4).fill(false), "f");
+    }
+    get NUM_ENCODERS() {
+        return 4;
+    }
+    get LCD_STRIP_SIZE() {
+        const size = this.LCD_ENCODER_SIZE;
+        size.width *= this.NUM_ENCODERS;
+        return size;
+    }
+    get LCD_ENCODER_SIZE() {
+        return { width: 200, height: 100 };
+    }
+    calculateEncoderForX(x) {
+        const encoderWidth = this.LCD_ENCODER_SIZE.width;
+        return Math.floor(x / encoderWidth);
+    }
+    handleInputBuffer(data) {
+        const inputType = data[0];
+        switch (inputType) {
+            case 0x00: // Button
+                super.handleInputBuffer(data);
+                break;
+            case 0x02: // LCD
+                this.handleLcdInput(data);
+                break;
+            case 0x03: // Encoder
+                this.handleEncoderInput(data);
+                break;
+        }
+    }
+    handleLcdInput(data) {
+        const buffer = Buffer.from(data);
+        const position = {
+            x: buffer.readUint16LE(5),
+            y: buffer.readUint16LE(7),
+        };
+        const index = this.calculateEncoderForX(position.x);
+        switch (data[3]) {
+            case 0x01: // short press
+                this.emit('lcdShortPress', index, position);
+                break;
+            case 0x02: // long press
+                this.emit('lcdLongPress', index, position);
+                break;
+            case 0x03: {
+                // swipe
+                const position2 = {
+                    x: buffer.readUint16LE(9),
+                    y: buffer.readUint16LE(11),
+                };
+                const index2 = this.calculateEncoderForX(position2.x);
+                this.emit('lcdSwipe', index, index2, position, position2);
+                break;
+            }
+        }
+    }
+    handleEncoderInput(data) {
+        switch (data[3]) {
+            case 0x00: // press/release
+                for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
+                    const keyPressed = Boolean(data[4 + keyIndex]);
+                    const stateChanged = keyPressed !== __classPrivateFieldGet(this, _StreamDeckPlus_encoderState, "f")[keyIndex];
+                    if (stateChanged) {
+                        __classPrivateFieldGet(this, _StreamDeckPlus_encoderState, "f")[keyIndex] = keyPressed;
+                        if (keyPressed) {
+                            this.emit('encoderDown', keyIndex);
+                        }
+                        else {
+                            this.emit('encoderUp', keyIndex);
+                        }
+                    }
+                }
+                break;
+            case 0x01: // rotate
+                for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
+                    const intArray = new Int8Array(data.buffer, data.byteOffset, data.byteLength);
+                    const value = intArray[4 + keyIndex];
+                    if (value > 0) {
+                        this.emit('rotateRight', keyIndex, value);
+                    }
+                    else if (value < 0) {
+                        this.emit('rotateLeft', keyIndex, -value);
+                    }
+                }
+                break;
+        }
+    }
+    async clearPanel() {
+        const clearButtons = super.clearPanel();
+        const lcdSize = this.LCD_STRIP_SIZE;
+        const buffer = Buffer.alloc(lcdSize.width * lcdSize.height * 4);
+        const clearLcd = this.fillLcdRegion(0, 0, buffer, {
+            format: 'rgba',
+            width: lcdSize.width,
+            height: lcdSize.height,
+        });
+        await Promise.all([clearButtons, clearLcd]);
+    }
+    async fillEncoderLcd(index, buffer, sourceOptions) {
+        if (this.NUM_ENCODERS === 0)
+            throw new Error(`There are no encoders`);
+        const size = this.LCD_ENCODER_SIZE;
+        const x = index * size.width;
+        return this.fillLcdRegion(x, 0, buffer, {
+            format: sourceOptions.format,
+            width: size.width,
+            height: size.height,
+        });
+    }
+    async fillLcdRegion(x, y, imageBuffer, sourceOptions) {
+        // Basic bounds checking
+        const maxSize = this.LCD_STRIP_SIZE;
+        if (x < 0 || x + sourceOptions.width > maxSize.width) {
+            throw new TypeError(`Image will not fit within the lcd strip`);
+        }
+        if (y < 0 || y + sourceOptions.height > maxSize.height) {
+            throw new TypeError(`Image will not fit within the lcd strip`);
+        }
+        const imageSize = sourceOptions.width * sourceOptions.height * sourceOptions.format.length;
+        if (imageBuffer.length !== imageSize) {
+            throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
+        }
+        // A lot of this drawing code is heavily based on the normal button
+        const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions);
+        const packets = this.generateFillLcdWrites(x, y, byteBuffer, sourceOptions);
+        await this.device.sendReports(packets);
+    }
+    async convertFillLcdBuffer(sourceBuffer, sourceOptions) {
+        const sourceOptions2 = {
+            format: sourceOptions.format,
+            offset: 0,
+            stride: sourceOptions.width * sourceOptions.format.length,
+        };
+        const byteBuffer = (0, util_1.imageToByteArray)(sourceBuffer, sourceOptions2, { colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip }, 0, sourceOptions.width, sourceOptions.height);
+        return this.encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height);
+    }
+    generateFillLcdWrites(x, y, byteBuffer, sourceOptions) {
+        const MAX_PACKET_SIZE = 1024; // this.getFillImagePacketLength()
+        const PACKET_HEADER_LENGTH = 16;
+        const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH;
+        const result = [];
+        let remainingBytes = byteBuffer.length;
+        for (let part = 0; remainingBytes > 0; part++) {
+            const packet = Buffer.alloc(MAX_PACKET_SIZE);
+            const byteCount = Math.min(remainingBytes, MAX_PAYLOAD_SIZE);
+            packet.writeUInt8(0x02, 0);
+            packet.writeUInt8(0x0c, 1);
+            packet.writeUInt16LE(x, 2);
+            packet.writeUInt16LE(y, 4);
+            packet.writeUInt16LE(sourceOptions.width, 6);
+            packet.writeUInt16LE(sourceOptions.height, 8);
+            packet.writeUInt8(remainingBytes <= MAX_PAYLOAD_SIZE ? 1 : 0, 10); // Is last
+            packet.writeUInt16LE(part, 11);
+            packet.writeUInt16LE(byteCount, 13);
+            const byteOffset = byteBuffer.length - remainingBytes;
+            remainingBytes -= byteCount;
+            byteBuffer.copy(packet, PACKET_HEADER_LENGTH, byteOffset, byteOffset + byteCount);
+            result.push(packet);
+        }
+        return result;
+    }
+}
+exports.StreamDeckPlus = StreamDeckPlus;
+_StreamDeckPlus_encoderState = new WeakMap();
+//# sourceMappingURL=plus.js.map
+
+/***/ }),
+
 /***/ 287:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -5575,7 +5821,7 @@ exports.StreamDeckPedal = StreamDeckPedal;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckXL = void 0;
 const base_gen2_1 = __webpack_require__(679);
-const id_1 = __webpack_require__(766);
+const id_1 = __webpack_require__(663);
 const xlProperties = {
     MODEL: id_1.DeviceModelId.XL,
     PRODUCT_NAME: 'Streamdeck XL',
@@ -5583,7 +5829,7 @@ const xlProperties = {
     ROWS: 4,
     ICON_SIZE: 96,
     KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 4,
+    KEY_DATA_OFFSET: 3,
 };
 class StreamDeckXL extends base_gen2_1.StreamDeckGen2Base {
     constructor(device, options) {
@@ -5603,7 +5849,7 @@ exports.StreamDeckXL = StreamDeckXL;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckXLV2 = void 0;
 const base_gen2_1 = __webpack_require__(679);
-const id_1 = __webpack_require__(766);
+const id_1 = __webpack_require__(663);
 const xlProperties = {
     MODEL: id_1.DeviceModelId.XLV2,
     PRODUCT_NAME: 'Streamdeck XL',
@@ -5611,7 +5857,7 @@ const xlProperties = {
     ROWS: 4,
     ICON_SIZE: 96,
     KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 4,
+    KEY_DATA_OFFSET: 3,
 };
 class StreamDeckXLV2 extends base_gen2_1.StreamDeckGen2Base {
     constructor(device, options) {
@@ -5646,6 +5892,15 @@ class StreamDeckProxy {
     }
     get KEY_ROWS() {
         return this.device.KEY_ROWS;
+    }
+    get NUM_ENCODERS() {
+        return this.device.NUM_ENCODERS;
+    }
+    get LCD_STRIP_SIZE() {
+        return this.device.LCD_STRIP_SIZE;
+    }
+    get LCD_ENCODER_SIZE() {
+        return this.device.LCD_ENCODER_SIZE;
     }
     get ICON_SIZE() {
         return this.device.ICON_SIZE;
@@ -5694,6 +5949,12 @@ class StreamDeckProxy {
     }
     async getSerialNumber() {
         return this.device.getSerialNumber();
+    }
+    async fillEncoderLcd(index, imageBuffer, sourceOptions) {
+        return this.device.fillEncoderLcd(index, imageBuffer, sourceOptions);
+    }
+    async fillLcdRegion(x, y, imageBuffer, sourceOptions) {
+        return this.device.fillLcdRegion(x, y, imageBuffer, sourceOptions);
     }
     /**
      * EventEmitter
@@ -5749,6 +6010,16 @@ exports.StreamDeckProxy = StreamDeckProxy;
 
 /***/ }),
 
+/***/ 456:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+//# sourceMappingURL=types.js.map
+
+/***/ }),
+
 /***/ 764:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -5757,15 +6028,17 @@ exports.StreamDeckProxy = StreamDeckProxy;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.writeBMPHeader = exports.BMP_HEADER_LENGTH = exports.imageToByteArray = void 0;
-function imageToByteArray(imageBuffer, sourceOptions, targetOptions, destPadding, imageSize) {
-    const byteBuffer = Buffer.alloc(destPadding + imageSize * imageSize * targetOptions.colorMode.length);
+function imageToByteArray(imageBuffer, sourceOptions, targetOptions, destPadding, imageWidth, imageHeight) {
+    if (!imageHeight)
+        imageHeight = imageWidth;
+    const byteBuffer = Buffer.alloc(destPadding + imageWidth * imageHeight * targetOptions.colorMode.length);
     const flipColours = sourceOptions.format.substring(0, 3) !== targetOptions.colorMode.substring(0, 3);
-    for (let y = 0; y < imageSize; y++) {
-        const rowOffset = destPadding + imageSize * targetOptions.colorMode.length * y;
-        for (let x = 0; x < imageSize; x++) {
+    for (let y = 0; y < imageHeight; y++) {
+        const rowOffset = destPadding + imageWidth * targetOptions.colorMode.length * y;
+        for (let x = 0; x < imageWidth; x++) {
             // Apply x/y flips
-            let x2 = targetOptions.xFlip ? imageSize - x - 1 : x;
-            let y2 = targetOptions.yFlip ? imageSize - y - 1 : y;
+            let x2 = targetOptions.xFlip ? imageWidth - x - 1 : x;
+            let y2 = targetOptions.yFlip ? imageHeight - y - 1 : y;
             if (targetOptions.rotate) {
                 // Swap x and y
                 const tmpX = x2;
@@ -5847,9 +6120,7 @@ class WebHIDDevice extends events_1.EventEmitter {
             // Button press
             if (event.reportId === 0x01) {
                 const data = new Uint8Array(event.data.buffer);
-                const offset = this.dataKeyOffset || 1;
-                const buttons = Array.from(data).slice(offset - 1, data.length - 1);
-                this.emit('input', buttons);
+                this.emit('input', data);
             }
         });
     }
@@ -5857,7 +6128,7 @@ class WebHIDDevice extends events_1.EventEmitter {
         return this.device.close();
     }
     async sendFeatureReport(data) {
-        return this.device.sendFeatureReport(data[0], new Uint8Array(data.slice(1)));
+        return this.device.sendFeatureReport(data[0], new Uint8Array(data.subarray(1)));
     }
     async getFeatureReport(reportId, _reportLength) {
         const view = await this.device.receiveFeatureReport(reportId);
@@ -5866,7 +6137,7 @@ class WebHIDDevice extends events_1.EventEmitter {
     async sendReports(buffers) {
         return this.reportQueue.add(async () => {
             for (const data of buffers) {
-                await this.device.sendReport(data[0], new Uint8Array(data.slice(1)));
+                await this.device.sendReport(data[0], new Uint8Array(data.subarray(1)));
             }
         });
     }
@@ -5897,17 +6168,14 @@ Object.defineProperty(exports, "StreamDeckWeb", ({ enumerable: true, get: functi
  */
 async function requestStreamDecks(options) {
     // TODO - error handling
-    return navigator.hid
-        .requestDevice({
+    const browserDevices = await navigator.hid.requestDevice({
         filters: [
             {
                 vendorId: core_1.VENDOR_ID,
             },
         ],
-    })
-        .then(async (browserDevices) => {
-        return Promise.all(browserDevices.map(async (dev) => openDevice(dev, options)));
     });
+    return Promise.all(browserDevices.map(async (dev) => openDevice(dev, options)));
 }
 exports.requestStreamDecks = requestStreamDecks;
 /**
@@ -5916,10 +6184,11 @@ exports.requestStreamDecks = requestStreamDecks;
  * @param options Options to customise the device behvaiour
  */
 async function getStreamDecks(options) {
-    // TODO - error handling
-    return navigator.hid.getDevices().then(async (browserDevices) => {
-        return Promise.all(browserDevices.map(async (dev) => openDevice(dev, options)));
-    });
+    const browserDevices = await navigator.hid.getDevices();
+    const validDevices = browserDevices.filter((d) => d.vendorId === core_1.VENDOR_ID);
+    const resultDevices = await Promise.all(validDevices.map(async (dev) => openDevice(dev, options).catch((_) => null)) // Ignore failures
+    );
+    return resultDevices.filter((v) => !!v);
 }
 exports.getStreamDecks = getStreamDecks;
 /**
@@ -5932,13 +6201,6 @@ async function openDevice(browserDevice, userOptions) {
     if (!model) {
         throw new Error('Stream Deck is of unexpected type.');
     }
-    // if (model.id === DeviceModelId.ORIGINAL) {
-    // 	const browser = detect()
-    // 	if (browser && browser.os === 'Linux') {
-    // 		// See https://github.com/node-hid/node-hid/issues/249 for more info.
-    // 		throw new Error('This is not supported on linux')
-    // 	}
-    // }
     await browserDevice.open();
     const options = {
         useOriginalKeyOrder: false,
@@ -6110,7 +6372,7 @@ const chase_1 = __webpack_require__(888);
 if (true) {
     const elm = document.querySelector('#version_str');
     if (elm) {
-        elm.innerHTML = `v${"5.6.0-alpha.0"}`;
+        elm.innerHTML = `v${"5.7.1"}`;
     }
 }
 function appendLog(str) {
@@ -6159,6 +6421,27 @@ async function openDevice(device) {
     device.on('up', (key) => {
         appendLog(`Key ${key} up`);
         currentDemo.keyUp(device, key).catch(console.error);
+    });
+    device.on('encoderDown', (encoder) => {
+        appendLog(`Encoder ${encoder} down`);
+    });
+    device.on('encoderUp', (encoder) => {
+        appendLog(`Encoder ${encoder} up`);
+    });
+    device.on('rotateLeft', (encoder, amount) => {
+        appendLog(`Encoder ${encoder} left (${amount})`);
+    });
+    device.on('rotateRight', (encoder, amount) => {
+        appendLog(`Encoder ${encoder} right (${amount})`);
+    });
+    device.on('lcdShortPress', (encoder, position) => {
+        appendLog(`LCD short press ${encoder} (${position.x},${position.y})`);
+    });
+    device.on('lcdLongPress', (encoder, position) => {
+        appendLog(`LCD long press ${encoder} (${position.x},${position.y})`);
+    });
+    device.on('lcdSwipe', (_fromEncoder, _toEncoder, fromPosition, toPosition) => {
+        appendLog(`LCD swipe (${fromPosition.x},${fromPosition.y}) -> (${toPosition.x},${toPosition.y})`);
     });
     await currentDemo.start(device);
     // Sample actions
