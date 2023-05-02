@@ -5543,13 +5543,13 @@ node-gyp@^9.0.0:
     tar "^6.1.2"
     which "^2.0.2"
 
-"node-hid@npm:@julusian/hid@^2.5.0-3":
-  version "2.5.0-3"
-  resolved "https://registry.yarnpkg.com/@julusian/hid/-/hid-2.5.0-3.tgz#4d0a1aabef8a47b79a3ccdb30fc5b53e8618f5e1"
-  integrity sha512-BXL3QbgWvtuFPY8lMwBQ6CwDBeU/WJDedOhe5Y9QGf2ibwdbSMMLRfdFGUqeVgoO5YcyvUqXTM6oighswc3yVg==
+"node-hid@npm:@julusian/hid@^3.0.0-0":
+  version "3.0.0-0"
+  resolved "https://registry.yarnpkg.com/@julusian/hid/-/hid-3.0.0-0.tgz#f3cbde6a13781e3c436f388c24225805006582fa"
+  integrity sha512-7k1lpDZcI8zH8Qsu6ivBWMhcJL7TxaJLZiYGx0KoxGPJhOvkEf7z+ZwHk02wZmh+z5gccHGKIpMKhP5P54aZeQ==
   dependencies:
     node-addon-api "^3.2.1"
-    pkg-prebuilds "^0.1.0"
+    pkg-prebuilds "^0.2.1"
 
 node-int64@^0.4.0:
   version "0.4.0"
@@ -6206,7 +6206,14 @@ pkg-dir@^4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-pkg-prebuilds@^0.1.0, pkg-prebuilds@~0.1.0:
+pkg-prebuilds@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/pkg-prebuilds/-/pkg-prebuilds-0.2.1.tgz#4b91f410ab600df4eb657634d623549cc188c5ed"
+  integrity sha512-FdOlDiRqRL7i9aYzQflhGWCoiJf/8u6Qgzq48gKsRDYejtfjvGb1U5QGSzllcqpNg2a8Swx/9fMgtuVefwU+zw==
+  dependencies:
+    yargs "^17.5.1"
+
+pkg-prebuilds@~0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/pkg-prebuilds/-/pkg-prebuilds-0.1.0.tgz#7ac38674146708e763a4581a0759d5e8594f61b6"
   integrity sha512-ALsGSiwO6EDvjrrFRiv7Q6HZPrqCgTpNxQMFs3P4Ic25cP94DmLy0iGvZDlJmQBbq2IS8xkZrifwkoOHIetY9Q==

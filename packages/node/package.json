@@ -52,7 +52,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=12.18"
+    "node": ">=16.0"
   },
   "dependencies": {
     "@elgato-stream-deck/core": "6.0.0-async-test.1",
