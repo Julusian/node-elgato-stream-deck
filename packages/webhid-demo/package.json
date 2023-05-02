@@ -1,6 +1,6 @@
 {
   "name": "@elgato-stream-deck/webhid-demo",
-  "version": "6.0.0-0",
+  "version": "6.0.0-async-test.4",
   "private": true,
   "license": "MIT",
   "homepage": "https://github.com/julusian/node-elgato-stream-deck#readme",
@@ -20,7 +20,7 @@
     "build": "rimraf dist && cross-env NODE_ENV=production webpack --progress"
   },
   "dependencies": {
-    "@elgato-stream-deck/webhid": "^6.0.0-0",
+    "@elgato-stream-deck/webhid": "^6.0.0-async-test.4",
     "buffer": "^6.0.3",
     "html-to-image": "^1.11.11"
   }
