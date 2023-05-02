@@ -1,4 +1,4 @@
-import { HIDDevice as CoreHIDDevice } from '@elgato-stream-deck/core'
+import { HIDDevice as CoreHIDDevice, HIDDeviceInfo } from '@elgato-stream-deck/core'
 import { EventEmitter } from 'events'
 import Queue from 'p-queue'
 
@@ -43,5 +43,11 @@ export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 				await this.device.sendReport(data[0], new Uint8Array(data.subarray(1)))
 			}
 		})
+	}
+	public async getDeviceInfo(): Promise<HIDDeviceInfo> {
+		return {
+			productId: this.device.productId,
+			vendorId: this.device.vendorId,
+		}
 	}
 }

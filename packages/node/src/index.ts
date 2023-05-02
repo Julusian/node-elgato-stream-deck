@@ -58,28 +58,7 @@ export async function getStreamDeckInfo(path: string): Promise<StreamDeckDeviceI
  * @param devicePath The path of the device to open. If not set, the first will be used
  * @param userOptions Options to customise the device behvaiour
  */
-export async function openStreamDeck(
-	devicePath?: string,
-	userOptions?: OpenStreamDeckOptionsNode
-): Promise<StreamDeck> {
-	let foundDevices = await listStreamDecks()
-	if (devicePath) {
-		foundDevices = foundDevices.filter((d) => d.path === devicePath)
-	}
-
-	if (foundDevices.length === 0) {
-		if (devicePath) {
-			throw new Error(`Device "${devicePath}" was not found`)
-		} else {
-			throw new Error('No Stream Decks are connected.')
-		}
-	}
-
-	const model = DEVICE_MODELS.find((m) => m.id === foundDevices[0].model)
-	if (!model) {
-		throw new Error('Stream Deck is of unexpected type.')
-	}
-
+export async function openStreamDeck(devicePath: string, userOptions?: OpenStreamDeckOptionsNode): Promise<StreamDeck> {
 	// Clone the options, to ensure they dont get changed
 	const jpegOptions: JPEGEncodeOptions | undefined = userOptions?.jpegOptions
 		? { ...userOptions.jpegOptions }
@@ -92,18 +71,29 @@ export async function openStreamDeck(
 		...userOptions,
 	}
 
-	let device: HIDDevice
-	if (userOptions?.hackUseSync) {
-		const hidDevice = new HID.HID(foundDevices[0].path)
-		device = new NodeHIDSyncDevice(hidDevice)
-	} else {
-		const hidDevice = await HID.HIDAsync.open(foundDevices[0].path)
-		device = new NodeHIDDevice(hidDevice)
+	let device: HIDDevice | undefined
+	try {
+		if (userOptions?.hackUseSync) {
+			const hidDevice = new HID.HID(devicePath)
+			device = new NodeHIDSyncDevice(hidDevice)
+		} else {
+			const hidDevice = await HID.HIDAsync.open(devicePath)
+			device = new NodeHIDDevice(hidDevice)
+		}
+
+		const deviceInfo = await device.getDeviceInfo()
+
+		const model = DEVICE_MODELS.find(
+			(m) => m.productId === deviceInfo.productId && deviceInfo.vendorId === VENDOR_ID
+		)
+		if (!model) {
+			throw new Error('Stream Deck is of unexpected type.')
+		}
+
+		const rawSteamdeck = new model.class(device, options)
+		return new StreamDeckNode(rawSteamdeck, userOptions?.resetToLogoOnClose ?? false)
+	} catch (e) {
+		if (device) await device.close().catch(() => null) // Suppress error
+		throw e
 	}
-
-	// HACK - needed a change
-	// TODO - can we determine what the device is onceit is opened? Save having to do the devices search above
-
-	const rawSteamdeck = new model.class(device, options)
-	return new StreamDeckNode(rawSteamdeck, userOptions?.resetToLogoOnClose ?? false)
 }

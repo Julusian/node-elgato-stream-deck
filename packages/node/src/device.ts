@@ -1,6 +1,6 @@
-import type { DeviceModelId, HIDDevice } from '@elgato-stream-deck/core'
+import type { DeviceModelId, HIDDevice, HIDDeviceInfo } from '@elgato-stream-deck/core'
 import { EventEmitter } from 'events'
-import type { HIDAsync, HID } from 'node-hid'
+import type { HIDAsync, HID, Device as NodeHIDDeviceInfo } from 'node-hid'
 
 /**
  * Information about a found streamdeck
@@ -53,6 +53,16 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 		}
 		await Promise.all(ps)
 	}
+
+	public async getDeviceInfo(): Promise<HIDDeviceInfo> {
+		// @ts-expect-error getDeviceInfo missing in typings
+		const info: NodeHIDDeviceInfo = await this.device.getDeviceInfo()
+
+		return {
+			productId: info.productId,
+			vendorId: info.vendorId,
+		}
+	}
 }
 
 /**
@@ -89,6 +99,16 @@ export class NodeHIDSyncDevice extends EventEmitter implements HIDDevice {
 	public async sendReports(buffers: Buffer[]): Promise<void> {
 		for (const data of buffers) {
 			this.device.write(data)
+		}
+	}
+
+	public async getDeviceInfo(): Promise<HIDDeviceInfo> {
+		// @ts-expect-error getDeviceInfo missing in typings
+		const info: NodeHIDDeviceInfo = this.device.getDeviceInfo()
+
+		return {
+			productId: info.productId,
+			vendorId: info.vendorId,
 		}
 	}
 }
