@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.7.3](https://github.com/julusian/node-elgato-stream-deck/compare/v5.7.2...v5.7.3) (2023-06-20)
+
+
+### Bug Fixes
+
+* streamdeck mini unable to be opened on windows ([f8b174a](https://github.com/julusian/node-elgato-stream-deck/commit/f8b174a31a1afabf6f8aa1b69ed52809f5f6316b))
+
+
+
+
+
 ## [5.7.2](https://github.com/julusian/node-elgato-stream-deck/compare/v5.7.1...v5.7.2) (2023-01-17)
 
 
