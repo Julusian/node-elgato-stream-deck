@@ -56,6 +56,6 @@
   },
   "dependencies": {
     "eventemitter3": "^4.0.7",
-    "tslib": "^2.5.0"
+    "tslib": "^2.5.3"
   }
 }
