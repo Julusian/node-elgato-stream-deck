@@ -3132,13 +3132,13 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "getFontEmbedCSS": () => (/* binding */ getFontEmbedCSS),
-  "toBlob": () => (/* binding */ toBlob),
-  "toCanvas": () => (/* binding */ toCanvas),
-  "toJpeg": () => (/* binding */ toJpeg),
-  "toPixelData": () => (/* binding */ toPixelData),
-  "toPng": () => (/* binding */ toPng),
-  "toSvg": () => (/* binding */ toSvg)
+  getFontEmbedCSS: () => (/* binding */ getFontEmbedCSS),
+  toBlob: () => (/* binding */ toBlob),
+  toCanvas: () => (/* binding */ toCanvas),
+  toJpeg: () => (/* binding */ toJpeg),
+  toPixelData: () => (/* binding */ toPixelData),
+  toPng: () => (/* binding */ toPng),
+  toSvg: () => (/* binding */ toSvg)
 });
 
 ;// CONCATENATED MODULE: ../../../node_modules/html-to-image/es/util.js
@@ -4990,12 +4990,26 @@ class StreamDeckGen1Base extends base_1.StreamDeckBase {
         await this.device.sendFeatureReport(resetCommandBuffer);
     }
     async getFirmwareVersion() {
-        const val = await this.device.getFeatureReport(4, 17);
-        const end = val.indexOf(0);
+        let val;
+        try {
+            val = await this.device.getFeatureReport(4, 32);
+        }
+        catch (e) {
+            // In case some devices can't handle the different report length
+            val = await this.device.getFeatureReport(4, 17);
+        }
+        const end = val.indexOf(0, 5);
         return val.toString('ascii', 5, end === -1 ? undefined : end);
     }
     async getSerialNumber() {
-        const val = await this.device.getFeatureReport(3, 17);
+        let val;
+        try {
+            val = await this.device.getFeatureReport(3, 32);
+        }
+        catch (e) {
+            // In case some devices can't handle the different report length
+            val = await this.device.getFeatureReport(3, 17);
+        }
         return val.toString('ascii', 5, 17);
     }
 }
@@ -5055,7 +5069,7 @@ class StreamDeckGen2Base extends base_1.StreamDeckBase {
     }
     async getFirmwareVersion() {
         const val = await this.device.getFeatureReport(5, 32);
-        const end = val.indexOf(0);
+        const end = val.indexOf(0, 6);
         return val.toString('ascii', 6, end === -1 ? undefined : end);
     }
     async getSerialNumber() {
@@ -5416,10 +5430,6 @@ class StreamDeckMiniV2 extends base_gen1_1.StreamDeckGen1Base {
     getFillImagePacketLength() {
         return 1024;
     }
-    async getSerialNumber() {
-        const val = await this.device.getFeatureReport(3, 32);
-        return val.toString('ascii', 5, 17);
-    }
 }
 exports.StreamDeckMiniV2 = StreamDeckMiniV2;
 //# sourceMappingURL=miniv2.js.map
@@ -5580,7 +5590,7 @@ class StreamDeckPedal extends base_1.StreamDeckInputBase {
     }
     async getFirmwareVersion() {
         const val = await this.device.getFeatureReport(5, 32);
-        const end = val.indexOf(0);
+        const end = val.indexOf(0, 6);
         return val.toString('ascii', 6, end === -1 ? undefined : end);
     }
     async getSerialNumber() {
