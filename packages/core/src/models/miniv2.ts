@@ -34,9 +34,4 @@ export class StreamDeckMiniV2 extends StreamDeckGen1Base {
 	protected getFillImagePacketLength(): number {
 		return 1024
 	}
-
-	public async getSerialNumber(): Promise<string> {
-		const val = await this.device.getFeatureReport(3, 32)
-		return val.toString('ascii', 5, 17)
-	}
 }

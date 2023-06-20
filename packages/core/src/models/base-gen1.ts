@@ -39,13 +39,25 @@ export abstract class StreamDeckGen1Base extends StreamDeckBase {
 	}
 
 	public async getFirmwareVersion(): Promise<string> {
-		const val = await this.device.getFeatureReport(4, 17)
-		const end = val.indexOf(0)
+		let val: Buffer
+		try {
+			val = await this.device.getFeatureReport(4, 32)
+		} catch (e) {
+			// In case some devices can't handle the different report length
+			val = await this.device.getFeatureReport(4, 17)
+		}
+		const end = val.indexOf(0, 5)
 		return val.toString('ascii', 5, end === -1 ? undefined : end)
 	}
 
 	public async getSerialNumber(): Promise<string> {
-		const val = await this.device.getFeatureReport(3, 17)
+		let val: Buffer
+		try {
+			val = await this.device.getFeatureReport(3, 32)
+		} catch (e) {
+			// In case some devices can't handle the different report length
+			val = await this.device.getFeatureReport(3, 17)
+		}
 		return val.toString('ascii', 5, 17)
 	}
 }
