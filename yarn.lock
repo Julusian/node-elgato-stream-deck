@@ -464,7 +464,7 @@ __metadata:
   dependencies:
     "@elgato-stream-deck/core": "npm:6.0.0-async-test.4"
     jpeg-js: "npm:^0.4.4"
-    node-hid: "npm:@julusian/hid@^3.0.0-0"
+    node-hid: "npm:^3.0.0"
     tslib: "npm:^2.6.2"
   peerDependencies:
     "@julusian/jpeg-turbo": ^1.1.2 || ^2.0.0
@@ -8511,16 +8511,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-hid@npm:@julusian/hid@^3.0.0-0":
-  version: 3.0.0-2
-  resolution: "@julusian/hid@npm:3.0.0-2"
+"node-hid@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "node-hid@npm:3.0.0"
   dependencies:
     node-addon-api: "npm:^3.2.1"
     node-gyp: "npm:latest"
     pkg-prebuilds: "npm:^0.2.1"
   bin:
     hid-showdevices: src/show-devices.js
-  checksum: 2ff595c1833fc53bc4bc2b8cb98d06e59730e412fa7049bfd6a4bfc4ef4cbb0bb16540e36c9008347914518c7642b549d5ca321f8f63c41678f75093d97bf64f
+  checksum: 43c534e9b549648742798ed8ec423b64a23d55cbcfd8bcb5f8c507bafedcc4d94f422069243f10721f9c16576ef0e92887135c99aab19739efeb4d00e2a6347c
   languageName: node
   linkType: hard
 
