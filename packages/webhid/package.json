@@ -1,47 +1,47 @@
 {
-  "name": "@elgato-stream-deck/webhid",
-  "version": "5.7.3",
-  "description": "An npm module for interfacing with the Elgato Stream Deck in the browser",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "license": "MIT",
-  "homepage": "https://github.com/julusian/node-elgato-stream-deck#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/julusian/node-elgato-stream-deck.git"
-  },
-  "bugs": {
-    "url": "https://github.com/julusian/node-elgato-stream-deck/issues"
-  },
-  "author": {
-    "name": "Julian Waller",
-    "email": "git@julusian.co.uk"
-  },
-  "keywords": [
-    "elgato",
-    "stream",
-    "deck",
-    "streamdeck",
-    "hid",
-    "usb",
-    "hardware",
-    "interface",
-    "controller"
-  ],
-  "scripts": {
-    "build": "rimraf dist && yarn build:main",
-    "build:main": "tsc -p tsconfig.build.json"
-  },
-  "files": [
-    "dist"
-  ],
-  "dependencies": {
-    "@elgato-stream-deck/core": "5.7.3",
-    "@types/w3c-web-hid": "^1.0.6",
-    "p-queue": "^6.6.2",
-    "tslib": "^2.6.2"
-  },
-  "engines": {
-    "node": ">=18.18"
-  }
+	"name": "@elgato-stream-deck/webhid",
+	"version": "5.7.3",
+	"description": "An npm module for interfacing with the Elgato Stream Deck in the browser",
+	"main": "dist/index.js",
+	"typings": "dist/index.d.ts",
+	"license": "MIT",
+	"homepage": "https://github.com/julusian/node-elgato-stream-deck#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/julusian/node-elgato-stream-deck.git"
+	},
+	"bugs": {
+		"url": "https://github.com/julusian/node-elgato-stream-deck/issues"
+	},
+	"author": {
+		"name": "Julian Waller",
+		"email": "git@julusian.co.uk"
+	},
+	"keywords": [
+		"elgato",
+		"stream",
+		"deck",
+		"streamdeck",
+		"hid",
+		"usb",
+		"hardware",
+		"interface",
+		"controller"
+	],
+	"scripts": {
+		"build": "run g:rimraf dist && run build:main",
+		"build:main": "run g:tsc -p tsconfig.build.json"
+	},
+	"files": [
+		"dist"
+	],
+	"dependencies": {
+		"@elgato-stream-deck/core": "5.7.3",
+		"@types/w3c-web-hid": "^1.0.6",
+		"p-queue": "^6.6.2",
+		"tslib": "^2.6.2"
+	},
+	"engines": {
+		"node": ">=18.18"
+	}
 }

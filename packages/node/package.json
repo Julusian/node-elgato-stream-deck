@@ -1,66 +1,66 @@
 {
-  "name": "@elgato-stream-deck/node",
-  "version": "5.7.3",
-  "description": "An npm module for interfacing with the Elgato Stream Deck in node",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "license": "MIT",
-  "homepage": "https://github.com/julusian/node-elgato-stream-deck#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/julusian/node-elgato-stream-deck.git"
-  },
-  "bugs": {
-    "url": "https://github.com/julusian/node-elgato-stream-deck/issues"
-  },
-  "author": {
-    "name": "Julian Waller",
-    "email": "git@julusian.co.uk"
-  },
-  "contributors": [
-    {
-      "name": "Håkon Nessjøen",
-      "email": "haakon@bitfocus.io"
-    },
-    {
-      "name": "Richard Fox",
-      "twitter": "ProbablePrime"
-    },
-    {
-      "name": "Chris Hanel",
-      "twitter": "chrishanel",
-      "email": "chrishanel@gmail.com",
-      "url": "http://www.chrishanel.com/"
-    }
-  ],
-  "keywords": [
-    "elgato",
-    "stream",
-    "deck",
-    "streamdeck",
-    "hid",
-    "usb",
-    "hardware",
-    "interface",
-    "controller"
-  ],
-  "scripts": {
-    "build": "rimraf dist && yarn build:main",
-    "build:main": "tsc -p tsconfig.build.json"
-  },
-  "files": [
-    "dist"
-  ],
-  "engines": {
-    "node": ">=18.18"
-  },
-  "dependencies": {
-    "@elgato-stream-deck/core": "5.7.3",
-    "jpeg-js": "^0.4.2",
-    "node-hid": "^2.1.1",
-    "tslib": "^2.6.2"
-  },
-  "peerDependencies": {
-    "@julusian/jpeg-turbo": "^1.1.2 || ^2.0.0"
-  }
+	"name": "@elgato-stream-deck/node",
+	"version": "5.7.3",
+	"description": "An npm module for interfacing with the Elgato Stream Deck in node",
+	"main": "dist/index.js",
+	"typings": "dist/index.d.ts",
+	"license": "MIT",
+	"homepage": "https://github.com/julusian/node-elgato-stream-deck#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/julusian/node-elgato-stream-deck.git"
+	},
+	"bugs": {
+		"url": "https://github.com/julusian/node-elgato-stream-deck/issues"
+	},
+	"author": {
+		"name": "Julian Waller",
+		"email": "git@julusian.co.uk"
+	},
+	"contributors": [
+		{
+			"name": "Håkon Nessjøen",
+			"email": "haakon@bitfocus.io"
+		},
+		{
+			"name": "Richard Fox",
+			"twitter": "ProbablePrime"
+		},
+		{
+			"name": "Chris Hanel",
+			"twitter": "chrishanel",
+			"email": "chrishanel@gmail.com",
+			"url": "http://www.chrishanel.com/"
+		}
+	],
+	"keywords": [
+		"elgato",
+		"stream",
+		"deck",
+		"streamdeck",
+		"hid",
+		"usb",
+		"hardware",
+		"interface",
+		"controller"
+	],
+	"scripts": {
+		"build": "run g:rimraf dist && run build:main",
+		"build:main": "run g:tsc -p tsconfig.build.json"
+	},
+	"files": [
+		"dist"
+	],
+	"engines": {
+		"node": ">=18.18"
+	},
+	"dependencies": {
+		"@elgato-stream-deck/core": "5.7.3",
+		"jpeg-js": "^0.4.2",
+		"node-hid": "^2.1.1",
+		"tslib": "^2.6.2"
+	},
+	"peerDependencies": {
+		"@julusian/jpeg-turbo": "^1.1.2 || ^2.0.0"
+	}
 }

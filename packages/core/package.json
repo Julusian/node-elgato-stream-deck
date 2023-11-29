@@ -1,61 +1,61 @@
 {
-  "name": "@elgato-stream-deck/core",
-  "version": "5.7.3",
-  "description": "An npm module for interfacing with the Elgato Stream Deck",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "license": "MIT",
-  "homepage": "https://github.com/julusian/node-elgato-stream-deck#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/julusian/node-elgato-stream-deck.git"
-  },
-  "bugs": {
-    "url": "https://github.com/julusian/node-elgato-stream-deck/issues"
-  },
-  "author": {
-    "name": "Julian Waller",
-    "email": "git@julusian.co.uk"
-  },
-  "contributors": [
-    {
-      "name": "Håkon Nessjøen",
-      "email": "haakon@bitfocus.io"
-    },
-    {
-      "name": "Richard Fox",
-      "twitter": "ProbablePrime"
-    },
-    {
-      "name": "Chris Hanel",
-      "twitter": "chrishanel",
-      "email": "chrishanel@gmail.com",
-      "url": "http://www.chrishanel.com/"
-    }
-  ],
-  "keywords": [
-    "elgato",
-    "stream",
-    "deck",
-    "streamdeck",
-    "hid",
-    "usb",
-    "hardware",
-    "interface",
-    "controller"
-  ],
-  "scripts": {
-    "build": "rimraf dist && yarn build:main",
-    "build:main": "tsc -p tsconfig.build.json"
-  },
-  "files": [
-    "dist"
-  ],
-  "engines": {
-    "node": ">=18.18"
-  },
-  "dependencies": {
-    "eventemitter3": "^4.0.7",
-    "tslib": "^2.6.2"
-  }
+	"name": "@elgato-stream-deck/core",
+	"version": "5.7.3",
+	"description": "An npm module for interfacing with the Elgato Stream Deck",
+	"main": "dist/index.js",
+	"typings": "dist/index.d.ts",
+	"license": "MIT",
+	"homepage": "https://github.com/julusian/node-elgato-stream-deck#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/julusian/node-elgato-stream-deck.git"
+	},
+	"bugs": {
+		"url": "https://github.com/julusian/node-elgato-stream-deck/issues"
+	},
+	"author": {
+		"name": "Julian Waller",
+		"email": "git@julusian.co.uk"
+	},
+	"contributors": [
+		{
+			"name": "Håkon Nessjøen",
+			"email": "haakon@bitfocus.io"
+		},
+		{
+			"name": "Richard Fox",
+			"twitter": "ProbablePrime"
+		},
+		{
+			"name": "Chris Hanel",
+			"twitter": "chrishanel",
+			"email": "chrishanel@gmail.com",
+			"url": "http://www.chrishanel.com/"
+		}
+	],
+	"keywords": [
+		"elgato",
+		"stream",
+		"deck",
+		"streamdeck",
+		"hid",
+		"usb",
+		"hardware",
+		"interface",
+		"controller"
+	],
+	"scripts": {
+		"build": "run g:rimraf dist && run build:main",
+		"build:main": "run g:tsc -p tsconfig.build.json"
+	},
+	"files": [
+		"dist"
+	],
+	"engines": {
+		"node": ">=18.18"
+	},
+	"dependencies": {
+		"eventemitter3": "^4.0.7",
+		"tslib": "^2.6.2"
+	}
 }
