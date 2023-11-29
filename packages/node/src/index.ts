@@ -22,7 +22,7 @@ export function listStreamDecks(): StreamDeckDeviceInfo[] {
 			if (info) devices[dev.path] = info
 		}
 	}
-	return Object.values(devices)
+	return Object.values<StreamDeckDeviceInfo>(devices)
 }
 
 /**
@@ -86,6 +86,6 @@ export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeck
 	}
 
 	const device = new NodeHIDDevice(foundDevices[0])
-	const rawSteamdeck = new model.class(device, options || {})
+	const rawSteamdeck = new model.class(device, options)
 	return new StreamDeckNode(rawSteamdeck, userOptions?.resetToLogoOnClose ?? false)
 }

@@ -147,12 +147,8 @@ describe('StreamDeck Devices', () => {
 			},
 		])
 
-		expect(() => openStreamDeck('not-a-real-path')).toThrowError(
-			new Error(`Device "not-a-real-path" was not found`)
-		)
+		expect(() => openStreamDeck('not-a-real-path')).toThrow(new Error(`Device "not-a-real-path" was not found`))
 
-		expect(() => openStreamDeck('path-bad-product')).toThrowError(
-			new Error(`Device "path-bad-product" was not found`)
-		)
+		expect(() => openStreamDeck('path-bad-product')).toThrow(new Error(`Device "path-bad-product" was not found`))
 	})
 })
