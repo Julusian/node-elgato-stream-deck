@@ -94,19 +94,19 @@ The root methods exposed by the library are as follows. For more information it 
 /**
  * Scan for and list detected devices
  */
-export function listStreamDecks(): StreamDeckDeviceInfo[]
+export function listStreamDecks(): Promise<StreamDeckDeviceInfo[]>
 
 /**
  * Get the info of a device if the given path is a streamdeck
  */
-export function getStreamDeckInfo(path: string): StreamDeckDeviceInfo | undefined
+export function getStreamDeckInfo(path: string): Promise<StreamDeckDeviceInfo | undefined>
 
 /**
  * Open a streamdeck
  * @param devicePath The path of the device to open. If not set, the first will be used
  * @param userOptions Options to customise the device behvaiour
  */
-export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeckOptionsNode): StreamDeck
+export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeckOptionsNode): Promise<StreamDeck>
 ```
 
 The StreamDeck type can be found [here](/packages/core/src/models/types.ts#L15)

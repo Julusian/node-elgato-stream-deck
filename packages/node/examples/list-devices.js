@@ -7,6 +7,8 @@ for (const dev of HID.devices()) {
 }
 
 console.log('STREAMDECKS')
-for (const dev of listStreamDecks()) {
-	console.log(dev)
-}
+listStreamDecks().then((devs) => {
+	for (const dev of devs) {
+		console.log(dev)
+	}
+})

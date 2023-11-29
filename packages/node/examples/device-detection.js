@@ -26,8 +26,8 @@ async function addDevice(info) {
 	//  add any other event listeners
 }
 
-function refresh() {
-	const streamdecks = listStreamDecks()
+async function refresh() {
+	const streamdecks = await listStreamDecks()
 	streamdecks.forEach((device) => {
 		if (!streamDecks[device.path]) {
 			addDevice(device).catch((e) => console.error('Add failed:', e))
