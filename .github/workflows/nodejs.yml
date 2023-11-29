@@ -7,7 +7,7 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - name: Install linux dependencies
         if: runner.os == 'Linux'
         run: |
@@ -30,7 +30,7 @@ jobs:
     name: audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - name: Install linux dependencies
         if: runner.os == 'Linux'
         run: |
@@ -59,7 +59,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - name: Install linux dependencies
         if: runner.os == 'Linux'
         run: |
@@ -95,7 +95,7 @@ jobs:
       - test
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
