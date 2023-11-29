@@ -6149,6 +6149,12 @@ class WebHIDDevice extends events_1.EventEmitter {
             }
         });
     }
+    async getDeviceInfo() {
+        return {
+            productId: this.device.productId,
+            vendorId: this.device.vendorId,
+        };
+    }
 }
 exports.WebHIDDevice = WebHIDDevice;
 //# sourceMappingURL=device.js.map
@@ -6210,13 +6216,19 @@ async function openDevice(browserDevice, userOptions) {
         throw new Error('Stream Deck is of unexpected type.');
     }
     await browserDevice.open();
-    const options = {
-        useOriginalKeyOrder: false,
-        encodeJPEG: jpeg_1.encodeJPEG,
-        ...userOptions,
-    };
-    const device = new model.class(new device_1.WebHIDDevice(browserDevice), options || {});
-    return new wrapper_1.StreamDeckWeb(device);
+    try {
+        const options = {
+            useOriginalKeyOrder: false,
+            encodeJPEG: jpeg_1.encodeJPEG,
+            ...userOptions,
+        };
+        const device = new model.class(new device_1.WebHIDDevice(browserDevice), options || {});
+        return new wrapper_1.StreamDeckWeb(device);
+    }
+    catch (e) {
+        await browserDevice.close().catch(() => null); // Suppress error
+        throw e;
+    }
 }
 exports.openDevice = openDevice;
 //# sourceMappingURL=index.js.map
@@ -6380,7 +6392,7 @@ const chase_1 = __webpack_require__(888);
 if (true) {
     const elm = document.querySelector('#version_str');
     if (elm) {
-        elm.innerHTML = `v${"5.7.3"}`;
+        elm.innerHTML = `v${"6.0.0-0"}`;
     }
 }
 function appendLog(str) {
