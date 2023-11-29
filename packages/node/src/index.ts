@@ -1,4 +1,4 @@
-import { DEVICE_MODELS, HIDDevice, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from '@elgato-stream-deck/core'
+import { DEVICE_MODELS, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from '@elgato-stream-deck/core'
 import * as HID from 'node-hid'
 import { NodeHIDDevice, NodeHIDSyncDevice, StreamDeckDeviceInfo } from './device'
 import { encodeJPEG, JPEGEncodeOptions } from './jpeg'
@@ -10,8 +10,12 @@ export interface OpenStreamDeckOptionsNode extends OpenStreamDeckOptions {
 	jpegOptions?: JPEGEncodeOptions
 	resetToLogoOnClose?: boolean
 
-	/** @deprecated */
-	hackUseSync?: boolean
+	/**
+	 * @deprecated
+	 * Backwards compatibility option, for using the sync node-hid implementation.
+	 * This should not be used and will be removed in a future minor version
+	 */
+	useSyncNodeHid?: boolean
 }
 
 /**
@@ -25,7 +29,7 @@ export async function listStreamDecks(): Promise<StreamDeckDeviceInfo[]> {
 			if (info) devices[dev.path] = info
 		}
 	}
-	return Object.values(devices)
+	return Object.values<StreamDeckDeviceInfo>(devices)
 }
 
 /**
@@ -71,9 +75,9 @@ export async function openStreamDeck(devicePath: string, userOptions?: OpenStrea
 		...userOptions,
 	}
 
-	let device: HIDDevice | undefined
+	let device: NodeHIDDevice | NodeHIDSyncDevice | undefined
 	try {
-		if (userOptions?.hackUseSync) {
+		if (userOptions?.useSyncNodeHid) {
 			const hidDevice = new HID.HID(devicePath)
 			device = new NodeHIDSyncDevice(hidDevice)
 		} else {

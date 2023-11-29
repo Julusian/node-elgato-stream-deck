@@ -62,7 +62,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 
 	public async getFirmwareVersion(): Promise<string> {
 		const val = await this.device.getFeatureReport(5, 32)
-		const end = val.indexOf(0)
+		const end = val.indexOf(0, 6)
 		return val.toString('ascii', 6, end === -1 ? undefined : end)
 	}
 
