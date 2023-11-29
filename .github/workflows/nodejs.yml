@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: yarn install
         env:
           CI: true
@@ -39,7 +39,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: yarn install
         env:
           CI: true
@@ -55,7 +55,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [18.x, 20.x 21.x]
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
@@ -76,7 +76,7 @@ jobs:
         env:
           CI: true
       - name: Send coverage
-        if: matrix.node-version == '16.x'
+        if: matrix.node-version == '18.x'
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true
@@ -88,8 +88,8 @@ jobs:
     continue-on-error: true
     timeout-minutes: 15
 
-    # only run for master TODO - enable
-    # if: github.ref == 'refs/heads/master'
+    # only run for main TODO - enable
+    # if: github.ref == 'refs/heads/main'
 
     needs:
       - test
@@ -99,7 +99,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Prepare build
         run: |
           yarn install
