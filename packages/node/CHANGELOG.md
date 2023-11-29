@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.7.3...v6.0.0) (2023-11-29)
+
+
+### Features
+
+* use async node-hid ([#75](https://github.com/julusian/node-elgato-stream-deck/issues/75)) ([9938244](https://github.com/julusian/node-elgato-stream-deck/commit/9938244f1c61618ce821fe574127c5ae81211c72))
+
+
+
+
+
 ## [5.7.3](https://github.com/julusian/node-elgato-stream-deck/compare/v5.7.2...v5.7.3) (2023-06-20)
 
 **Note:** Version bump only for package @elgato-stream-deck/node
