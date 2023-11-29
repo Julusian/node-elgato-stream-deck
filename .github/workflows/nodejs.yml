@@ -17,7 +17,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18.x
-      - run: yarn install
+      - run: |
+          corepack enable
+          yarn install
         env:
           CI: true
       - run: yarn build
@@ -40,7 +42,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18.x
-      - run: yarn install
+      - run: |
+          corepack enable
+          yarn install
         env:
           CI: true
       - run: yarn validate:dependencies
@@ -69,7 +73,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - run: yarn install
+      - run: |
+          corepack enable
+          yarn install
         env:
           CI: true
       - run: yarn unit
@@ -102,6 +108,7 @@ jobs:
           node-version: 18.x
       - name: Prepare build
         run: |
+          corepack enable
           yarn install
           yarn build
         env:
