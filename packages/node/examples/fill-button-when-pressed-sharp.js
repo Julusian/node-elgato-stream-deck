@@ -3,7 +3,7 @@ const sharp = require('sharp')
 const { openStreamDeck } = require('../dist/index')
 
 ;(async () => {
-	const streamDeck = openStreamDeck()
+	const streamDeck = await openStreamDeck()
 	streamDeck.clearPanel()
 
 	const img = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))

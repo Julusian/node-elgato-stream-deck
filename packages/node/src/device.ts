@@ -1,6 +1,6 @@
-import { DeviceModelId, HIDDevice } from '@elgato-stream-deck/core'
+import type { DeviceModelId, HIDDevice, HIDDeviceInfo } from '@elgato-stream-deck/core'
 import { EventEmitter } from 'events'
-import * as HID from 'node-hid'
+import type { HIDAsync, HID, Device as NodeHIDDeviceInfo } from 'node-hid'
 
 /**
  * Information about a found streamdeck
@@ -19,12 +19,62 @@ export interface StreamDeckDeviceInfo {
  * This translates it into the common format expected by @elgato-stream-deck/core
  */
 export class NodeHIDDevice extends EventEmitter implements HIDDevice {
-	private device: HID.HID
+	private device: HIDAsync
 
-	constructor(deviceInfo: StreamDeckDeviceInfo) {
+	constructor(device: HIDAsync) {
 		super()
 
-		this.device = new HID.HID(deviceInfo.path)
+		this.device = device
+		this.device.on('error', (error) => this.emit('error', error))
+
+		this.device.on('data', (data: Buffer) => {
+			// Button press
+			if (data[0] === 0x01) {
+				const keyData = data.subarray(1)
+				this.emit('input', keyData)
+			}
+		})
+	}
+
+	public async close(): Promise<void> {
+		await this.device.close()
+	}
+
+	public async sendFeatureReport(data: Buffer): Promise<void> {
+		await this.device.sendFeatureReport(data)
+	}
+	public async getFeatureReport(reportId: number, reportLength: number): Promise<Buffer> {
+		return this.device.getFeatureReport(reportId, reportLength)
+	}
+	public async sendReports(buffers: Buffer[]): Promise<void> {
+		const ps: Promise<any>[] = []
+		for (const data of buffers) {
+			ps.push(this.device.write(data))
+		}
+		await Promise.all(ps)
+	}
+
+	public async getDeviceInfo(): Promise<HIDDeviceInfo> {
+		// @ts-expect-error getDeviceInfo missing in typings
+		const info: NodeHIDDeviceInfo = await this.device.getDeviceInfo()
+
+		return {
+			productId: info.productId,
+			vendorId: info.vendorId,
+		}
+	}
+}
+
+/**
+ * HACK sync implementation
+ */
+export class NodeHIDSyncDevice extends EventEmitter implements HIDDevice {
+	private device: HID
+
+	constructor(device: HID) {
+		super()
+
+		this.device = device
 		this.device.on('error', (error) => this.emit('error', error))
 
 		this.device.on('data', (data: Buffer) => {
@@ -49,6 +99,16 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 	public async sendReports(buffers: Buffer[]): Promise<void> {
 		for (const data of buffers) {
 			this.device.write(data)
+		}
+	}
+
+	public async getDeviceInfo(): Promise<HIDDeviceInfo> {
+		// @ts-expect-error getDeviceInfo missing in typings
+		const info: NodeHIDDeviceInfo = this.device.getDeviceInfo()
+
+		return {
+			productId: info.productId,
+			vendorId: info.vendorId,
 		}
 	}
 }

@@ -16,7 +16,7 @@ import { StreamDeck } from './types'
 
 export * from './types'
 export * from './id'
-export { HIDDevice } from './device'
+export { HIDDevice, HIDDeviceInfo } from './device'
 export { OpenStreamDeckOptions } from './models'
 export { StreamDeckProxy } from './proxy'
 

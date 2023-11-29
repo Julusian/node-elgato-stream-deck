@@ -14,4 +14,11 @@ export interface HIDDevice {
 	getFeatureReport(reportId: number, reportLength: number): Promise<Buffer>
 
 	sendReports(buffers: Buffer[]): Promise<void>
+
+	getDeviceInfo(): Promise<HIDDeviceInfo>
+}
+
+export interface HIDDeviceInfo {
+	productId: number
+	vendorId: number
 }

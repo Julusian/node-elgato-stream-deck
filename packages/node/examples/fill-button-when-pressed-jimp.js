@@ -4,7 +4,7 @@ const Jimp = require('jimp')
 const { openStreamDeck } = require('../dist/index')
 
 ;(async () => {
-	const streamDeck = openStreamDeck()
+	const streamDeck = await openStreamDeck()
 	streamDeck.clearPanel()
 
 	const bmpImg = await Jimp.read(path.resolve(__dirname, 'fixtures/github_logo.png')).then((img) => {

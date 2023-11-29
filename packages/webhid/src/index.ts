@@ -55,12 +55,18 @@ export async function openDevice(
 
 	await browserDevice.open()
 
-	const options: Required<OpenStreamDeckOptions> = {
-		useOriginalKeyOrder: false,
-		encodeJPEG: encodeJPEG,
-		...userOptions,
-	}
+	try {
+		const options: Required<OpenStreamDeckOptions> = {
+			useOriginalKeyOrder: false,
+			encodeJPEG: encodeJPEG,
+			...userOptions,
+		}
 
-	const device: StreamDeck = new model.class(new WebHIDDevice(browserDevice), options || {})
-	return new StreamDeckWeb(device)
+		const device: StreamDeck = new model.class(new WebHIDDevice(browserDevice), options || {})
+		return new StreamDeckWeb(device)
+	} catch (e) {
+		await browserDevice.close().catch(() => null) // Suppress error
+
+		throw e
+	}
 }
