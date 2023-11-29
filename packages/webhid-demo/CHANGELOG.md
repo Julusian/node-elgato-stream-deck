@@ -3,19 +3,9 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [6.0.0-async-test.1](https://github.com/julusian/node-elgato-stream-deck/compare/v5.7.2...v6.0.0-async-test.1) (2023-01-17)
-
-**Note:** Version bump only for package @elgato-stream-deck/webhid-demo
-
-
-
-
-
 ## [5.7.3](https://github.com/julusian/node-elgato-stream-deck/compare/v5.7.2...v5.7.3) (2023-06-20)
 
-
 **Note:** Version bump only for package @elgato-stream-deck/webhid-demo
-
 
 
 
