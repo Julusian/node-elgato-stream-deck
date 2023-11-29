@@ -1,13 +1,9 @@
 /* eslint-disable jest/no-standalone-expect */
 import { EventEmitter } from 'events'
-import type { HIDAsync } from 'node-hid'
+import type { Device, HIDAsync } from 'node-hid'
 export class DummyHID extends EventEmitter implements HIDAsync {
-	public path: string
-
-	constructor(devicePath: string) {
+	constructor() {
 		super()
-		expect(typeof devicePath).toEqual('string')
-		this.path = devicePath
 	}
 	public async close(): Promise<void> {
 		throw new Error('Not implemented')
@@ -39,4 +35,13 @@ export class DummyHID extends EventEmitter implements HIDAsync {
 	public async setNonBlocking(_no_block: boolean): Promise<void> {
 		throw new Error('Method not implemented.')
 	}
+
+	public async generateDeviceInfo(): Promise<Device> {
+		// TODO - remove this!
+		throw new Error('Not implemented')
+	}
+
+	public getDeviceInfo = jest.fn(async (): Promise<Device> => {
+		throw new Error('Not implemented')
+	})
 }
