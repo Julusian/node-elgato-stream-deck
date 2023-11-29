@@ -5207,9 +5207,8 @@ class StreamDeckBase extends StreamDeckInputBase {
         });
     }
     async fillKeyBuffer(keyIndex, imageBuffer, options) {
-        var _a;
         this.checkValidKeyIndex(keyIndex);
-        const sourceFormat = (_a = options === null || options === void 0 ? void 0 : options.format) !== null && _a !== void 0 ? _a : 'rgb';
+        const sourceFormat = options?.format ?? 'rgb';
         this.checkSourceFormat(sourceFormat);
         const imageSize = this.ICON_PIXELS * sourceFormat.length;
         if (imageBuffer.length !== imageSize) {
@@ -5223,8 +5222,7 @@ class StreamDeckBase extends StreamDeckInputBase {
         });
     }
     async fillPanelBuffer(imageBuffer, options) {
-        var _a;
-        const sourceFormat = (_a = options === null || options === void 0 ? void 0 : options.format) !== null && _a !== void 0 ? _a : 'rgb';
+        const sourceFormat = options?.format ?? 'rgb';
         this.checkSourceFormat(sourceFormat);
         const imageSize = this.ICON_PIXELS * sourceFormat.length * this.NUM_KEYS;
         if (imageBuffer.length !== imageSize) {
@@ -6386,10 +6384,9 @@ if (true) {
     }
 }
 function appendLog(str) {
-    var _a;
     const logElm = document.getElementById('log');
     if (logElm) {
-        logElm.textContent = `${str}\n${(_a = logElm.textContent) !== null && _a !== void 0 ? _a : ''}`;
+        logElm.textContent = `${str}\n${logElm.textContent ?? ''}`;
     }
 }
 const demoSelect = document.getElementById('demo-select');
