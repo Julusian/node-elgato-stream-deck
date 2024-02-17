@@ -206,7 +206,9 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		if (keyIndex >= this.NUM_KEYS) {
 			await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, r, g, b]))
 		} else {
-			const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]))
+			const pixels = new Uint8Array(this.ICON_BYTES)
+			pixels.fill([r, g, b])
+
 			const keyIndex2 = this.transformKeyIndex(keyIndex)
 			await this.fillImageRange(keyIndex2, pixels, {
 				format: 'rgb',
@@ -279,7 +281,9 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		if (keyIndex >= this.NUM_KEYS) {
 			await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, 0, 0, 0]))
 		} else {
-			const pixels = Buffer.alloc(this.ICON_BYTES, 0)
+			const pixels = new Uint8Array(this.ICON_BYTES)
+			pixels.fill(0)
+
 			const keyIndex2 = this.transformKeyIndex(keyIndex)
 			await this.fillImageRange(keyIndex2, pixels, {
 				format: 'rgb',
@@ -290,7 +294,9 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 	}
 
 	public async clearPanel(): Promise<void> {
-		const pixels = Buffer.alloc(this.ICON_BYTES, 0)
+		const pixels = new Uint8Array(this.ICON_BYTES)
+		pixels.fill(0)
+
 		const ps: Array<Promise<void>> = []
 		for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
 			ps.push(

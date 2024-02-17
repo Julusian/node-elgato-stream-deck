@@ -38,12 +38,12 @@ export class StreamDeckPedal extends StreamDeckInputBase {
 	public async getFirmwareVersion(): Promise<string> {
 		const val = await this.device.getFeatureReport(5, 32)
 		const end = val.indexOf(0, 6)
-		return val.toString('ascii', 6, end === -1 ? undefined : end)
+		return new TextDecoder('ascii').decode(val.subarray(6, end === -1 ? undefined : end))
 	}
 
 	public async getSerialNumber(): Promise<string> {
 		const val = await this.device.getFeatureReport(6, 32)
-		return val.toString('ascii', 2, 14)
+		return new TextDecoder('ascii').decode(val.subarray(2, 14))
 	}
 
 	public async fillKeyColor(_keyIndex: number, _r: number, _g: number, _b: number): Promise<void> {
