@@ -84,9 +84,6 @@ jobs:
       - name: Send coverage
         if: matrix.node-version == '18.x'
         uses: codecov/codecov-action@v4
-        with:
-          fail_ci_if_error: true
-          # name: codecov-umbrella
 
   publish-demo:
     name: Publish demo to Github Pages
