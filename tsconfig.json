@@ -1,7 +1,9 @@
 {
-	"extends": "./tsconfig.build.json",
-	"exclude": ["node_modules/**"],
-	"compilerOptions": {
-		"types": ["jest", "node", "dom"]
-	}
+	"files": [],
+	"references": [
+		{ "path": "./packages/core" },
+		{ "path": "./packages/node" },
+		{ "path": "./packages/webhid" },
+		{ "path": "./packages/webhid-demo" }
+	]
 }

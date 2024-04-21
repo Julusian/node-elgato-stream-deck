@@ -1,9 +1,9 @@
 /* eslint-disable jest/no-standalone-expect */
 import { EventEmitter } from 'events'
 import { EncodeJPEGHelper } from '../models/base'
-import { HIDDevice } from '../device'
+import { HIDDevice, HIDDeviceInfo } from '../device'
 export class DummyHID extends EventEmitter implements HIDDevice {
-	public dataKeyOffset?: number | undefined
+	public dataKeyOffset: number | undefined
 
 	constructor(public readonly path: string, public readonly encodeJPEG: jest.MockedFunction<EncodeJPEGHelper>) {
 		super()
@@ -21,5 +21,8 @@ export class DummyHID extends EventEmitter implements HIDDevice {
 	}
 	public async close(): Promise<void> {
 		throw new Error('Not implemented')
+	}
+	public async getDeviceInfo(): Promise<HIDDeviceInfo> {
+		throw new Error('Method not implemented.')
 	}
 }

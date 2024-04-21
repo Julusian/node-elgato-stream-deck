@@ -28,10 +28,6 @@
 		"interface",
 		"controller"
 	],
-	"scripts": {
-		"build": "run g:rimraf dist && run build:main",
-		"build:main": "run g:tsc -p tsconfig.build.json"
-	},
 	"files": [
 		"dist"
 	],
