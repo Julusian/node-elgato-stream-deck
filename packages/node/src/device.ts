@@ -59,6 +59,7 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 		const info: NodeHIDDeviceInfo = await this.device.getDeviceInfo()
 
 		return {
+			path: info.path,
 			productId: info.productId,
 			vendorId: info.vendorId,
 		}
@@ -107,6 +108,7 @@ export class NodeHIDSyncDevice extends EventEmitter implements HIDDevice {
 		const info: NodeHIDDeviceInfo = this.device.getDeviceInfo()
 
 		return {
+			path: info.path,
 			productId: info.productId,
 			vendorId: info.vendorId,
 		}

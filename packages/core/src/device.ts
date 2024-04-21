@@ -19,6 +19,7 @@ export interface HIDDevice {
 }
 
 export interface HIDDeviceInfo {
+	path: string | undefined
 	productId: number
 	vendorId: number
 }

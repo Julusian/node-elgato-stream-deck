@@ -8,6 +8,7 @@ import {
 	LcdSegmentSize,
 	StreamDeckEvents,
 } from './types'
+import { HIDDeviceInfo } from './device'
 
 /**
  * A minimal proxy around a StreamDeck instance.
@@ -67,6 +68,9 @@ export class StreamDeckProxy implements StreamDeck {
 
 	public async close(): Promise<void> {
 		return this.device.close()
+	}
+	public async getHidDeviceInfo(): Promise<HIDDeviceInfo> {
+		return this.device.getHidDeviceInfo()
 	}
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		return this.device.fillKeyColor(keyIndex, r, g, b)

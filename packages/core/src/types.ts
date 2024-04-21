@@ -1,5 +1,6 @@
 import * as EventEmitter from 'eventemitter3'
 import { DeviceModelId, EncoderIndex, KeyIndex } from './id'
+import { HIDDeviceInfo } from './device'
 
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
@@ -76,6 +77,11 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * Close the device
 	 */
 	close(): Promise<void>
+
+	/**
+	 * Get information about the underlying HID device
+	 */
+	getHidDeviceInfo(): Promise<HIDDeviceInfo>
 
 	/**
 	 * Fills the given key with a solid color.

@@ -1,6 +1,6 @@
 import * as EventEmitter from 'eventemitter3'
 
-import { HIDDevice } from '../device'
+import { HIDDevice, HIDDeviceInfo } from '../device'
 import { DeviceModelId, EncoderIndex, KeyIndex } from '../id'
 import {
 	FillImageOptions,
@@ -128,6 +128,10 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 
 	public async close(): Promise<void> {
 		return this.device.close()
+	}
+
+	public async getHidDeviceInfo(): Promise<HIDDeviceInfo> {
+		return this.device.getDeviceInfo()
 	}
 
 	public abstract setBrightness(percentage: number): Promise<void>

@@ -50,6 +50,7 @@ export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 	}
 	public async getDeviceInfo(): Promise<HIDDeviceInfo> {
 		return {
+			path: undefined,
 			productId: this.device.productId,
 			vendorId: this.device.vendorId,
 		}
