@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0](https://github.com/julusian/node-elgato-stream-deck/compare/v6.0.0...v6.1.0) (2024-04-21)
+
+
+### Bug Fixes
+
+* rework udev rules [#88](https://github.com/julusian/node-elgato-stream-deck/issues/88) ([d6054a7](https://github.com/julusian/node-elgato-stream-deck/commit/d6054a79781239dc8c845d2f866335621297d9c2))
+
+
+### Features
+
+* **node:** expose path of opened device [#65](https://github.com/julusian/node-elgato-stream-deck/issues/65) ([45ebbe5](https://github.com/julusian/node-elgato-stream-deck/commit/45ebbe5a9e721f3a89d027d977193f7aa322f6ce))
+* **webhid:** Add forget method [#79](https://github.com/julusian/node-elgato-stream-deck/issues/79) ([f13ee36](https://github.com/julusian/node-elgato-stream-deck/commit/f13ee363ef1e1a236ce815917e7f5e76ae8efb79))
+
+
+
+
+
 # [6.0.0](https://github.com/julusian/node-elgato-stream-deck/compare/v5.7.3...v6.0.0) (2023-11-29)
 
 
