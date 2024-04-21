@@ -12,6 +12,9 @@ const originalProperties: StreamDeckProperties = {
 	ICON_SIZE: 72,
 	KEY_DIRECTION: 'rtl',
 	KEY_DATA_OFFSET: 0,
+
+	KEY_SPACING_HORIZONTAL: 25,
+	KEY_SPACING_VERTICAL: 25,
 }
 
 export class StreamDeckOriginal extends StreamDeckGen1Base {

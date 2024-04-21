@@ -26,6 +26,8 @@ export type StreamDeckProperties = Readonly<{
 	ICON_SIZE: number
 	KEY_DIRECTION: 'ltr' | 'rtl'
 	KEY_DATA_OFFSET: number
+	KEY_SPACING_HORIZONTAL: number
+	KEY_SPACING_VERTICAL: number
 }>
 
 export interface InternalFillImageOptions extends FillImageOptions {
@@ -65,6 +67,13 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	}
 	get ICON_PIXELS(): number {
 		return this.ICON_SIZE * this.ICON_SIZE
+	}
+
+	get KEY_SPACING_HORIZONTAL(): number {
+		return this.deviceProperties.KEY_SPACING_HORIZONTAL
+	}
+	get KEY_SPACING_VERTICAL(): number {
+		return this.deviceProperties.KEY_SPACING_VERTICAL
 	}
 
 	get MODEL(): DeviceModelId {

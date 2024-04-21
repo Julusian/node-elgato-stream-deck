@@ -56,6 +56,11 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	/** The number of bytes for a RGB encoded image for a button */
 	readonly ICON_BYTES: number
 
+	/** The horizontal spacing in pixels between each button */
+	readonly KEY_SPACING_HORIZONTAL: number
+	/** The vertical spacing in pixels between each button */
+	readonly KEY_SPACING_VERTICAL: number
+
 	/** The model of this device */
 	readonly MODEL: DeviceModelId
 	/** The name of the product/model */

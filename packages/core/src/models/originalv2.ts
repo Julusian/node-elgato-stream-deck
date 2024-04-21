@@ -11,6 +11,9 @@ const origV2Properties: StreamDeckProperties = {
 	ICON_SIZE: 72,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 3,
+
+	KEY_SPACING_HORIZONTAL: 25,
+	KEY_SPACING_VERTICAL: 25,
 }
 
 export class StreamDeckOriginalV2 extends StreamDeckGen2Base {

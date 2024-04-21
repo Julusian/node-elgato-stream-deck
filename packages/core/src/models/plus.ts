@@ -13,6 +13,9 @@ const plusProperties: StreamDeckProperties = {
 	ICON_SIZE: 120,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 3,
+
+	KEY_SPACING_HORIZONTAL: 99,
+	KEY_SPACING_VERTICAL: 40,
 }
 
 export class StreamDeckPlus extends StreamDeckGen2Base {

@@ -42,6 +42,12 @@ export class StreamDeckProxy implements StreamDeck {
 	public get ICON_PIXELS(): number {
 		return this.device.ICON_PIXELS
 	}
+	public get KEY_SPACING_VERTICAL(): number {
+		return this.device.KEY_SPACING_VERTICAL
+	}
+	public get KEY_SPACING_HORIZONTAL(): number {
+		return this.device.KEY_SPACING_HORIZONTAL
+	}
 	public get MODEL(): DeviceModelId {
 		return this.device.MODEL
 	}
