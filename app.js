@@ -6440,7 +6440,7 @@ const chase_1 = __webpack_require__(889);
 if (true) {
     const elm = document.querySelector('#version_str');
     if (elm) {
-        elm.innerHTML = `v${"6.0.0"}`;
+        elm.innerHTML = `v${"6.1.0"}`;
     }
 }
 function appendLog(str) {
