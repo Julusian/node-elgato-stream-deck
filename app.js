@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 277:
+/***/ 28:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -159,7 +159,7 @@ function fromByteArray (uint8) {
 
 /***/ }),
 
-/***/ 291:
+/***/ 429:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
@@ -174,16 +174,16 @@ var __webpack_unused_export__;
 
 
 
-const base64 = __webpack_require__(277)
-const ieee754 = __webpack_require__(608)
+const base64 = __webpack_require__(28)
+const ieee754 = __webpack_require__(801)
 const customInspectSymbol =
   (typeof Symbol === 'function' && typeof Symbol['for'] === 'function') // eslint-disable-line dot-notation
     ? Symbol['for']('nodejs.util.inspect.custom') // eslint-disable-line dot-notation
     : null
 
-exports.lW = Buffer
+exports.hp = Buffer
 __webpack_unused_export__ = SlowBuffer
-exports.h2 = 50
+exports.IS = 50
 
 const K_MAX_LENGTH = 0x7fffffff
 __webpack_unused_export__ = K_MAX_LENGTH
@@ -782,7 +782,7 @@ Buffer.prototype.equals = function equals (b) {
 
 Buffer.prototype.inspect = function inspect () {
   let str = ''
-  const max = exports.h2
+  const max = exports.IS
   str = this.toString('hex', 0, max).replace(/(.{2})/g, '$1 ').trim()
   if (this.length > max) str += ' ... '
   return '<Buffer ' + str + '>'
@@ -2274,7 +2274,7 @@ function BufferBigIntNotDefined () {
 
 /***/ }),
 
-/***/ 399:
+/***/ 646:
 /***/ ((module) => {
 
 "use strict";
@@ -2618,7 +2618,7 @@ if (true) {
 
 /***/ }),
 
-/***/ 531:
+/***/ 621:
 /***/ ((module) => {
 
 "use strict";
@@ -3123,7 +3123,7 @@ function eventTargetAgnosticAddListener(emitter, name, listener, flags) {
 
 /***/ }),
 
-/***/ 771:
+/***/ 559:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -4045,7 +4045,7 @@ async function getFontEmbedCSS(node, options = {}) {
 
 /***/ }),
 
-/***/ 608:
+/***/ 801:
 /***/ ((__unused_webpack_module, exports) => {
 
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
@@ -4137,7 +4137,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 /***/ }),
 
-/***/ 490:
+/***/ 651:
 /***/ ((module) => {
 
 "use strict";
@@ -4160,15 +4160,15 @@ module.exports = (promise, onFinally) => {
 
 /***/ }),
 
-/***/ 10:
+/***/ 968:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const EventEmitter = __webpack_require__(399);
-const p_timeout_1 = __webpack_require__(605);
-const priority_queue_1 = __webpack_require__(986);
+const EventEmitter = __webpack_require__(646);
+const p_timeout_1 = __webpack_require__(455);
+const priority_queue_1 = __webpack_require__(856);
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const empty = () => { };
 const timeoutError = new p_timeout_1.TimeoutError();
@@ -4447,7 +4447,7 @@ exports["default"] = PQueue;
 
 /***/ }),
 
-/***/ 982:
+/***/ 152:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -4476,13 +4476,13 @@ exports["default"] = lowerBound;
 
 /***/ }),
 
-/***/ 986:
+/***/ 856:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const lower_bound_1 = __webpack_require__(982);
+const lower_bound_1 = __webpack_require__(152);
 class PriorityQueue {
     constructor() {
         this._queue = [];
@@ -4516,13 +4516,13 @@ exports["default"] = PriorityQueue;
 
 /***/ }),
 
-/***/ 605:
+/***/ 455:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const pFinally = __webpack_require__(490);
+const pFinally = __webpack_require__(651);
 
 class TimeoutError extends Error {
 	constructor(message) {
@@ -4581,11 +4581,11 @@ module.exports.TimeoutError = TimeoutError;
 
 /***/ }),
 
-/***/ 888:
+/***/ 889:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
-/* provided dependency */ var Buffer = __webpack_require__(291)["lW"];
+/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChaseDemo = void 0;
@@ -4665,14 +4665,14 @@ exports.ChaseDemo = ChaseDemo;
 
 /***/ }),
 
-/***/ 652:
+/***/ 35:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DomImageDemo = void 0;
-const html_to_image_1 = __webpack_require__(771);
+const html_to_image_1 = __webpack_require__(559);
 function getRandomColor() {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -4737,7 +4737,7 @@ exports.DomImageDemo = DomImageDemo;
 
 /***/ }),
 
-/***/ 306:
+/***/ 964:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -4773,7 +4773,7 @@ exports.FillWhenPressedDemo = FillWhenPressedDemo;
 
 /***/ }),
 
-/***/ 283:
+/***/ 215:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -4828,7 +4828,7 @@ exports.RapidFillDemo = RapidFillDemo;
 
 /***/ }),
 
-/***/ 663:
+/***/ 444:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -4846,12 +4846,12 @@ var DeviceModelId;
     DeviceModelId["XLV2"] = "xlv2";
     DeviceModelId["PEDAL"] = "pedal";
     DeviceModelId["PLUS"] = "plus";
-})(DeviceModelId = exports.DeviceModelId || (exports.DeviceModelId = {}));
+})(DeviceModelId || (exports.DeviceModelId = DeviceModelId = {}));
 //# sourceMappingURL=id.js.map
 
 /***/ }),
 
-/***/ 613:
+/***/ 601:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -4872,12 +4872,12 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DEVICE_MODELS = exports.DeviceModelType = exports.VENDOR_ID = exports.StreamDeckProxy = void 0;
-const id_1 = __webpack_require__(663);
-const models_1 = __webpack_require__(567);
-const plus_1 = __webpack_require__(914);
-__exportStar(__webpack_require__(456), exports);
-__exportStar(__webpack_require__(663), exports);
-var proxy_1 = __webpack_require__(922);
+const id_1 = __webpack_require__(444);
+const models_1 = __webpack_require__(612);
+const plus_1 = __webpack_require__(562);
+__exportStar(__webpack_require__(64), exports);
+__exportStar(__webpack_require__(444), exports);
+var proxy_1 = __webpack_require__(481);
 Object.defineProperty(exports, "StreamDeckProxy", ({ enumerable: true, get: function () { return proxy_1.StreamDeckProxy; } }));
 /** Elgato vendor id */
 exports.VENDOR_ID = 0x0fd9;
@@ -4885,7 +4885,7 @@ var DeviceModelType;
 (function (DeviceModelType) {
     DeviceModelType["STREAMDECK"] = "streamdeck";
     DeviceModelType["PEDAL"] = "pedal";
-})(DeviceModelType = exports.DeviceModelType || (exports.DeviceModelType = {}));
+})(DeviceModelType || (exports.DeviceModelType = DeviceModelType = {}));
 /** List of all the known models, and the classes to use them */
 exports.DEVICE_MODELS = [
     {
@@ -4947,15 +4947,15 @@ exports.DEVICE_MODELS = [
 
 /***/ }),
 
-/***/ 882:
+/***/ 165:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
-/* provided dependency */ var Buffer = __webpack_require__(291)["lW"];
+/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckGen1Base = void 0;
-const base_1 = __webpack_require__(576);
+const base_1 = __webpack_require__(67);
 /**
  * Base class for generation 1 hardware (before the xl)
  */
@@ -5018,16 +5018,16 @@ exports.StreamDeckGen1Base = StreamDeckGen1Base;
 
 /***/ }),
 
-/***/ 679:
+/***/ 748:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
-/* provided dependency */ var Buffer = __webpack_require__(291)["lW"];
+/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckGen2Base = void 0;
-const util_1 = __webpack_require__(764);
-const base_1 = __webpack_require__(576);
+const util_1 = __webpack_require__(369);
+const base_1 = __webpack_require__(67);
 /**
  * Base class for generation 2 hardware (starting with the xl)
  */
@@ -5100,15 +5100,15 @@ exports.StreamDeckGen2Base = StreamDeckGen2Base;
 
 /***/ }),
 
-/***/ 576:
+/***/ 67:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
-/* provided dependency */ var Buffer = __webpack_require__(291)["lW"];
+/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckBase = exports.StreamDeckInputBase = void 0;
-const EventEmitter = __webpack_require__(399);
+const EventEmitter = __webpack_require__(646);
 class StreamDeckInputBase extends EventEmitter {
     get NUM_KEYS() {
         return this.KEY_COLUMNS * this.KEY_ROWS;
@@ -5139,6 +5139,12 @@ class StreamDeckInputBase extends EventEmitter {
     }
     get ICON_PIXELS() {
         return this.ICON_SIZE * this.ICON_SIZE;
+    }
+    get KEY_SPACING_HORIZONTAL() {
+        return this.deviceProperties.KEY_SPACING_HORIZONTAL;
+    }
+    get KEY_SPACING_VERTICAL() {
+        return this.deviceProperties.KEY_SPACING_VERTICAL;
     }
     get MODEL() {
         return this.deviceProperties.MODEL;
@@ -5331,45 +5337,45 @@ exports.StreamDeckBase = StreamDeckBase;
 
 /***/ }),
 
-/***/ 567:
+/***/ 612:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckPlus = exports.StreamDeckPedal = exports.StreamDeckOriginalMK2 = exports.StreamDeckOriginalV2 = exports.StreamDeckXLV2 = exports.StreamDeckXL = exports.StreamDeckMiniV2 = exports.StreamDeckMini = exports.StreamDeckOriginal = void 0;
-var original_1 = __webpack_require__(148);
+var original_1 = __webpack_require__(745);
 Object.defineProperty(exports, "StreamDeckOriginal", ({ enumerable: true, get: function () { return original_1.StreamDeckOriginal; } }));
-var mini_1 = __webpack_require__(758);
+var mini_1 = __webpack_require__(321);
 Object.defineProperty(exports, "StreamDeckMini", ({ enumerable: true, get: function () { return mini_1.StreamDeckMini; } }));
-var miniv2_1 = __webpack_require__(207);
+var miniv2_1 = __webpack_require__(681);
 Object.defineProperty(exports, "StreamDeckMiniV2", ({ enumerable: true, get: function () { return miniv2_1.StreamDeckMiniV2; } }));
-var xl_1 = __webpack_require__(287);
+var xl_1 = __webpack_require__(766);
 Object.defineProperty(exports, "StreamDeckXL", ({ enumerable: true, get: function () { return xl_1.StreamDeckXL; } }));
-var xlv2_1 = __webpack_require__(474);
+var xlv2_1 = __webpack_require__(786);
 Object.defineProperty(exports, "StreamDeckXLV2", ({ enumerable: true, get: function () { return xlv2_1.StreamDeckXLV2; } }));
-var originalv2_1 = __webpack_require__(168);
+var originalv2_1 = __webpack_require__(769);
 Object.defineProperty(exports, "StreamDeckOriginalV2", ({ enumerable: true, get: function () { return originalv2_1.StreamDeckOriginalV2; } }));
-var original_mk2_1 = __webpack_require__(51);
+var original_mk2_1 = __webpack_require__(158);
 Object.defineProperty(exports, "StreamDeckOriginalMK2", ({ enumerable: true, get: function () { return original_mk2_1.StreamDeckOriginalMK2; } }));
-var pedal_1 = __webpack_require__(266);
+var pedal_1 = __webpack_require__(756);
 Object.defineProperty(exports, "StreamDeckPedal", ({ enumerable: true, get: function () { return pedal_1.StreamDeckPedal; } }));
-var plus_1 = __webpack_require__(914);
+var plus_1 = __webpack_require__(562);
 Object.defineProperty(exports, "StreamDeckPlus", ({ enumerable: true, get: function () { return plus_1.StreamDeckPlus; } }));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
 
-/***/ 758:
+/***/ 321:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckMini = void 0;
-const util_1 = __webpack_require__(764);
-const base_gen1_1 = __webpack_require__(882);
-const id_1 = __webpack_require__(663);
+const util_1 = __webpack_require__(369);
+const base_gen1_1 = __webpack_require__(165);
+const id_1 = __webpack_require__(444);
 const miniProperties = {
     MODEL: id_1.DeviceModelId.MINI,
     PRODUCT_NAME: 'Streamdeck Mini',
@@ -5378,6 +5384,8 @@ const miniProperties = {
     ICON_SIZE: 80,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 0,
+    KEY_SPACING_HORIZONTAL: 28,
+    KEY_SPACING_VERTICAL: 28,
 };
 class StreamDeckMini extends base_gen1_1.StreamDeckGen1Base {
     constructor(device, options) {
@@ -5397,16 +5405,16 @@ exports.StreamDeckMini = StreamDeckMini;
 
 /***/ }),
 
-/***/ 207:
+/***/ 681:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckMiniV2 = void 0;
-const util_1 = __webpack_require__(764);
-const base_gen1_1 = __webpack_require__(882);
-const id_1 = __webpack_require__(663);
+const util_1 = __webpack_require__(369);
+const base_gen1_1 = __webpack_require__(165);
+const id_1 = __webpack_require__(444);
 const miniV2Properties = {
     MODEL: id_1.DeviceModelId.MINIV2,
     PRODUCT_NAME: 'Streamdeck Mini',
@@ -5415,6 +5423,8 @@ const miniV2Properties = {
     ICON_SIZE: 80,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 0,
+    KEY_SPACING_HORIZONTAL: 28,
+    KEY_SPACING_VERTICAL: 28,
 };
 class StreamDeckMiniV2 extends base_gen1_1.StreamDeckGen1Base {
     constructor(device, options) {
@@ -5434,15 +5444,15 @@ exports.StreamDeckMiniV2 = StreamDeckMiniV2;
 
 /***/ }),
 
-/***/ 51:
+/***/ 158:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckOriginalMK2 = void 0;
-const base_gen2_1 = __webpack_require__(679);
-const id_1 = __webpack_require__(663);
+const base_gen2_1 = __webpack_require__(748);
+const id_1 = __webpack_require__(444);
 const origMK2Properties = {
     MODEL: id_1.DeviceModelId.ORIGINALMK2,
     PRODUCT_NAME: 'Streamdeck MK2',
@@ -5451,6 +5461,8 @@ const origMK2Properties = {
     ICON_SIZE: 72,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 3,
+    KEY_SPACING_HORIZONTAL: 25,
+    KEY_SPACING_VERTICAL: 25,
 };
 class StreamDeckOriginalMK2 extends base_gen2_1.StreamDeckGen2Base {
     constructor(device, options) {
@@ -5462,17 +5474,17 @@ exports.StreamDeckOriginalMK2 = StreamDeckOriginalMK2;
 
 /***/ }),
 
-/***/ 148:
+/***/ 745:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
-/* provided dependency */ var Buffer = __webpack_require__(291)["lW"];
+/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckOriginal = void 0;
-const util_1 = __webpack_require__(764);
-const base_gen1_1 = __webpack_require__(882);
-const id_1 = __webpack_require__(663);
+const util_1 = __webpack_require__(369);
+const base_gen1_1 = __webpack_require__(165);
+const id_1 = __webpack_require__(444);
 const originalProperties = {
     MODEL: id_1.DeviceModelId.ORIGINAL,
     PRODUCT_NAME: 'Streamdeck',
@@ -5481,6 +5493,8 @@ const originalProperties = {
     ICON_SIZE: 72,
     KEY_DIRECTION: 'rtl',
     KEY_DATA_OFFSET: 0,
+    KEY_SPACING_HORIZONTAL: 25,
+    KEY_SPACING_VERTICAL: 25,
 };
 class StreamDeckOriginal extends base_gen1_1.StreamDeckGen1Base {
     constructor(device, options) {
@@ -5525,15 +5539,15 @@ exports.StreamDeckOriginal = StreamDeckOriginal;
 
 /***/ }),
 
-/***/ 168:
+/***/ 769:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckOriginalV2 = void 0;
-const base_gen2_1 = __webpack_require__(679);
-const id_1 = __webpack_require__(663);
+const base_gen2_1 = __webpack_require__(748);
+const id_1 = __webpack_require__(444);
 const origV2Properties = {
     MODEL: id_1.DeviceModelId.ORIGINALV2,
     PRODUCT_NAME: 'Streamdeck',
@@ -5542,6 +5556,8 @@ const origV2Properties = {
     ICON_SIZE: 72,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 3,
+    KEY_SPACING_HORIZONTAL: 25,
+    KEY_SPACING_VERTICAL: 25,
 };
 class StreamDeckOriginalV2 extends base_gen2_1.StreamDeckGen2Base {
     constructor(device, options) {
@@ -5553,15 +5569,15 @@ exports.StreamDeckOriginalV2 = StreamDeckOriginalV2;
 
 /***/ }),
 
-/***/ 266:
+/***/ 756:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckPedal = void 0;
-const base_1 = __webpack_require__(576);
-const id_1 = __webpack_require__(663);
+const base_1 = __webpack_require__(67);
+const id_1 = __webpack_require__(444);
 const pedalProperties = {
     MODEL: id_1.DeviceModelId.PEDAL,
     PRODUCT_NAME: 'Streamdeck Pedal',
@@ -5570,6 +5586,8 @@ const pedalProperties = {
     ICON_SIZE: 0,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 3,
+    KEY_SPACING_HORIZONTAL: 0,
+    KEY_SPACING_VERTICAL: 0,
 };
 class StreamDeckPedal extends base_1.StreamDeckInputBase {
     constructor(device, options) {
@@ -5616,11 +5634,11 @@ exports.StreamDeckPedal = StreamDeckPedal;
 
 /***/ }),
 
-/***/ 914:
+/***/ 562:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
-/* provided dependency */ var Buffer = __webpack_require__(291)["lW"];
+/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
     if (kind === "m") throw new TypeError("Private method is not writable");
@@ -5636,9 +5654,9 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var _StreamDeckPlus_encoderState;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckPlus = void 0;
-const util_1 = __webpack_require__(764);
-const base_gen2_1 = __webpack_require__(679);
-const id_1 = __webpack_require__(663);
+const util_1 = __webpack_require__(369);
+const base_gen2_1 = __webpack_require__(748);
+const id_1 = __webpack_require__(444);
 const plusProperties = {
     MODEL: id_1.DeviceModelId.PLUS,
     PRODUCT_NAME: 'Streamdeck +',
@@ -5647,6 +5665,8 @@ const plusProperties = {
     ICON_SIZE: 120,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 3,
+    KEY_SPACING_HORIZONTAL: 99,
+    KEY_SPACING_VERTICAL: 40,
 };
 class StreamDeckPlus extends base_gen2_1.StreamDeckGen2Base {
     constructor(device, options) {
@@ -5821,15 +5841,15 @@ _StreamDeckPlus_encoderState = new WeakMap();
 
 /***/ }),
 
-/***/ 287:
+/***/ 766:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckXL = void 0;
-const base_gen2_1 = __webpack_require__(679);
-const id_1 = __webpack_require__(663);
+const base_gen2_1 = __webpack_require__(748);
+const id_1 = __webpack_require__(444);
 const xlProperties = {
     MODEL: id_1.DeviceModelId.XL,
     PRODUCT_NAME: 'Streamdeck XL',
@@ -5838,6 +5858,8 @@ const xlProperties = {
     ICON_SIZE: 96,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 3,
+    KEY_SPACING_HORIZONTAL: 32,
+    KEY_SPACING_VERTICAL: 39,
 };
 class StreamDeckXL extends base_gen2_1.StreamDeckGen2Base {
     constructor(device, options) {
@@ -5849,15 +5871,15 @@ exports.StreamDeckXL = StreamDeckXL;
 
 /***/ }),
 
-/***/ 474:
+/***/ 786:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckXLV2 = void 0;
-const base_gen2_1 = __webpack_require__(679);
-const id_1 = __webpack_require__(663);
+const base_gen2_1 = __webpack_require__(748);
+const id_1 = __webpack_require__(444);
 const xlProperties = {
     MODEL: id_1.DeviceModelId.XLV2,
     PRODUCT_NAME: 'Streamdeck XL',
@@ -5866,6 +5888,8 @@ const xlProperties = {
     ICON_SIZE: 96,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 3,
+    KEY_SPACING_HORIZONTAL: 32,
+    KEY_SPACING_VERTICAL: 39,
 };
 class StreamDeckXLV2 extends base_gen2_1.StreamDeckGen2Base {
     constructor(device, options) {
@@ -5877,7 +5901,7 @@ exports.StreamDeckXLV2 = StreamDeckXLV2;
 
 /***/ }),
 
-/***/ 922:
+/***/ 481:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -5918,6 +5942,12 @@ class StreamDeckProxy {
     }
     get ICON_PIXELS() {
         return this.device.ICON_PIXELS;
+    }
+    get KEY_SPACING_VERTICAL() {
+        return this.device.KEY_SPACING_VERTICAL;
+    }
+    get KEY_SPACING_HORIZONTAL() {
+        return this.device.KEY_SPACING_HORIZONTAL;
     }
     get MODEL() {
         return this.device.MODEL;
@@ -6018,7 +6048,7 @@ exports.StreamDeckProxy = StreamDeckProxy;
 
 /***/ }),
 
-/***/ 456:
+/***/ 64:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6028,11 +6058,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 764:
+/***/ 369:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
-/* provided dependency */ var Buffer = __webpack_require__(291)["lW"];
+/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.writeBMPHeader = exports.BMP_HEADER_LENGTH = exports.imageToByteArray = void 0;
@@ -6103,16 +6133,16 @@ exports.writeBMPHeader = writeBMPHeader;
 
 /***/ }),
 
-/***/ 768:
+/***/ 351:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
-/* provided dependency */ var Buffer = __webpack_require__(291)["lW"];
+/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.WebHIDDevice = void 0;
-const events_1 = __webpack_require__(531);
-const p_queue_1 = __webpack_require__(10);
+const events_1 = __webpack_require__(621);
+const p_queue_1 = __webpack_require__(968);
 /**
  * The wrapped browser HIDDevice.
  * This translates it into the common format expected by @elgato-stream-deck/core
@@ -6161,20 +6191,20 @@ exports.WebHIDDevice = WebHIDDevice;
 
 /***/ }),
 
-/***/ 415:
+/***/ 253:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.openDevice = exports.getStreamDecks = exports.requestStreamDecks = exports.StreamDeckWeb = exports.DeviceModelId = void 0;
-const core_1 = __webpack_require__(613);
-const device_1 = __webpack_require__(768);
-const jpeg_1 = __webpack_require__(438);
-const wrapper_1 = __webpack_require__(934);
-var core_2 = __webpack_require__(613);
+const core_1 = __webpack_require__(601);
+const device_1 = __webpack_require__(351);
+const jpeg_1 = __webpack_require__(443);
+const wrapper_1 = __webpack_require__(26);
+var core_2 = __webpack_require__(601);
 Object.defineProperty(exports, "DeviceModelId", ({ enumerable: true, get: function () { return core_2.DeviceModelId; } }));
-var wrapper_2 = __webpack_require__(934);
+var wrapper_2 = __webpack_require__(26);
 Object.defineProperty(exports, "StreamDeckWeb", ({ enumerable: true, get: function () { return wrapper_2.StreamDeckWeb; } }));
 /**
  * Request the user to select some streamdecks to open
@@ -6235,11 +6265,11 @@ exports.openDevice = openDevice;
 
 /***/ }),
 
-/***/ 438:
+/***/ 443:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
-/* provided dependency */ var Buffer = __webpack_require__(291)["lW"];
+/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.encodeJPEG = void 0;
@@ -6280,15 +6310,15 @@ exports.encodeJPEG = encodeJPEG;
 
 /***/ }),
 
-/***/ 934:
+/***/ 26:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
-/* provided dependency */ var Buffer = __webpack_require__(291)["lW"];
+/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckWeb = void 0;
-const core_1 = __webpack_require__(613);
+const core_1 = __webpack_require__(601);
 /**
  * A StreamDeck instance.
  * This is an extended variant of the class, to provide some more web friendly helpers, such as accepting a canvas
@@ -6384,11 +6414,11 @@ var exports = __webpack_exports__;
 var __webpack_unused_export__;
 
 __webpack_unused_export__ = ({ value: true });
-const webhid_1 = __webpack_require__(415);
-const dom_1 = __webpack_require__(652);
-const fill_when_pressed_1 = __webpack_require__(306);
-const rapid_fill_1 = __webpack_require__(283);
-const chase_1 = __webpack_require__(888);
+const webhid_1 = __webpack_require__(253);
+const dom_1 = __webpack_require__(35);
+const fill_when_pressed_1 = __webpack_require__(964);
+const rapid_fill_1 = __webpack_require__(215);
+const chase_1 = __webpack_require__(889);
 if (true) {
     const elm = document.querySelector('#version_str');
     if (elm) {
