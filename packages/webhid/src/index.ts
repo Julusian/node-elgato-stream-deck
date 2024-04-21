@@ -62,8 +62,9 @@ export async function openDevice(
 			...userOptions,
 		}
 
-		const device: StreamDeck = new model.class(new WebHIDDevice(browserDevice), options || {})
-		return new StreamDeckWeb(device)
+		const browserHid = new WebHIDDevice(browserDevice)
+		const device: StreamDeck = new model.class(browserHid, options || {})
+		return new StreamDeckWeb(device, browserHid)
 	} catch (e) {
 		await browserDevice.close().catch(() => null) // Suppress error
 

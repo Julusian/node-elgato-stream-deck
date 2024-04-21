@@ -30,6 +30,10 @@ export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 		return this.device.close()
 	}
 
+	public async forget(): Promise<void> {
+		return this.device.forget()
+	}
+
 	public async sendFeatureReport(data: Buffer): Promise<void> {
 		return this.device.sendFeatureReport(data[0], new Uint8Array(data.subarray(1)))
 	}
