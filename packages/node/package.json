@@ -45,7 +45,8 @@
 		"controller"
 	],
 	"files": [
-		"dist"
+		"dist",
+		"udev"
 	],
 	"engines": {
 		"node": ">=18.18"

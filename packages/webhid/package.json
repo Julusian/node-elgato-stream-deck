@@ -29,7 +29,8 @@
 		"controller"
 	],
 	"files": [
-		"dist"
+		"dist",
+		"udev"
 	],
 	"dependencies": {
 		"@elgato-stream-deck/core": "6.0.0",
