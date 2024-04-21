@@ -44,7 +44,7 @@
     "snyk-nodejs-lockfile-parser": "^1.53.1",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
-    "typescript": "~4.9.5",
+    "typescript": "~5.1.6",
     "usb": "^2.12.1"
   },
   "workspaces": [
