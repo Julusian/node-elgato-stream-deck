@@ -58,7 +58,7 @@ jobs:
         run: |
           yarn config set npmAuthToken $NPM_AUTH_TOKEN
 
-          yarn workspaces foreach --all -pt --exclude elgato-stream-deck-packages npm publish --access=public --tag ${{ steps.do-publish.outputs.tag }}
+          yarn workspaces foreach --all -pt --exclude elgato-stream-deck-packages --exclude @elgato-stream-deck/webhid-demo npm publish --access=public --tag ${{ steps.do-publish.outputs.tag }}
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           CI: true
