@@ -5187,6 +5187,9 @@ class StreamDeckInputBase extends EventEmitter {
     async close() {
         return this.device.close();
     }
+    async getHidDeviceInfo() {
+        return this.device.getDeviceInfo();
+    }
     transformKeyIndex(keyIndex) {
         return keyIndex;
     }
@@ -5961,6 +5964,9 @@ class StreamDeckProxy {
     async close() {
         return this.device.close();
     }
+    async getHidDeviceInfo() {
+        return this.device.getHidDeviceInfo();
+    }
     async fillKeyColor(keyIndex, r, g, b) {
         return this.device.fillKeyColor(keyIndex, r, g, b);
     }
@@ -6165,6 +6171,9 @@ class WebHIDDevice extends events_1.EventEmitter {
     async close() {
         return this.device.close();
     }
+    async forget() {
+        return this.device.forget();
+    }
     async sendFeatureReport(data) {
         return this.device.sendFeatureReport(data[0], new Uint8Array(data.subarray(1)));
     }
@@ -6181,6 +6190,7 @@ class WebHIDDevice extends events_1.EventEmitter {
     }
     async getDeviceInfo() {
         return {
+            path: undefined,
             productId: this.device.productId,
             vendorId: this.device.vendorId,
         };
@@ -6252,8 +6262,9 @@ async function openDevice(browserDevice, userOptions) {
             encodeJPEG: jpeg_1.encodeJPEG,
             ...userOptions,
         };
-        const device = new model.class(new device_1.WebHIDDevice(browserDevice), options || {});
-        return new wrapper_1.StreamDeckWeb(device);
+        const browserHid = new device_1.WebHIDDevice(browserDevice);
+        const device = new model.class(browserHid, options || {});
+        return new wrapper_1.StreamDeckWeb(device, browserHid);
     }
     catch (e) {
         await browserDevice.close().catch(() => null); // Suppress error
@@ -6324,8 +6335,15 @@ const core_1 = __webpack_require__(601);
  * This is an extended variant of the class, to provide some more web friendly helpers, such as accepting a canvas
  */
 class StreamDeckWeb extends core_1.StreamDeckProxy {
-    constructor(device) {
+    constructor(device, hid) {
         super(device);
+        this.hid = hid;
+    }
+    /**
+     * Instruct the browser to close and forget the device. This will revoke the website's permissions to access the device.
+     */
+    async forget() {
+        await this.hid.forget();
     }
     async fillKeyCanvas(keyIndex, canvas) {
         this.checkValidKeyIndex(keyIndex);
