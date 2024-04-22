@@ -122,20 +122,6 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		}
 	}
 
-	public async clearPanel(): Promise<void> {
-		const clearButtons = super.clearPanel()
-
-		const lcdSize = this.LCD_STRIP_SIZE
-		const buffer = Buffer.alloc(lcdSize.width * lcdSize.height * 4)
-		const clearLcd = this.fillLcdRegion(0, 0, buffer, {
-			format: 'rgba',
-			width: lcdSize.width,
-			height: lcdSize.height,
-		})
-
-		await Promise.all([clearButtons, clearLcd])
-	}
-
 	public override async fillLcd(buffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
 		const size = this.LCD_STRIP_SIZE
 		if (!size) throw new Error(`There is no lcd to fill`)

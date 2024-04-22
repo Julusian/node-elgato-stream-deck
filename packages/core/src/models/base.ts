@@ -300,6 +300,17 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		for (let buttonIndex = 0; buttonIndex < this.NUM_TOUCH_KEYS; buttonIndex++) {
 			ps.push(this.clearKey(buttonIndex + this.NUM_KEYS))
 		}
+
+		const lcdSize = this.LCD_STRIP_SIZE
+		if (lcdSize) {
+			const buffer = Buffer.alloc(lcdSize.width * lcdSize.height * 4)
+			ps.push(
+				this.fillLcd(buffer, {
+					format: 'rgba',
+				})
+			)
+		}
+
 		await Promise.all(ps)
 	}
 
