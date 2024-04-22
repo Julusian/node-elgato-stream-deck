@@ -1,12 +1,15 @@
 const path = require('path')
 const sharp = require('sharp')
-const { openStreamDeck, DeviceModelId } = require('../dist/index')
+const { listStreamDecks, openStreamDeck, DeviceModelId } = require('../dist/index')
 
 ;(async () => {
-	const streamDeck = openStreamDeck()
-	streamDeck.clearPanel()
+	const devices = await listStreamDecks()
+	if (!devices[0]) throw new Error('No device found')
+	await streamDeck.clearPanel()
 
-	if (streamDeck.MODEL !== DeviceModelId.PLUS) throw new Error('Unsupported device')
+	const streamDeck = await openStreamDeck(devices[0].path)
+
+	if (streamDeck.MODEL !== DeviceModelId.PLUS) throw new Error('This demo only supports the plus')
 
 	const img = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 		.flatten()

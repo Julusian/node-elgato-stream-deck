@@ -4,7 +4,7 @@ const streamDecks = {}
 
 async function addDevice(info) {
 	const path = info.path
-	streamDecks[path] = openStreamDeck(path)
+	streamDecks[path] = await openStreamDeck(path)
 
 	console.log(info)
 	console.log('Serial:', await streamDecks[path].getSerialNumber())

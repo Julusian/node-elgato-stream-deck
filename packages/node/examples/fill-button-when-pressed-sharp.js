@@ -1,10 +1,13 @@
 const path = require('path')
 const sharp = require('sharp')
-const { openStreamDeck } = require('../dist/index')
+const { listStreamDecks, openStreamDeck } = require('../dist/index')
 
 ;(async () => {
-	const streamDeck = await openStreamDeck('/dev/hidraw11')
-	streamDeck.clearPanel()
+	const devices = await listStreamDecks()
+	if (!devices[0]) throw new Error('No device found')
+
+	const streamDeck = await openStreamDeck(devices[0].path)
+	await streamDeck.clearPanel()
 
 	const img = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 		.flatten()
@@ -16,7 +19,7 @@ const { openStreamDeck } = require('../dist/index')
 		// Fill the pressed key with an image of the GitHub logo.
 		console.log('Filling button #%d', keyIndex)
 		if (keyIndex >= streamDeck.NUM_KEYS) {
-			streamDeck.fillKeyColor(keyIndex, 0, 0, 255).catch((e) => console.error('Fill failed:', e))
+			streamDeck.fillKeyColor(keyIndex, 255, 255, 255).catch((e) => console.error('Fill failed:', e))
 		} else {
 			streamDeck.fillKeyBuffer(keyIndex, img).catch((e) => console.error('Fill failed:', e))
 		}

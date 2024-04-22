@@ -1,7 +1,11 @@
-const { openStreamDeck } = require('../dist/index')
+const { listStreamDecks, openStreamDeck } = require('../dist/index')
 
-openStreamDeck().then((streamDeck) => {
-	streamDeck.clearPanel()
+;(async () => {
+	const devices = await listStreamDecks()
+	if (!devices[0]) throw new Error('No device found')
+
+	const streamDeck = await openStreamDeck(devices[0].path)
+	await streamDeck.clearPanel()
 
 	streamDeck.on('down', (keyIndex) => {
 		// Fill the pressed key with an image of the GitHub logo.
@@ -18,4 +22,4 @@ openStreamDeck().then((streamDeck) => {
 	streamDeck.on('error', (error) => {
 		console.error(error)
 	})
-})
+})()
