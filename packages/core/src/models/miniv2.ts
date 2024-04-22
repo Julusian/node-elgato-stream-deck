@@ -34,8 +34,4 @@ export class StreamDeckMiniV2 extends StreamDeckGen1Base {
 		writeBMPHeader(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 2835)
 		return Promise.resolve(byteBuffer)
 	}
-
-	protected getFillImagePacketLength(): number {
-		return 1024
-	}
 }

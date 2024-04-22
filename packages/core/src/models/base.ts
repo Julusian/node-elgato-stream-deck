@@ -10,6 +10,7 @@ import {
 	StreamDeck,
 	StreamDeckEvents,
 } from '../types'
+import type { StreamdeckImageWriter } from '../imageWriter/types'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
@@ -176,6 +177,18 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 }
 
 export abstract class StreamDeckBase extends StreamDeckInputBase {
+	protected readonly imageWriter: StreamdeckImageWriter
+
+	constructor(
+		device: HIDDevice,
+		options: OpenStreamDeckOptions,
+		properties: StreamDeckProperties,
+		imageWriter: StreamdeckImageWriter
+	) {
+		super(device, options, properties)
+		this.imageWriter = imageWriter
+	}
+
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		this.checkValidKeyIndex(keyIndex, true)
 
@@ -289,47 +302,12 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 
 	protected abstract convertFillImage(imageBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer>
 
-	protected abstract getFillImageCommandHeaderLength(): number
-	protected abstract writeFillImageCommandHeader(
-		buffer: Buffer,
-		keyIndex: number,
-		partIndex: number,
-		isLast: boolean,
-		bodyLength: number
-	): void
-
-	protected abstract getFillImagePacketLength(): number
-
-	protected generateFillImageWrites(keyIndex: KeyIndex, byteBuffer: Buffer): Buffer[] {
-		const MAX_PACKET_SIZE = this.getFillImagePacketLength()
-		const PACKET_HEADER_LENGTH = this.getFillImageCommandHeaderLength()
-		const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH
-
-		const result: Buffer[] = []
-
-		let remainingBytes = byteBuffer.length
-		for (let part = 0; remainingBytes > 0; part++) {
-			const packet = Buffer.alloc(MAX_PACKET_SIZE)
-
-			const byteCount = Math.min(remainingBytes, MAX_PAYLOAD_SIZE)
-			this.writeFillImageCommandHeader(packet, keyIndex, part, remainingBytes <= MAX_PAYLOAD_SIZE, byteCount)
-
-			const byteOffset = byteBuffer.length - remainingBytes
-			remainingBytes -= byteCount
-			byteBuffer.copy(packet, PACKET_HEADER_LENGTH, byteOffset, byteOffset + byteCount)
-
-			result.push(packet)
-		}
-
-		return result
-	}
-
 	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOptions: InternalFillImageOptions) {
 		this.checkValidKeyIndex(keyIndex)
 
 		const byteBuffer = await this.convertFillImage(imageBuffer, sourceOptions)
 
-		const packets = this.generateFillImageWrites(keyIndex, byteBuffer)
+		const packets = this.imageWriter.generateFillImageWrites(keyIndex, byteBuffer)
 		await this.device.sendReports(packets)
 	}
 

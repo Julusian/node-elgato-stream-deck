@@ -7,6 +7,8 @@ import {
 	StreamDeckBase,
 	StreamDeckProperties,
 } from './base'
+import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
+import { StreamdeckGen2ImageHeaderGenerator } from '../imageWriter/headerGenerator'
 
 /**
  * Base class for generation 2 hardware (starting with the xl)
@@ -21,7 +23,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 		properties: StreamDeckProperties,
 		disableXYFlip?: boolean
 	) {
-		super(device, options, properties)
+		super(device, options, properties, new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator()))
 
 		this.encodeJPEG = options.encodeJPEG
 		this.xyFlip = !disableXYFlip
@@ -69,29 +71,6 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 	public async getSerialNumber(): Promise<string> {
 		const val = await this.device.getFeatureReport(6, 32)
 		return val.toString('ascii', 2, 14)
-	}
-
-	protected getFillImageCommandHeaderLength(): number {
-		return 8
-	}
-
-	protected writeFillImageCommandHeader(
-		buffer: Buffer,
-		keyIndex: number,
-		partIndex: number,
-		isLast: boolean,
-		bodyLength: number
-	): void {
-		buffer.writeUInt8(0x02, 0)
-		buffer.writeUInt8(0x07, 1)
-		buffer.writeUInt8(keyIndex, 2)
-		buffer.writeUInt8(isLast ? 1 : 0, 3)
-		buffer.writeUInt16LE(bodyLength, 4)
-		buffer.writeUInt16LE(partIndex++, 6)
-	}
-
-	protected getFillImagePacketLength(): number {
-		return 1024
 	}
 
 	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
