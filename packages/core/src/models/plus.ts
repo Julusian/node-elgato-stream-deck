@@ -10,6 +10,7 @@ const plusProperties: StreamDeckProperties = {
 	PRODUCT_NAME: 'Streamdeck +',
 	COLUMNS: 4,
 	ROWS: 2,
+	TOUCH_BUTTONS: 0,
 	ICON_SIZE: 120,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 3,

@@ -8,6 +8,7 @@ const pedalProperties: StreamDeckProperties = {
 	PRODUCT_NAME: 'Streamdeck Pedal',
 	COLUMNS: 3,
 	ROWS: 1,
+	TOUCH_BUTTONS: 0,
 	ICON_SIZE: 0,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 3,

@@ -9,6 +9,7 @@ const miniV2Properties: StreamDeckProperties = {
 	PRODUCT_NAME: 'Streamdeck Mini',
 	COLUMNS: 3,
 	ROWS: 2,
+	TOUCH_BUTTONS: 0,
 	ICON_SIZE: 80,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 0,

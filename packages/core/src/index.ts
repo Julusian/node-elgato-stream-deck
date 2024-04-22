@@ -9,9 +9,10 @@ import {
 	StreamDeckXL,
 	StreamDeckXLV2,
 	StreamDeckPedal,
+	StreamDeckNeo,
+	StreamDeckPlus,
 	OpenStreamDeckOptions,
 } from './models'
-import { StreamDeckPlus } from './models/plus'
 import { StreamDeck } from './types'
 
 export * from './types'
@@ -36,59 +37,63 @@ export interface DeviceModelSpec {
 }
 
 /** List of all the known models, and the classes to use them */
-export const DEVICE_MODELS: DeviceModelSpec[] = [
-	{
-		id: DeviceModelId.ORIGINAL,
+export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id'> } = {
+	[DeviceModelId.ORIGINAL]: {
 		type: DeviceModelType.STREAMDECK,
 		productId: 0x0060,
 		class: StreamDeckOriginal,
 	},
-	{
-		id: DeviceModelId.MINI,
+	[DeviceModelId.MINI]: {
 		type: DeviceModelType.STREAMDECK,
 		productId: 0x0063,
 		class: StreamDeckMini,
 	},
-	{
-		id: DeviceModelId.XL,
+	[DeviceModelId.XL]: {
 		type: DeviceModelType.STREAMDECK,
 		productId: 0x006c,
 		class: StreamDeckXL,
 	},
-	{
-		id: DeviceModelId.ORIGINALV2,
+	[DeviceModelId.ORIGINALV2]: {
 		type: DeviceModelType.STREAMDECK,
 		productId: 0x006d,
 		class: StreamDeckOriginalV2,
 	},
-	{
-		id: DeviceModelId.ORIGINALMK2,
+	[DeviceModelId.ORIGINALMK2]: {
 		type: DeviceModelType.STREAMDECK,
 		productId: 0x0080,
 		class: StreamDeckOriginalMK2,
 	},
-	{
-		id: DeviceModelId.PLUS,
+	[DeviceModelId.PLUS]: {
 		type: DeviceModelType.STREAMDECK,
 		productId: 0x0084,
 		class: StreamDeckPlus,
 	},
-	{
-		id: DeviceModelId.PEDAL,
+	[DeviceModelId.PEDAL]: {
 		type: DeviceModelType.PEDAL,
 		productId: 0x0086,
 		class: StreamDeckPedal,
 	},
-	{
-		id: DeviceModelId.XLV2,
+	[DeviceModelId.XLV2]: {
 		type: DeviceModelType.STREAMDECK,
 		productId: 0x008f,
 		class: StreamDeckXLV2,
 	},
-	{
-		id: DeviceModelId.MINIV2,
+	[DeviceModelId.MINIV2]: {
 		type: DeviceModelType.STREAMDECK,
 		productId: 0x0090,
 		class: StreamDeckMiniV2,
 	},
-]
+	[DeviceModelId.NEO]: {
+		type: DeviceModelType.STREAMDECK,
+		productId: 0x009a,
+		class: StreamDeckNeo,
+	},
+}
+
+/** @deprecated maybe? */
+export const DEVICE_MODELS: DeviceModelSpec[] = Object.entries<Omit<DeviceModelSpec, 'id'>>(DEVICE_MODELS2).map(
+	([id, spec]) => ({
+		id: id as any as DeviceModelId,
+		...spec,
+	})
+)

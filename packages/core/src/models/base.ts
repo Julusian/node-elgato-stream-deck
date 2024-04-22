@@ -23,6 +23,7 @@ export type StreamDeckProperties = Readonly<{
 	PRODUCT_NAME: string
 	COLUMNS: number
 	ROWS: number
+	TOUCH_BUTTONS: number
 	ICON_SIZE: number
 	KEY_DIRECTION: 'ltr' | 'rtl'
 	KEY_DATA_OFFSET: number
@@ -44,6 +45,9 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	}
 	get KEY_ROWS(): number {
 		return this.deviceProperties.ROWS
+	}
+	get NUM_TOUCH_KEYS(): number {
+		return this.deviceProperties.TOUCH_BUTTONS
 	}
 
 	get NUM_ENCODERS(): number {
@@ -94,7 +98,7 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 		this.deviceProperties = properties
 		this.device = device
 
-		this.keyState = new Array<boolean>(this.NUM_KEYS).fill(false)
+		this.keyState = new Array<boolean>(this.NUM_KEYS + this.NUM_TOUCH_KEYS).fill(false)
 
 		this.device.on('input', (data: Uint8Array) => this.handleInputBuffer(data))
 
@@ -104,8 +108,9 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	}
 
 	protected handleInputBuffer(data: Uint8Array): void {
+		const totalKeyCount = this.NUM_KEYS + this.NUM_TOUCH_KEYS
 		const keyData = data.subarray(this.deviceProperties.KEY_DATA_OFFSET || 0)
-		for (let i = 0; i < this.NUM_KEYS; i++) {
+		for (let i = 0; i < totalKeyCount; i++) {
 			const keyPressed = Boolean(keyData[i])
 			const keyIndex = this.transformKeyIndex(i)
 			const stateChanged = keyPressed !== this.keyState[keyIndex]
@@ -120,9 +125,10 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 		}
 	}
 
-	public checkValidKeyIndex(keyIndex: KeyIndex): void {
-		if (keyIndex < 0 || keyIndex >= this.NUM_KEYS) {
-			throw new TypeError(`Expected a valid keyIndex 0 - ${this.NUM_KEYS - 1}`)
+	public checkValidKeyIndex(keyIndex: KeyIndex, includeTouchKeys?: boolean): void {
+		const totalKeys = this.NUM_KEYS + (includeTouchKeys ? this.NUM_TOUCH_KEYS : 0)
+		if (keyIndex < 0 || keyIndex >= totalKeys) {
+			throw new TypeError(`Expected a valid keyIndex 0 - ${totalKeys - 1}`)
 		}
 	}
 
@@ -171,19 +177,23 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 
 export abstract class StreamDeckBase extends StreamDeckInputBase {
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
-		this.checkValidKeyIndex(keyIndex)
+		this.checkValidKeyIndex(keyIndex, true)
 
 		this.checkRGBValue(r)
 		this.checkRGBValue(g)
 		this.checkRGBValue(b)
 
-		const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]))
-		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		await this.fillImageRange(keyIndex2, pixels, {
-			format: 'rgb',
-			offset: 0,
-			stride: this.ICON_SIZE * 3,
-		})
+		if (keyIndex >= this.NUM_KEYS) {
+			await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, r, g, b]))
+		} else {
+			const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]))
+			const keyIndex2 = this.transformKeyIndex(keyIndex)
+			await this.fillImageRange(keyIndex2, pixels, {
+				format: 'rgb',
+				offset: 0,
+				stride: this.ICON_SIZE * 3,
+			})
+		}
 	}
 
 	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
@@ -244,15 +254,19 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 	}
 
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
-		this.checkValidKeyIndex(keyIndex)
+		this.checkValidKeyIndex(keyIndex, true)
 
-		const pixels = Buffer.alloc(this.ICON_BYTES, 0)
-		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		await this.fillImageRange(keyIndex2, pixels, {
-			format: 'rgb',
-			offset: 0,
-			stride: this.ICON_SIZE * 3,
-		})
+		if (keyIndex >= this.NUM_KEYS) {
+			await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, 0, 0, 0]))
+		} else {
+			const pixels = Buffer.alloc(this.ICON_BYTES, 0)
+			const keyIndex2 = this.transformKeyIndex(keyIndex)
+			await this.fillImageRange(keyIndex2, pixels, {
+				format: 'rgb',
+				offset: 0,
+				stride: this.ICON_SIZE * 3,
+			})
+		}
 	}
 
 	public async clearPanel(): Promise<void> {
@@ -266,6 +280,9 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 					stride: this.ICON_SIZE * 3,
 				})
 			)
+		}
+		for (let buttonIndex = 0; buttonIndex < this.NUM_TOUCH_KEYS; buttonIndex++) {
+			ps.push(this.clearKey(buttonIndex + this.NUM_KEYS))
 		}
 		await Promise.all(ps)
 	}

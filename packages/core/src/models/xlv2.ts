@@ -8,6 +8,7 @@ const xlProperties: StreamDeckProperties = {
 	PRODUCT_NAME: 'Streamdeck XL',
 	COLUMNS: 8,
 	ROWS: 4,
+	TOUCH_BUTTONS: 0,
 	ICON_SIZE: 96,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 3,

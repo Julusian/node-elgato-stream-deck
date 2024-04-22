@@ -8,6 +8,7 @@ const origV2Properties: StreamDeckProperties = {
 	PRODUCT_NAME: 'Streamdeck',
 	COLUMNS: 5,
 	ROWS: 3,
+	TOUCH_BUTTONS: 0,
 	ICON_SIZE: 72,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 3,
