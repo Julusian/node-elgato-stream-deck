@@ -1,5 +1,5 @@
 import { HIDDevice } from '../device'
-import { imageToByteArray } from '../util'
+import { transformImageBuffer } from '../util'
 import {
 	EncodeJPEGHelper,
 	InternalFillImageOptions,
@@ -74,7 +74,7 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 	}
 
 	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
-		const byteBuffer = imageToByteArray(
+		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
 			sourceOptions,
 			{ colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip },

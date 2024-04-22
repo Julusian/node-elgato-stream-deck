@@ -1,4 +1,4 @@
-import { imageToByteArray } from '../util'
+import { transformImageBuffer } from '../util'
 import { FillImageOptions, FillLcdImageOptions, LcdPosition, LcdSegmentSize } from '../types'
 import { HIDDevice } from '../device'
 import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
@@ -136,6 +136,17 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		await Promise.all([clearButtons, clearLcd])
 	}
 
+	public override async fillLcd(buffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
+		const size = this.LCD_STRIP_SIZE
+		if (!size) throw new Error(`There is no lcd to fill`)
+
+		return this.fillLcdRegion(0, 0, buffer, {
+			format: sourceOptions.format,
+			width: size.width,
+			height: size.height,
+		})
+	}
+
 	public override async fillEncoderLcd(
 		index: EncoderIndex,
 		buffer: Buffer,
@@ -187,7 +198,7 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 			stride: sourceOptions.width * sourceOptions.format.length,
 		}
 
-		const byteBuffer = imageToByteArray(
+		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
 			sourceOptions2,
 			{ colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip },

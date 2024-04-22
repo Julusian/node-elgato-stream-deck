@@ -1,5 +1,5 @@
 import { HIDDevice } from '../device'
-import { BMP_HEADER_LENGTH, imageToByteArray, writeBMPHeader } from '../util'
+import { BMP_HEADER_LENGTH, transformImageBuffer, writeBMPHeader } from '../util'
 import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
 import { StreamDeckGen1Base } from './base-gen1'
 import { DeviceModelId, KeyIndex } from '../id'
@@ -40,7 +40,7 @@ export class StreamDeckOriginal extends StreamDeckGen1Base {
 	}
 
 	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
-		const byteBuffer = imageToByteArray(
+		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
 			sourceOptions,
 			{ colorMode: 'bgr', xFlip: true },

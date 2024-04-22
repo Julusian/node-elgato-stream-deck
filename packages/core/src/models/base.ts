@@ -156,6 +156,9 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	public abstract fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void>
 	public abstract fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
 
+	public async fillLcd(_imageBuffer: Buffer, _sourceOptions: FillImageOptions): Promise<void> {
+		throw new Error('Not supported for this model')
+	}
 	public async fillEncoderLcd(
 		_index: EncoderIndex,
 		_buffer: Buffer,

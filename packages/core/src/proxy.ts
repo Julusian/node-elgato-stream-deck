@@ -103,6 +103,10 @@ export class StreamDeckProxy implements StreamDeck {
 		return this.device.getSerialNumber()
 	}
 
+	public async fillLcd(imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
+		return this.device.fillLcd(imageBuffer, sourceOptions)
+	}
+
 	public async fillEncoderLcd(
 		index: EncoderIndex,
 		imageBuffer: Buffer,

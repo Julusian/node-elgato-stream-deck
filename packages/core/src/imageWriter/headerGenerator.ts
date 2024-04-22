@@ -73,3 +73,24 @@ export class StreamdeckPlusLcdImageHeaderGenerator
 		buffer.writeUInt16LE(bodyLength, 13)
 	}
 }
+
+export class StreamdeckNeoLcdImageHeaderGenerator implements StreamdeckImageHeaderGenerator<null> {
+	getFillImageCommandHeaderLength(): number {
+		return 8
+	}
+
+	writeFillImageCommandHeader(
+		buffer: Buffer,
+		_props: never,
+		partIndex: number,
+		isLast: boolean,
+		bodyLength: number
+	): void {
+		buffer.writeUInt8(0x02, 0)
+		buffer.writeUInt8(0x0b, 1)
+		buffer.writeUInt8(0, 2)
+		buffer.writeUInt8(isLast ? 1 : 0, 3)
+		buffer.writeUInt16LE(bodyLength, 4)
+		buffer.writeUInt16LE(partIndex++, 6)
+	}
+}

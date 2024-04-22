@@ -7,7 +7,7 @@ export interface FillImageTargetOptions {
 	rotate?: boolean
 }
 
-export function imageToByteArray(
+export function transformImageBuffer(
 	imageBuffer: Buffer,
 	sourceOptions: InternalFillImageOptions,
 	targetOptions: FillImageTargetOptions,

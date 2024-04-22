@@ -1,4 +1,4 @@
-import { imageToByteArray } from '../util'
+import { transformImageBuffer } from '../util'
 
 function getSimpleBuffer(dim: number, components: 3 | 4): Buffer {
 	const buf = Buffer.alloc(dim * dim * components)
@@ -10,7 +10,7 @@ function getSimpleBuffer(dim: number, components: 3 | 4): Buffer {
 describe('imageToByteArray', () => {
 	test('basic rgb -> rgba', () => {
 		const srcBuffer = getSimpleBuffer(2, 3)
-		const res = imageToByteArray(
+		const res = transformImageBuffer(
 			srcBuffer,
 			{ format: 'rgb', offset: 0, stride: 2 * 3 },
 			{ colorMode: 'rgba' },
@@ -21,12 +21,18 @@ describe('imageToByteArray', () => {
 	})
 	test('basic rgb -> bgr', () => {
 		const srcBuffer = getSimpleBuffer(2, 3)
-		const res = imageToByteArray(srcBuffer, { format: 'rgb', offset: 0, stride: 2 * 3 }, { colorMode: 'bgr' }, 4, 2)
+		const res = transformImageBuffer(
+			srcBuffer,
+			{ format: 'rgb', offset: 0, stride: 2 * 3 },
+			{ colorMode: 'bgr' },
+			4,
+			2
+		)
 		expect(res).toMatchSnapshot()
 	})
 	test('basic bgra -> bgr', () => {
 		const srcBuffer = getSimpleBuffer(2, 4)
-		const res = imageToByteArray(
+		const res = transformImageBuffer(
 			srcBuffer,
 			{ format: 'bgra', offset: 0, stride: 2 * 4 },
 			{ colorMode: 'bgr' },
@@ -37,7 +43,7 @@ describe('imageToByteArray', () => {
 	})
 	test('basic bgra -> rgba', () => {
 		const srcBuffer = getSimpleBuffer(2, 4)
-		const res = imageToByteArray(
+		const res = transformImageBuffer(
 			srcBuffer,
 			{ format: 'bgra', offset: 0, stride: 2 * 4 },
 			{ colorMode: 'rgba' },
@@ -49,7 +55,7 @@ describe('imageToByteArray', () => {
 
 	test('basic vflip', () => {
 		const srcBuffer = getSimpleBuffer(3, 3)
-		const res = imageToByteArray(
+		const res = transformImageBuffer(
 			srcBuffer,
 			{ format: 'bgr', offset: 0, stride: 3 * 3 },
 			{ colorMode: 'bgr', yFlip: true },
@@ -61,7 +67,7 @@ describe('imageToByteArray', () => {
 
 	test('basic xflip', () => {
 		const srcBuffer = getSimpleBuffer(3, 3)
-		const res = imageToByteArray(
+		const res = transformImageBuffer(
 			srcBuffer,
 			{ format: 'bgr', offset: 0, stride: 3 * 3 },
 			{ colorMode: 'bgr', xFlip: true },
