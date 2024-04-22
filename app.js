@@ -5199,12 +5199,13 @@ class StreamDeckGen2Base extends base_1.StreamDeckBase {
     }
     async getFirmwareVersion() {
         const val = await this.device.getFeatureReport(5, 32);
-        const end = val.indexOf(0, 6);
-        return val.toString('ascii', 6, end === -1 ? undefined : end);
+        const end = val.readUint8(1) + 2;
+        return val.toString('ascii', 6, end);
     }
     async getSerialNumber() {
         const val = await this.device.getFeatureReport(6, 32);
-        return val.toString('ascii', 2, 14);
+        const end = val.readUint8(1) + 2;
+        return val.toString('ascii', 2, end);
     }
     async convertFillImage(sourceBuffer, sourceOptions) {
         const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions, { colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip }, 0, this.ICON_SIZE);
@@ -5420,6 +5421,13 @@ class StreamDeckBase extends StreamDeckInputBase {
         }
         for (let buttonIndex = 0; buttonIndex < this.NUM_TOUCH_KEYS; buttonIndex++) {
             ps.push(this.clearKey(buttonIndex + this.NUM_KEYS));
+        }
+        const lcdSize = this.LCD_STRIP_SIZE;
+        if (lcdSize) {
+            const buffer = Buffer.alloc(lcdSize.width * lcdSize.height * 4);
+            ps.push(this.fillLcd(buffer, {
+                format: 'rgba',
+            }));
         }
         await Promise.all(ps);
     }
@@ -5938,17 +5946,6 @@ class StreamDeckPlus extends base_gen2_1.StreamDeckGen2Base {
                 }
                 break;
         }
-    }
-    async clearPanel() {
-        const clearButtons = super.clearPanel();
-        const lcdSize = this.LCD_STRIP_SIZE;
-        const buffer = Buffer.alloc(lcdSize.width * lcdSize.height * 4);
-        const clearLcd = this.fillLcdRegion(0, 0, buffer, {
-            format: 'rgba',
-            width: lcdSize.width,
-            height: lcdSize.height,
-        });
-        await Promise.all([clearButtons, clearLcd]);
     }
     async fillLcd(buffer, sourceOptions) {
         const size = this.LCD_STRIP_SIZE;
