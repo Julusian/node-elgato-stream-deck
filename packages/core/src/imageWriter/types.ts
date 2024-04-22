@@ -1,14 +1,18 @@
 import type { KeyIndex } from '../id'
 
-export interface StreamdeckImageWriter {
-	generateFillImageWrites(keyIndex: KeyIndex, byteBuffer: Buffer): Buffer[]
+export interface StreamdeckImageWriterProps {
+	keyIndex: KeyIndex
 }
 
-export interface StreamdeckImageHeaderGenerator {
+export interface StreamdeckImageWriter<TProps = StreamdeckImageWriterProps> {
+	generateFillImageWrites(props: TProps, byteBuffer: Buffer): Buffer[]
+}
+
+export interface StreamdeckImageHeaderGenerator<TProps = StreamdeckImageWriterProps> {
 	getFillImageCommandHeaderLength(): number
 	writeFillImageCommandHeader(
 		buffer: Buffer,
-		keyIndex: number,
+		props: TProps,
 		partIndex: number,
 		isLast: boolean,
 		bodyLength: number

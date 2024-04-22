@@ -4,6 +4,8 @@ import { HIDDevice } from '../device'
 import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
 import { StreamDeckGen2Base } from './base-gen2'
 import { DeviceModelId, EncoderIndex } from '../id'
+import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
+import { StreamdeckPlusLcdImageHeaderGenerator } from '../imageWriter/headerGenerator'
 
 const plusProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.PLUS,
@@ -20,6 +22,7 @@ const plusProperties: StreamDeckProperties = {
 }
 
 export class StreamDeckPlus extends StreamDeckGen2Base {
+	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter(new StreamdeckPlusLcdImageHeaderGenerator())
 	readonly #encoderState: boolean[]
 
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
@@ -173,7 +176,7 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		// A lot of this drawing code is heavily based on the normal button
 		const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions)
 
-		const packets = this.generateFillLcdWrites(x, y, byteBuffer, sourceOptions)
+		const packets = this.#lcdImageWriter.generateFillImageWrites({ ...sourceOptions, x, y }, byteBuffer)
 		await this.device.sendReports(packets)
 	}
 
@@ -194,42 +197,5 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		)
 
 		return this.encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height)
-	}
-
-	private generateFillLcdWrites(
-		x: number,
-		y: number,
-		byteBuffer: Buffer,
-		sourceOptions: FillLcdImageOptions
-	): Buffer[] {
-		const MAX_PACKET_SIZE = 1024 // this.getFillImagePacketLength()
-		const PACKET_HEADER_LENGTH = 16
-		const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH
-
-		const result: Buffer[] = []
-
-		let remainingBytes = byteBuffer.length
-		for (let part = 0; remainingBytes > 0; part++) {
-			const packet = Buffer.alloc(MAX_PACKET_SIZE)
-
-			const byteCount = Math.min(remainingBytes, MAX_PAYLOAD_SIZE)
-			packet.writeUInt8(0x02, 0)
-			packet.writeUInt8(0x0c, 1)
-			packet.writeUInt16LE(x, 2)
-			packet.writeUInt16LE(y, 4)
-			packet.writeUInt16LE(sourceOptions.width, 6)
-			packet.writeUInt16LE(sourceOptions.height, 8)
-			packet.writeUInt8(remainingBytes <= MAX_PAYLOAD_SIZE ? 1 : 0, 10) // Is last
-			packet.writeUInt16LE(part, 11)
-			packet.writeUInt16LE(byteCount, 13)
-
-			const byteOffset = byteBuffer.length - remainingBytes
-			remainingBytes -= byteCount
-			byteBuffer.copy(packet, PACKET_HEADER_LENGTH, byteOffset, byteOffset + byteCount)
-
-			result.push(packet)
-		}
-
-		return result
 	}
 }

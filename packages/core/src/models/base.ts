@@ -307,7 +307,7 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 
 		const byteBuffer = await this.convertFillImage(imageBuffer, sourceOptions)
 
-		const packets = this.imageWriter.generateFillImageWrites(keyIndex, byteBuffer)
+		const packets = this.imageWriter.generateFillImageWrites({ keyIndex }, byteBuffer)
 		await this.device.sendReports(packets)
 	}
 
