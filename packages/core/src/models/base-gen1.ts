@@ -60,4 +60,23 @@ export abstract class StreamDeckGen1Base extends StreamDeckBase {
 		}
 		return val.toString('ascii', 5, 17)
 	}
+
+	protected getFillImageCommandHeaderLength(): number {
+		return 16
+	}
+
+	protected writeFillImageCommandHeader(
+		buffer: Buffer,
+		keyIndex: number,
+		partIndex: number,
+		isLast: boolean,
+		_bodyLength: number
+	): void {
+		buffer.writeUInt8(0x02, 0)
+		buffer.writeUInt8(0x01, 1)
+		buffer.writeUInt16LE(partIndex, 2)
+		// 3 = 0x00
+		buffer.writeUInt8(isLast ? 1 : 0, 4)
+		buffer.writeUInt8(keyIndex + 1, 5)
+	}
 }
