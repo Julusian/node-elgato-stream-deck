@@ -64,13 +64,14 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 
 	public async getFirmwareVersion(): Promise<string> {
 		const val = await this.device.getFeatureReport(5, 32)
-		const end = val.indexOf(0, 6)
-		return val.toString('ascii', 6, end === -1 ? undefined : end)
+		const end = val.readUint8(1) + 2
+		return val.toString('ascii', 6, end)
 	}
 
 	public async getSerialNumber(): Promise<string> {
 		const val = await this.device.getFeatureReport(6, 32)
-		return val.toString('ascii', 2, 14)
+		const end = val.readUint8(1) + 2
+		return val.toString('ascii', 2, end)
 	}
 
 	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
