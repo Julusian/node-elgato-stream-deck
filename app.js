@@ -4846,8 +4846,134 @@ var DeviceModelId;
     DeviceModelId["XLV2"] = "xlv2";
     DeviceModelId["PEDAL"] = "pedal";
     DeviceModelId["PLUS"] = "plus";
+    DeviceModelId["NEO"] = "neo";
 })(DeviceModelId || (exports.DeviceModelId = DeviceModelId = {}));
 //# sourceMappingURL=id.js.map
+
+/***/ }),
+
+/***/ 598:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamdeckNeoLcdImageHeaderGenerator = exports.StreamdeckPlusLcdImageHeaderGenerator = exports.StreamdeckGen2ImageHeaderGenerator = exports.StreamdeckGen1ImageHeaderGenerator = void 0;
+class StreamdeckGen1ImageHeaderGenerator {
+    getFillImageCommandHeaderLength() {
+        return 16;
+    }
+    writeFillImageCommandHeader(buffer, props, partIndex, isLast, _bodyLength) {
+        buffer.writeUInt8(0x02, 0);
+        buffer.writeUInt8(0x01, 1);
+        buffer.writeUInt16LE(partIndex, 2);
+        // 3 = 0x00
+        buffer.writeUInt8(isLast ? 1 : 0, 4);
+        buffer.writeUInt8(props.keyIndex + 1, 5);
+    }
+}
+exports.StreamdeckGen1ImageHeaderGenerator = StreamdeckGen1ImageHeaderGenerator;
+class StreamdeckGen2ImageHeaderGenerator {
+    getFillImageCommandHeaderLength() {
+        return 8;
+    }
+    writeFillImageCommandHeader(buffer, props, partIndex, isLast, bodyLength) {
+        buffer.writeUInt8(0x02, 0);
+        buffer.writeUInt8(0x07, 1);
+        buffer.writeUInt8(props.keyIndex, 2);
+        buffer.writeUInt8(isLast ? 1 : 0, 3);
+        buffer.writeUInt16LE(bodyLength, 4);
+        buffer.writeUInt16LE(partIndex++, 6);
+    }
+}
+exports.StreamdeckGen2ImageHeaderGenerator = StreamdeckGen2ImageHeaderGenerator;
+class StreamdeckPlusLcdImageHeaderGenerator {
+    getFillImageCommandHeaderLength() {
+        return 16;
+    }
+    writeFillImageCommandHeader(buffer, props, partIndex, isLast, bodyLength) {
+        buffer.writeUInt8(0x02, 0);
+        buffer.writeUInt8(0x0c, 1);
+        buffer.writeUInt16LE(props.x, 2);
+        buffer.writeUInt16LE(props.y, 4);
+        buffer.writeUInt16LE(props.width, 6);
+        buffer.writeUInt16LE(props.height, 8);
+        buffer.writeUInt8(isLast ? 1 : 0, 10); // Is last
+        buffer.writeUInt16LE(partIndex, 11);
+        buffer.writeUInt16LE(bodyLength, 13);
+    }
+}
+exports.StreamdeckPlusLcdImageHeaderGenerator = StreamdeckPlusLcdImageHeaderGenerator;
+class StreamdeckNeoLcdImageHeaderGenerator {
+    getFillImageCommandHeaderLength() {
+        return 8;
+    }
+    writeFillImageCommandHeader(buffer, _props, partIndex, isLast, bodyLength) {
+        buffer.writeUInt8(0x02, 0);
+        buffer.writeUInt8(0x0b, 1);
+        buffer.writeUInt8(0, 2);
+        buffer.writeUInt8(isLast ? 1 : 0, 3);
+        buffer.writeUInt16LE(bodyLength, 4);
+        buffer.writeUInt16LE(partIndex++, 6);
+    }
+}
+exports.StreamdeckNeoLcdImageHeaderGenerator = StreamdeckNeoLcdImageHeaderGenerator;
+//# sourceMappingURL=headerGenerator.js.map
+
+/***/ }),
+
+/***/ 222:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamdeckDefaultImageWriter = exports.StreamdeckOriginalImageWriter = void 0;
+const headerGenerator_1 = __webpack_require__(598);
+class StreamdeckOriginalImageWriter {
+    constructor() {
+        this.headerGenerator = new headerGenerator_1.StreamdeckGen1ImageHeaderGenerator();
+    }
+    generateFillImageWrites(props, byteBuffer) {
+        const MAX_PACKET_SIZE = 8191;
+        const PACKET_HEADER_LENGTH = this.headerGenerator.getFillImageCommandHeaderLength();
+        // The original uses larger packets, and splits the payload equally across 2
+        const packet1Bytes = byteBuffer.length / 2;
+        const packet1 = Buffer.alloc(MAX_PACKET_SIZE);
+        this.headerGenerator.writeFillImageCommandHeader(packet1, props, 0x01, false, packet1Bytes);
+        byteBuffer.copy(packet1, PACKET_HEADER_LENGTH, 0, packet1Bytes);
+        const packet2 = Buffer.alloc(MAX_PACKET_SIZE);
+        this.headerGenerator.writeFillImageCommandHeader(packet2, props, 0x02, true, packet1Bytes);
+        byteBuffer.copy(packet2, PACKET_HEADER_LENGTH, packet1Bytes);
+        return [packet1, packet2];
+    }
+}
+exports.StreamdeckOriginalImageWriter = StreamdeckOriginalImageWriter;
+class StreamdeckDefaultImageWriter {
+    constructor(headerGenerator) {
+        this.headerGenerator = headerGenerator;
+    }
+    generateFillImageWrites(props, byteBuffer) {
+        const MAX_PACKET_SIZE = 1024;
+        const PACKET_HEADER_LENGTH = this.headerGenerator.getFillImageCommandHeaderLength();
+        const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH;
+        const result = [];
+        let remainingBytes = byteBuffer.length;
+        for (let part = 0; remainingBytes > 0; part++) {
+            const packet = Buffer.alloc(MAX_PACKET_SIZE);
+            const byteCount = Math.min(remainingBytes, MAX_PAYLOAD_SIZE);
+            this.headerGenerator.writeFillImageCommandHeader(packet, props, part, remainingBytes <= MAX_PAYLOAD_SIZE, byteCount);
+            const byteOffset = byteBuffer.length - remainingBytes;
+            remainingBytes -= byteCount;
+            byteBuffer.copy(packet, PACKET_HEADER_LENGTH, byteOffset, byteOffset + byteCount);
+            result.push(packet);
+        }
+        return result;
+    }
+}
+exports.StreamdeckDefaultImageWriter = StreamdeckDefaultImageWriter;
+//# sourceMappingURL=imageWriter.js.map
 
 /***/ }),
 
@@ -4871,10 +4997,9 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DEVICE_MODELS = exports.DeviceModelType = exports.VENDOR_ID = exports.StreamDeckProxy = void 0;
+exports.DEVICE_MODELS = exports.DEVICE_MODELS2 = exports.DeviceModelType = exports.VENDOR_ID = exports.StreamDeckProxy = void 0;
 const id_1 = __webpack_require__(444);
 const models_1 = __webpack_require__(612);
-const plus_1 = __webpack_require__(562);
 __exportStar(__webpack_require__(64), exports);
 __exportStar(__webpack_require__(444), exports);
 var proxy_1 = __webpack_require__(481);
@@ -4887,62 +5012,63 @@ var DeviceModelType;
     DeviceModelType["PEDAL"] = "pedal";
 })(DeviceModelType || (exports.DeviceModelType = DeviceModelType = {}));
 /** List of all the known models, and the classes to use them */
-exports.DEVICE_MODELS = [
-    {
-        id: id_1.DeviceModelId.ORIGINAL,
+exports.DEVICE_MODELS2 = {
+    [id_1.DeviceModelId.ORIGINAL]: {
         type: DeviceModelType.STREAMDECK,
         productId: 0x0060,
         class: models_1.StreamDeckOriginal,
     },
-    {
-        id: id_1.DeviceModelId.MINI,
+    [id_1.DeviceModelId.MINI]: {
         type: DeviceModelType.STREAMDECK,
         productId: 0x0063,
         class: models_1.StreamDeckMini,
     },
-    {
-        id: id_1.DeviceModelId.XL,
+    [id_1.DeviceModelId.XL]: {
         type: DeviceModelType.STREAMDECK,
         productId: 0x006c,
         class: models_1.StreamDeckXL,
     },
-    {
-        id: id_1.DeviceModelId.ORIGINALV2,
+    [id_1.DeviceModelId.ORIGINALV2]: {
         type: DeviceModelType.STREAMDECK,
         productId: 0x006d,
         class: models_1.StreamDeckOriginalV2,
     },
-    {
-        id: id_1.DeviceModelId.ORIGINALMK2,
+    [id_1.DeviceModelId.ORIGINALMK2]: {
         type: DeviceModelType.STREAMDECK,
         productId: 0x0080,
         class: models_1.StreamDeckOriginalMK2,
     },
-    {
-        id: id_1.DeviceModelId.PLUS,
+    [id_1.DeviceModelId.PLUS]: {
         type: DeviceModelType.STREAMDECK,
         productId: 0x0084,
-        class: plus_1.StreamDeckPlus,
+        class: models_1.StreamDeckPlus,
     },
-    {
-        id: id_1.DeviceModelId.PEDAL,
+    [id_1.DeviceModelId.PEDAL]: {
         type: DeviceModelType.PEDAL,
         productId: 0x0086,
         class: models_1.StreamDeckPedal,
     },
-    {
-        id: id_1.DeviceModelId.XLV2,
+    [id_1.DeviceModelId.XLV2]: {
         type: DeviceModelType.STREAMDECK,
         productId: 0x008f,
         class: models_1.StreamDeckXLV2,
     },
-    {
-        id: id_1.DeviceModelId.MINIV2,
+    [id_1.DeviceModelId.MINIV2]: {
         type: DeviceModelType.STREAMDECK,
         productId: 0x0090,
         class: models_1.StreamDeckMiniV2,
     },
-];
+    [id_1.DeviceModelId.NEO]: {
+        type: DeviceModelType.STREAMDECK,
+        productId: 0x009a,
+        class: models_1.StreamDeckNeo,
+    },
+};
+/** @deprecated maybe? */
+exports.DEVICE_MODELS = Object.entries(exports.DEVICE_MODELS2).map(([id, spec]) => ({
+    id: id,
+    ...spec,
+}));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -4956,12 +5082,14 @@ exports.DEVICE_MODELS = [
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckGen1Base = void 0;
 const base_1 = __webpack_require__(67);
+const imageWriter_1 = __webpack_require__(222);
+const headerGenerator_1 = __webpack_require__(598);
 /**
  * Base class for generation 1 hardware (before the xl)
  */
 class StreamDeckGen1Base extends base_1.StreamDeckBase {
-    constructor(device, options, properties) {
-        super(device, options, properties);
+    constructor(device, options, properties, imageWriter) {
+        super(device, options, properties, imageWriter ?? new imageWriter_1.StreamdeckDefaultImageWriter(new headerGenerator_1.StreamdeckGen1ImageHeaderGenerator()));
     }
     /**
      * Sets the brightness of the keys on the Stream Deck
@@ -5028,12 +5156,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckGen2Base = void 0;
 const util_1 = __webpack_require__(369);
 const base_1 = __webpack_require__(67);
+const imageWriter_1 = __webpack_require__(222);
+const headerGenerator_1 = __webpack_require__(598);
 /**
  * Base class for generation 2 hardware (starting with the xl)
  */
 class StreamDeckGen2Base extends base_1.StreamDeckBase {
     constructor(device, options, properties, disableXYFlip) {
-        super(device, options, properties);
+        super(device, options, properties, new imageWriter_1.StreamdeckDefaultImageWriter(new headerGenerator_1.StreamdeckGen2ImageHeaderGenerator()));
         this.encodeJPEG = options.encodeJPEG;
         this.xyFlip = !disableXYFlip;
     }
@@ -5076,22 +5206,8 @@ class StreamDeckGen2Base extends base_1.StreamDeckBase {
         const val = await this.device.getFeatureReport(6, 32);
         return val.toString('ascii', 2, 14);
     }
-    getFillImageCommandHeaderLength() {
-        return 8;
-    }
-    writeFillImageCommandHeader(buffer, keyIndex, partIndex, isLast, bodyLength) {
-        buffer.writeUInt8(0x02, 0);
-        buffer.writeUInt8(0x07, 1);
-        buffer.writeUInt8(keyIndex, 2);
-        buffer.writeUInt8(isLast ? 1 : 0, 3);
-        buffer.writeUInt16LE(bodyLength, 4);
-        buffer.writeUInt16LE(partIndex++, 6);
-    }
-    getFillImagePacketLength() {
-        return 1024;
-    }
     async convertFillImage(sourceBuffer, sourceOptions) {
-        const byteBuffer = (0, util_1.imageToByteArray)(sourceBuffer, sourceOptions, { colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip }, 0, this.ICON_SIZE);
+        const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions, { colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip }, 0, this.ICON_SIZE);
         return this.encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE);
     }
 }
@@ -5118,6 +5234,9 @@ class StreamDeckInputBase extends EventEmitter {
     }
     get KEY_ROWS() {
         return this.deviceProperties.ROWS;
+    }
+    get NUM_TOUCH_KEYS() {
+        return this.deviceProperties.TOUCH_BUTTONS;
     }
     get NUM_ENCODERS() {
         // Overridden by models which support this
@@ -5156,15 +5275,16 @@ class StreamDeckInputBase extends EventEmitter {
         super();
         this.deviceProperties = properties;
         this.device = device;
-        this.keyState = new Array(this.NUM_KEYS).fill(false);
+        this.keyState = new Array(this.NUM_KEYS + this.NUM_TOUCH_KEYS).fill(false);
         this.device.on('input', (data) => this.handleInputBuffer(data));
         this.device.on('error', (err) => {
             this.emit('error', err);
         });
     }
     handleInputBuffer(data) {
+        const totalKeyCount = this.NUM_KEYS + this.NUM_TOUCH_KEYS;
         const keyData = data.subarray(this.deviceProperties.KEY_DATA_OFFSET || 0);
-        for (let i = 0; i < this.NUM_KEYS; i++) {
+        for (let i = 0; i < totalKeyCount; i++) {
             const keyPressed = Boolean(keyData[i]);
             const keyIndex = this.transformKeyIndex(i);
             const stateChanged = keyPressed !== this.keyState[keyIndex];
@@ -5179,9 +5299,10 @@ class StreamDeckInputBase extends EventEmitter {
             }
         }
     }
-    checkValidKeyIndex(keyIndex) {
-        if (keyIndex < 0 || keyIndex >= this.NUM_KEYS) {
-            throw new TypeError(`Expected a valid keyIndex 0 - ${this.NUM_KEYS - 1}`);
+    checkValidKeyIndex(keyIndex, includeTouchKeys) {
+        const totalKeys = this.NUM_KEYS + (includeTouchKeys ? this.NUM_TOUCH_KEYS : 0);
+        if (keyIndex < 0 || keyIndex >= totalKeys) {
+            throw new TypeError(`Expected a valid keyIndex 0 - ${totalKeys - 1}`);
         }
     }
     async close() {
@@ -5193,6 +5314,9 @@ class StreamDeckInputBase extends EventEmitter {
     transformKeyIndex(keyIndex) {
         return keyIndex;
     }
+    async fillLcd(_imageBuffer, _sourceOptions) {
+        throw new Error('Not supported for this model');
+    }
     async fillEncoderLcd(_index, _buffer, _sourceOptions) {
         throw new Error('Not supported for this model');
     }
@@ -5202,18 +5326,27 @@ class StreamDeckInputBase extends EventEmitter {
 }
 exports.StreamDeckInputBase = StreamDeckInputBase;
 class StreamDeckBase extends StreamDeckInputBase {
+    constructor(device, options, properties, imageWriter) {
+        super(device, options, properties);
+        this.imageWriter = imageWriter;
+    }
     async fillKeyColor(keyIndex, r, g, b) {
-        this.checkValidKeyIndex(keyIndex);
+        this.checkValidKeyIndex(keyIndex, true);
         this.checkRGBValue(r);
         this.checkRGBValue(g);
         this.checkRGBValue(b);
-        const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]));
-        const keyIndex2 = this.transformKeyIndex(keyIndex);
-        await this.fillImageRange(keyIndex2, pixels, {
-            format: 'rgb',
-            offset: 0,
-            stride: this.ICON_SIZE * 3,
-        });
+        if (keyIndex >= this.NUM_KEYS) {
+            await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, r, g, b]));
+        }
+        else {
+            const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]));
+            const keyIndex2 = this.transformKeyIndex(keyIndex);
+            await this.fillImageRange(keyIndex2, pixels, {
+                format: 'rgb',
+                offset: 0,
+                stride: this.ICON_SIZE * 3,
+            });
+        }
     }
     async fillKeyBuffer(keyIndex, imageBuffer, options) {
         this.checkValidKeyIndex(keyIndex);
@@ -5261,14 +5394,19 @@ class StreamDeckBase extends StreamDeckInputBase {
         await Promise.all(ps);
     }
     async clearKey(keyIndex) {
-        this.checkValidKeyIndex(keyIndex);
-        const pixels = Buffer.alloc(this.ICON_BYTES, 0);
-        const keyIndex2 = this.transformKeyIndex(keyIndex);
-        await this.fillImageRange(keyIndex2, pixels, {
-            format: 'rgb',
-            offset: 0,
-            stride: this.ICON_SIZE * 3,
-        });
+        this.checkValidKeyIndex(keyIndex, true);
+        if (keyIndex >= this.NUM_KEYS) {
+            await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, 0, 0, 0]));
+        }
+        else {
+            const pixels = Buffer.alloc(this.ICON_BYTES, 0);
+            const keyIndex2 = this.transformKeyIndex(keyIndex);
+            await this.fillImageRange(keyIndex2, pixels, {
+                format: 'rgb',
+                offset: 0,
+                stride: this.ICON_SIZE * 3,
+            });
+        }
     }
     async clearPanel() {
         const pixels = Buffer.alloc(this.ICON_BYTES, 0);
@@ -5280,40 +5418,15 @@ class StreamDeckBase extends StreamDeckInputBase {
                 stride: this.ICON_SIZE * 3,
             }));
         }
-        await Promise.all(ps);
-    }
-    getFillImageCommandHeaderLength() {
-        return 16;
-    }
-    writeFillImageCommandHeader(buffer, keyIndex, partIndex, isLast, _bodyLength) {
-        buffer.writeUInt8(0x02, 0);
-        buffer.writeUInt8(0x01, 1);
-        buffer.writeUInt16LE(partIndex, 2);
-        // 3 = 0x00
-        buffer.writeUInt8(isLast ? 1 : 0, 4);
-        buffer.writeUInt8(keyIndex + 1, 5);
-    }
-    generateFillImageWrites(keyIndex, byteBuffer) {
-        const MAX_PACKET_SIZE = this.getFillImagePacketLength();
-        const PACKET_HEADER_LENGTH = this.getFillImageCommandHeaderLength();
-        const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH;
-        const result = [];
-        let remainingBytes = byteBuffer.length;
-        for (let part = 0; remainingBytes > 0; part++) {
-            const packet = Buffer.alloc(MAX_PACKET_SIZE);
-            const byteCount = Math.min(remainingBytes, MAX_PAYLOAD_SIZE);
-            this.writeFillImageCommandHeader(packet, keyIndex, part, remainingBytes <= MAX_PAYLOAD_SIZE, byteCount);
-            const byteOffset = byteBuffer.length - remainingBytes;
-            remainingBytes -= byteCount;
-            byteBuffer.copy(packet, PACKET_HEADER_LENGTH, byteOffset, byteOffset + byteCount);
-            result.push(packet);
+        for (let buttonIndex = 0; buttonIndex < this.NUM_TOUCH_KEYS; buttonIndex++) {
+            ps.push(this.clearKey(buttonIndex + this.NUM_KEYS));
         }
-        return result;
+        await Promise.all(ps);
     }
     async fillImageRange(keyIndex, imageBuffer, sourceOptions) {
         this.checkValidKeyIndex(keyIndex);
         const byteBuffer = await this.convertFillImage(imageBuffer, sourceOptions);
-        const packets = this.generateFillImageWrites(keyIndex, byteBuffer);
+        const packets = this.imageWriter.generateFillImageWrites({ keyIndex }, byteBuffer);
         await this.device.sendReports(packets);
     }
     checkRGBValue(value) {
@@ -5346,7 +5459,7 @@ exports.StreamDeckBase = StreamDeckBase;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckPlus = exports.StreamDeckPedal = exports.StreamDeckOriginalMK2 = exports.StreamDeckOriginalV2 = exports.StreamDeckXLV2 = exports.StreamDeckXL = exports.StreamDeckMiniV2 = exports.StreamDeckMini = exports.StreamDeckOriginal = void 0;
+exports.StreamDeckNeo = exports.StreamDeckPlus = exports.StreamDeckPedal = exports.StreamDeckOriginalMK2 = exports.StreamDeckOriginalV2 = exports.StreamDeckXLV2 = exports.StreamDeckXL = exports.StreamDeckMiniV2 = exports.StreamDeckMini = exports.StreamDeckOriginal = void 0;
 var original_1 = __webpack_require__(745);
 Object.defineProperty(exports, "StreamDeckOriginal", ({ enumerable: true, get: function () { return original_1.StreamDeckOriginal; } }));
 var mini_1 = __webpack_require__(321);
@@ -5365,6 +5478,8 @@ var pedal_1 = __webpack_require__(756);
 Object.defineProperty(exports, "StreamDeckPedal", ({ enumerable: true, get: function () { return pedal_1.StreamDeckPedal; } }));
 var plus_1 = __webpack_require__(562);
 Object.defineProperty(exports, "StreamDeckPlus", ({ enumerable: true, get: function () { return plus_1.StreamDeckPlus; } }));
+var neo_1 = __webpack_require__(350);
+Object.defineProperty(exports, "StreamDeckNeo", ({ enumerable: true, get: function () { return neo_1.StreamDeckNeo; } }));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -5384,6 +5499,7 @@ const miniProperties = {
     PRODUCT_NAME: 'Streamdeck Mini',
     COLUMNS: 3,
     ROWS: 2,
+    TOUCH_BUTTONS: 0,
     ICON_SIZE: 80,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 0,
@@ -5395,7 +5511,7 @@ class StreamDeckMini extends base_gen1_1.StreamDeckGen1Base {
         super(device, options, miniProperties);
     }
     async convertFillImage(sourceBuffer, sourceOptions) {
-        const byteBuffer = (0, util_1.imageToByteArray)(sourceBuffer, sourceOptions, { colorMode: 'bgr', rotate: true, yFlip: true }, util_1.BMP_HEADER_LENGTH, this.ICON_SIZE);
+        const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions, { colorMode: 'bgr', rotate: true, yFlip: true }, util_1.BMP_HEADER_LENGTH, this.ICON_SIZE);
         (0, util_1.writeBMPHeader)(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 2835);
         return Promise.resolve(byteBuffer);
     }
@@ -5423,6 +5539,7 @@ const miniV2Properties = {
     PRODUCT_NAME: 'Streamdeck Mini',
     COLUMNS: 3,
     ROWS: 2,
+    TOUCH_BUTTONS: 0,
     ICON_SIZE: 80,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 0,
@@ -5434,16 +5551,83 @@ class StreamDeckMiniV2 extends base_gen1_1.StreamDeckGen1Base {
         super(device, options, miniV2Properties);
     }
     async convertFillImage(sourceBuffer, sourceOptions) {
-        const byteBuffer = (0, util_1.imageToByteArray)(sourceBuffer, sourceOptions, { colorMode: 'bgr', rotate: true, yFlip: true }, util_1.BMP_HEADER_LENGTH, this.ICON_SIZE);
+        const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions, { colorMode: 'bgr', rotate: true, yFlip: true }, util_1.BMP_HEADER_LENGTH, this.ICON_SIZE);
         (0, util_1.writeBMPHeader)(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 2835);
         return Promise.resolve(byteBuffer);
-    }
-    getFillImagePacketLength() {
-        return 1024;
     }
 }
 exports.StreamDeckMiniV2 = StreamDeckMiniV2;
 //# sourceMappingURL=miniv2.js.map
+
+/***/ }),
+
+/***/ 350:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var _StreamDeckNeo_lcdImageWriter;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamDeckNeo = void 0;
+const id_1 = __webpack_require__(444);
+const base_gen2_1 = __webpack_require__(748);
+const imageWriter_1 = __webpack_require__(222);
+const headerGenerator_1 = __webpack_require__(598);
+const util_1 = __webpack_require__(369);
+const neoProperties = {
+    MODEL: id_1.DeviceModelId.NEO,
+    PRODUCT_NAME: 'Streamdeck Neo',
+    COLUMNS: 4,
+    ROWS: 2,
+    TOUCH_BUTTONS: 2,
+    ICON_SIZE: 96,
+    KEY_DIRECTION: 'ltr',
+    KEY_DATA_OFFSET: 3,
+    KEY_SPACING_HORIZONTAL: 30,
+    KEY_SPACING_VERTICAL: 30,
+};
+class StreamDeckNeo extends base_gen2_1.StreamDeckGen2Base {
+    constructor(device, options) {
+        super(device, options, neoProperties);
+        _StreamDeckNeo_lcdImageWriter.set(this, new imageWriter_1.StreamdeckDefaultImageWriter(new headerGenerator_1.StreamdeckNeoLcdImageHeaderGenerator()));
+    }
+    get LCD_STRIP_SIZE() {
+        return {
+            width: 248,
+            height: 58,
+        };
+    }
+    async fillLcd(imageBuffer, sourceOptions) {
+        const size = this.LCD_STRIP_SIZE;
+        if (!size)
+            throw new Error(`There is no lcd to fill`);
+        const imageSize = size.width * size.height * sourceOptions.format.length;
+        if (imageBuffer.length !== imageSize) {
+            throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
+        }
+        // A lot of this drawing code is heavily based on the normal button
+        const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, size, sourceOptions);
+        const packets = __classPrivateFieldGet(this, _StreamDeckNeo_lcdImageWriter, "f").generateFillImageWrites(null, byteBuffer);
+        await this.device.sendReports(packets);
+    }
+    async convertFillLcdBuffer(sourceBuffer, size, sourceOptions) {
+        const sourceOptions2 = {
+            format: sourceOptions.format,
+            offset: 0,
+            stride: size.width * sourceOptions.format.length,
+        };
+        const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions2, { colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip }, 0, size.width, size.height);
+        return this.encodeJPEG(byteBuffer, size.width, size.height);
+    }
+}
+exports.StreamDeckNeo = StreamDeckNeo;
+_StreamDeckNeo_lcdImageWriter = new WeakMap();
+//# sourceMappingURL=neo.js.map
 
 /***/ }),
 
@@ -5461,6 +5645,7 @@ const origMK2Properties = {
     PRODUCT_NAME: 'Streamdeck MK2',
     COLUMNS: 5,
     ROWS: 3,
+    TOUCH_BUTTONS: 0,
     ICON_SIZE: 72,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 3,
@@ -5481,18 +5666,19 @@ exports.StreamDeckOriginalMK2 = StreamDeckOriginalMK2;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
-/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckOriginal = void 0;
 const util_1 = __webpack_require__(369);
 const base_gen1_1 = __webpack_require__(165);
 const id_1 = __webpack_require__(444);
+const imageWriter_1 = __webpack_require__(222);
 const originalProperties = {
     MODEL: id_1.DeviceModelId.ORIGINAL,
     PRODUCT_NAME: 'Streamdeck',
     COLUMNS: 5,
     ROWS: 3,
+    TOUCH_BUTTONS: 0,
     ICON_SIZE: 72,
     KEY_DIRECTION: 'rtl',
     KEY_DATA_OFFSET: 0,
@@ -5501,7 +5687,7 @@ const originalProperties = {
 };
 class StreamDeckOriginal extends base_gen1_1.StreamDeckGen1Base {
     constructor(device, options) {
-        super(device, options, originalProperties);
+        super(device, options, originalProperties, new imageWriter_1.StreamdeckOriginalImageWriter());
         this.useOriginalKeyOrder = !!options.useOriginalKeyOrder;
     }
     transformKeyIndex(keyIndex) {
@@ -5515,26 +5701,10 @@ class StreamDeckOriginal extends base_gen1_1.StreamDeckGen1Base {
             return keyIndex;
         }
     }
-    getFillImagePacketLength() {
-        return 8191;
-    }
     async convertFillImage(sourceBuffer, sourceOptions) {
-        const byteBuffer = (0, util_1.imageToByteArray)(sourceBuffer, sourceOptions, { colorMode: 'bgr', xFlip: true }, util_1.BMP_HEADER_LENGTH, this.ICON_SIZE);
+        const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions, { colorMode: 'bgr', xFlip: true }, util_1.BMP_HEADER_LENGTH, this.ICON_SIZE);
         (0, util_1.writeBMPHeader)(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 3780);
         return Promise.resolve(byteBuffer);
-    }
-    generateFillImageWrites(keyIndex, byteBuffer) {
-        const MAX_PACKET_SIZE = this.getFillImagePacketLength();
-        const PACKET_HEADER_LENGTH = this.getFillImageCommandHeaderLength();
-        // The original uses larger packets, and splits the payload equally across 2
-        const packet1Bytes = byteBuffer.length / 2;
-        const packet1 = Buffer.alloc(MAX_PACKET_SIZE);
-        this.writeFillImageCommandHeader(packet1, keyIndex, 0x01, false, packet1Bytes);
-        byteBuffer.copy(packet1, PACKET_HEADER_LENGTH, 0, packet1Bytes);
-        const packet2 = Buffer.alloc(MAX_PACKET_SIZE);
-        this.writeFillImageCommandHeader(packet2, keyIndex, 0x02, true, packet1Bytes);
-        byteBuffer.copy(packet2, PACKET_HEADER_LENGTH, packet1Bytes);
-        return [packet1, packet2];
     }
 }
 exports.StreamDeckOriginal = StreamDeckOriginal;
@@ -5556,6 +5726,7 @@ const origV2Properties = {
     PRODUCT_NAME: 'Streamdeck',
     COLUMNS: 5,
     ROWS: 3,
+    TOUCH_BUTTONS: 0,
     ICON_SIZE: 72,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 3,
@@ -5586,6 +5757,7 @@ const pedalProperties = {
     PRODUCT_NAME: 'Streamdeck Pedal',
     COLUMNS: 3,
     ROWS: 1,
+    TOUCH_BUTTONS: 0,
     ICON_SIZE: 0,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 3,
@@ -5654,17 +5826,20 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _StreamDeckPlus_encoderState;
+var _StreamDeckPlus_lcdImageWriter, _StreamDeckPlus_encoderState;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckPlus = void 0;
 const util_1 = __webpack_require__(369);
 const base_gen2_1 = __webpack_require__(748);
 const id_1 = __webpack_require__(444);
+const imageWriter_1 = __webpack_require__(222);
+const headerGenerator_1 = __webpack_require__(598);
 const plusProperties = {
     MODEL: id_1.DeviceModelId.PLUS,
     PRODUCT_NAME: 'Streamdeck +',
     COLUMNS: 4,
     ROWS: 2,
+    TOUCH_BUTTONS: 0,
     ICON_SIZE: 120,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 3,
@@ -5674,6 +5849,7 @@ const plusProperties = {
 class StreamDeckPlus extends base_gen2_1.StreamDeckGen2Base {
     constructor(device, options) {
         super(device, options, plusProperties, true);
+        _StreamDeckPlus_lcdImageWriter.set(this, new imageWriter_1.StreamdeckDefaultImageWriter(new headerGenerator_1.StreamdeckPlusLcdImageHeaderGenerator()));
         _StreamDeckPlus_encoderState.set(this, void 0);
         __classPrivateFieldSet(this, _StreamDeckPlus_encoderState, new Array(4).fill(false), "f");
     }
@@ -5774,6 +5950,16 @@ class StreamDeckPlus extends base_gen2_1.StreamDeckGen2Base {
         });
         await Promise.all([clearButtons, clearLcd]);
     }
+    async fillLcd(buffer, sourceOptions) {
+        const size = this.LCD_STRIP_SIZE;
+        if (!size)
+            throw new Error(`There is no lcd to fill`);
+        return this.fillLcdRegion(0, 0, buffer, {
+            format: sourceOptions.format,
+            width: size.width,
+            height: size.height,
+        });
+    }
     async fillEncoderLcd(index, buffer, sourceOptions) {
         if (this.NUM_ENCODERS === 0)
             throw new Error(`There are no encoders`);
@@ -5800,7 +5986,7 @@ class StreamDeckPlus extends base_gen2_1.StreamDeckGen2Base {
         }
         // A lot of this drawing code is heavily based on the normal button
         const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions);
-        const packets = this.generateFillLcdWrites(x, y, byteBuffer, sourceOptions);
+        const packets = __classPrivateFieldGet(this, _StreamDeckPlus_lcdImageWriter, "f").generateFillImageWrites({ ...sourceOptions, x, y }, byteBuffer);
         await this.device.sendReports(packets);
     }
     async convertFillLcdBuffer(sourceBuffer, sourceOptions) {
@@ -5809,37 +5995,12 @@ class StreamDeckPlus extends base_gen2_1.StreamDeckGen2Base {
             offset: 0,
             stride: sourceOptions.width * sourceOptions.format.length,
         };
-        const byteBuffer = (0, util_1.imageToByteArray)(sourceBuffer, sourceOptions2, { colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip }, 0, sourceOptions.width, sourceOptions.height);
+        const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions2, { colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip }, 0, sourceOptions.width, sourceOptions.height);
         return this.encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height);
-    }
-    generateFillLcdWrites(x, y, byteBuffer, sourceOptions) {
-        const MAX_PACKET_SIZE = 1024; // this.getFillImagePacketLength()
-        const PACKET_HEADER_LENGTH = 16;
-        const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH;
-        const result = [];
-        let remainingBytes = byteBuffer.length;
-        for (let part = 0; remainingBytes > 0; part++) {
-            const packet = Buffer.alloc(MAX_PACKET_SIZE);
-            const byteCount = Math.min(remainingBytes, MAX_PAYLOAD_SIZE);
-            packet.writeUInt8(0x02, 0);
-            packet.writeUInt8(0x0c, 1);
-            packet.writeUInt16LE(x, 2);
-            packet.writeUInt16LE(y, 4);
-            packet.writeUInt16LE(sourceOptions.width, 6);
-            packet.writeUInt16LE(sourceOptions.height, 8);
-            packet.writeUInt8(remainingBytes <= MAX_PAYLOAD_SIZE ? 1 : 0, 10); // Is last
-            packet.writeUInt16LE(part, 11);
-            packet.writeUInt16LE(byteCount, 13);
-            const byteOffset = byteBuffer.length - remainingBytes;
-            remainingBytes -= byteCount;
-            byteBuffer.copy(packet, PACKET_HEADER_LENGTH, byteOffset, byteOffset + byteCount);
-            result.push(packet);
-        }
-        return result;
     }
 }
 exports.StreamDeckPlus = StreamDeckPlus;
-_StreamDeckPlus_encoderState = new WeakMap();
+_StreamDeckPlus_lcdImageWriter = new WeakMap(), _StreamDeckPlus_encoderState = new WeakMap();
 //# sourceMappingURL=plus.js.map
 
 /***/ }),
@@ -5858,6 +6019,7 @@ const xlProperties = {
     PRODUCT_NAME: 'Streamdeck XL',
     COLUMNS: 8,
     ROWS: 4,
+    TOUCH_BUTTONS: 0,
     ICON_SIZE: 96,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 3,
@@ -5888,6 +6050,7 @@ const xlProperties = {
     PRODUCT_NAME: 'Streamdeck XL',
     COLUMNS: 8,
     ROWS: 4,
+    TOUCH_BUTTONS: 0,
     ICON_SIZE: 96,
     KEY_DIRECTION: 'ltr',
     KEY_DATA_OFFSET: 3,
@@ -5928,6 +6091,9 @@ class StreamDeckProxy {
     get KEY_ROWS() {
         return this.device.KEY_ROWS;
     }
+    get NUM_TOUCH_KEYS() {
+        return this.device.NUM_TOUCH_KEYS;
+    }
     get NUM_ENCODERS() {
         return this.device.NUM_ENCODERS;
     }
@@ -5958,8 +6124,8 @@ class StreamDeckProxy {
     get PRODUCT_NAME() {
         return this.device.PRODUCT_NAME;
     }
-    checkValidKeyIndex(keyIndex) {
-        this.device.checkValidKeyIndex(keyIndex);
+    checkValidKeyIndex(keyIndex, includeTouchKeys) {
+        this.device.checkValidKeyIndex(keyIndex, includeTouchKeys);
     }
     async close() {
         return this.device.close();
@@ -5993,6 +6159,9 @@ class StreamDeckProxy {
     }
     async getSerialNumber() {
         return this.device.getSerialNumber();
+    }
+    async fillLcd(imageBuffer, sourceOptions) {
+        return this.device.fillLcd(imageBuffer, sourceOptions);
     }
     async fillEncoderLcd(index, imageBuffer, sourceOptions) {
         return this.device.fillEncoderLcd(index, imageBuffer, sourceOptions);
@@ -6071,8 +6240,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 /* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.writeBMPHeader = exports.BMP_HEADER_LENGTH = exports.imageToByteArray = void 0;
-function imageToByteArray(imageBuffer, sourceOptions, targetOptions, destPadding, imageWidth, imageHeight) {
+exports.writeBMPHeader = exports.BMP_HEADER_LENGTH = exports.transformImageBuffer = void 0;
+function transformImageBuffer(imageBuffer, sourceOptions, targetOptions, destPadding, imageWidth, imageHeight) {
     if (!imageHeight)
         imageHeight = imageWidth;
     const byteBuffer = Buffer.alloc(destPadding + imageWidth * imageHeight * targetOptions.colorMode.length);
@@ -6111,7 +6280,7 @@ function imageToByteArray(imageBuffer, sourceOptions, targetOptions, destPadding
     }
     return byteBuffer;
 }
-exports.imageToByteArray = imageToByteArray;
+exports.transformImageBuffer = transformImageBuffer;
 exports.BMP_HEADER_LENGTH = 54;
 function writeBMPHeader(buf, iconSize, iconBytes, imagePPM) {
     // Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
