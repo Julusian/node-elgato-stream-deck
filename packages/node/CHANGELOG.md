@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0](https://github.com/julusian/node-elgato-stream-deck/compare/v6.0.0...v6.2.0) (2024-04-30)
+
+
+### Bug Fixes
+
+* rework udev rules [#88](https://github.com/julusian/node-elgato-stream-deck/issues/88) ([d6054a7](https://github.com/julusian/node-elgato-stream-deck/commit/d6054a79781239dc8c845d2f866335621297d9c2))
+* update examples to run and better support plus and neo ([219e37c](https://github.com/julusian/node-elgato-stream-deck/commit/219e37cdf77963cc59c4de810fdb555e30194408))
+
+
+### Features
+
+* neo lcd drawing ([7d13bc0](https://github.com/julusian/node-elgato-stream-deck/commit/7d13bc03306fccad119b4f203c9106bc93d5515b))
+* **node:** expose path of opened device [#65](https://github.com/julusian/node-elgato-stream-deck/issues/65) ([45ebbe5](https://github.com/julusian/node-elgato-stream-deck/commit/45ebbe5a9e721f3a89d027d977193f7aa322f6ce))
+* support for streamdeck neo ([65197a7](https://github.com/julusian/node-elgato-stream-deck/commit/65197a7735d86ebd1883f96a5f7719b2bd1c95fb))
+
+
+
+
+
 # [6.1.0](https://github.com/julusian/node-elgato-stream-deck/compare/v6.0.0...v6.1.0) (2024-04-21)
 
 

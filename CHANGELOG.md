@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0](https://github.com/julusian/node-elgato-stream-deck/compare/v6.0.0...v6.2.0) (2024-04-30)
+
+
+### Bug Fixes
+
+* clear neo screen as part of `clearPanel` ([53b88e5](https://github.com/julusian/node-elgato-stream-deck/commit/53b88e5772cd7e8f0fb9716e6e7f4d714e5c029f))
+* omit tests from npm packages ([80e6676](https://github.com/julusian/node-elgato-stream-deck/commit/80e6676bab58bf154b733c137881ba13bae9d04d))
+* rework udev rules [#88](https://github.com/julusian/node-elgato-stream-deck/issues/88) ([d6054a7](https://github.com/julusian/node-elgato-stream-deck/commit/d6054a79781239dc8c845d2f866335621297d9c2))
+* support longer serial numbers [#76](https://github.com/julusian/node-elgato-stream-deck/issues/76) ([545cb6e](https://github.com/julusian/node-elgato-stream-deck/commit/545cb6eaa2eccecc5f94e47973465e7b1a43f664))
+* update examples to run and better support plus and neo ([219e37c](https://github.com/julusian/node-elgato-stream-deck/commit/219e37cdf77963cc59c4de810fdb555e30194408))
+
+
+### Features
+
+* add `KEY_SPACING_VERTICAL` and `KEY_SPACING_HORIZONTAL` properties ([d69e5c7](https://github.com/julusian/node-elgato-stream-deck/commit/d69e5c74fe027e3763eee645b1639c367de19155))
+* neo lcd drawing ([7d13bc0](https://github.com/julusian/node-elgato-stream-deck/commit/7d13bc03306fccad119b4f203c9106bc93d5515b))
+* **node:** expose path of opened device [#65](https://github.com/julusian/node-elgato-stream-deck/issues/65) ([45ebbe5](https://github.com/julusian/node-elgato-stream-deck/commit/45ebbe5a9e721f3a89d027d977193f7aa322f6ce))
+* refactor image generation to be more modular ([4f62a9d](https://github.com/julusian/node-elgato-stream-deck/commit/4f62a9d05d7abb4d44779281cdc2285c66623f3a))
+* refactor streamdeck plus lcd image generation (needs testing) ([e32eaa5](https://github.com/julusian/node-elgato-stream-deck/commit/e32eaa53e47b6c43a5bf4ffa0a55afd9eee7be87))
+* support for streamdeck neo ([65197a7](https://github.com/julusian/node-elgato-stream-deck/commit/65197a7735d86ebd1883f96a5f7719b2bd1c95fb))
+* **webhid:** Add forget method [#79](https://github.com/julusian/node-elgato-stream-deck/issues/79) ([f13ee36](https://github.com/julusian/node-elgato-stream-deck/commit/f13ee363ef1e1a236ce815917e7f5e76ae8efb79))
+
+
+
+
+
 # [6.1.0](https://github.com/julusian/node-elgato-stream-deck/compare/v6.0.0...v6.1.0) (2024-04-21)
 
 
