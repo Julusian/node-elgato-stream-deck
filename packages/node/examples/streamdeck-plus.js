@@ -5,9 +5,9 @@ const { listStreamDecks, openStreamDeck, DeviceModelId } = require('../dist/inde
 ;(async () => {
 	const devices = await listStreamDecks()
 	if (!devices[0]) throw new Error('No device found')
-	await streamDeck.clearPanel()
 
 	const streamDeck = await openStreamDeck(devices[0].path)
+	await streamDeck.clearPanel()
 
 	if (streamDeck.MODEL !== DeviceModelId.PLUS) throw new Error('This demo only supports the plus')
 
