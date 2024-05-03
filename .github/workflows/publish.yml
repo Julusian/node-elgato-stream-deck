@@ -26,7 +26,7 @@ jobs:
             echo "No Token"
           else
 
-            PUBLISHED_VERSION=$(yarn npm info --json . | jq -c '.version' -r)
+            PUBLISHED_VERSION=$(yarn npm info --json @elgato-stream-deck/node | jq -c '.version' -r)
             THIS_VERSION=$(node -p "require('./package.json').version")
             # Simple bash helper to comapre version numbers
             verlte() {
