@@ -1,3 +1,4 @@
+import { uint8ArrayToDataView } from '../util'
 import type { StreamdeckImageHeaderGenerator, StreamdeckImageWriterProps } from './types'
 
 export class StreamdeckGen1ImageHeaderGenerator implements StreamdeckImageHeaderGenerator {
@@ -6,18 +7,19 @@ export class StreamdeckGen1ImageHeaderGenerator implements StreamdeckImageHeader
 	}
 
 	writeFillImageCommandHeader(
-		buffer: Buffer,
+		buffer: Uint8Array,
 		props: StreamdeckImageWriterProps,
 		partIndex: number,
 		isLast: boolean,
 		_bodyLength: number
 	): void {
-		buffer.writeUInt8(0x02, 0)
-		buffer.writeUInt8(0x01, 1)
-		buffer.writeUInt16LE(partIndex, 2)
-		// 3 = 0x00
-		buffer.writeUInt8(isLast ? 1 : 0, 4)
-		buffer.writeUInt8(props.keyIndex + 1, 5)
+		const bufferView = uint8ArrayToDataView(buffer)
+
+		bufferView.setUint8(0, 0x02)
+		bufferView.setUint8(2, 0x01)
+		bufferView.setUint16(2, partIndex, true)
+		bufferView.setUint8(4, isLast ? 1 : 0)
+		bufferView.setUint8(5, props.keyIndex + 1)
 	}
 }
 
@@ -27,18 +29,20 @@ export class StreamdeckGen2ImageHeaderGenerator implements StreamdeckImageHeader
 	}
 
 	writeFillImageCommandHeader(
-		buffer: Buffer,
+		buffer: Uint8Array,
 		props: StreamdeckImageWriterProps,
 		partIndex: number,
 		isLast: boolean,
 		bodyLength: number
 	): void {
-		buffer.writeUInt8(0x02, 0)
-		buffer.writeUInt8(0x07, 1)
-		buffer.writeUInt8(props.keyIndex, 2)
-		buffer.writeUInt8(isLast ? 1 : 0, 3)
-		buffer.writeUInt16LE(bodyLength, 4)
-		buffer.writeUInt16LE(partIndex++, 6)
+		const bufferView = uint8ArrayToDataView(buffer)
+
+		bufferView.setUint8(0, 0x02)
+		bufferView.setUint8(1, 0x07)
+		bufferView.setUint8(2, props.keyIndex)
+		bufferView.setUint8(3, isLast ? 1 : 0)
+		bufferView.setUint16(4, bodyLength, true)
+		bufferView.setUint16(4, partIndex++, true)
 	}
 }
 
@@ -56,21 +60,23 @@ export class StreamdeckPlusLcdImageHeaderGenerator
 	}
 
 	writeFillImageCommandHeader(
-		buffer: Buffer,
+		buffer: Uint8Array,
 		props: StreamdeckPlusHeaderProps,
 		partIndex: number,
 		isLast: boolean,
 		bodyLength: number
 	): void {
-		buffer.writeUInt8(0x02, 0)
-		buffer.writeUInt8(0x0c, 1)
-		buffer.writeUInt16LE(props.x, 2)
-		buffer.writeUInt16LE(props.y, 4)
-		buffer.writeUInt16LE(props.width, 6)
-		buffer.writeUInt16LE(props.height, 8)
-		buffer.writeUInt8(isLast ? 1 : 0, 10) // Is last
-		buffer.writeUInt16LE(partIndex, 11)
-		buffer.writeUInt16LE(bodyLength, 13)
+		const bufferView = uint8ArrayToDataView(buffer)
+
+		bufferView.setUint8(0, 0x02)
+		bufferView.setUint8(1, 0x0c)
+		bufferView.setUint16(2, props.x, true)
+		bufferView.setUint16(4, props.y, true)
+		bufferView.setUint16(6, props.width, true)
+		bufferView.setUint16(8, props.height, true)
+		bufferView.setUint8(10, isLast ? 1 : 0)
+		bufferView.setUint16(11, partIndex, true)
+		bufferView.setUint16(13, bodyLength, true)
 	}
 }
 
@@ -80,17 +86,19 @@ export class StreamdeckNeoLcdImageHeaderGenerator implements StreamdeckImageHead
 	}
 
 	writeFillImageCommandHeader(
-		buffer: Buffer,
+		buffer: Uint8Array,
 		_props: never,
 		partIndex: number,
 		isLast: boolean,
 		bodyLength: number
 	): void {
-		buffer.writeUInt8(0x02, 0)
-		buffer.writeUInt8(0x0b, 1)
-		buffer.writeUInt8(0, 2)
-		buffer.writeUInt8(isLast ? 1 : 0, 3)
-		buffer.writeUInt16LE(bodyLength, 4)
-		buffer.writeUInt16LE(partIndex++, 6)
+		const bufferView = uint8ArrayToDataView(buffer)
+
+		bufferView.setUint8(0, 0x02)
+		bufferView.setUint8(1, 0x0b)
+		bufferView.setUint8(2, 0)
+		bufferView.setUint8(3, isLast ? 1 : 0)
+		bufferView.setUint16(4, bodyLength, true)
+		bufferView.setUint16(6, partIndex, true)
 	}
 }

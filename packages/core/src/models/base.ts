@@ -12,7 +12,7 @@ import {
 } from '../types'
 import type { StreamdeckImageWriter } from '../imageWriter/types'
 
-export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
+export type EncodeJPEGHelper = (buffer: Uint8Array, width: number, height: number) => Promise<Uint8Array>
 
 export interface OpenStreamDeckOptions {
 	useOriginalKeyOrder?: boolean
@@ -153,15 +153,19 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	}
 
 	public abstract fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
-	public abstract fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void>
-	public abstract fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
+	public abstract fillKeyBuffer(
+		keyIndex: KeyIndex,
+		imageBuffer: Uint8Array,
+		options?: FillImageOptions
+	): Promise<void>
+	public abstract fillPanelBuffer(imageBuffer: Uint8Array, options?: FillPanelOptions): Promise<void>
 
-	public async fillLcd(_imageBuffer: Buffer, _sourceOptions: FillImageOptions): Promise<void> {
+	public async fillLcd(_imageBuffer: Uint8Array, _sourceOptions: FillImageOptions): Promise<void> {
 		throw new Error('Not supported for this model')
 	}
 	public async fillEncoderLcd(
 		_index: EncoderIndex,
-		_buffer: Buffer,
+		_buffer: Uint8Array,
 		_sourceOptions: FillImageOptions
 	): Promise<void> {
 		throw new Error('Not supported for this model')
@@ -169,7 +173,7 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	public async fillLcdRegion(
 		_x: number,
 		_y: number,
-		_imageBuffer: Buffer,
+		_imageBuffer: Uint8Array,
 		_sourceOptions: FillLcdImageOptions
 	): Promise<void> {
 		throw new Error('Not supported for this model')
@@ -202,7 +206,9 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		if (keyIndex >= this.NUM_KEYS) {
 			await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, r, g, b]))
 		} else {
-			const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]))
+			const pixels = new Uint8Array(this.ICON_BYTES)
+			pixels.fill([r, g, b])
+
 			const keyIndex2 = this.transformKeyIndex(keyIndex)
 			await this.fillImageRange(keyIndex2, pixels, {
 				format: 'rgb',
@@ -212,7 +218,7 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		}
 	}
 
-	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
+	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Uint8Array, options?: FillImageOptions): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
 		const sourceFormat = options?.format ?? 'rgb'
@@ -231,7 +237,7 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		})
 	}
 
-	public async fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void> {
+	public async fillPanelBuffer(imageBuffer: Uint8Array, options?: FillPanelOptions): Promise<void> {
 		const sourceFormat = options?.format ?? 'rgb'
 		this.checkSourceFormat(sourceFormat)
 
@@ -275,7 +281,9 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		if (keyIndex >= this.NUM_KEYS) {
 			await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, 0, 0, 0]))
 		} else {
-			const pixels = Buffer.alloc(this.ICON_BYTES, 0)
+			const pixels = new Uint8Array(this.ICON_BYTES)
+			pixels.fill(0)
+
 			const keyIndex2 = this.transformKeyIndex(keyIndex)
 			await this.fillImageRange(keyIndex2, pixels, {
 				format: 'rgb',
@@ -286,7 +294,9 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 	}
 
 	public async clearPanel(): Promise<void> {
-		const pixels = Buffer.alloc(this.ICON_BYTES, 0)
+		const pixels = new Uint8Array(this.ICON_BYTES)
+		pixels.fill(0)
+
 		const ps: Array<Promise<void>> = []
 		for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
 			ps.push(
@@ -314,9 +324,12 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		await Promise.all(ps)
 	}
 
-	protected abstract convertFillImage(imageBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer>
+	protected abstract convertFillImage(
+		imageBuffer: Uint8Array,
+		sourceOptions: InternalFillImageOptions
+	): Promise<Uint8Array>
 
-	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOptions: InternalFillImageOptions) {
+	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Uint8Array, sourceOptions: InternalFillImageOptions) {
 		this.checkValidKeyIndex(keyIndex)
 
 		const byteBuffer = await this.convertFillImage(imageBuffer, sourceOptions)

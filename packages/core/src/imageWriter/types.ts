@@ -5,13 +5,13 @@ export interface StreamdeckImageWriterProps {
 }
 
 export interface StreamdeckImageWriter<TProps = StreamdeckImageWriterProps> {
-	generateFillImageWrites(props: TProps, byteBuffer: Buffer): Buffer[]
+	generateFillImageWrites(props: TProps, byteBuffer: Uint8Array): Uint8Array[]
 }
 
 export interface StreamdeckImageHeaderGenerator<TProps = StreamdeckImageWriterProps> {
 	getFillImageCommandHeaderLength(): number
 	writeFillImageCommandHeader(
-		buffer: Buffer,
+		buffer: Uint8Array,
 		props: TProps,
 		partIndex: number,
 		isLast: boolean,

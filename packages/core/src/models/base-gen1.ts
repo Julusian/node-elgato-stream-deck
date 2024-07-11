@@ -33,7 +33,7 @@ export abstract class StreamDeckGen1Base extends StreamDeckBase {
 		}
 
 		// prettier-ignore
-		const brightnessCommandBuffer = Buffer.from([
+		const brightnessCommandBuffer = Uint8Array.from([
 			0x05,
 			0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
@@ -43,7 +43,7 @@ export abstract class StreamDeckGen1Base extends StreamDeckBase {
 
 	public async resetToLogo(): Promise<void> {
 		// prettier-ignore
-		const resetCommandBuffer = Buffer.from([
+		const resetCommandBuffer = Uint8Array.from([
 			0x0b,
 			0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
@@ -52,7 +52,7 @@ export abstract class StreamDeckGen1Base extends StreamDeckBase {
 	}
 
 	public async getFirmwareVersion(): Promise<string> {
-		let val: Buffer
+		let val: Uint8Array
 		try {
 			val = await this.device.getFeatureReport(4, 32)
 		} catch (e) {
@@ -60,17 +60,17 @@ export abstract class StreamDeckGen1Base extends StreamDeckBase {
 			val = await this.device.getFeatureReport(4, 17)
 		}
 		const end = val.indexOf(0, 5)
-		return val.toString('ascii', 5, end === -1 ? undefined : end)
+		return new TextDecoder('ascii').decode(val.subarray(5, end === -1 ? undefined : end))
 	}
 
 	public async getSerialNumber(): Promise<string> {
-		let val: Buffer
+		let val: Uint8Array
 		try {
 			val = await this.device.getFeatureReport(3, 32)
 		} catch (e) {
 			// In case some devices can't handle the different report length
 			val = await this.device.getFeatureReport(3, 17)
 		}
-		return val.toString('ascii', 5, 17)
+		return new TextDecoder('ascii').decode(val.subarray(5, 17))
 	}
 }

@@ -77,7 +77,7 @@ export class NodeHIDSyncDevice extends EventEmitter implements HIDDevice {
 		this.device = device
 		this.device.on('error', (error) => this.emit('error', error))
 
-		this.device.on('data', (data: Buffer) => {
+		this.device.on('data', (data: Uint8Array) => {
 			// Button press
 			if (data[0] === 0x01) {
 				const keyData = data.subarray(1)
@@ -90,15 +90,15 @@ export class NodeHIDSyncDevice extends EventEmitter implements HIDDevice {
 		this.device.close()
 	}
 
-	public async sendFeatureReport(data: Buffer): Promise<void> {
-		this.device.sendFeatureReport(data)
+	public async sendFeatureReport(data: Uint8Array): Promise<void> {
+		this.device.sendFeatureReport(Buffer.from(data))
 	}
-	public async getFeatureReport(reportId: number, reportLength: number): Promise<Buffer> {
+	public async getFeatureReport(reportId: number, reportLength: number): Promise<Uint8Array> {
 		return Buffer.from(this.device.getFeatureReport(reportId, reportLength))
 	}
-	public async sendReports(buffers: Buffer[]): Promise<void> {
+	public async sendReports(buffers: Uint8Array[]): Promise<void> {
 		for (const data of buffers) {
-			this.device.write(data)
+			this.device.write(Buffer.from(data))
 		}
 	}
 

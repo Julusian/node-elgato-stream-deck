@@ -24,11 +24,11 @@ const DEFAULT_QUALITY = 95
  * @param height Hieght of the image
  */
 export async function encodeJPEG(
-	buffer: Buffer,
+	buffer: Uint8Array,
 	width: number,
 	height: number,
 	options: JPEGEncodeOptions | undefined
-): Promise<Buffer> {
+): Promise<Uint8Array> {
 	try {
 		// Try using jpeg-turbo if it is available
 		if (jpegTurbo && jpegTurbo.bufferSize && !!jpegTurbo.compressSync) {
@@ -41,7 +41,7 @@ export async function encodeJPEG(
 			}
 			if (buffer.length === width * height * 4) {
 				const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(encodeOptions))
-				return jpegTurbo.compress(buffer, tmpBuffer, encodeOptions)
+				return jpegTurbo.compress(Buffer.from(buffer.buffer), tmpBuffer, encodeOptions)
 			}
 		}
 	} catch (e) {
