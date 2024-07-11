@@ -12,13 +12,13 @@ export class StreamdeckOriginalImageWriter implements StreamdeckImageWriter {
 
 		const packet1Bytes = byteBuffer.length / 2
 
-		const packet1 = Buffer.alloc(MAX_PACKET_SIZE)
+		const packet1 = new Uint8Array(MAX_PACKET_SIZE)
 		this.headerGenerator.writeFillImageCommandHeader(packet1, props, 0x01, false, packet1Bytes)
-		byteBuffer.copy(packet1, PACKET_HEADER_LENGTH, 0, packet1Bytes)
+		packet1.set(byteBuffer.subarray(0, packet1Bytes), PACKET_HEADER_LENGTH)
 
-		const packet2 = Buffer.alloc(MAX_PACKET_SIZE)
+		const packet2 = new Uint8Array(MAX_PACKET_SIZE)
 		this.headerGenerator.writeFillImageCommandHeader(packet2, props, 0x02, true, packet1Bytes)
-		byteBuffer.copy(packet2, PACKET_HEADER_LENGTH, packet1Bytes)
+		packet2.set(byteBuffer.subarray(packet1Bytes), PACKET_HEADER_LENGTH)
 
 		return [packet1, packet2]
 	}
@@ -42,7 +42,7 @@ export class StreamdeckDefaultImageWriter<TProps = StreamdeckImageWriterProps>
 
 		let remainingBytes = byteBuffer.length
 		for (let part = 0; remainingBytes > 0; part++) {
-			const packet = Buffer.alloc(MAX_PACKET_SIZE)
+			const packet = new Uint8Array(MAX_PACKET_SIZE)
 
 			const byteCount = Math.min(remainingBytes, MAX_PAYLOAD_SIZE)
 			this.headerGenerator.writeFillImageCommandHeader(
@@ -55,7 +55,7 @@ export class StreamdeckDefaultImageWriter<TProps = StreamdeckImageWriterProps>
 
 			const byteOffset = byteBuffer.length - remainingBytes
 			remainingBytes -= byteCount
-			byteBuffer.copy(packet, PACKET_HEADER_LENGTH, byteOffset, byteOffset + byteCount)
+			packet.set(byteBuffer.subarray(byteOffset, byteOffset + byteCount), PACKET_HEADER_LENGTH)
 
 			result.push(packet)
 		}

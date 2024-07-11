@@ -122,7 +122,7 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		}
 	}
 
-	public override async fillLcd(buffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
+	public override async fillLcd(buffer: Uint8Array, sourceOptions: FillImageOptions): Promise<void> {
 		const size = this.LCD_STRIP_SIZE
 		if (!size) throw new Error(`There is no lcd to fill`)
 

@@ -117,7 +117,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
 	 */
-	fillLcd(imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
+	fillLcd(imageBuffer: Uint8Array, sourceOptions: FillImageOptions): Promise<void>
 
 	/**
 	 * Fills the lcd strip above an encoder

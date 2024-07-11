@@ -34,7 +34,7 @@ export class StreamDeckNeo extends StreamDeckGen2Base {
 		}
 	}
 
-	public override async fillLcd(imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
+	public override async fillLcd(imageBuffer: Uint8Array, sourceOptions: FillImageOptions): Promise<void> {
 		const size = this.LCD_STRIP_SIZE
 		if (!size) throw new Error(`There is no lcd to fill`)
 
@@ -51,10 +51,10 @@ export class StreamDeckNeo extends StreamDeckGen2Base {
 	}
 
 	private async convertFillLcdBuffer(
-		sourceBuffer: Buffer,
+		sourceBuffer: Uint8Array,
 		size: LcdSegmentSize,
 		sourceOptions: FillImageOptions
-	): Promise<Buffer> {
+	): Promise<Uint8Array> {
 		const sourceOptions2: InternalFillImageOptions = {
 			format: sourceOptions.format,
 			offset: 0,

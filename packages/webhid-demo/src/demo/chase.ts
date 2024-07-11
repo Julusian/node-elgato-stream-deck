@@ -28,7 +28,7 @@ export class ChaseDemo implements Demo {
 				ctx.fillText(n.toString(), 8, canvas.height * 0.9, canvas.width * 0.8)
 
 				const id = ctx.getImageData(0, 0, canvas.width, canvas.height)
-				ps.push(device.fillKeyBuffer(i, Buffer.from(id.data), { format: 'rgba' }))
+				ps.push(device.fillKeyBuffer(i, id.data, { format: 'rgba' }))
 				ctx.restore()
 			}
 		}

@@ -34,8 +34,8 @@ export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 		return this.device.forget()
 	}
 
-	public async sendFeatureReport(data: Buffer): Promise<void> {
-		return this.device.sendFeatureReport(data[0], new Uint8Array(data.subarray(1)))
+	public async sendFeatureReport(data: Uint8Array): Promise<void> {
+		return this.device.sendFeatureReport(data[0], data.subarray(1))
 	}
 	public async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
 		const view = await this.device.receiveFeatureReport(reportId)
@@ -44,7 +44,7 @@ export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 	public async sendReports(buffers: Uint8Array[]): Promise<void> {
 		return this.reportQueue.add(async () => {
 			for (const data of buffers) {
-				await this.device.sendReport(data[0], new Uint8Array(data.subarray(1)))
+				await this.device.sendReport(data[0], data.subarray(1))
 			}
 		})
 	}

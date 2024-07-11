@@ -1,3 +1,4 @@
+import { uint8ArrayToDataView } from './util'
 import { InternalFillImageOptions } from './models/base'
 
 export interface FillImageTargetOptions {
@@ -17,10 +18,10 @@ export function transformImageBuffer(
 ): Uint8Array {
 	if (!imageHeight) imageHeight = imageWidth
 
-	const imageBufferView = new DataView(imageBuffer)
+	const imageBufferView = uint8ArrayToDataView(imageBuffer)
 
 	const byteBuffer = new Uint8Array(destPadding + imageWidth * imageHeight * targetOptions.colorMode.length)
-	const byteBufferView = new DataView(byteBuffer)
+	const byteBufferView = uint8ArrayToDataView(byteBuffer)
 
 	const flipColours = sourceOptions.format.substring(0, 3) !== targetOptions.colorMode.substring(0, 3)
 
@@ -65,7 +66,7 @@ export function transformImageBuffer(
 
 export const BMP_HEADER_LENGTH = 54
 export function writeBMPHeader(buf: Uint8Array, iconSize: number, iconBytes: number, imagePPM: number): void {
-	const bufView = new DataView(buf)
+	const bufView = uint8ArrayToDataView(buf)
 	// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
 
 	// Bitmap file header
@@ -88,4 +89,8 @@ export function writeBMPHeader(buf: Uint8Array, iconSize: number, iconBytes: num
 	bufView.setInt32(42, imagePPM, true) // Vertical resolution ppm
 	bufView.setInt32(46, 0, true) // Colour pallette size
 	bufView.setInt32(50, 0, true) // 'Important' Colour count
+}
+
+export function uint8ArrayToDataView(buffer: Uint8Array): DataView {
+	return new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength)
 }
