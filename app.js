@@ -5199,12 +5199,12 @@ class StreamDeckGen2Base extends base_1.StreamDeckBase {
     }
     async getFirmwareVersion() {
         const val = await this.device.getFeatureReport(5, 32);
-        const end = val.readUint8(1) + 2;
+        const end = val.readUInt8(1) + 2;
         return val.toString('ascii', 6, end);
     }
     async getSerialNumber() {
         const val = await this.device.getFeatureReport(6, 32);
-        const end = val.readUint8(1) + 2;
+        const end = val.readUInt8(1) + 2;
         return val.toString('ascii', 2, end);
     }
     async convertFillImage(sourceBuffer, sourceOptions) {
@@ -6606,7 +6606,7 @@ const chase_1 = __webpack_require__(889);
 if (true) {
     const elm = document.querySelector('#version_str');
     if (elm) {
-        elm.innerHTML = `v${"6.2.0"}`;
+        elm.innerHTML = `v${"6.2.1"}`;
     }
 }
 function appendLog(str) {
