@@ -84,6 +84,8 @@ jobs:
       - name: Send coverage
         if: matrix.node-version == '18.x'
         uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   publish-demo:
     name: Publish demo to Github Pages
