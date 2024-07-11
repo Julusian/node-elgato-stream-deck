@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.1](https://github.com/julusian/node-elgato-stream-deck/compare/v6.2.0...v6.2.1) (2024-07-11)
+
+
+### Bug Fixes
+
+* val.readUint8 is not a function ([#95](https://github.com/julusian/node-elgato-stream-deck/issues/95)) ([d80b765](https://github.com/julusian/node-elgato-stream-deck/commit/d80b76572cb02589549315eaee92de7c08f963eb))
+
+
+
+
+
 # [6.2.0](https://github.com/julusian/node-elgato-stream-deck/compare/v6.0.0...v6.2.0) (2024-04-30)
 
 
