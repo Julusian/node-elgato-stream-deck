@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.2.2](https://github.com/julusian/node-elgato-stream-deck/compare/v6.2.1...v6.2.2) (2024-07-11)
+
+
+### Bug Fixes
+
+* build error ([e23aa8b](https://github.com/julusian/node-elgato-stream-deck/commit/e23aa8b61a570b08dcaf53461bbf9ad857371d8c))
+
+
+
+
+
 ## [6.2.1](https://github.com/julusian/node-elgato-stream-deck/compare/v6.2.0...v6.2.1) (2024-07-11)
 
 **Note:** Version bump only for package @elgato-stream-deck/node
