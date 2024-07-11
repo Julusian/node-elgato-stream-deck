@@ -1,4 +1,3 @@
-import { uint8ArrayToDataView } from './util'
 import { InternalFillImageOptions } from './models/base'
 
 export interface FillImageTargetOptions {
