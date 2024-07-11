@@ -55,7 +55,6 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 	}
 
 	public async getDeviceInfo(): Promise<HIDDeviceInfo> {
-		// @ts-expect-error getDeviceInfo missing in typings
 		const info: NodeHIDDeviceInfo = await this.device.getDeviceInfo()
 
 		return {
@@ -104,7 +103,6 @@ export class NodeHIDSyncDevice extends EventEmitter implements HIDDevice {
 	}
 
 	public async getDeviceInfo(): Promise<HIDDeviceInfo> {
-		// @ts-expect-error getDeviceInfo missing in typings
 		const info: NodeHIDDeviceInfo = this.device.getDeviceInfo()
 
 		return {
