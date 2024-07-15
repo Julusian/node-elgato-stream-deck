@@ -18,10 +18,12 @@ export type StreamDeckProperties = Readonly<{
 	COLUMNS: number
 	ROWS: number
 	TOUCH_BUTTONS: number
-	ICON_SIZE: number
+	BUTTON_WIDTH_PX: number
+	BUTTON_HEIGHT_PX: number
 	KEY_DIRECTION: 'ltr' | 'rtl'
 	KEY_DATA_OFFSET: number
 	ENCODER_COUNT: number
+	SUPPORTS_RGB_KEY_FILL: boolean
 
 	KEY_SPACING_HORIZONTAL: number
 	KEY_SPACING_VERTICAL: number
@@ -50,14 +52,17 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 		return this.deviceProperties.ENCODER_COUNT
 	}
 
-	get ICON_SIZE(): number {
-		return this.deviceProperties.ICON_SIZE
+	get BUTTON_WIDTH_PX(): number {
+		return this.deviceProperties.BUTTON_WIDTH_PX
 	}
-	get ICON_BYTES(): number {
-		return this.ICON_PIXELS * 3
+	get BUTTON_HEIGHT_PX(): number {
+		return this.deviceProperties.BUTTON_HEIGHT_PX
 	}
-	get ICON_PIXELS(): number {
-		return this.ICON_SIZE * this.ICON_SIZE
+	get BUTTON_RGB_BYTES(): number {
+		return this.BUTTON_TOTAL_PX * 3
+	}
+	get BUTTON_TOTAL_PX(): number {
+		return this.BUTTON_WIDTH_PX * this.BUTTON_HEIGHT_PX
 	}
 
 	get KEY_SPACING_HORIZONTAL(): number {
@@ -171,15 +176,15 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		this.checkRGBValue(g)
 		this.checkRGBValue(b)
 
-		if (keyIndex >= this.NUM_KEYS) {
-			await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, r, g, b]))
+		if (this.deviceProperties.SUPPORTS_RGB_KEY_FILL || keyIndex >= this.NUM_KEYS) {
+			await this.sendKeyRgb(keyIndex, r, g, b)
 		} else {
-			const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]))
+			const pixels = Buffer.alloc(this.BUTTON_RGB_BYTES, Buffer.from([r, g, b]))
 			const keyIndex2 = this.transformKeyIndex(keyIndex)
 			await this.fillImageRange(keyIndex2, pixels, {
 				format: 'rgb',
 				offset: 0,
-				stride: this.ICON_SIZE * 3,
+				stride: this.BUTTON_WIDTH_PX * 3,
 			})
 		}
 	}
@@ -190,7 +195,7 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		const sourceFormat = options?.format ?? 'rgb'
 		this.checkSourceFormat(sourceFormat)
 
-		const imageSize = this.ICON_PIXELS * sourceFormat.length
+		const imageSize = this.BUTTON_TOTAL_PX * sourceFormat.length
 		if (imageBuffer.length !== imageSize) {
 			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
 		}
@@ -199,7 +204,7 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		await this.fillImageRange(keyIndex2, imageBuffer, {
 			format: sourceFormat,
 			offset: 0,
-			stride: this.ICON_SIZE * sourceFormat.length,
+			stride: this.BUTTON_WIDTH_PX * sourceFormat.length,
 		})
 	}
 
@@ -207,17 +212,17 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		const sourceFormat = options?.format ?? 'rgb'
 		this.checkSourceFormat(sourceFormat)
 
-		const imageSize = this.ICON_PIXELS * sourceFormat.length * this.NUM_KEYS
+		const imageSize = this.BUTTON_TOTAL_PX * sourceFormat.length * this.NUM_KEYS
 		if (imageBuffer.length !== imageSize) {
 			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
 		}
 
-		const iconSize = this.ICON_SIZE * sourceFormat.length
+		const iconSize = this.BUTTON_WIDTH_PX * sourceFormat.length
 		const stride = iconSize * this.KEY_COLUMNS
 
 		const ps: Array<Promise<void>> = []
 		for (let row = 0; row < this.KEY_ROWS; row++) {
-			const rowOffset = stride * row * this.ICON_SIZE
+			const rowOffset = stride * row * this.BUTTON_HEIGHT_PX
 
 			for (let column = 0; column < this.KEY_COLUMNS; column++) {
 				let index = row * this.KEY_COLUMNS
@@ -241,34 +246,46 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		await Promise.all(ps)
 	}
 
+	private async sendKeyRgb(keyIndex: number, red: number, green: number, blue: number): Promise<void> {
+		await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, red, green, blue]))
+	}
+
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
 		this.checkValidKeyIndex(keyIndex, true)
 
-		if (keyIndex >= this.NUM_KEYS) {
-			await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, 0, 0, 0]))
+		if (this.deviceProperties.SUPPORTS_RGB_KEY_FILL || keyIndex >= this.NUM_KEYS) {
+			await this.sendKeyRgb(keyIndex, 0, 0, 0)
 		} else {
-			const pixels = Buffer.alloc(this.ICON_BYTES, 0)
+			const pixels = Buffer.alloc(this.BUTTON_RGB_BYTES, 0)
 			const keyIndex2 = this.transformKeyIndex(keyIndex)
 			await this.fillImageRange(keyIndex2, pixels, {
 				format: 'rgb',
 				offset: 0,
-				stride: this.ICON_SIZE * 3,
+				stride: this.BUTTON_WIDTH_PX * 3,
 			})
 		}
 	}
 
 	protected clearPanelInner(): Promise<void>[] {
-		const pixels = Buffer.alloc(this.ICON_BYTES, 0)
 		const ps: Array<Promise<void>> = []
-		for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
-			ps.push(
-				this.fillImageRange(keyIndex, pixels, {
-					format: 'rgb',
-					offset: 0,
-					stride: this.ICON_SIZE * 3,
-				})
-			)
+
+		if (this.deviceProperties.SUPPORTS_RGB_KEY_FILL) {
+			for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
+				ps.push(this.sendKeyRgb(keyIndex, 0, 0, 0))
+			}
+		} else if (this.BUTTON_RGB_BYTES > 0) {
+			const pixels = Buffer.alloc(this.BUTTON_RGB_BYTES, 0)
+			for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
+				ps.push(
+					this.fillImageRange(keyIndex, pixels, {
+						format: 'rgb',
+						offset: 0,
+						stride: this.BUTTON_WIDTH_PX * 3,
+					})
+				)
+			}
 		}
+
 		for (let buttonIndex = 0; buttonIndex < this.NUM_TOUCH_KEYS; buttonIndex++) {
 			ps.push(this.clearKey(buttonIndex + this.NUM_KEYS))
 		}

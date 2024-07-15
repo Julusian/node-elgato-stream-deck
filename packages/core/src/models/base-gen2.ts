@@ -124,9 +124,10 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 			sourceOptions,
 			{ colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip },
 			0,
-			this.ICON_SIZE
+			this.BUTTON_WIDTH_PX,
+			this.BUTTON_HEIGHT_PX
 		)
 
-		return this.encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE)
+		return this.encodeJPEG(byteBuffer, this.BUTTON_WIDTH_PX, this.BUTTON_HEIGHT_PX)
 	}
 }

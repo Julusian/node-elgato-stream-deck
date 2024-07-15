@@ -198,14 +198,14 @@ function runForDevice(path: string, model: DeviceModelId): void {
 	})
 
 	test('fillPanelBuffer', async () => {
-		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.ICON_BYTES)
+		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.BUTTON_RGB_BYTES)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await streamDeck.fillPanelBuffer(buffer)
 
 		expect(fillKeyBufferMock).toHaveBeenCalledTimes(streamDeck.NUM_KEYS)
 
-		const stride = streamDeck.KEY_COLUMNS * streamDeck.ICON_SIZE * 3
+		const stride = streamDeck.KEY_COLUMNS * streamDeck.BUTTON_WIDTH_PX * 3
 		for (let i = 0; i < streamDeck.NUM_KEYS; i++) {
 			expect(fillKeyBufferMock).toHaveBeenCalledWith(i, expect.any(Buffer), {
 				format: 'rgb',
@@ -218,14 +218,14 @@ function runForDevice(path: string, model: DeviceModelId): void {
 	})
 
 	test('fillPanelBuffer with format', async () => {
-		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.ICON_PIXELS * 4)
+		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.BUTTON_TOTAL_PX * 4)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await streamDeck.fillPanelBuffer(buffer, { format: 'bgra' })
 
 		expect(fillKeyBufferMock).toHaveBeenCalledTimes(streamDeck.NUM_KEYS)
 
-		const stride = streamDeck.KEY_COLUMNS * streamDeck.ICON_SIZE * 4
+		const stride = streamDeck.KEY_COLUMNS * streamDeck.BUTTON_WIDTH_PX * 4
 		for (let i = 0; i < streamDeck.NUM_KEYS; i++) {
 			expect(fillKeyBufferMock).toHaveBeenCalledWith(i, expect.any(Buffer), {
 				format: 'bgra',
@@ -238,7 +238,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 	})
 
 	test('fillPanelBuffer bad format', async () => {
-		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.ICON_BYTES)
+		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.BUTTON_RGB_BYTES)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await expect(async () => streamDeck.fillPanelBuffer(buffer, { format: 'abc' as any })).rejects.toThrow()
@@ -255,7 +255,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 	})
 
 	test('fillKeyBuffer', async () => {
-		const buffer = Buffer.alloc(streamDeck.ICON_BYTES)
+		const buffer = Buffer.alloc(streamDeck.BUTTON_RGB_BYTES)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await streamDeck.fillKeyBuffer(2, buffer)
@@ -264,14 +264,14 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		expect(fillKeyBufferMock).toHaveBeenCalledWith(2, expect.any(Buffer), {
 			format: 'rgb',
 			offset: 0,
-			stride: streamDeck.ICON_SIZE * 3,
+			stride: streamDeck.BUTTON_WIDTH_PX * 3,
 		})
 		// Buffer has to be seperately as a deep equality check is really slow
 		expect(fillKeyBufferMock.mock.calls[0][1]).toBe(buffer)
 	})
 
 	test('fillKeyBuffer with format', async () => {
-		const buffer = Buffer.alloc(streamDeck.ICON_PIXELS * 4)
+		const buffer = Buffer.alloc(streamDeck.BUTTON_TOTAL_PX * 4)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await streamDeck.fillKeyBuffer(2, buffer, { format: 'rgba' })
@@ -280,14 +280,14 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		expect(fillKeyBufferMock).toHaveBeenCalledWith(2, expect.any(Buffer), {
 			format: 'rgba',
 			offset: 0,
-			stride: streamDeck.ICON_SIZE * 4,
+			stride: streamDeck.BUTTON_WIDTH_PX * 4,
 		})
 		// Buffer has to be seperately as a deep equality check is really slow
 		expect(fillKeyBufferMock.mock.calls[0][1]).toBe(buffer)
 	})
 
 	test('fillKeyBuffer bad key', async () => {
-		const buffer = Buffer.alloc(streamDeck.ICON_BYTES)
+		const buffer = Buffer.alloc(streamDeck.BUTTON_RGB_BYTES)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await expect(async () => streamDeck.fillKeyBuffer(-1, buffer)).rejects.toThrow()
@@ -297,7 +297,7 @@ function runForDevice(path: string, model: DeviceModelId): void {
 	})
 
 	test('fillKeyBuffer bad format', async () => {
-		const buffer = Buffer.alloc(streamDeck.ICON_BYTES)
+		const buffer = Buffer.alloc(streamDeck.BUTTON_RGB_BYTES)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await expect(async () => streamDeck.fillKeyBuffer(1, buffer, { format: 'abc' as any })).rejects.toThrow()
@@ -322,11 +322,11 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		expect(fillKeyBufferMock).toHaveBeenCalledWith(4, expect.any(Buffer), {
 			format: 'rgb',
 			offset: 0,
-			stride: streamDeck.ICON_SIZE * 3,
+			stride: streamDeck.BUTTON_WIDTH_PX * 3,
 		})
 		// console.log(JSON.stringify(bufferToIntArray(fillKeyBufferMock.mock.calls[0][1])))
 		expect(fillKeyBufferMock.mock.calls[0][1]).toEqual(
-			readFixtureJSON(`fillColor-buffer-${streamDeck.ICON_SIZE}.json`)
+			readFixtureJSON(`fillColor-buffer-${streamDeck.BUTTON_WIDTH_PX}.json`)
 		)
 	})
 
@@ -442,22 +442,22 @@ describe('StreamDeck (Flipped keymap)', () => {
 		expect(fillKeyBufferMock).toHaveBeenNthCalledWith(1, 4, expect.any(Buffer), {
 			format: 'rgb',
 			offset: 0,
-			stride: streamDeck.ICON_SIZE * 3,
+			stride: streamDeck.BUTTON_WIDTH_PX * 3,
 		})
 		expect(fillKeyBufferMock).toHaveBeenNthCalledWith(2, 0, expect.any(Buffer), {
 			format: 'rgb',
 			offset: 0,
-			stride: streamDeck.ICON_SIZE * 3,
+			stride: streamDeck.BUTTON_WIDTH_PX * 3,
 		})
 		expect(fillKeyBufferMock).toHaveBeenNthCalledWith(3, 7, expect.any(Buffer), {
 			format: 'rgb',
 			offset: 0,
-			stride: streamDeck.ICON_SIZE * 3,
+			stride: streamDeck.BUTTON_WIDTH_PX * 3,
 		})
 		expect(fillKeyBufferMock).toHaveBeenNthCalledWith(4, 10, expect.any(Buffer), {
 			format: 'rgb',
 			offset: 0,
-			stride: streamDeck.ICON_SIZE * 3,
+			stride: streamDeck.BUTTON_WIDTH_PX * 3,
 		})
 	})
 

@@ -42,8 +42,8 @@ export class ChaseDemo implements Demo {
 		this.counter = 0
 
 		const canvas = document.createElement('canvas')
-		canvas.width = device.ICON_SIZE
-		canvas.height = device.ICON_SIZE
+		canvas.width = device.BUTTON_WIDTH_PX
+		canvas.height = device.BUTTON_HEIGHT_PX
 
 		await this.drawButtons(device, canvas, this.counter)
 

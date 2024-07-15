@@ -10,10 +10,12 @@ const miniV2Properties: StreamDeckProperties = {
 	COLUMNS: 3,
 	ROWS: 2,
 	TOUCH_BUTTONS: 0,
-	ICON_SIZE: 80,
+	BUTTON_WIDTH_PX: 80,
+	BUTTON_HEIGHT_PX: 80,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 0,
 	ENCODER_COUNT: 0,
+	SUPPORTS_RGB_KEY_FILL: true, // TODO - verify this
 
 	KEY_SPACING_HORIZONTAL: 28,
 	KEY_SPACING_VERTICAL: 28,
@@ -30,9 +32,10 @@ export class StreamDeckMiniV2 extends StreamDeckGen1Base {
 			sourceOptions,
 			{ colorMode: 'bgr', rotate: true, yFlip: true },
 			BMP_HEADER_LENGTH,
-			this.ICON_SIZE
+			this.BUTTON_WIDTH_PX,
+			this.BUTTON_HEIGHT_PX
 		)
-		writeBMPHeader(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 2835)
+		writeBMPHeader(byteBuffer, this.BUTTON_WIDTH_PX, this.BUTTON_HEIGHT_PX, this.BUTTON_RGB_BYTES, 2835)
 		return Promise.resolve(byteBuffer)
 	}
 }

@@ -28,7 +28,7 @@ export class StreamDeckWeb extends StreamDeckProxy {
 			throw new Error('Failed to get canvas context')
 		}
 
-		const data = ctx.getImageData(0, 0, this.ICON_SIZE, this.ICON_SIZE)
+		const data = ctx.getImageData(0, 0, this.BUTTON_WIDTH_PX, this.BUTTON_HEIGHT_PX)
 		return this.device.fillKeyBuffer(keyIndex, Buffer.from(data.data), { format: 'rgba' })
 	}
 
@@ -38,7 +38,12 @@ export class StreamDeckWeb extends StreamDeckProxy {
 			throw new Error('Failed to get canvas context')
 		}
 
-		const data = ctx.getImageData(0, 0, this.ICON_SIZE * this.KEY_COLUMNS, this.ICON_SIZE * this.KEY_ROWS)
+		const data = ctx.getImageData(
+			0,
+			0,
+			this.BUTTON_WIDTH_PX * this.KEY_COLUMNS,
+			this.BUTTON_HEIGHT_PX * this.KEY_ROWS
+		)
 		return this.device.fillPanelBuffer(Buffer.from(data.data), { format: 'rgba' })
 	}
 }

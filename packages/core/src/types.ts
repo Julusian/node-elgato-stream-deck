@@ -48,12 +48,14 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	/** The number of encoders on this streamdeck (if any) */
 	readonly NUM_ENCODERS: number
 
-	/** The horizontal/vertical resolution of the buttons */
-	readonly ICON_SIZE: number
+	/** The horizontal resolution of the buttons */
+	readonly BUTTON_WIDTH_PX: number
+	/** The vertical resolution of the buttons */
+	readonly BUTTON_HEIGHT_PX: number
 	/** The total number of pixels of a button */
-	readonly ICON_PIXELS: number
+	readonly BUTTON_TOTAL_PX: number
 	/** The number of bytes for a RGB encoded image for a button */
-	readonly ICON_BYTES: number
+	readonly BUTTON_RGB_BYTES: number
 
 	/** The horizontal spacing in pixels between each button */
 	readonly KEY_SPACING_HORIZONTAL: number

@@ -29,14 +29,17 @@ export class StreamDeckProxy implements StreamDeck {
 	public get NUM_ENCODERS(): number {
 		return this.device.NUM_ENCODERS
 	}
-	public get ICON_SIZE(): number {
-		return this.device.ICON_SIZE
+	public get BUTTON_WIDTH_PX(): number {
+		return this.device.BUTTON_WIDTH_PX
 	}
-	public get ICON_BYTES(): number {
-		return this.device.ICON_BYTES
+	public get BUTTON_HEIGHT_PX(): number {
+		return this.device.BUTTON_HEIGHT_PX
 	}
-	public get ICON_PIXELS(): number {
-		return this.device.ICON_PIXELS
+	public get BUTTON_RGB_BYTES(): number {
+		return this.device.BUTTON_RGB_BYTES
+	}
+	public get BUTTON_TOTAL_PX(): number {
+		return this.device.BUTTON_TOTAL_PX
 	}
 	public get KEY_SPACING_VERTICAL(): number {
 		return this.device.KEY_SPACING_VERTICAL
