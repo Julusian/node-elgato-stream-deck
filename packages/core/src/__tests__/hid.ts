@@ -1,10 +1,8 @@
 /* eslint-disable jest/no-standalone-expect */
 import { EventEmitter } from 'events'
 import { EncodeJPEGHelper } from '../models/base'
-import { HIDDevice, HIDDeviceInfo } from '../device'
-export class DummyHID extends EventEmitter implements HIDDevice {
-	public dataKeyOffset: number | undefined
-
+import { HIDDevice, HIDDeviceEvents, HIDDeviceInfo } from '../device'
+export class DummyHID extends EventEmitter<HIDDeviceEvents> implements HIDDevice {
 	constructor(public readonly path: string, public readonly encodeJPEG: jest.MockedFunction<EncodeJPEGHelper>) {
 		super()
 		expect(typeof path).toEqual('string')

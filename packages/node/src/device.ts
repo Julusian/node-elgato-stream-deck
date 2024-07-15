@@ -1,4 +1,4 @@
-import type { DeviceModelId, HIDDevice, HIDDeviceInfo } from '@elgato-stream-deck/core'
+import type { DeviceModelId, HIDDevice, HIDDeviceEvents, HIDDeviceInfo } from '@elgato-stream-deck/core'
 import { EventEmitter } from 'events'
 import type { HIDAsync, HID, Device as NodeHIDDeviceInfo } from 'node-hid'
 
@@ -18,7 +18,7 @@ export interface StreamDeckDeviceInfo {
  * The wrapped node-hid HIDDevice.
  * This translates it into the common format expected by @elgato-stream-deck/core
  */
-export class NodeHIDDevice extends EventEmitter implements HIDDevice {
+export class NodeHIDDevice extends EventEmitter<HIDDeviceEvents> implements HIDDevice {
 	private device: HIDAsync
 
 	constructor(device: HIDAsync) {
@@ -68,7 +68,7 @@ export class NodeHIDDevice extends EventEmitter implements HIDDevice {
 /**
  * HACK sync implementation
  */
-export class NodeHIDSyncDevice extends EventEmitter implements HIDDevice {
+export class NodeHIDSyncDevice extends EventEmitter<HIDDeviceEvents> implements HIDDevice {
 	private device: HID
 
 	constructor(device: HID) {
