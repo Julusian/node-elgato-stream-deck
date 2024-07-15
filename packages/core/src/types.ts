@@ -1,4 +1,4 @@
-import * as EventEmitter from 'eventemitter3'
+import { EventEmitter } from 'events'
 import { DeviceModelId, EncoderIndex, KeyIndex } from './id'
 import { HIDDeviceInfo } from './device'
 

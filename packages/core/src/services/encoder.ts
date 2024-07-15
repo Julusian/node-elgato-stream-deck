@@ -1,4 +1,4 @@
-import * as EventEmitter from 'eventemitter3'
+import type { EventEmitter } from 'events'
 import type { StreamDeckEvents } from '..'
 
 export class EncoderInputService {
