@@ -11,7 +11,7 @@ const { listStreamDecks, openStreamDeck } = require('../dist/index')
 
 	const img = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 		.flatten()
-		.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
+		.resize(streamDeck.BUTTON_WIDTH_PX, streamDeck.BUTTON_HEIGHT_PX)
 		.raw()
 		.toBuffer()
 

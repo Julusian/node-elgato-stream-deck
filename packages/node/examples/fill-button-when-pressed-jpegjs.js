@@ -10,7 +10,7 @@ const { listStreamDecks, openStreamDeck } = require('../dist/index')
 	const streamDeck = await openStreamDeck(devices[0].path)
 	await streamDeck.clearPanel()
 
-	const rawFile = fs.readFileSync(path.resolve(__dirname, `fixtures/github_logo_${streamDeck.ICON_SIZE}.jpg`))
+	const rawFile = fs.readFileSync(path.resolve(__dirname, `fixtures/github_logo_${streamDeck.BUTTON_WIDTH_PX}.jpg`))
 	const img = jpegJS.decode(rawFile).data
 
 	streamDeck.on('down', (keyIndex) => {

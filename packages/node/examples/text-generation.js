@@ -9,19 +9,21 @@ openStreamDeck().then((streamDeck) => {
 		console.log('Filling button #%d', keyIndex)
 
 		try {
-			const finalBuffer = await sharp(path.resolve(__dirname, `fixtures/github_logo_${streamDeck.ICON_SIZE}.jpg`))
+			const finalBuffer = await sharp(
+				path.resolve(__dirname, `fixtures/github_logo_${streamDeck.BUTTON_WIDTH_PX}.jpg`)
+			)
 				.composite([
 					{
 						input: Buffer.from(
-							`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${streamDeck.ICON_SIZE} ${
-								streamDeck.ICON_SIZE
+							`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${streamDeck.BUTTON_WIDTH_PX} ${
+								streamDeck.BUTTON_HEIGHT_PX
 							}" version="1.1">
                         <text
                             font-family="'sans-serif'"
                             font-size="14px"
 							font-weight="bold"
-                            x="${streamDeck.ICON_SIZE / 2}"
-                            y="${streamDeck.ICON_SIZE - 10}"
+                            x="${streamDeck.BUTTON_WIDTH_PX / 2}"
+                            y="${streamDeck.BUTTON_HEIGHT_PX - 10}"
                             fill="#fff"
                             text-anchor="middle"
 							stroke="#666"

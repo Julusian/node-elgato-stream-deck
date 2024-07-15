@@ -19,12 +19,12 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 
 	const imgField = await sharp(path.resolve(__dirname, 'fixtures/sunny_field.png'))
 		.flatten()
-		.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
+		.resize(streamDeck.BUTTON_WIDTH_PX * streamDeck.KEY_COLUMNS, streamDeck.BUTTON_HEIGHT_PX * streamDeck.KEY_ROWS)
 		.raw()
 		.toBuffer()
 	const imgMosaic = await sharp(path.resolve(__dirname, '../../../fixtures/mosaic.png'))
 		.flatten()
-		.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
+		.resize(streamDeck.BUTTON_WIDTH_PX * streamDeck.KEY_COLUMNS, streamDeck.BUTTON_HEIGHT_PX * streamDeck.KEY_ROWS)
 		.raw()
 		.toBuffer()
 

@@ -12,10 +12,16 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 	await streamDeck.clearPanel()
 
 	const bmpImgField = await Jimp.read(path.resolve(__dirname, 'fixtures/sunny_field.png')).then((img) => {
-		return img.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
+		return img.resize(
+			streamDeck.BUTTON_WIDTH_PX * streamDeck.KEY_COLUMNS,
+			streamDeck.BUTTON_HEIGHT_PX * streamDeck.KEY_ROWS
+		)
 	})
 	const bmpImgMosaic = await Jimp.read(path.resolve(__dirname, '../../../fixtures/mosaic.png')).then((img) => {
-		return img.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
+		return img.resize(
+			streamDeck.BUTTON_WIDTH_PX * streamDeck.KEY_COLUMNS,
+			streamDeck.BUTTON_HEIGHT_PX * streamDeck.KEY_ROWS
+		)
 	})
 	const bmpImgFieldLcd = streamDeck.LCD_STRIP_SIZE
 		? await Jimp.read(path.resolve(__dirname, 'fixtures/sunny_field.png')).then((img) => {
