@@ -1,5 +1,5 @@
 import { HIDDevice } from '../device'
-import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
+import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen2Properties } from './base'
 import { DeviceModelId } from '../id'
 import { StreamDeckGen2Base } from './base-gen2'
 import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
@@ -7,7 +7,7 @@ import { StreamdeckNeoLcdImageHeaderGenerator } from '../imageWriter/headerGener
 import { FillImageOptions, FillLcdImageOptions, LcdSegmentSize, StreamDeckLcdStripService } from '../types'
 import { transformImageBuffer } from '../util'
 
-const neoProperties: StreamDeckProperties = {
+const neoProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.NEO,
 	PRODUCT_NAME: 'Streamdeck Neo',
 	COLUMNS: 4,
@@ -15,10 +15,7 @@ const neoProperties: StreamDeckProperties = {
 	TOUCH_BUTTONS: 2,
 	BUTTON_WIDTH_PX: 96,
 	BUTTON_HEIGHT_PX: 96,
-	KEY_DIRECTION: 'ltr',
-	KEY_DATA_OFFSET: 3,
 	ENCODER_COUNT: 0,
-	SUPPORTS_RGB_KEY_FILL: true,
 
 	KEY_SPACING_HORIZONTAL: 30,
 	KEY_SPACING_VERTICAL: 30,

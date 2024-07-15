@@ -1,21 +1,18 @@
 import { HIDDevice } from '../device'
 import { BMP_HEADER_LENGTH, transformImageBuffer, writeBMPHeader } from '../util'
-import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
+import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen1Properties } from './base'
 import { StreamDeckGen1Base } from './base-gen1'
 import { DeviceModelId, KeyIndex } from '../id'
 import { StreamdeckOriginalImageWriter } from '../imageWriter/imageWriter'
 
-const originalProperties: StreamDeckProperties = {
+const originalProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.ORIGINAL,
 	PRODUCT_NAME: 'Streamdeck',
 	COLUMNS: 5,
 	ROWS: 3,
-	TOUCH_BUTTONS: 0,
 	BUTTON_WIDTH_PX: 72,
 	BUTTON_HEIGHT_PX: 72,
 	KEY_DIRECTION: 'rtl',
-	KEY_DATA_OFFSET: 0,
-	ENCODER_COUNT: 0,
 	SUPPORTS_RGB_KEY_FILL: false,
 
 	KEY_SPACING_HORIZONTAL: 25,
@@ -52,6 +49,6 @@ export class StreamDeckOriginal extends StreamDeckGen1Base {
 			this.BUTTON_HEIGHT_PX
 		)
 		writeBMPHeader(byteBuffer, this.BUTTON_WIDTH_PX, this.BUTTON_HEIGHT_PX, this.BUTTON_RGB_BYTES, 3780)
-		return Promise.resolve(byteBuffer)
+		return byteBuffer
 	}
 }

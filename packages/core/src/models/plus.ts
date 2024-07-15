@@ -8,13 +8,13 @@ import {
 	StreamDeckLcdStripService,
 } from '../types'
 import { HIDDevice } from '../device'
-import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
+import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen2Properties } from './base'
 import { StreamDeckGen2Base } from './base-gen2'
 import { DeviceModelId, EncoderIndex } from '../id'
 import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
 import { StreamdeckPlusLcdImageHeaderGenerator } from '../imageWriter/headerGenerator'
 
-const plusProperties: StreamDeckProperties = {
+const plusProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.PLUS,
 	PRODUCT_NAME: 'Streamdeck +',
 	COLUMNS: 4,
@@ -22,10 +22,7 @@ const plusProperties: StreamDeckProperties = {
 	TOUCH_BUTTONS: 0,
 	BUTTON_WIDTH_PX: 120,
 	BUTTON_HEIGHT_PX: 120,
-	KEY_DIRECTION: 'ltr',
-	KEY_DATA_OFFSET: 3,
 	ENCODER_COUNT: 4,
-	SUPPORTS_RGB_KEY_FILL: true,
 
 	KEY_SPACING_HORIZONTAL: 99,
 	KEY_SPACING_VERTICAL: 40,

@@ -5,12 +5,22 @@ import {
 	InternalFillImageOptions,
 	OpenStreamDeckOptions,
 	StreamDeckBase,
+	StreamDeckGen2Properties,
 	StreamDeckProperties,
 } from './base'
 import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
 import { StreamdeckGen2ImageHeaderGenerator } from '../imageWriter/headerGenerator'
 import type { StreamDeckLcdStripService, StreamDeckLcdStripServiceInternal } from '../types'
 import { EncoderInputService } from '../services/encoder'
+
+function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): StreamDeckProperties {
+	return {
+		...rawProps,
+		KEY_DATA_OFFSET: 3,
+		KEY_DIRECTION: 'ltr',
+		SUPPORTS_RGB_KEY_FILL: true,
+	}
+}
 
 /**
  * Base class for generation 2 hardware (starting with the xl)
@@ -29,11 +39,16 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 	constructor(
 		device: HIDDevice,
 		options: Required<OpenStreamDeckOptions>,
-		properties: StreamDeckProperties,
+		properties: StreamDeckGen2Properties,
 		lcdStripService: StreamDeckLcdStripServiceInternal | null,
 		disableXYFlip?: boolean
 	) {
-		super(device, options, properties, new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator()))
+		super(
+			device,
+			options,
+			extendDevicePropertiesForGen2(properties),
+			new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator())
+		)
 
 		this.encodeJPEG = options.encodeJPEG
 		this.xyFlip = !disableXYFlip

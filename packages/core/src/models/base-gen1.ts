@@ -1,8 +1,17 @@
 import { HIDDevice } from '../device'
-import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
+import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckGen1Properties, StreamDeckProperties } from './base'
 import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
 import { StreamdeckGen1ImageHeaderGenerator } from '../imageWriter/headerGenerator'
 import { StreamdeckImageWriter } from '../imageWriter/types'
+
+function extendDevicePropertiesForGen1(rawProps: StreamDeckGen1Properties): StreamDeckProperties {
+	return {
+		...rawProps,
+		KEY_DATA_OFFSET: 0,
+		TOUCH_BUTTONS: 0,
+		ENCODER_COUNT: 0,
+	}
+}
 
 /**
  * Base class for generation 1 hardware (before the xl)
@@ -11,13 +20,13 @@ export abstract class StreamDeckGen1Base extends StreamDeckBase {
 	constructor(
 		device: HIDDevice,
 		options: Required<OpenStreamDeckOptions>,
-		properties: StreamDeckProperties,
+		properties: StreamDeckGen1Properties,
 		imageWriter?: StreamdeckImageWriter
 	) {
 		super(
 			device,
 			options,
-			properties,
+			extendDevicePropertiesForGen1(properties),
 			imageWriter ?? new StreamdeckDefaultImageWriter(new StreamdeckGen1ImageHeaderGenerator())
 		)
 	}
