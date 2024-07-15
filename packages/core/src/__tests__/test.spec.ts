@@ -394,12 +394,12 @@ describe('StreamDeck', () => {
 		await streamDeck.fillKeyColor(14, 1, 2, 3)
 
 		expect(fillKeyBufferMock).toHaveBeenCalledTimes(4)
-		expect(fillKeyBufferMock).toHaveBeenNthCalledWith(1, 4, expect.any(Buffer), {
+		expect(fillKeyBufferMock).toHaveBeenNthCalledWith(1, 0, expect.any(Buffer), {
 			format: 'rgb',
 			offset: 0,
 			stride: streamDeck.BUTTON_WIDTH_PX * 3,
 		})
-		expect(fillKeyBufferMock).toHaveBeenNthCalledWith(2, 0, expect.any(Buffer), {
+		expect(fillKeyBufferMock).toHaveBeenNthCalledWith(2, 4, expect.any(Buffer), {
 			format: 'rgb',
 			offset: 0,
 			stride: streamDeck.BUTTON_WIDTH_PX * 3,
@@ -409,7 +409,7 @@ describe('StreamDeck', () => {
 			offset: 0,
 			stride: streamDeck.BUTTON_WIDTH_PX * 3,
 		})
-		expect(fillKeyBufferMock).toHaveBeenNthCalledWith(4, 10, expect.any(Buffer), {
+		expect(fillKeyBufferMock).toHaveBeenNthCalledWith(4, 14, expect.any(Buffer), {
 			format: 'rgb',
 			offset: 0,
 			stride: streamDeck.BUTTON_WIDTH_PX * 3,

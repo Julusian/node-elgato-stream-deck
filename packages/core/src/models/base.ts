@@ -150,7 +150,15 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	public abstract getSerialNumber(): Promise<string>
 
 	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {
-		return keyIndex
+		if (this.deviceProperties.KEY_DIRECTION === 'ltr') {
+			// Normal
+			return keyIndex
+		} else {
+			// Horizontal flip
+			const half = (this.KEY_COLUMNS - 1) / 2
+			const diff = ((keyIndex % this.KEY_COLUMNS) - half) * -half
+			return keyIndex + diff
+		}
 	}
 
 	public abstract fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
@@ -185,8 +193,7 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 			await this.sendKeyRgb(keyIndex, r, g, b)
 		} else {
 			const pixels = Buffer.alloc(this.BUTTON_RGB_BYTES, Buffer.from([r, g, b]))
-			const keyIndex2 = this.transformKeyIndex(keyIndex)
-			await this.fillImageRange(keyIndex2, pixels, {
+			await this.fillImageRange(keyIndex, pixels, {
 				format: 'rgb',
 				offset: 0,
 				stride: this.BUTTON_WIDTH_PX * 3,
@@ -205,8 +212,7 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
 		}
 
-		const keyIndex2 = this.transformKeyIndex(keyIndex)
-		await this.fillImageRange(keyIndex2, imageBuffer, {
+		await this.fillImageRange(keyIndex, imageBuffer, {
 			format: sourceFormat,
 			offset: 0,
 			stride: this.BUTTON_WIDTH_PX * sourceFormat.length,
@@ -230,13 +236,7 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 			const rowOffset = stride * row * this.BUTTON_HEIGHT_PX
 
 			for (let column = 0; column < this.KEY_COLUMNS; column++) {
-				let index = row * this.KEY_COLUMNS
-				if (this.deviceProperties.KEY_DIRECTION === 'ltr') {
-					index += column
-				} else {
-					index += this.KEY_COLUMNS - column - 1
-				}
-
+				const index = row * this.KEY_COLUMNS + column
 				const colOffset = column * iconSize
 
 				ps.push(
@@ -262,8 +262,7 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 			await this.sendKeyRgb(keyIndex, 0, 0, 0)
 		} else {
 			const pixels = Buffer.alloc(this.BUTTON_RGB_BYTES, 0)
-			const keyIndex2 = this.transformKeyIndex(keyIndex)
-			await this.fillImageRange(keyIndex2, pixels, {
+			await this.fillImageRange(keyIndex, pixels, {
 				format: 'rgb',
 				offset: 0,
 				stride: this.BUTTON_WIDTH_PX * 3,
@@ -307,9 +306,11 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOptions: InternalFillImageOptions) {
 		this.checkValidKeyIndex(keyIndex)
 
+		const keyIndexTransformed = this.transformKeyIndex(keyIndex)
+
 		const byteBuffer = await this.convertFillImage(imageBuffer, sourceOptions)
 
-		const packets = this.imageWriter.generateFillImageWrites({ keyIndex }, byteBuffer)
+		const packets = this.imageWriter.generateFillImageWrites({ keyIndex: keyIndexTransformed }, byteBuffer)
 		await this.device.sendReports(packets)
 	}
 

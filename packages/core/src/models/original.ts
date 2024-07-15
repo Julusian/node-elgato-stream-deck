@@ -2,7 +2,7 @@ import { HIDDevice } from '../device'
 import { BMP_HEADER_LENGTH, transformImageBuffer, writeBMPHeader } from '../util'
 import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen1Properties } from './base'
 import { StreamDeckGen1Base } from './base-gen1'
-import { DeviceModelId, KeyIndex } from '../id'
+import { DeviceModelId } from '../id'
 import { StreamdeckOriginalImageWriter } from '../imageWriter/imageWriter'
 
 const originalProperties: StreamDeckGen1Properties = {
@@ -22,13 +22,6 @@ const originalProperties: StreamDeckGen1Properties = {
 export class StreamDeckOriginal extends StreamDeckGen1Base {
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
 		super(device, options, originalProperties, new StreamdeckOriginalImageWriter())
-	}
-
-	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {
-		// Horizontal flip
-		const half = (this.KEY_COLUMNS - 1) / 2
-		const diff = ((keyIndex % this.KEY_COLUMNS) - half) * -half
-		return keyIndex + diff
 	}
 
 	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
