@@ -14,7 +14,6 @@ function openStreamDeck(path: string, deviceModel: DeviceModelId, userOptions?: 
 		throw new Error('Not implemented')
 	})
 	const options: Required<OpenStreamDeckOptions> = {
-		useOriginalKeyOrder: false,
 		encodeJPEG: encodeJpegMock,
 		...userOptions,
 	}
@@ -28,7 +27,6 @@ function openStreamDeck(path: string, deviceModel: DeviceModelId, userOptions?: 
 	return new model.class(
 		device,
 		options || {
-			useOriginalKeyOrder: false,
 			encodeJPEG: undefined,
 		}
 	)
@@ -41,7 +39,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 	}
 
 	beforeEach(() => {
-		streamDeck = openStreamDeck(path, model, { useOriginalKeyOrder: true })
+		streamDeck = openStreamDeck(path, model)
 	})
 
 	test('checkValidKeyIndex', async () => {
@@ -385,84 +383,7 @@ describe('StreamDeck', () => {
 	}
 
 	beforeEach(() => {
-		streamDeck = openStreamDeck(devicePath, DeviceModelId.ORIGINAL, { useOriginalKeyOrder: true })
-	})
-
-	test('constructor uses the provided devicePath', () => {
-		const streamDeck2 = openStreamDeck(devicePath, DeviceModelId.ORIGINAL)
-		const device = getDevice(streamDeck2)
-		expect(device.path).toEqual(devicePath)
-		expect(streamDeck2.MODEL).toEqual(DeviceModelId.ORIGINAL)
-	})
-
-	runForDevice(devicePath, DeviceModelId.ORIGINAL, false)
-
-	test('fillImage', async () => {
-		const device = getDevice()
-		const writeFn: jest.Mock<Promise<void>, [Buffer[]]> = (device.sendReports = jest.fn())
-		expect(writeFn).toHaveBeenCalledTimes(0)
-		await streamDeck.fillKeyBuffer(0, readFixtureJSON('fillImage-sample-icon-72.json'))
-
-		expect(writeFn.mock.calls).toMatchSnapshot()
-	})
-
-	test('down and up events', () => {
-		const downSpy = jest.fn()
-		const upSpy = jest.fn()
-		streamDeck.on('up', upSpy)
-		streamDeck.on('down', downSpy)
-
-		const device = getDevice()
-		// prettier-ignore
-		device.emit('input', Buffer.from([ 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
-		// prettier-ignore
-		device.emit('input', Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
-
-		expect(downSpy).toHaveBeenCalledTimes(1)
-		expect(upSpy).toHaveBeenCalledTimes(1)
-		expect(downSpy).toHaveBeenNthCalledWith(1, 0)
-		expect(upSpy).toHaveBeenNthCalledWith(1, 0)
-	})
-
-	test('down and up events: combined presses', () => {
-		const downSpy = jest.fn()
-		const upSpy = jest.fn()
-		streamDeck.on('down', downSpy)
-		streamDeck.on('up', upSpy)
-
-		const device = getDevice()
-		// Press 1
-		// prettier-ignore
-		device.emit('input', Buffer.from([0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
-		// Press 8
-		// prettier-ignore
-		device.emit('input', Buffer.from([0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
-
-		expect(downSpy).toHaveBeenCalledTimes(2)
-		expect(upSpy).toHaveBeenCalledTimes(0)
-
-		// Release both
-		// prettier-ignore
-		device.emit('input', Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
-
-		expect(downSpy).toHaveBeenCalledTimes(2)
-		expect(upSpy).toHaveBeenCalledTimes(2)
-		expect(downSpy).toHaveBeenNthCalledWith(1, 1)
-		expect(upSpy).toHaveBeenNthCalledWith(1, 1)
-		expect(downSpy).toHaveBeenNthCalledWith(2, 8)
-		expect(upSpy).toHaveBeenNthCalledWith(2, 8)
-	})
-})
-
-describe('StreamDeck (Flipped keymap)', () => {
-	const devicePath = 'some_random_path_here'
-	let streamDeck: StreamDeck
-	function getDevice(sd?: StreamDeck): DummyHID {
-		return (sd || (streamDeck as any)).device
-	}
-
-	beforeEach(() => {
-		streamDeck = openStreamDeck(devicePath, DeviceModelId.ORIGINAL, { useOriginalKeyOrder: false })
+		streamDeck = openStreamDeck(devicePath, DeviceModelId.ORIGINAL)
 	})
 
 	test('fillKeyColor', async () => {

@@ -8,7 +8,6 @@ import type { StreamdeckImageWriter } from '../imageWriter/types'
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
 export interface OpenStreamDeckOptions {
-	useOriginalKeyOrder?: boolean
 	encodeJPEG?: EncodeJPEGHelper
 }
 

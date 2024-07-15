@@ -20,23 +20,15 @@ const originalProperties: StreamDeckGen1Properties = {
 }
 
 export class StreamDeckOriginal extends StreamDeckGen1Base {
-	private readonly useOriginalKeyOrder: boolean
-
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
 		super(device, options, originalProperties, new StreamdeckOriginalImageWriter())
-
-		this.useOriginalKeyOrder = !!options.useOriginalKeyOrder
 	}
 
 	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {
-		if (!this.useOriginalKeyOrder) {
-			// Horizontal flip
-			const half = (this.KEY_COLUMNS - 1) / 2
-			const diff = ((keyIndex % this.KEY_COLUMNS) - half) * -half
-			return keyIndex + diff
-		} else {
-			return keyIndex
-		}
+		// Horizontal flip
+		const half = (this.KEY_COLUMNS - 1) / 2
+		const diff = ((keyIndex % this.KEY_COLUMNS) - half) * -half
+		return keyIndex + diff
 	}
 
 	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {

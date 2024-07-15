@@ -57,7 +57,6 @@ export async function openDevice(
 
 	try {
 		const options: Required<OpenStreamDeckOptions> = {
-			useOriginalKeyOrder: false,
 			encodeJPEG: encodeJPEG,
 			...userOptions,
 		}
