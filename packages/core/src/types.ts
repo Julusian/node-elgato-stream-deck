@@ -47,10 +47,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 
 	/** The number of encoders on this streamdeck (if any) */
 	readonly NUM_ENCODERS: number
-	/** The full size of the lcd strip on this streamdeck (if any) */
-	readonly LCD_STRIP_SIZE: LcdSegmentSize | undefined
-	/** The size of the lcd per encoder on this streamdeck (if any) */
-	readonly LCD_ENCODER_SIZE: LcdSegmentSize | undefined
 
 	/** The horizontal/vertical resolution of the buttons */
 	readonly ICON_SIZE: number
@@ -68,6 +64,8 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	readonly MODEL: DeviceModelId
 	/** The name of the product/model */
 	readonly PRODUCT_NAME: string
+
+	readonly lcdStrip: StreamDeckLcdStripService | null
 
 	/**
 	 * Checks if a keyIndex is valid. Throws an error on failure
@@ -113,30 +111,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
 
 	/**
-	 * Fill the whole lcd strip
-	 * @param {Buffer} imageBuffer The image to write
-	 * @param {Object} sourceOptions Options to control the write
-	 */
-	fillLcd(imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
-
-	/**
-	 * Fills the lcd strip above an encoder
-	 * @param {number} index The encoder to draw above
-	 * @param {Buffer} imageBuffer The image to write
-	 * @param {Object} sourceOptions Options to control the write
-	 */
-	fillEncoderLcd(index: EncoderIndex, imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
-
-	/**
-	 * Fill a region of the lcd strip, ignoring the boundaries of the encoders
-	 * @param {number} x The x position to draw to
-	 * @param {number} y The y position to draw to
-	 * @param {Buffer} imageBuffer The image to write
-	 * @param {Object} sourceOptions Options to control the write
-	 */
-	fillLcdRegion(x: number, y: number, imageBuffer: Buffer, sourceOptions: FillLcdImageOptions): Promise<void>
-
-	/**
 	 * Clears the given key.
 	 *
 	 * @param {number} keyIndex The key to clear
@@ -169,4 +143,39 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * Get serial number from Stream Deck
 	 */
 	getSerialNumber(): Promise<string>
+}
+
+export interface StreamDeckLcdStripService {
+	/** The full size of the lcd strip on this streamdeck (if any) */
+	readonly LCD_STRIP_SIZE: LcdSegmentSize
+	/** The size of the lcd per encoder on this streamdeck (if any) */
+	readonly LCD_ENCODER_SIZE: LcdSegmentSize | undefined
+
+	/**
+	 * Fill the whole lcd strip
+	 * @param {Buffer} imageBuffer The image to write
+	 * @param {Object} sourceOptions Options to control the write
+	 */
+	fillLcd(imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
+
+	/**
+	 * Fills the lcd strip above an encoder
+	 * @param {number} index The encoder to draw above
+	 * @param {Buffer} imageBuffer The image to write
+	 * @param {Object} sourceOptions Options to control the write
+	 */
+	fillEncoderLcd(index: EncoderIndex, imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
+
+	/**
+	 * Fill a region of the lcd strip, ignoring the boundaries of the encoders
+	 * @param {number} x The x position to draw to
+	 * @param {number} y The y position to draw to
+	 * @param {Buffer} imageBuffer The image to write
+	 * @param {Object} sourceOptions Options to control the write
+	 */
+	fillLcdRegion(x: number, y: number, imageBuffer: Buffer, sourceOptions: FillLcdImageOptions): Promise<void>
+}
+
+export interface StreamDeckLcdStripServiceInternal extends StreamDeckLcdStripService {
+	handleInput(data: Uint8Array): void
 }

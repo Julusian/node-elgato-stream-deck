@@ -13,6 +13,7 @@ const miniProperties: StreamDeckProperties = {
 	ICON_SIZE: 80,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 0,
+	ENCODER_COUNT: 0,
 
 	KEY_SPACING_HORIZONTAL: 28,
 	KEY_SPACING_VERTICAL: 28,

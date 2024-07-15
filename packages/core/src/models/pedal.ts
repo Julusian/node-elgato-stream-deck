@@ -12,6 +12,7 @@ const pedalProperties: StreamDeckProperties = {
 	ICON_SIZE: 0,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 3,
+	ENCODER_COUNT: 0,
 
 	KEY_SPACING_HORIZONTAL: 0,
 	KEY_SPACING_VERTICAL: 0,

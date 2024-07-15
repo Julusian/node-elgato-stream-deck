@@ -12,6 +12,7 @@ const origV2Properties: StreamDeckProperties = {
 	ICON_SIZE: 72,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 3,
+	ENCODER_COUNT: 0,
 
 	KEY_SPACING_HORIZONTAL: 25,
 	KEY_SPACING_VERTICAL: 25,
@@ -19,6 +20,6 @@ const origV2Properties: StreamDeckProperties = {
 
 export class StreamDeckOriginalV2 extends StreamDeckGen2Base {
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(device, options, origV2Properties)
+		super(device, options, origV2Properties, null)
 	}
 }

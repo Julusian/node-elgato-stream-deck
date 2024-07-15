@@ -9,6 +9,8 @@ import {
 } from './base'
 import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
 import { StreamdeckGen2ImageHeaderGenerator } from '../imageWriter/headerGenerator'
+import type { StreamDeckLcdStripService, StreamDeckLcdStripServiceInternal } from '../types'
+import { EncoderInputService } from '../services/encoder'
 
 /**
  * Base class for generation 2 hardware (starting with the xl)
@@ -17,16 +19,58 @@ export abstract class StreamDeckGen2Base extends StreamDeckBase {
 	protected readonly encodeJPEG: EncodeJPEGHelper
 	protected readonly xyFlip: boolean
 
+	protected readonly lcdStripService: StreamDeckLcdStripServiceInternal | null
+	protected readonly encoderService: EncoderInputService
+
+	override get lcdStrip(): StreamDeckLcdStripService | null {
+		return this.lcdStripService
+	}
+
 	constructor(
 		device: HIDDevice,
 		options: Required<OpenStreamDeckOptions>,
 		properties: StreamDeckProperties,
+		lcdStripService: StreamDeckLcdStripServiceInternal | null,
 		disableXYFlip?: boolean
 	) {
 		super(device, options, properties, new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator()))
 
 		this.encodeJPEG = options.encodeJPEG
 		this.xyFlip = !disableXYFlip
+
+		this.lcdStripService = lcdStripService
+		this.encoderService = new EncoderInputService(this, this.NUM_ENCODERS)
+	}
+
+	protected handleInputBuffer(data: Uint8Array): void {
+		const inputType = data[0]
+		switch (inputType) {
+			case 0x00: // Button
+				super.handleInputBuffer(data)
+				break
+			case 0x02: // LCD
+				this.lcdStripService?.handleInput(data)
+				break
+			case 0x03: // Encoder
+				this.encoderService.handleInput(data)
+				break
+		}
+	}
+
+	protected clearPanelInner(): Promise<void>[] {
+		const ps = super.clearPanelInner()
+
+		if (this.lcdStripService) {
+			const lcdSize = this.lcdStripService.LCD_STRIP_SIZE
+			const buffer = Buffer.alloc(lcdSize.width * lcdSize.height * 4)
+			ps.push(
+				this.lcdStripService.fillLcd(buffer, {
+					format: 'rgba',
+				})
+			)
+		}
+
+		return ps
 	}
 
 	/**

@@ -1,12 +1,18 @@
 import { transformImageBuffer } from '../util'
-import { FillImageOptions, FillLcdImageOptions, LcdPosition, LcdSegmentSize } from '../types'
+import {
+	FillImageOptions,
+	FillLcdImageOptions,
+	LcdPosition,
+	LcdSegmentSize,
+	StreamDeckEvents,
+	StreamDeckLcdStripService,
+} from '../types'
 import { HIDDevice } from '../device'
-import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
+import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
 import { StreamDeckGen2Base } from './base-gen2'
 import { DeviceModelId, EncoderIndex } from '../id'
 import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
 import { StreamdeckPlusLcdImageHeaderGenerator } from '../imageWriter/headerGenerator'
-import { EncoderInputService } from '../services/encoder'
 
 const plusProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.PLUS,
@@ -17,26 +23,48 @@ const plusProperties: StreamDeckProperties = {
 	ICON_SIZE: 120,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 3,
+	ENCODER_COUNT: 4,
 
 	KEY_SPACING_HORIZONTAL: 99,
 	KEY_SPACING_VERTICAL: 40,
 }
 
 export class StreamDeckPlus extends StreamDeckGen2Base {
-	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter(new StreamdeckPlusLcdImageHeaderGenerator())
-	readonly #encoderService = new EncoderInputService(this, this.NUM_ENCODERS)
-
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(device, options, plusProperties, true)
+		super(
+			device,
+			options,
+			plusProperties,
+			new StreamDeckPlusLcdService(
+				options.encodeJPEG,
+				device,
+				(key, ...args) => this.emit(key, ...args),
+				plusProperties.ENCODER_COUNT
+			),
+			true
+		)
 	}
+}
 
-	public get NUM_ENCODERS(): number {
-		return 4
+class StreamDeckPlusLcdService implements StreamDeckLcdStripService {
+	readonly #encodeJPEG: EncodeJPEGHelper
+	readonly #device: HIDDevice
+
+	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter(new StreamdeckPlusLcdImageHeaderGenerator())
+
+	readonly #emitEvent: SomeEmitEventFn
+	readonly #encoderCount: number
+
+	constructor(encodeJPEG: EncodeJPEGHelper, device: HIDDevice, emitEvent: SomeEmitEventFn, encoderCount: number) {
+		this.#encodeJPEG = encodeJPEG
+		this.#device = device
+		this.#emitEvent = emitEvent
+		this.#encoderCount = encoderCount
 	}
 
 	public get LCD_STRIP_SIZE(): LcdSegmentSize {
 		const size = this.LCD_ENCODER_SIZE
-		size.width *= this.NUM_ENCODERS
+		size.width *= this.#encoderCount
 		return size
 	}
 	public get LCD_ENCODER_SIZE(): LcdSegmentSize {
@@ -48,22 +76,7 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		return Math.floor(x / encoderWidth)
 	}
 
-	protected handleInputBuffer(data: Uint8Array): void {
-		const inputType = data[0]
-		switch (inputType) {
-			case 0x00: // Button
-				super.handleInputBuffer(data)
-				break
-			case 0x02: // LCD
-				this.handleLcdInput(data)
-				break
-			case 0x03: // Encoder
-				this.#encoderService.handleInput(data)
-				break
-		}
-	}
-
-	private handleLcdInput(data: Uint8Array): void {
+	public handleInput(data: Uint8Array): void {
 		const buffer = Buffer.from(data)
 		const position: LcdPosition = {
 			x: buffer.readUint16LE(5),
@@ -73,10 +86,10 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 
 		switch (data[3]) {
 			case 0x01: // short press
-				this.emit('lcdShortPress', index, position)
+				this.#emitEvent('lcdShortPress', index, position)
 				break
 			case 0x02: // long press
-				this.emit('lcdLongPress', index, position)
+				this.#emitEvent('lcdLongPress', index, position)
 				break
 			case 0x03: {
 				// swipe
@@ -85,13 +98,13 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 					y: buffer.readUint16LE(11),
 				}
 				const index2 = this.calculateEncoderForX(position2.x)
-				this.emit('lcdSwipe', index, index2, position, position2)
+				this.#emitEvent('lcdSwipe', index, index2, position, position2)
 				break
 			}
 		}
 	}
 
-	public override async fillLcd(buffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
+	public async fillLcd(buffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
 		const size = this.LCD_STRIP_SIZE
 		if (!size) throw new Error(`There is no lcd to fill`)
 
@@ -102,12 +115,8 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		})
 	}
 
-	public override async fillEncoderLcd(
-		index: EncoderIndex,
-		buffer: Buffer,
-		sourceOptions: FillImageOptions
-	): Promise<void> {
-		if (this.NUM_ENCODERS === 0) throw new Error(`There are no encoders`)
+	public async fillEncoderLcd(index: EncoderIndex, buffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
+		if (this.#encoderCount === 0) throw new Error(`There are no encoders`)
 
 		const size = this.LCD_ENCODER_SIZE
 		const x = index * size.width
@@ -119,7 +128,7 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		})
 	}
 
-	public override async fillLcdRegion(
+	public async fillLcdRegion(
 		x: number,
 		y: number,
 		imageBuffer: Buffer,
@@ -143,7 +152,7 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions)
 
 		const packets = this.#lcdImageWriter.generateFillImageWrites({ ...sourceOptions, x, y }, byteBuffer)
-		await this.device.sendReports(packets)
+		await this.#device.sendReports(packets)
 	}
 
 	private async convertFillLcdBuffer(sourceBuffer: Buffer, sourceOptions: FillLcdImageOptions): Promise<Buffer> {
@@ -156,12 +165,15 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
 			sourceOptions2,
-			{ colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip },
+			{ colorMode: 'rgba' },
 			0,
 			sourceOptions.width,
 			sourceOptions.height
 		)
 
-		return this.encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height)
+		return this.#encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height)
 	}
 }
+
+type SomeEmitEventFn = EmitEventFn<keyof StreamDeckEvents>
+type EmitEventFn<K extends keyof StreamDeckEvents> = (key: K, ...args: StreamDeckEvents[K]) => void

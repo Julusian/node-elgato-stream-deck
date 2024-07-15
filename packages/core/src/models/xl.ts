@@ -12,6 +12,7 @@ const xlProperties: StreamDeckProperties = {
 	ICON_SIZE: 96,
 	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 3,
+	ENCODER_COUNT: 0,
 
 	KEY_SPACING_HORIZONTAL: 32,
 	KEY_SPACING_VERTICAL: 39,
@@ -19,6 +20,6 @@ const xlProperties: StreamDeckProperties = {
 
 export class StreamDeckXL extends StreamDeckGen2Base {
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(device, options, xlProperties)
+		super(device, options, xlProperties, null)
 	}
 }

@@ -1,15 +1,8 @@
 import { EventEmitter } from 'events'
 
 import { HIDDevice, HIDDeviceInfo } from '../device'
-import { DeviceModelId, EncoderIndex, KeyIndex } from '../id'
-import {
-	FillImageOptions,
-	FillLcdImageOptions,
-	FillPanelOptions,
-	LcdSegmentSize,
-	StreamDeck,
-	StreamDeckEvents,
-} from '../types'
+import { DeviceModelId, KeyIndex } from '../id'
+import { FillImageOptions, FillPanelOptions, StreamDeck, StreamDeckEvents, StreamDeckLcdStripService } from '../types'
 import type { StreamdeckImageWriter } from '../imageWriter/types'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
@@ -28,6 +21,8 @@ export type StreamDeckProperties = Readonly<{
 	ICON_SIZE: number
 	KEY_DIRECTION: 'ltr' | 'rtl'
 	KEY_DATA_OFFSET: number
+	ENCODER_COUNT: number
+
 	KEY_SPACING_HORIZONTAL: number
 	KEY_SPACING_VERTICAL: number
 }>
@@ -52,16 +47,7 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	}
 
 	get NUM_ENCODERS(): number {
-		// Overridden by models which support this
-		return 0
-	}
-	get LCD_STRIP_SIZE(): LcdSegmentSize | undefined {
-		// Overridden by models which support this
-		return undefined
-	}
-	public get LCD_ENCODER_SIZE(): LcdSegmentSize | undefined {
-		// Overridden by models which support this
-		return undefined
+		return this.deviceProperties.ENCODER_COUNT
 	}
 
 	get ICON_SIZE(): number {
@@ -86,6 +72,11 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	}
 	get PRODUCT_NAME(): string {
 		return this.deviceProperties.PRODUCT_NAME
+	}
+
+	get lcdStrip(): StreamDeckLcdStripService | null {
+		// Overridden by models which support this
+		return null
 	}
 
 	protected readonly device: HIDDevice
@@ -155,25 +146,6 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	public abstract fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
 	public abstract fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void>
 	public abstract fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
-
-	public async fillLcd(_imageBuffer: Buffer, _sourceOptions: FillImageOptions): Promise<void> {
-		throw new Error('Not supported for this model')
-	}
-	public async fillEncoderLcd(
-		_index: EncoderIndex,
-		_buffer: Buffer,
-		_sourceOptions: FillImageOptions
-	): Promise<void> {
-		throw new Error('Not supported for this model')
-	}
-	public async fillLcdRegion(
-		_x: number,
-		_y: number,
-		_imageBuffer: Buffer,
-		_sourceOptions: FillLcdImageOptions
-	): Promise<void> {
-		throw new Error('Not supported for this model')
-	}
 
 	public abstract clearKey(keyIndex: KeyIndex): Promise<void>
 	public abstract clearPanel(): Promise<void>
@@ -285,7 +257,7 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		}
 	}
 
-	public async clearPanel(): Promise<void> {
+	protected clearPanelInner(): Promise<void>[] {
 		const pixels = Buffer.alloc(this.ICON_BYTES, 0)
 		const ps: Array<Promise<void>> = []
 		for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
@@ -301,17 +273,11 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 			ps.push(this.clearKey(buttonIndex + this.NUM_KEYS))
 		}
 
-		const lcdSize = this.LCD_STRIP_SIZE
-		if (lcdSize) {
-			const buffer = Buffer.alloc(lcdSize.width * lcdSize.height * 4)
-			ps.push(
-				this.fillLcd(buffer, {
-					format: 'rgba',
-				})
-			)
-		}
+		return ps
+	}
 
-		await Promise.all(ps)
+	public async clearPanel(): Promise<void> {
+		await Promise.all(this.clearPanelInner())
 	}
 
 	protected abstract convertFillImage(imageBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer>
