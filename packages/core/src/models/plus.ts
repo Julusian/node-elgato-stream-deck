@@ -6,6 +6,7 @@ import { StreamDeckGen2Base } from './base-gen2'
 import { DeviceModelId, EncoderIndex } from '../id'
 import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
 import { StreamdeckPlusLcdImageHeaderGenerator } from '../imageWriter/headerGenerator'
+import { EncoderInputService } from '../services/encoder'
 
 const plusProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.PLUS,
@@ -23,12 +24,10 @@ const plusProperties: StreamDeckProperties = {
 
 export class StreamDeckPlus extends StreamDeckGen2Base {
 	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter(new StreamdeckPlusLcdImageHeaderGenerator())
-	readonly #encoderState: boolean[]
+	readonly #encoderService = new EncoderInputService(this, this.NUM_ENCODERS)
 
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
 		super(device, options, plusProperties, true)
-
-		this.#encoderState = new Array<boolean>(4).fill(false)
 	}
 
 	public get NUM_ENCODERS(): number {
@@ -59,7 +58,7 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 				this.handleLcdInput(data)
 				break
 			case 0x03: // Encoder
-				this.handleEncoderInput(data)
+				this.#encoderService.handleInput(data)
 				break
 		}
 	}
@@ -89,36 +88,6 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 				this.emit('lcdSwipe', index, index2, position, position2)
 				break
 			}
-		}
-	}
-
-	private handleEncoderInput(data: Uint8Array): void {
-		switch (data[3]) {
-			case 0x00: // press/release
-				for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
-					const keyPressed = Boolean(data[4 + keyIndex])
-					const stateChanged = keyPressed !== this.#encoderState[keyIndex]
-					if (stateChanged) {
-						this.#encoderState[keyIndex] = keyPressed
-						if (keyPressed) {
-							this.emit('encoderDown', keyIndex)
-						} else {
-							this.emit('encoderUp', keyIndex)
-						}
-					}
-				}
-				break
-			case 0x01: // rotate
-				for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
-					const intArray = new Int8Array(data.buffer, data.byteOffset, data.byteLength)
-					const value = intArray[4 + keyIndex]
-					if (value > 0) {
-						this.emit('rotateRight', keyIndex, value)
-					} else if (value < 0) {
-						this.emit('rotateLeft', keyIndex, -value)
-					}
-				}
-				break
 		}
 	}
 
