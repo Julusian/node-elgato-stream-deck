@@ -34,7 +34,7 @@ function openStreamDeck(path: string, deviceModel: DeviceModelId, userOptions?: 
 	)
 }
 
-function runForDevice(path: string, model: DeviceModelId): void {
+function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: boolean): void {
 	let streamDeck: StreamDeck
 	function getDevice(sd?: StreamDeck): DummyHID {
 		return (sd || (streamDeck as any)).device
@@ -49,23 +49,45 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		await expect(async () => streamDeck.clearKey(15)).rejects.toThrow()
 	})
 
-	test('clearKey', async () => {
-		const mockedFn = ((streamDeck as any).fillImageRange = jest.fn(async () => Promise.resolve()))
-		await streamDeck.clearKey(2)
-		expect(mockedFn).toHaveBeenCalledTimes(1)
-		expect(mockedFn).toHaveBeenNthCalledWith(1, 2, expect.anything(), expect.anything())
-	})
+	if (supportsRgbKeyFill) {
+		test('clearKey', async () => {
+			const hid = getDevice(streamDeck)
+			const mockedFn = (hid.sendFeatureReport = jest.fn(async () => Promise.resolve()))
+			await streamDeck.clearKey(2)
+			expect(mockedFn).toHaveBeenCalledTimes(1)
+			expect(mockedFn).toHaveBeenNthCalledWith(1, Buffer.from([3, 6, 2, 0, 0, 0]))
+		})
 
-	test('clearPanel', async () => {
-		const mockedFn = ((streamDeck as any).fillImageRange = jest.fn(async () => Promise.resolve()))
-		await streamDeck.clearPanel()
+		test('clearPanel', async () => {
+			const hid = getDevice(streamDeck)
+			const mockedFn = (hid.sendFeatureReport = jest.fn(async () => Promise.resolve()))
+			await streamDeck.clearPanel()
 
-		const keyCount = streamDeck.NUM_KEYS
-		expect(mockedFn).toHaveBeenCalledTimes(keyCount)
-		for (let i = 0; i < keyCount; i++) {
-			expect(mockedFn).toHaveBeenNthCalledWith(i + 1, i, expect.anything(), expect.anything())
-		}
-	})
+			const keyCount = streamDeck.NUM_KEYS
+			expect(mockedFn).toHaveBeenCalledTimes(keyCount)
+			for (let i = 0; i < keyCount; i++) {
+				expect(mockedFn).toHaveBeenNthCalledWith(i + 1, Buffer.from([3, 6, i, 0, 0, 0]))
+			}
+		})
+	} else {
+		test('clearKey', async () => {
+			const mockedFn = ((streamDeck as any).fillImageRange = jest.fn(async () => Promise.resolve()))
+			await streamDeck.clearKey(2)
+			expect(mockedFn).toHaveBeenCalledTimes(1)
+			expect(mockedFn).toHaveBeenNthCalledWith(1, 2, expect.anything(), expect.anything())
+		})
+
+		test('clearPanel', async () => {
+			const mockedFn = ((streamDeck as any).fillImageRange = jest.fn(async () => Promise.resolve()))
+			await streamDeck.clearPanel()
+
+			const keyCount = streamDeck.NUM_KEYS
+			expect(mockedFn).toHaveBeenCalledTimes(keyCount)
+			for (let i = 0; i < keyCount; i++) {
+				expect(mockedFn).toHaveBeenNthCalledWith(i + 1, i, expect.anything(), expect.anything())
+			}
+		})
+	}
 
 	test('fillKeyBuffer throws on undersized buffers', async () => {
 		const smallBuffer = Buffer.alloc(1)
@@ -314,21 +336,33 @@ function runForDevice(path: string, model: DeviceModelId): void {
 		expect(fillKeyBufferMock).toHaveBeenCalledTimes(0)
 	})
 
-	test('fillKeyColor', async () => {
-		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
-		await streamDeck.fillKeyColor(4, 123, 255, 86)
+	if (supportsRgbKeyFill) {
+		test('fillKeyColor', async () => {
+			const hid = getDevice(streamDeck)
+			const mockedFn = (hid.sendFeatureReport = jest.fn(async () => Promise.resolve()))
 
-		expect(fillKeyBufferMock).toHaveBeenCalledTimes(1)
-		expect(fillKeyBufferMock).toHaveBeenCalledWith(4, expect.any(Buffer), {
-			format: 'rgb',
-			offset: 0,
-			stride: streamDeck.BUTTON_WIDTH_PX * 3,
+			await streamDeck.fillKeyColor(4, 123, 255, 86)
+
+			expect(mockedFn).toHaveBeenCalledTimes(1)
+			expect(mockedFn).toHaveBeenNthCalledWith(1, Buffer.from([3, 6, 4, 123, 255, 86]))
 		})
-		// console.log(JSON.stringify(bufferToIntArray(fillKeyBufferMock.mock.calls[0][1])))
-		expect(fillKeyBufferMock.mock.calls[0][1]).toEqual(
-			readFixtureJSON(`fillColor-buffer-${streamDeck.BUTTON_WIDTH_PX}.json`)
-		)
-	})
+	} else {
+		test('fillKeyColor', async () => {
+			const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
+			await streamDeck.fillKeyColor(4, 123, 255, 86)
+
+			expect(fillKeyBufferMock).toHaveBeenCalledTimes(1)
+			expect(fillKeyBufferMock).toHaveBeenCalledWith(4, expect.any(Buffer), {
+				format: 'rgb',
+				offset: 0,
+				stride: streamDeck.BUTTON_WIDTH_PX * 3,
+			})
+			// console.log(JSON.stringify(bufferToIntArray(fillKeyBufferMock.mock.calls[0][1])))
+			expect(fillKeyBufferMock.mock.calls[0][1]).toEqual(
+				readFixtureJSON(`fillColor-buffer-${streamDeck.BUTTON_WIDTH_PX}.json`)
+			)
+		})
+	}
 
 	test('fillKeyColor bad rgb', async () => {
 		await expect(async () => streamDeck.fillKeyColor(0, 256, 0, 0)).rejects.toThrow()
@@ -361,7 +395,7 @@ describe('StreamDeck', () => {
 		expect(streamDeck2.MODEL).toEqual(DeviceModelId.ORIGINAL)
 	})
 
-	runForDevice(devicePath, DeviceModelId.ORIGINAL)
+	runForDevice(devicePath, DeviceModelId.ORIGINAL, false)
 
 	test('fillImage', async () => {
 		const device = getDevice()
@@ -505,7 +539,7 @@ describe('StreamDeck Mini', () => {
 		expect(streamDeck2.MODEL).toEqual(DeviceModelId.MINI)
 	})
 
-	runForDevice(devicePath, DeviceModelId.MINI)
+	runForDevice(devicePath, DeviceModelId.MINI, false)
 
 	test('fillImage', async () => {
 		const device = getDevice()
@@ -553,7 +587,7 @@ describe('StreamDeck XL', () => {
 		expect(streamDeck2.MODEL).toEqual(DeviceModelId.XL)
 	})
 
-	runForDevice(devicePath, DeviceModelId.XL)
+	runForDevice(devicePath, DeviceModelId.XL, true)
 
 	test('setBrightness', async () => {
 		const device = getDevice()
@@ -660,7 +694,7 @@ describe('StreamDeck Original V2', () => {
 		expect(streamDeck2.MODEL).toEqual(DeviceModelId.ORIGINALV2)
 	})
 
-	runForDevice(devicePath, DeviceModelId.ORIGINALV2)
+	runForDevice(devicePath, DeviceModelId.ORIGINALV2, true)
 
 	test('fillImage', async () => {
 		const device = getDevice()
