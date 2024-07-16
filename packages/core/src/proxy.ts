@@ -1,7 +1,6 @@
-import { DeviceModelId, KeyIndex } from './id'
-import { StreamDeck, FillImageOptions, FillPanelOptions, StreamDeckEvents, StreamDeckLcdStripService } from './types'
-import { HIDDeviceInfo } from './hid-device'
-import { StreamDeckControlDefinition } from './models/controlDefinition'
+import type { DeviceModelId } from './id'
+import type { StreamDeck, StreamDeckEvents, StreamDeckLcdStripService } from './types'
+import type { StreamDeckControlDefinition } from './models/controlDefinition'
 
 /**
  * A minimal proxy around a StreamDeck instance.
@@ -44,32 +43,46 @@ export class StreamDeckProxy implements StreamDeck {
 		return this.device.lcdStrip
 	}
 
+	public calculateFillPanelDimensions(
+		...args: Parameters<StreamDeck['calculateFillPanelDimensions']>
+	): ReturnType<StreamDeck['calculateFillPanelDimensions']> {
+		return this.device.calculateFillPanelDimensions(...args)
+	}
+
 	public async close(): Promise<void> {
 		return this.device.close()
 	}
-	public async getHidDeviceInfo(): Promise<HIDDeviceInfo> {
-		return this.device.getHidDeviceInfo()
+	public async getHidDeviceInfo(
+		...args: Parameters<StreamDeck['getHidDeviceInfo']>
+	): ReturnType<StreamDeck['getHidDeviceInfo']> {
+		return this.device.getHidDeviceInfo(...args)
 	}
-	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
-		return this.device.fillKeyColor(keyIndex, r, g, b)
+	public async fillKeyColor(...args: Parameters<StreamDeck['fillKeyColor']>): ReturnType<StreamDeck['fillKeyColor']> {
+		return this.device.fillKeyColor(...args)
 	}
-	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
-		return this.device.fillKeyBuffer(keyIndex, imageBuffer, options)
+	public async fillKeyBuffer(
+		...args: Parameters<StreamDeck['fillKeyBuffer']>
+	): ReturnType<StreamDeck['fillKeyBuffer']> {
+		return this.device.fillKeyBuffer(...args)
 	}
-	public async fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void> {
-		return this.device.fillPanelBuffer(imageBuffer, options)
+	public async fillPanelBuffer(
+		...args: Parameters<StreamDeck['fillPanelBuffer']>
+	): ReturnType<StreamDeck['fillPanelBuffer']> {
+		return this.device.fillPanelBuffer(...args)
 	}
-	public async clearKey(keyIndex: KeyIndex): Promise<void> {
-		return this.device.clearKey(keyIndex)
+	public async clearKey(...args: Parameters<StreamDeck['clearKey']>): ReturnType<StreamDeck['clearKey']> {
+		return this.device.clearKey(...args)
 	}
-	public async clearPanel(): Promise<void> {
-		return this.device.clearPanel()
+	public async clearPanel(...args: Parameters<StreamDeck['clearPanel']>): ReturnType<StreamDeck['clearPanel']> {
+		return this.device.clearPanel(...args)
 	}
-	public async setBrightness(percentage: number): Promise<void> {
-		return this.device.setBrightness(percentage)
+	public async setBrightness(
+		...args: Parameters<StreamDeck['setBrightness']>
+	): ReturnType<StreamDeck['setBrightness']> {
+		return this.device.setBrightness(...args)
 	}
-	public async resetToLogo(): Promise<void> {
-		return this.device.resetToLogo()
+	public async resetToLogo(...args: Parameters<StreamDeck['resetToLogo']>): ReturnType<StreamDeck['resetToLogo']> {
+		return this.device.resetToLogo(...args)
 	}
 	public async getFirmwareVersion(): Promise<string> {
 		return this.device.getFirmwareVersion()

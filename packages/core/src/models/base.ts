@@ -1,9 +1,10 @@
 import { EventEmitter } from 'events'
 
 import { HIDDevice, HIDDeviceInfo } from '../hid-device'
-import { DeviceModelId, KeyIndex } from '../id'
+import { DeviceModelId, Dimension, KeyIndex } from '../id'
 import type {
 	FillImageOptions,
+	FillPanelDimensionsOptions,
 	FillPanelOptions,
 	StreamDeck,
 	StreamDeckEvents,
@@ -135,10 +136,7 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 		}
 	}
 
-	public calculateFillPanelDimensions(withPadding?: boolean | undefined): { width: number; height: number } | null {
-		// TODO - implement this
-		return null
-	}
+	public abstract calculateFillPanelDimensions(options?: FillPanelDimensionsOptions): Dimension | null
 
 	public async close(): Promise<void> {
 		return this.device.close()
@@ -175,6 +173,10 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 	) {
 		super(device, options, properties)
 		this.buttonsLcdService = new ButtonsLcdService(imageWriter, imagePacker, device, properties)
+	}
+
+	public calculateFillPanelDimensions(options?: FillPanelDimensionsOptions): Dimension | null {
+		return this.buttonsLcdService.calculateFillPanelDimensions(options)
 	}
 
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {

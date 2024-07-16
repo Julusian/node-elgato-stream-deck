@@ -1,7 +1,7 @@
 import { HIDDevice } from '../hid-device'
 import { OpenStreamDeckOptions, StreamDeckInputBase, StreamDeckProperties } from './base'
-import { DeviceModelId } from '../id'
-import { FillImageOptions, FillPanelOptions } from '../types'
+import { DeviceModelId, Dimension } from '../id'
+import { FillImageOptions, FillPanelDimensionsOptions, FillPanelOptions } from '../types'
 import { StreamDeckControlDefinition } from './controlDefinition'
 import { freezeDefinitions } from './controlsGenerator'
 
@@ -35,8 +35,6 @@ const pedalControls: StreamDeckControlDefinition[] = [
 const pedalProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.PEDAL,
 	PRODUCT_NAME: 'Streamdeck Pedal',
-	COLUMNS: 3,
-	ROWS: 1,
 	BUTTON_WIDTH_PX: 0,
 	BUTTON_HEIGHT_PX: 0,
 	KEY_DATA_OFFSET: 3,
@@ -75,6 +73,11 @@ class StreamDeckPedal extends StreamDeckInputBase {
 	public async getSerialNumber(): Promise<string> {
 		const val = await this.device.getFeatureReport(6, 32)
 		return val.toString('ascii', 2, 14)
+	}
+
+	public calculateFillPanelDimensions(_options?: FillPanelDimensionsOptions): Dimension | null {
+		// Not supported
+		return null
 	}
 
 	public async fillKeyColor(_keyIndex: number, _r: number, _g: number, _b: number): Promise<void> {

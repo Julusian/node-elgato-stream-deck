@@ -1,13 +1,14 @@
 import { EventEmitter } from 'events'
-import { DeviceModelId, EncoderIndex, KeyIndex } from './id'
+import { DeviceModelId, Dimension, EncoderIndex, KeyIndex } from './id'
 import { HIDDeviceInfo } from './hid-device'
 import { StreamDeckControlDefinition } from './models/controlDefinition'
 
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
 }
-export interface FillPanelOptions extends FillImageOptions {
-	// TODO - utilise this
+export interface FillPanelOptions extends FillImageOptions, FillPanelDimensionsOptions {}
+
+export interface FillPanelDimensionsOptions {
 	withPadding?: boolean
 }
 
@@ -61,7 +62,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	// TODO - I'm not sure on this, maybe it is better being flattened out, even if this is done internally
 	readonly lcdStrip: StreamDeckLcdStripService | null
 
-	calculateFillPanelDimensions(withPadding?: boolean): { width: number; height: number } | null
+	calculateFillPanelDimensions(options?: FillPanelDimensionsOptions): Dimension | null
 
 	/**
 	 * Close the device

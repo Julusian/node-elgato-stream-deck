@@ -61,8 +61,6 @@ plusControls.push(
 const plusProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.PLUS,
 	PRODUCT_NAME: 'Streamdeck +',
-	COLUMNS: 4,
-	ROWS: 2,
 	BUTTON_WIDTH_PX: 120,
 	BUTTON_HEIGHT_PX: 120,
 

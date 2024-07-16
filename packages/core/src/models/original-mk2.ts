@@ -7,8 +7,6 @@ import { freezeDefinitions, generateButtonsGrid } from './controlsGenerator'
 const origMK2Properties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.ORIGINALMK2,
 	PRODUCT_NAME: 'Streamdeck MK2',
-	COLUMNS: 5,
-	ROWS: 3,
 	BUTTON_WIDTH_PX: 72,
 	BUTTON_HEIGHT_PX: 72,
 

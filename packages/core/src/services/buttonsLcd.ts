@@ -1,7 +1,7 @@
 import type { StreamDeckProperties } from '../models/base'
 import type { HIDDevice } from '../hid-device'
-import type { KeyIndex } from '../id'
-import type { FillImageOptions, FillPanelOptions } from '../types'
+import type { Dimension, KeyIndex } from '../id'
+import type { FillImageOptions, FillPanelDimensionsOptions, FillPanelOptions } from '../types'
 import type { StreamdeckImageWriter } from './imageWriter/types'
 import type { StreamDeckButtonControlDefinition } from '../models/controlDefinition'
 
@@ -15,6 +15,13 @@ export interface ButtonLcdImagePacker {
 	readonly imageHeight: number
 
 	convertPixelBuffer(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer>
+}
+
+interface GridSpan {
+	minRow: number
+	maxRow: number
+	minCol: number
+	maxCol: number
 }
 
 export class ButtonsLcdService {
@@ -42,9 +49,49 @@ export class ButtonsLcdService {
 		return this.imagePixelCount * 3
 	}
 
-	/** @deprecated */
-	private get keyCount(): number {
-		return this.#deviceProperties.COLUMNS * this.#deviceProperties.ROWS
+	private getLcdButtonControls(): StreamDeckButtonControlDefinition[] {
+		return this.#deviceProperties.CONTROLS.filter(
+			(control): control is StreamDeckButtonControlDefinition =>
+				control.type === 'button' && control.feedbackType === 'lcd'
+		)
+	}
+
+	private calculateLcdGridSpan(buttonsLcd: StreamDeckButtonControlDefinition[]): GridSpan | null {
+		if (buttonsLcd.length === 0) return null
+
+		const allRowValues = buttonsLcd.map((button) => button.row)
+		const allColumnValues = buttonsLcd.map((button) => button.column)
+
+		return {
+			minRow: Math.min(...allRowValues),
+			maxRow: Math.max(...allRowValues),
+			minCol: Math.min(...allColumnValues),
+			maxCol: Math.max(...allColumnValues),
+		}
+	}
+
+	private calculateDimensionsFromGridSpan(gridSpan: GridSpan, withPadding: boolean | undefined): Dimension {
+		if (withPadding) {
+			// TODO: Implement padding
+			throw new Error('Not implemented')
+		} else {
+			const rowCount = gridSpan.maxRow - gridSpan.minRow + 1
+			const columnCount = gridSpan.maxCol - gridSpan.minCol + 1
+
+			return {
+				width: columnCount * this.#imagePacker.imageWidth,
+				height: rowCount * this.#imagePacker.imageHeight,
+			}
+		}
+	}
+
+	public calculateFillPanelDimensions(options: FillPanelDimensionsOptions | undefined): Dimension | null {
+		const buttonLcdControls = this.getLcdButtonControls()
+		const gridSpan = this.calculateLcdGridSpan(buttonLcdControls)
+
+		if (!gridSpan) return null
+
+		return this.calculateDimensionsFromGridSpan(gridSpan, options?.withPadding)
 	}
 
 	public async clearPanel(): Promise<void> {
@@ -63,7 +110,7 @@ export class ButtonsLcdService {
 					} else {
 						const pixels = Buffer.alloc(this.imageRgbBytes, 0)
 						ps.push(
-							this.fillImageRange(control.hidIndex, pixels, {
+							this.fillImageRangeControl(control, pixels, {
 								format: 'rgb',
 								offset: 0,
 								stride: this.#imagePacker.imageWidth * 3,
@@ -86,7 +133,12 @@ export class ButtonsLcdService {
 		this.checkRGBValue(g)
 		this.checkRGBValue(b)
 
-		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || keyIndex >= this.keyCount) {
+		const control = this.#deviceProperties.CONTROLS.find(
+			(control): control is StreamDeckButtonControlDefinition =>
+				control.type === 'button' && control.index === keyIndex
+		)
+
+		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control?.feedbackType === 'rgb') {
 			await this.sendKeyRgb(keyIndex, r, g, b)
 		} else {
 			const pixels = Buffer.alloc(this.imageRgbBytes, Buffer.from([r, g, b]))
@@ -118,30 +170,42 @@ export class ButtonsLcdService {
 		const sourceFormat = options?.format ?? 'rgb'
 		this.checkSourceFormat(sourceFormat)
 
-		const imageSize = this.imagePixelCount * sourceFormat.length * this.keyCount
-		if (imageBuffer.length !== imageSize) {
-			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
+		const buttonLcdControls = this.getLcdButtonControls()
+		const panelGridSpan = this.calculateLcdGridSpan(buttonLcdControls)
+
+		if (!panelGridSpan) {
+			throw new Error(`Panel does not support being filled`)
+		}
+
+		const panelDimensions = this.calculateDimensionsFromGridSpan(panelGridSpan, options?.withPadding)
+
+		const expectedByteCount = sourceFormat.length * panelDimensions.width * panelDimensions.height
+		if (imageBuffer.length !== expectedByteCount) {
+			throw new RangeError(
+				`Expected image buffer of length ${expectedByteCount}, got length ${imageBuffer.length}`
+			)
 		}
 
 		const iconSize = this.#imagePacker.imageWidth * sourceFormat.length
-		const stride = iconSize * this.#deviceProperties.COLUMNS
+		const stride = panelDimensions.width * sourceFormat.length
 
 		const ps: Array<Promise<void>> = []
-		for (let row = 0; row < this.#deviceProperties.ROWS; row++) {
-			const rowOffset = stride * row * this.#imagePacker.imageHeight
+		for (const control of buttonLcdControls) {
+			const controlRow = control.row - panelGridSpan.minRow
+			const controlCol = control.column - panelGridSpan.minCol
 
-			for (let column = 0; column < this.#deviceProperties.COLUMNS; column++) {
-				const index = row * this.#deviceProperties.COLUMNS + column
-				const colOffset = column * iconSize
+			const rowOffset = stride * controlRow * this.#imagePacker.imageHeight
+			const colOffset = controlCol * iconSize
 
-				ps.push(
-					this.fillImageRange(index, imageBuffer, {
-						format: sourceFormat,
-						offset: rowOffset + colOffset,
-						stride,
-					})
-				)
-			}
+			// TODO: Implement padding
+
+			ps.push(
+				this.fillImageRangeControl(control, imageBuffer, {
+					format: sourceFormat,
+					offset: rowOffset + colOffset,
+					stride,
+				})
+			)
 		}
 		await Promise.all(ps)
 	}
@@ -151,7 +215,12 @@ export class ButtonsLcdService {
 	}
 
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
-		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || keyIndex >= this.keyCount) {
+		const control = this.#deviceProperties.CONTROLS.find(
+			(control): control is StreamDeckButtonControlDefinition =>
+				control.type === 'button' && control.index === keyIndex
+		)
+
+		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control?.feedbackType === 'rgb') {
 			await this.sendKeyRgb(keyIndex, 0, 0, 0)
 		} else {
 			const pixels = Buffer.alloc(this.imageRgbBytes, 0)
@@ -169,8 +238,16 @@ export class ButtonsLcdService {
 				control.type === 'button' && control.index === keyIndex
 		)
 		if (!buttonControl) throw new TypeError(`Expected a valid keyIndex`)
+		return this.fillImageRangeControl(buttonControl, imageBuffer, sourceOptions)
+	}
+
+	private async fillImageRangeControl(
+		buttonControl: StreamDeckButtonControlDefinition,
+		imageBuffer: Buffer,
+		sourceOptions: InternalFillImageOptions
+	) {
 		if (buttonControl.feedbackType !== 'lcd')
-			throw new TypeError(`keyIndex ${keyIndex} does not support lcd feedback`)
+			throw new TypeError(`keyIndex ${buttonControl.index} does not support lcd feedback`)
 
 		const byteBuffer = await this.#imagePacker.convertPixelBuffer(imageBuffer, sourceOptions)
 

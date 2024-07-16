@@ -5,13 +5,6 @@ import { DeviceModelId } from '../id'
 import { StreamdeckOriginalImageWriter } from '../services/imageWriter/imageWriter'
 import { freezeDefinitions, generateButtonsGrid } from './controlsGenerator'
 
-// function transformKeyIndex(properties: Readonly<StreamDeckProperties>, keyIndex: KeyIndex): KeyIndex {
-// 		// Horizontal flip
-// 		const half = (properties.COLUMNS - 1) / 2
-// 		const diff = ((keyIndex % properties.COLUMNS) - half) * -half
-// 		return keyIndex + diff
-// }
-
 const originalProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.ORIGINAL,
 	PRODUCT_NAME: 'Streamdeck',
