@@ -15,15 +15,6 @@ export class StreamDeckProxy implements StreamDeck {
 		this.device = device
 	}
 
-	public get NUM_KEYS(): number {
-		return this.device.NUM_KEYS
-	}
-	public get KEY_COLUMNS(): number {
-		return this.device.KEY_COLUMNS
-	}
-	public get KEY_ROWS(): number {
-		return this.device.KEY_ROWS
-	}
 	public get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
 		return this.device.CONTROLS
 	}
@@ -32,9 +23,6 @@ export class StreamDeckProxy implements StreamDeck {
 	}
 	public get BUTTON_HEIGHT_PX(): number {
 		return this.device.BUTTON_HEIGHT_PX
-	}
-	public get BUTTON_RGB_BYTES(): number {
-		return this.device.BUTTON_RGB_BYTES
 	}
 	public get BUTTON_TOTAL_PX(): number {
 		return this.device.BUTTON_TOTAL_PX

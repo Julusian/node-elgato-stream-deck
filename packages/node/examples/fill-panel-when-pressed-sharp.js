@@ -10,6 +10,9 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 	const streamDeck = await openStreamDeck(devices[0].path)
 	await streamDeck.clearPanel()
 
+	const panelDimensions = streamDeck.calculateFillPanelDimensions()
+	if (!panelDimensions) throw new Error("Streamdeck doesn't support fillPanel")
+
 	streamDeck.getSerialNumber().then((ser) => {
 		console.log('serial', ser)
 	})
@@ -19,12 +22,12 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 
 	const imgField = await sharp(path.resolve(__dirname, 'fixtures/sunny_field.png'))
 		.flatten()
-		.resize(streamDeck.BUTTON_WIDTH_PX * streamDeck.KEY_COLUMNS, streamDeck.BUTTON_HEIGHT_PX * streamDeck.KEY_ROWS)
+		.resize(panelDimensions.width, panelDimensions.height)
 		.raw()
 		.toBuffer()
 	const imgMosaic = await sharp(path.resolve(__dirname, '../../../fixtures/mosaic.png'))
 		.flatten()
-		.resize(streamDeck.BUTTON_WIDTH_PX * streamDeck.KEY_COLUMNS, streamDeck.BUTTON_HEIGHT_PX * streamDeck.KEY_ROWS)
+		.resize(panelDimensions.width, panelDimensions.height)
 		.raw()
 		.toBuffer()
 

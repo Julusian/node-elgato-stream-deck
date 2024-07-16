@@ -22,8 +22,6 @@ export interface OpenStreamDeckOptions {
 export type StreamDeckProperties = Readonly<{
 	MODEL: DeviceModelId
 	PRODUCT_NAME: string
-	COLUMNS: number
-	ROWS: number
 	BUTTON_WIDTH_PX: number
 	BUTTON_HEIGHT_PX: number
 	KEY_DATA_OFFSET: number
@@ -31,21 +29,19 @@ export type StreamDeckProperties = Readonly<{
 
 	CONTROLS: Readonly<StreamDeckControlDefinition[]>
 
+	/**
+	 * TODO - rework this
+	 * @deprecated
+	 */
 	KEY_SPACING_HORIZONTAL: number
+	/**
+	 * TODO - rework this
+	 * @deprecated
+	 */
 	KEY_SPACING_VERTICAL: number
 }>
 
 export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
-	get NUM_KEYS(): number {
-		return this.KEY_COLUMNS * this.KEY_ROWS
-	}
-	get KEY_COLUMNS(): number {
-		return this.deviceProperties.COLUMNS
-	}
-	get KEY_ROWS(): number {
-		return this.deviceProperties.ROWS
-	}
-
 	get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
 		return this.deviceProperties.CONTROLS
 	}
@@ -55,9 +51,6 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	}
 	get BUTTON_HEIGHT_PX(): number {
 		return this.deviceProperties.BUTTON_HEIGHT_PX
-	}
-	get BUTTON_RGB_BYTES(): number {
-		return this.BUTTON_TOTAL_PX * 3
 	}
 	get BUTTON_TOTAL_PX(): number {
 		return this.BUTTON_WIDTH_PX * this.BUTTON_HEIGHT_PX
@@ -140,6 +133,11 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 		if (feedbackType && buttonControl.feedbackType !== feedbackType) {
 			throw new TypeError(`Expected a keyIndex with expected feedbackType`)
 		}
+	}
+
+	public calculateFillPanelDimensions(withPadding?: boolean | undefined): { width: number; height: number } | null {
+		// TODO - implement this
+		return null
 	}
 
 	public async close(): Promise<void> {

@@ -6,7 +6,10 @@ import { StreamDeckControlDefinition } from './models/controlDefinition'
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
 }
-export type FillPanelOptions = FillImageOptions
+export interface FillPanelOptions extends FillImageOptions {
+	// TODO - utilise this
+	withPadding?: boolean
+}
 
 export interface FillLcdImageOptions extends FillImageOptions {
 	width: number
@@ -34,14 +37,6 @@ export interface LcdSegmentSize {
 }
 
 export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
-	// TODO - remove these
-	/** The number of keys on this streamdeck */
-	readonly NUM_KEYS: number
-	/** The number of columns on this streamdeck */
-	readonly KEY_COLUMNS: number
-	/** The number of rows on this streamdeck */
-	readonly KEY_ROWS: number
-
 	/** List of the controls on this streamdeck */
 	readonly CONTROLS: Readonly<StreamDeckControlDefinition[]>
 
@@ -51,8 +46,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	readonly BUTTON_HEIGHT_PX: number
 	/** The total number of pixels of a button */
 	readonly BUTTON_TOTAL_PX: number
-	/** The number of bytes for a RGB encoded image for a button */
-	readonly BUTTON_RGB_BYTES: number // TODO - remove this?
 
 	// TODO: replace these with a definition on each button control which gives it a coordinate inside of the display
 	/** The horizontal spacing in pixels between each button */
@@ -67,6 +60,8 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 
 	// TODO - I'm not sure on this, maybe it is better being flattened out, even if this is done internally
 	readonly lcdStrip: StreamDeckLcdStripService | null
+
+	calculateFillPanelDimensions(withPadding?: boolean): { width: number; height: number } | null
 
 	/**
 	 * Close the device

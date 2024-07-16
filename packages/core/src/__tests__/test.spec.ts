@@ -218,7 +218,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 	})
 
 	test('fillPanelBuffer', async () => {
-		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.BUTTON_RGB_BYTES)
+		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.BUTTON_TOTAL_PX * 3)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await streamDeck.fillPanelBuffer(buffer)
@@ -258,7 +258,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 	})
 
 	test('fillPanelBuffer bad format', async () => {
-		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.BUTTON_RGB_BYTES)
+		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.BUTTON_TOTAL_PX * 3)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await expect(async () => streamDeck.fillPanelBuffer(buffer, { format: 'abc' as any })).rejects.toThrow()
@@ -275,7 +275,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 	})
 
 	test('fillKeyBuffer', async () => {
-		const buffer = Buffer.alloc(streamDeck.BUTTON_RGB_BYTES)
+		const buffer = Buffer.alloc(streamDeck.BUTTON_TOTAL_PX * 3)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await streamDeck.fillKeyBuffer(2, buffer)
@@ -307,7 +307,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 	})
 
 	test('fillKeyBuffer bad key', async () => {
-		const buffer = Buffer.alloc(streamDeck.BUTTON_RGB_BYTES)
+		const buffer = Buffer.alloc(streamDeck.BUTTON_TOTAL_PX * 3)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await expect(async () => streamDeck.fillKeyBuffer(-1, buffer)).rejects.toThrow()
@@ -317,7 +317,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 	})
 
 	test('fillKeyBuffer bad format', async () => {
-		const buffer = Buffer.alloc(streamDeck.BUTTON_RGB_BYTES)
+		const buffer = Buffer.alloc(streamDeck.BUTTON_TOTAL_PX * 3)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await expect(async () => streamDeck.fillKeyBuffer(1, buffer, { format: 'abc' as any })).rejects.toThrow()

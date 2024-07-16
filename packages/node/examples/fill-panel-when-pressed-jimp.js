@@ -11,17 +11,14 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 	const streamDeck = await openStreamDeck(devices[0].path)
 	await streamDeck.clearPanel()
 
+	const panelDimensions = streamDeck.calculateFillPanelDimensions()
+	if (!panelDimensions) throw new Error("Streamdeck doesn't support fillPanel")
+
 	const bmpImgField = await Jimp.read(path.resolve(__dirname, 'fixtures/sunny_field.png')).then((img) => {
-		return img.resize(
-			streamDeck.BUTTON_WIDTH_PX * streamDeck.KEY_COLUMNS,
-			streamDeck.BUTTON_HEIGHT_PX * streamDeck.KEY_ROWS
-		)
+		return img.resize(panelDimensions.width, panelDimensions.height)
 	})
 	const bmpImgMosaic = await Jimp.read(path.resolve(__dirname, '../../../fixtures/mosaic.png')).then((img) => {
-		return img.resize(
-			streamDeck.BUTTON_WIDTH_PX * streamDeck.KEY_COLUMNS,
-			streamDeck.BUTTON_HEIGHT_PX * streamDeck.KEY_ROWS
-		)
+		return img.resize(panelDimensions.width, panelDimensions.height)
 	})
 	const bmpImgFieldLcd = streamDeck.LCD_STRIP_SIZE
 		? await Jimp.read(path.resolve(__dirname, 'fixtures/sunny_field.png')).then((img) => {

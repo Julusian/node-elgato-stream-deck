@@ -38,12 +38,9 @@ export class StreamDeckWeb extends StreamDeckProxy {
 			throw new Error('Failed to get canvas context')
 		}
 
-		const data = ctx.getImageData(
-			0,
-			0,
-			this.BUTTON_WIDTH_PX * this.KEY_COLUMNS,
-			this.BUTTON_HEIGHT_PX * this.KEY_ROWS
-		)
+		const dimensions = this.calculateFillPanelDimensions()
+
+		const data = ctx.getImageData(0, 0, dimensions.width, dimensions.height)
 		return this.device.fillPanelBuffer(Buffer.from(data.data), { format: 'rgba' })
 	}
 }
