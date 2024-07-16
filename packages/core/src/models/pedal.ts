@@ -1,4 +1,4 @@
-import { HIDDevice } from '../device'
+import { HIDDevice } from '../hid-device'
 import { OpenStreamDeckOptions, StreamDeckInputBase, StreamDeckProperties } from './base'
 import { DeviceModelId } from '../id'
 import { FillImageOptions, FillPanelOptions } from '../types'

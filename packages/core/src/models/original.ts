@@ -1,4 +1,4 @@
-import { HIDDevice } from '../device'
+import { HIDDevice } from '../hid-device'
 import { BMP_HEADER_LENGTH, transformImageBuffer, writeBMPHeader } from '../util'
 import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen1Properties } from './base'
 import { StreamDeckGen1Base } from './base-gen1'

@@ -1,5 +1,5 @@
 import { KeyIndex, StreamDeck, StreamDeckProxy } from '@elgato-stream-deck/core'
-import { WebHIDDevice } from './device'
+import { WebHIDDevice } from './hid-device'
 
 /**
  * A StreamDeck instance.

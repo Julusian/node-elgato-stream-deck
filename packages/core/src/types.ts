@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 import { DeviceModelId, EncoderIndex, KeyIndex } from './id'
-import { HIDDeviceInfo } from './device'
+import { HIDDeviceInfo } from './hid-device'
 
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'

@@ -1,4 +1,4 @@
-import { HIDDevice } from '../device'
+import { HIDDevice } from '../hid-device'
 import { transformImageBuffer } from '../util'
 import {
 	EncodeJPEGHelper,

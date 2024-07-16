@@ -1,4 +1,4 @@
-import { HIDDevice } from '../device'
+import { HIDDevice } from '../hid-device'
 import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen2Properties } from './base'
 import { DeviceModelId } from '../id'
 import { StreamDeckGen2Base } from './base-gen2'

@@ -1,6 +1,6 @@
 import { DeviceModelId, KeyIndex } from './id'
 import { StreamDeck, FillImageOptions, FillPanelOptions, StreamDeckEvents, StreamDeckLcdStripService } from './types'
-import { HIDDeviceInfo } from './device'
+import { HIDDeviceInfo } from './hid-device'
 
 /**
  * A minimal proxy around a StreamDeck instance.

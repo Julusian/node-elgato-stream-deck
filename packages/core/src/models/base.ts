@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 
-import { HIDDevice, HIDDeviceInfo } from '../device'
+import { HIDDevice, HIDDeviceInfo } from '../hid-device'
 import { DeviceModelId, KeyIndex } from '../id'
 import { FillImageOptions, FillPanelOptions, StreamDeck, StreamDeckEvents, StreamDeckLcdStripService } from '../types'
 import type { StreamdeckImageWriter } from '../services/imageWriter/types'

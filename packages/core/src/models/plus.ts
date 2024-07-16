@@ -7,7 +7,7 @@ import {
 	StreamDeckEvents,
 	StreamDeckLcdStripService,
 } from '../types'
-import { HIDDevice } from '../device'
+import { HIDDevice } from '../hid-device'
 import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen2Properties } from './base'
 import { StreamDeckGen2Base } from './base-gen2'
 import { DeviceModelId, EncoderIndex } from '../id'

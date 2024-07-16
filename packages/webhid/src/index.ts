@@ -1,5 +1,5 @@
 import { DEVICE_MODELS, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from '@elgato-stream-deck/core'
-import { WebHIDDevice } from './device'
+import { WebHIDDevice } from './hid-device'
 import { encodeJPEG } from './jpeg'
 import { StreamDeckWeb } from './wrapper'
 

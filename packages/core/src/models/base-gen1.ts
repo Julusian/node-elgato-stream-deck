@@ -1,4 +1,4 @@
-import { HIDDevice } from '../device'
+import { HIDDevice } from '../hid-device'
 import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckGen1Properties, StreamDeckProperties } from './base'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckGen1ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
