@@ -12,8 +12,8 @@ export class EncoderInputService {
 		this.#encoderControls = allControls.filter(
 			(control): control is StreamDeckEncoderControlDefinition => control.type === 'encoder'
 		)
-		const maxIndex = Math.max(0, ...this.#encoderControls.map((control) => control.index))
-		this.#encoderState = new Array<boolean>(maxIndex).fill(false)
+		const maxIndex = Math.max(-1, ...this.#encoderControls.map((control) => control.index))
+		this.#encoderState = new Array<boolean>(maxIndex + 1).fill(false)
 	}
 
 	public handleInput(data: Uint8Array): void {

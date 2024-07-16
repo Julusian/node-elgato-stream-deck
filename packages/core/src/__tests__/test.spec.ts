@@ -371,7 +371,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 
 	test('fillKeyColor bad key', async () => {
 		await expect(async () => streamDeck.fillKeyColor(-1, 0, 0, 0)).rejects.toThrow()
-		await expect(async () => streamDeck.fillKeyColor(streamDeck.NUM_KEYS + 1, 0, 256, 0)).rejects.toThrow()
+		await expect(async () => streamDeck.fillKeyColor(50, 0, 256, 0)).rejects.toThrow()
 	})
 }
 
@@ -645,7 +645,21 @@ describe('StreamDeck Original V2', () => {
 
 		expect(downSpy).toHaveBeenCalledTimes(1)
 		expect(upSpy).toHaveBeenCalledTimes(1)
-		expect(downSpy).toHaveBeenNthCalledWith(1, 0)
-		expect(upSpy).toHaveBeenNthCalledWith(1, 0)
+		expect(downSpy).toHaveBeenNthCalledWith(1, {
+			column: 0,
+			feedbackType: 'lcd',
+			hidIndex: 0,
+			index: 0,
+			row: 0,
+			type: 'button',
+		})
+		expect(upSpy).toHaveBeenNthCalledWith(1, {
+			column: 0,
+			feedbackType: 'lcd',
+			hidIndex: 0,
+			index: 0,
+			row: 0,
+			type: 'button',
+		})
 	})
 })

@@ -90,7 +90,7 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 		const maxButtonIndex = properties.CONTROLS.filter(
 			(control): control is StreamDeckButtonControlDefinition => control.type === 'button'
 		).map((control) => control.index)
-		this.keyState = new Array<boolean>(Math.max(0, ...maxButtonIndex)).fill(false)
+		this.keyState = new Array<boolean>(Math.max(-1, ...maxButtonIndex) + 1).fill(false)
 
 		this.device.on('input', (data: Uint8Array) => this.handleInputBuffer(data))
 
