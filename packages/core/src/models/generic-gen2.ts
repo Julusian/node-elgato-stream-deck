@@ -5,7 +5,6 @@ import {
 	InternalFillImageOptions,
 	OpenStreamDeckOptions,
 	StreamDeckBase,
-	StreamDeckGen2Properties,
 	StreamDeckProperties,
 } from './base'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
@@ -22,10 +21,15 @@ function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): Stre
 	}
 }
 
+export type StreamDeckGen2Properties = Omit<
+	StreamDeckProperties,
+	'KEY_DATA_OFFSET' | 'KEY_DIRECTION' | 'SUPPORTS_RGB_KEY_FILL'
+>
+
 /**
- * Base class for generation 2 hardware (starting with the xl)
+ * Class for generation 2 hardware (starting with the xl)
  */
-export abstract class StreamDeckGen2Base extends StreamDeckBase {
+export class StreamDeckGen2 extends StreamDeckBase {
 	protected readonly encodeJPEG: EncodeJPEGHelper
 	protected readonly xyFlip: boolean
 

@@ -5,7 +5,7 @@
 
 import { readFixtureJSON } from './helpers'
 import { DeviceModelId, DEVICE_MODELS, StreamDeck } from '../'
-import { OpenStreamDeckOptions } from '../models'
+import { OpenStreamDeckOptions } from '../models/base'
 import { DummyHID } from './hid'
 import { EncodeJPEGHelper } from '../models/base'
 
@@ -24,7 +24,7 @@ function openStreamDeck(path: string, deviceModel: DeviceModelId, userOptions?: 
 	}
 
 	const device = new DummyHID(path, encodeJpegMock)
-	return new model.class(
+	return model.factory(
 		device,
 		options || {
 			encodeJPEG: undefined,

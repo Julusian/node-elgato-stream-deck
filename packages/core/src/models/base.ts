@@ -28,12 +28,6 @@ export type StreamDeckProperties = Readonly<{
 	KEY_SPACING_VERTICAL: number
 }>
 
-export type StreamDeckGen1Properties = Omit<StreamDeckProperties, 'KEY_DATA_OFFSET' | 'TOUCH_BUTTONS' | 'ENCODER_COUNT'>
-export type StreamDeckGen2Properties = Omit<
-	StreamDeckProperties,
-	'KEY_DATA_OFFSET' | 'KEY_DIRECTION' | 'SUPPORTS_RGB_KEY_FILL'
->
-
 export interface InternalFillImageOptions extends FillImageOptions {
 	offset: number
 	stride: number

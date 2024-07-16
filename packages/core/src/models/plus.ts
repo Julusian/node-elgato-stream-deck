@@ -8,8 +8,8 @@ import {
 	StreamDeckLcdStripService,
 } from '../types'
 import { HIDDevice } from '../hid-device'
-import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen2Properties } from './base'
-import { StreamDeckGen2Base } from './base-gen2'
+import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions } from './base'
+import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
 import { DeviceModelId, EncoderIndex } from '../id'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckPlusLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
@@ -28,7 +28,7 @@ const plusProperties: StreamDeckGen2Properties = {
 	KEY_SPACING_VERTICAL: 40,
 }
 
-export class StreamDeckPlus extends StreamDeckGen2Base {
+class StreamDeckPlus extends StreamDeckGen2 {
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
 		super(
 			device,
@@ -43,6 +43,11 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 			true
 		)
 	}
+}
+
+export function StreamDeckPlusFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckGen2 {
+	// TODO - remove this class, once the event emitting is possible
+	return new StreamDeckPlus(device, options)
 }
 
 class StreamDeckPlusLcdService implements StreamDeckLcdStripService {

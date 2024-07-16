@@ -1,22 +1,20 @@
 import { HIDDevice } from './hid-device'
 import { DeviceModelId } from './id'
-import {
-	StreamDeckMini,
-	StreamDeckOriginal,
-	StreamDeckOriginalV2,
-	StreamDeckOriginalMK2,
-	StreamDeckXL,
-	StreamDeckPedal,
-	StreamDeckNeo,
-	StreamDeckPlus,
-	OpenStreamDeckOptions,
-} from './models'
 import { StreamDeck } from './types'
+import { OpenStreamDeckOptions } from './models/base'
+import { StreamDeckOriginalFactory } from './models/original'
+import { StreamDeckMiniFactory } from './models/mini'
+import { StreamDeckXLFactory } from './models/xl'
+import { StreamDeckOriginalV2Factory } from './models/originalv2'
+import { StreamDeckOriginalMK2Factory } from './models/original-mk2'
+import { StreamDeckPlusFactory } from './models/plus'
+import { StreamDeckPedalFactory } from './models/pedal'
+import { StreamDeckNeoFactory } from './models/neo'
 
 export * from './types'
 export * from './id'
 export { HIDDevice, HIDDeviceInfo, HIDDeviceEvents } from './hid-device'
-export { OpenStreamDeckOptions } from './models'
+export { OpenStreamDeckOptions } from './models/base'
 export { StreamDeckProxy } from './proxy'
 
 /** Elgato vendor id */
@@ -31,7 +29,7 @@ export interface DeviceModelSpec {
 	id: DeviceModelId
 	type: DeviceModelType
 	productIds: number[]
-	class: new (device: HIDDevice, options: Required<OpenStreamDeckOptions>) => StreamDeck
+	factory: (device: HIDDevice, options: Required<OpenStreamDeckOptions>) => StreamDeck
 }
 
 /** List of all the known models, and the classes to use them */
@@ -39,42 +37,42 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.ORIGINAL]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0060],
-		class: StreamDeckOriginal,
+		factory: StreamDeckOriginalFactory,
 	},
 	[DeviceModelId.MINI]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0063, 0x0090],
-		class: StreamDeckMini,
+		factory: StreamDeckMiniFactory,
 	},
 	[DeviceModelId.XL]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x006c, 0x008f],
-		class: StreamDeckXL,
+		factory: StreamDeckXLFactory,
 	},
 	[DeviceModelId.ORIGINALV2]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x006d],
-		class: StreamDeckOriginalV2,
+		factory: StreamDeckOriginalV2Factory,
 	},
 	[DeviceModelId.ORIGINALMK2]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0080],
-		class: StreamDeckOriginalMK2,
+		factory: StreamDeckOriginalMK2Factory,
 	},
 	[DeviceModelId.PLUS]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0084],
-		class: StreamDeckPlus,
+		factory: StreamDeckPlusFactory,
 	},
 	[DeviceModelId.PEDAL]: {
 		type: DeviceModelType.PEDAL,
 		productIds: [0x0086],
-		class: StreamDeckPedal,
+		factory: StreamDeckPedalFactory,
 	},
 	[DeviceModelId.NEO]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x009a],
-		class: StreamDeckNeo,
+		factory: StreamDeckNeoFactory,
 	},
 }
 

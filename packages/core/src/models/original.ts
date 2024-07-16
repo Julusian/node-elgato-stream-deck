@@ -1,7 +1,6 @@
 import { HIDDevice } from '../hid-device'
-import { BMP_HEADER_LENGTH, transformImageBuffer, writeBMPHeader } from '../util'
-import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen1Properties } from './base'
-import { StreamDeckGen1Base } from './base-gen1'
+import { OpenStreamDeckOptions } from './base'
+import { StreamDeckGen1, StreamDeckGen1Properties } from './generic-gen1'
 import { DeviceModelId } from '../id'
 import { StreamdeckOriginalImageWriter } from '../services/imageWriter/imageWriter'
 
@@ -19,21 +18,13 @@ const originalProperties: StreamDeckGen1Properties = {
 	KEY_SPACING_VERTICAL: 25,
 }
 
-export class StreamDeckOriginal extends StreamDeckGen1Base {
-	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(device, options, originalProperties, new StreamdeckOriginalImageWriter())
-	}
-
-	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
-		const byteBuffer = transformImageBuffer(
-			sourceBuffer,
-			sourceOptions,
-			{ colorMode: 'bgr', xFlip: true },
-			BMP_HEADER_LENGTH,
-			this.BUTTON_WIDTH_PX,
-			this.BUTTON_HEIGHT_PX
-		)
-		writeBMPHeader(byteBuffer, this.BUTTON_WIDTH_PX, this.BUTTON_HEIGHT_PX, this.BUTTON_RGB_BYTES, 3780)
-		return byteBuffer
-	}
+export function StreamDeckOriginalFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckGen1 {
+	return new StreamDeckGen1(
+		device,
+		options,
+		originalProperties,
+		{ colorMode: 'bgr', xFlip: true },
+		3780,
+		new StreamdeckOriginalImageWriter()
+	)
 }

@@ -1,6 +1,6 @@
 import { HIDDevice } from '../hid-device'
-import { OpenStreamDeckOptions, StreamDeckGen2Properties } from './base'
-import { StreamDeckGen2Base } from './base-gen2'
+import { OpenStreamDeckOptions } from './base'
+import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
 import { DeviceModelId } from '../id'
 
 const origMK2Properties: StreamDeckGen2Properties = {
@@ -17,8 +17,9 @@ const origMK2Properties: StreamDeckGen2Properties = {
 	KEY_SPACING_VERTICAL: 25,
 }
 
-export class StreamDeckOriginalMK2 extends StreamDeckGen2Base {
-	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(device, options, origMK2Properties, null)
-	}
+export function StreamDeckOriginalMK2Factory(
+	device: HIDDevice,
+	options: Required<OpenStreamDeckOptions>
+): StreamDeckGen2 {
+	return new StreamDeckGen2(device, options, origMK2Properties, null)
 }

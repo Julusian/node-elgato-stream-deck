@@ -81,7 +81,7 @@ export async function openStreamDeck(devicePath: string, userOptions?: OpenStrea
 			throw new Error('Stream Deck is of unexpected type.')
 		}
 
-		const rawSteamdeck = new model.class(device, options)
+		const rawSteamdeck = model.factory(device, options)
 		return new StreamDeckNode(rawSteamdeck, userOptions?.resetToLogoOnClose ?? false)
 	} catch (e) {
 		if (device) await device.close().catch(() => null) // Suppress error

@@ -20,7 +20,7 @@ const pedalProperties: StreamDeckProperties = {
 	KEY_SPACING_VERTICAL: 0,
 }
 
-export class StreamDeckPedal extends StreamDeckInputBase {
+class StreamDeckPedal extends StreamDeckInputBase {
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
 		super(device, options, pedalProperties)
 	}
@@ -64,4 +64,8 @@ export class StreamDeckPedal extends StreamDeckInputBase {
 	public async clearPanel(): Promise<void> {
 		// Not supported
 	}
+}
+
+export function StreamDeckPedalFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckPedal {
+	return new StreamDeckPedal(device, options)
 }

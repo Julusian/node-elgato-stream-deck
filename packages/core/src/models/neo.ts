@@ -1,7 +1,7 @@
 import { HIDDevice } from '../hid-device'
-import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen2Properties } from './base'
+import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions } from './base'
 import { DeviceModelId } from '../id'
-import { StreamDeckGen2Base } from './base-gen2'
+import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckNeoLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 import { FillImageOptions, FillLcdImageOptions, LcdSegmentSize, StreamDeckLcdStripService } from '../types'
@@ -21,10 +21,8 @@ const neoProperties: StreamDeckGen2Properties = {
 	KEY_SPACING_VERTICAL: 30,
 }
 
-export class StreamDeckNeo extends StreamDeckGen2Base {
-	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(device, options, neoProperties, new StreamDeckNeoLcdService(options.encodeJPEG, device))
-	}
+export function StreamDeckNeoFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckGen2 {
+	return new StreamDeckGen2(device, options, neoProperties, new StreamDeckNeoLcdService(options.encodeJPEG, device))
 }
 
 class StreamDeckNeoLcdService implements StreamDeckLcdStripService {

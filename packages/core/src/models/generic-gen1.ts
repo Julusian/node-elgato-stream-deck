@@ -1,8 +1,9 @@
 import { HIDDevice } from '../hid-device'
-import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckGen1Properties, StreamDeckProperties } from './base'
+import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckGen1ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 import { StreamdeckImageWriter } from '../services/imageWriter/types'
+import { BMP_HEADER_LENGTH, FillImageTargetOptions, transformImageBuffer, writeBMPHeader } from '../util'
 
 function extendDevicePropertiesForGen1(rawProps: StreamDeckGen1Properties): StreamDeckProperties {
 	return {
@@ -13,14 +14,21 @@ function extendDevicePropertiesForGen1(rawProps: StreamDeckGen1Properties): Stre
 	}
 }
 
+export type StreamDeckGen1Properties = Omit<StreamDeckProperties, 'KEY_DATA_OFFSET' | 'TOUCH_BUTTONS' | 'ENCODER_COUNT'>
+
 /**
- * Base class for generation 1 hardware (before the xl)
+ * Class for generation 1 hardware (before the xl)
  */
-export abstract class StreamDeckGen1Base extends StreamDeckBase {
+export class StreamDeckGen1 extends StreamDeckBase {
+	readonly #targetOptions: FillImageTargetOptions
+	readonly #bmpImagePPM: number
+
 	constructor(
 		device: HIDDevice,
 		options: Required<OpenStreamDeckOptions>,
 		properties: StreamDeckGen1Properties,
+		targetOptions: FillImageTargetOptions,
+		bmpImagePPM: number,
 		imageWriter?: StreamdeckImageWriter
 	) {
 		super(
@@ -29,6 +37,28 @@ export abstract class StreamDeckGen1Base extends StreamDeckBase {
 			extendDevicePropertiesForGen1(properties),
 			imageWriter ?? new StreamdeckDefaultImageWriter(new StreamdeckGen1ImageHeaderGenerator())
 		)
+
+		this.#targetOptions = targetOptions
+		this.#bmpImagePPM = bmpImagePPM
+	}
+
+	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
+		const byteBuffer = transformImageBuffer(
+			sourceBuffer,
+			sourceOptions,
+			this.#targetOptions,
+			BMP_HEADER_LENGTH,
+			this.BUTTON_WIDTH_PX,
+			this.BUTTON_HEIGHT_PX
+		)
+		writeBMPHeader(
+			byteBuffer,
+			this.BUTTON_WIDTH_PX,
+			this.BUTTON_HEIGHT_PX,
+			this.BUTTON_RGB_BYTES,
+			this.#bmpImagePPM
+		)
+		return byteBuffer
 	}
 
 	/**

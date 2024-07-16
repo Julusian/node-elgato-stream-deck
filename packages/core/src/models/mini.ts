@@ -1,7 +1,6 @@
 import { HIDDevice } from '../hid-device'
-import { BMP_HEADER_LENGTH, transformImageBuffer, writeBMPHeader } from '../util'
-import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen1Properties } from './base'
-import { StreamDeckGen1Base } from './base-gen1'
+import { OpenStreamDeckOptions } from './base'
+import { StreamDeckGen1, StreamDeckGen1Properties } from './generic-gen1'
 import { DeviceModelId } from '../id'
 
 const miniProperties: StreamDeckGen1Properties = {
@@ -18,21 +17,6 @@ const miniProperties: StreamDeckGen1Properties = {
 	KEY_SPACING_VERTICAL: 28,
 }
 
-export class StreamDeckMini extends StreamDeckGen1Base {
-	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(device, options, miniProperties)
-	}
-
-	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
-		const byteBuffer = transformImageBuffer(
-			sourceBuffer,
-			sourceOptions,
-			{ colorMode: 'bgr', rotate: true, yFlip: true },
-			BMP_HEADER_LENGTH,
-			this.BUTTON_WIDTH_PX,
-			this.BUTTON_HEIGHT_PX
-		)
-		writeBMPHeader(byteBuffer, this.BUTTON_WIDTH_PX, this.BUTTON_HEIGHT_PX, this.BUTTON_RGB_BYTES, 2835)
-		return byteBuffer
-	}
+export function StreamDeckMiniFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckGen1 {
+	return new StreamDeckGen1(device, options, miniProperties, { colorMode: 'bgr', rotate: true, yFlip: true }, 2835)
 }
