@@ -1,4 +1,4 @@
-import { StreamDeck } from '@elgato-stream-deck/webhid'
+import { StreamDeck, StreamDeckButtonControlDefinition } from '@elgato-stream-deck/webhid'
 import { Demo } from './demo'
 
 export class ChaseDemo implements Demo {
@@ -13,9 +13,13 @@ export class ChaseDemo implements Demo {
 
 		const ps: Array<Promise<void>> = []
 
-		for (let i = 0; i < device.NUM_KEYS; i++) {
-			if (ctx) {
-				const n = c + i
+		const controls = device.CONTROLS.filter(
+			(control): control is StreamDeckButtonControlDefinition => control.type === 'button'
+		).sort((a, b) => b.index - a.index)
+
+		if (ctx) {
+			for (const control of controls) {
+				const n = c + control.index
 				ctx.save()
 				ctx.clearRect(0, 0, canvas.width, canvas.height)
 				// Start with a font that's 80% as high as the button. maxWidth
@@ -28,7 +32,7 @@ export class ChaseDemo implements Demo {
 				ctx.fillText(n.toString(), 8, canvas.height * 0.9, canvas.width * 0.8)
 
 				const id = ctx.getImageData(0, 0, canvas.width, canvas.height)
-				ps.push(device.fillKeyBuffer(i, Buffer.from(id.data), { format: 'rgba' }))
+				ps.push(device.fillKeyBuffer(control.index, Buffer.from(id.data), { format: 'rgba' }))
 				ctx.restore()
 			}
 		}

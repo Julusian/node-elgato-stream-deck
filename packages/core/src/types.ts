@@ -1,7 +1,12 @@
 import { EventEmitter } from 'events'
 import { DeviceModelId, Dimension, KeyIndex } from './id'
 import { HIDDeviceInfo } from './hid-device'
-import { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from './models/controlDefinition'
+import {
+	StreamDeckButtonControlDefinition,
+	StreamDeckControlDefinition,
+	StreamDeckEncoderControlDefinition,
+	StreamDeckLcdStripControlDefinition,
+} from './models/controlDefinition'
 
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
@@ -23,10 +28,10 @@ export interface LcdPosition {
 }
 
 export type StreamDeckEvents = {
-	down: [control: StreamDeckControlDefinition]
-	up: [control: StreamDeckControlDefinition]
+	down: [control: StreamDeckButtonControlDefinition | StreamDeckEncoderControlDefinition]
+	up: [control: StreamDeckButtonControlDefinition | StreamDeckEncoderControlDefinition]
 	error: [err: unknown]
-	rotate: [control: StreamDeckControlDefinition, amount: number]
+	rotate: [control: StreamDeckEncoderControlDefinition, amount: number]
 	lcdShortPress: [control: StreamDeckLcdStripControlDefinition, position: LcdPosition]
 	lcdLongPress: [control: StreamDeckLcdStripControlDefinition, position: LcdPosition]
 	lcdSwipe: [control: StreamDeckLcdStripControlDefinition, from: LcdPosition, to: LcdPosition]

@@ -4,7 +4,22 @@ import { NodeHIDDevice, StreamDeckDeviceInfo } from './hid-device'
 import { encodeJPEG, JPEGEncodeOptions } from './jpeg'
 import { StreamDeckNode } from './wrapper'
 
-export { DeviceModelId, KeyIndex, StreamDeck } from '@elgato-stream-deck/core'
+export {
+	VENDOR_ID,
+	DeviceModelId,
+	KeyIndex,
+	StreamDeck,
+	LcdPosition,
+	Dimension,
+	StreamDeckControlDefinitionBase,
+	StreamDeckButtonControlDefinition,
+	StreamDeckEncoderControlDefinition,
+	StreamDeckLcdStripControlDefinition,
+	StreamDeckControlDefinition,
+	OpenStreamDeckOptions,
+} from '@elgato-stream-deck/core'
+
+export { StreamDeckDeviceInfo, JPEGEncodeOptions }
 
 export interface OpenStreamDeckOptionsNode extends OpenStreamDeckOptions {
 	jpegOptions?: JPEGEncodeOptions

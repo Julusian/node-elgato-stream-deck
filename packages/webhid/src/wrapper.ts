@@ -21,7 +21,7 @@ export class StreamDeckWeb extends StreamDeckProxy {
 	}
 
 	public async fillKeyCanvas(keyIndex: KeyIndex, canvas: HTMLCanvasElement): Promise<void> {
-		this.checkValidKeyIndex(keyIndex)
+		// this.checkValidKeyIndex(keyIndex)
 
 		const ctx = canvas.getContext('2d')
 		if (!ctx) {
@@ -38,7 +38,7 @@ export class StreamDeckWeb extends StreamDeckProxy {
 			throw new Error('Failed to get canvas context')
 		}
 
-		const dimensions = this.calculateFillPanelDimensions()
+		const dimensions = this.device.calculateFillPanelDimensions()
 		if (!dimensions) {
 			throw new Error('Panel does not support filling')
 		}
