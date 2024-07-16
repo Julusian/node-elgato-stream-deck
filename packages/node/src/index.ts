@@ -36,7 +36,7 @@ export async function listStreamDecks(): Promise<StreamDeckDeviceInfo[]> {
  * If the provided device is a streamdeck, get the info about it
  */
 export function getStreamDeckDeviceInfo(dev: HID.Device): StreamDeckDeviceInfo | null {
-	const model = DEVICE_MODELS.find((m) => m.productId === dev.productId)
+	const model = DEVICE_MODELS.find((m) => m.productIds.includes(dev.productId))
 
 	if (model && dev.vendorId === VENDOR_ID && dev.path) {
 		return {
@@ -87,7 +87,7 @@ export async function openStreamDeck(devicePath: string, userOptions?: OpenStrea
 		const deviceInfo = await device.getDeviceInfo()
 
 		const model = DEVICE_MODELS.find(
-			(m) => m.productId === deviceInfo.productId && deviceInfo.vendorId === VENDOR_ID
+			(m) => deviceInfo.vendorId === VENDOR_ID && m.productIds.includes(deviceInfo.productId)
 		)
 		if (!model) {
 			throw new Error('Stream Deck is of unexpected type.')

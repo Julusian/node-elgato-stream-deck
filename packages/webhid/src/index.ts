@@ -48,7 +48,9 @@ export async function openDevice(
 	browserDevice: HIDDevice,
 	userOptions?: OpenStreamDeckOptions
 ): Promise<StreamDeckWeb> {
-	const model = DEVICE_MODELS.find((m) => m.productId === browserDevice.productId)
+	const model = DEVICE_MODELS.find(
+		(m) => browserDevice.vendorId === VENDOR_ID && m.productIds.includes(browserDevice.productId)
+	)
 	if (!model) {
 		throw new Error('Stream Deck is of unexpected type.')
 	}
