@@ -1,4 +1,4 @@
-import { Dimension } from '..'
+import { Dimension } from '.'
 
 export interface StreamDeckControlDefinitionBase {
 	type: 'button' | 'encoder' | 'lcd-strip'

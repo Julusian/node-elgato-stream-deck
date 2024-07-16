@@ -3,7 +3,7 @@ import type { HIDDevice } from '../hid-device'
 import type { Dimension, KeyIndex } from '../id'
 import type { FillImageOptions, FillPanelDimensionsOptions, FillPanelOptions } from '../types'
 import type { StreamdeckImageWriter } from './imageWriter/types'
-import type { StreamDeckButtonControlDefinition } from '../models/controlDefinition'
+import type { StreamDeckButtonControlDefinition } from '../controlDefinition'
 
 export interface InternalFillImageOptions extends FillImageOptions {
 	offset: number

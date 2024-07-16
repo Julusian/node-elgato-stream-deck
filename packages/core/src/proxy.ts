@@ -1,6 +1,6 @@
 import type { DeviceModelId } from './id'
-import type { StreamDeck, StreamDeckEvents, StreamDeckLcdStripService } from './types'
-import type { StreamDeckControlDefinition } from './models/controlDefinition'
+import type { StreamDeck, StreamDeckEvents } from './types'
+import type { StreamDeckControlDefinition } from './controlDefinition'
 
 /**
  * A minimal proxy around a StreamDeck instance.
@@ -37,10 +37,6 @@ export class StreamDeckProxy implements StreamDeck {
 	}
 	public get PRODUCT_NAME(): string {
 		return this.device.PRODUCT_NAME
-	}
-
-	public get lcdStrip(): StreamDeckLcdStripService | null {
-		return this.device.lcdStrip
 	}
 
 	public calculateFillPanelDimensions(
@@ -89,6 +85,28 @@ export class StreamDeckProxy implements StreamDeck {
 	}
 	public async getSerialNumber(): Promise<string> {
 		return this.device.getSerialNumber()
+	}
+
+	public async fillLcd(...args: Parameters<StreamDeck['fillLcd']>): ReturnType<StreamDeck['fillLcd']> {
+		return this.device.fillLcd(...args)
+	}
+
+	// public async fillEncoderLcd(
+	// 	...args: Parameters<StreamDeck['fillEncoderLcd']>
+	// ): ReturnType<StreamDeck['fillEncoderLcd']> {
+	// 	return this.device.fillEncoderLcd(...args)
+	// }
+
+	public async fillLcdRegion(
+		...args: Parameters<StreamDeck['fillLcdRegion']>
+	): ReturnType<StreamDeck['fillLcdRegion']> {
+		return this.device.fillLcdRegion(...args)
+	}
+
+	public async clearLcdStrip(
+		...args: Parameters<StreamDeck['clearLcdStrip']>
+	): ReturnType<StreamDeck['clearLcdStrip']> {
+		return this.device.clearLcdStrip(...args)
 	}
 
 	/**

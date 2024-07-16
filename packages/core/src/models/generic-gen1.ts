@@ -41,7 +41,8 @@ export class StreamDeckGen1 extends StreamDeckBase {
 				),
 				device,
 				fullProperties
-			)
+			),
+			null
 		)
 	}
 

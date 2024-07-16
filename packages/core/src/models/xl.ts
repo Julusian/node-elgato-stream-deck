@@ -2,7 +2,7 @@ import { HIDDevice } from '../hid-device'
 import { OpenStreamDeckOptions } from './base'
 import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
 import { DeviceModelId } from '../id'
-import { freezeDefinitions, generateButtonsGrid } from './controlsGenerator'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
 
 const xlProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.XL,

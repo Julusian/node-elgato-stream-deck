@@ -1,6 +1,6 @@
 import type { EventEmitter } from 'events'
 import type { StreamDeckEvents } from '..'
-import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../models/controlDefinition'
+import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../controlDefinition'
 
 export class EncoderInputService {
 	readonly #eventSource: EventEmitter<StreamDeckEvents>

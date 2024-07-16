@@ -1,5 +1,5 @@
 import { LcdPosition } from '../types'
-import { StreamDeckLcdStripControlDefinition } from '../models/controlDefinition'
+import { StreamDeckLcdStripControlDefinition } from '../controlDefinition'
 import { SomeEmitEventFn } from '../models/plus'
 
 export class LcdInputService {

@@ -2,7 +2,7 @@ import { HIDDevice } from '../hid-device'
 import { OpenStreamDeckOptions } from './base'
 import { StreamDeckGen1, StreamDeckGen1Properties } from './generic-gen1'
 import { DeviceModelId } from '../id'
-import { freezeDefinitions, generateButtonsGrid } from './controlsGenerator'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckGen1ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 

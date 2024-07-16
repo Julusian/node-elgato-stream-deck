@@ -13,7 +13,7 @@ import { StreamDeckNeoFactory } from './models/neo'
 
 export * from './types'
 export * from './id'
-export * from './models/controlDefinition'
+export * from './controlDefinition'
 export { HIDDevice, HIDDeviceInfo, HIDDeviceEvents } from './hid-device'
 export { OpenStreamDeckOptions } from './models/base'
 export { StreamDeckProxy } from './proxy'

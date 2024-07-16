@@ -3,7 +3,7 @@ import { OpenStreamDeckOptions } from './base'
 import { StreamDeckGen1, StreamDeckGen1Properties } from './generic-gen1'
 import { DeviceModelId } from '../id'
 import { StreamdeckOriginalImageWriter } from '../services/imageWriter/imageWriter'
-import { freezeDefinitions, generateButtonsGrid } from './controlsGenerator'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
 
 const originalProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.ORIGINAL,

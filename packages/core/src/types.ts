@@ -6,7 +6,7 @@ import {
 	StreamDeckControlDefinition,
 	StreamDeckEncoderControlDefinition,
 	StreamDeckLcdStripControlDefinition,
-} from './models/controlDefinition'
+} from './controlDefinition'
 
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
@@ -59,9 +59,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	/** The name of the product/model */
 	readonly PRODUCT_NAME: string
 
-	// TODO - I'm not sure on this, maybe it is better being flattened out, even if this is done internally
-	readonly lcdStrip: StreamDeckLcdStripService | null
-
 	calculateFillPanelDimensions(options?: FillPanelDimensionsOptions): Dimension | null
 
 	/**
@@ -102,42 +99,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
 
 	/**
-	 * Clears the given key.
-	 *
-	 * @param {number} keyIndex The key to clear
-	 */
-	clearKey(keyIndex: KeyIndex): Promise<void>
-
-	/**
-	 * Clears all keys.
-	 */
-	clearPanel(): Promise<void>
-
-	/**
-	 * Sets the brightness of the keys on the Stream Deck
-	 *
-	 * @param {number} percentage The percentage brightness
-	 */
-	setBrightness(percentage: number): Promise<void>
-
-	/**
-	 * Resets the display to the startup logo
-	 */
-	resetToLogo(): Promise<void>
-
-	/**
-	 * Get firmware version from Stream Deck
-	 */
-	getFirmwareVersion(): Promise<string>
-
-	/**
-	 * Get serial number from Stream Deck
-	 */
-	getSerialNumber(): Promise<string>
-}
-
-export interface StreamDeckLcdStripService {
-	/**
 	 * Fill the whole lcd strip
 	 * @param {number} lcdIndex The id of the lcd strip to draw to
 	 * @param {Buffer} imageBuffer The image to write
@@ -174,4 +135,38 @@ export interface StreamDeckLcdStripService {
 	 * @param {number} lcdIndex The id of the lcd strip to clear
 	 */
 	clearLcdStrip(lcdIndex: number): Promise<void>
+
+	/**
+	 * Clears the given key.
+	 *
+	 * @param {number} keyIndex The key to clear
+	 */
+	clearKey(keyIndex: KeyIndex): Promise<void>
+
+	/**
+	 * Clears all keys.
+	 */
+	clearPanel(): Promise<void>
+
+	/**
+	 * Sets the brightness of the keys on the Stream Deck
+	 *
+	 * @param {number} percentage The percentage brightness
+	 */
+	setBrightness(percentage: number): Promise<void>
+
+	/**
+	 * Resets the display to the startup logo
+	 */
+	resetToLogo(): Promise<void>
+
+	/**
+	 * Get firmware version from Stream Deck
+	 */
+	getFirmwareVersion(): Promise<string>
+
+	/**
+	 * Get serial number from Stream Deck
+	 */
+	getSerialNumber(): Promise<string>
 }
