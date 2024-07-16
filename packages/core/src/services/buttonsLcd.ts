@@ -1,7 +1,9 @@
+import type { StreamDeckProperties } from '../models/base'
 import type { HIDDevice } from '../hid-device'
 import type { KeyIndex } from '../id'
 import type { FillImageOptions, FillPanelOptions } from '../types'
 import type { StreamdeckImageWriter } from './imageWriter/types'
+import { transformKeyIndex } from '../util'
 
 export interface InternalFillImageOptions extends FillImageOptions {
 	offset: number
@@ -19,11 +21,18 @@ export class ButtonsLcdService {
 	readonly #imageWriter: StreamdeckImageWriter
 	readonly #imagePacker: ButtonLcdImagePacker
 	readonly #device: HIDDevice
+	readonly #deviceProperties: Readonly<StreamDeckProperties>
 
-	constructor(imageWriter: StreamdeckImageWriter, imagePacker: ButtonLcdImagePacker, device: HIDDevice) {
+	constructor(
+		imageWriter: StreamdeckImageWriter,
+		imagePacker: ButtonLcdImagePacker,
+		device: HIDDevice,
+		deviceProperties: Readonly<StreamDeckProperties>
+	) {
 		this.#imageWriter = imageWriter
 		this.#imagePacker = imagePacker
 		this.#device = device
+		this.#deviceProperties = deviceProperties
 	}
 
 	private get imagePixelCount(): number {
@@ -33,16 +42,21 @@ export class ButtonsLcdService {
 		return this.imagePixelCount * 3
 	}
 
+	/** @deprecated */
+	private get keyCount(): number {
+		return this.#deviceProperties.COLUMNS * this.#deviceProperties.ROWS
+	}
+
 	public async clearPanel(): Promise<void> {
 		const ps: Promise<void>[] = []
 
-		if (this.deviceProperties.SUPPORTS_RGB_KEY_FILL) {
-			for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
+		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL) {
+			for (let keyIndex = 0; keyIndex < this.keyCount; keyIndex++) {
 				ps.push(this.sendKeyRgb(keyIndex, 0, 0, 0))
 			}
 		} else if (this.imagePixelCount > 0) {
 			const pixels = Buffer.alloc(this.imageRgbBytes, 0)
-			for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
+			for (let keyIndex = 0; keyIndex < this.keyCount; keyIndex++) {
 				ps.push(
 					this.fillImageRange(keyIndex, pixels, {
 						format: 'rgb',
@@ -61,7 +75,7 @@ export class ButtonsLcdService {
 		this.checkRGBValue(g)
 		this.checkRGBValue(b)
 
-		if (this.deviceProperties.SUPPORTS_RGB_KEY_FILL || keyIndex >= this.NUM_KEYS) {
+		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || keyIndex >= this.keyCount) {
 			await this.sendKeyRgb(keyIndex, r, g, b)
 		} else {
 			const pixels = Buffer.alloc(this.imageRgbBytes, Buffer.from([r, g, b]))
@@ -93,20 +107,20 @@ export class ButtonsLcdService {
 		const sourceFormat = options?.format ?? 'rgb'
 		this.checkSourceFormat(sourceFormat)
 
-		const imageSize = this.imagePixelCount * sourceFormat.length * this.NUM_KEYS
+		const imageSize = this.imagePixelCount * sourceFormat.length * this.keyCount
 		if (imageBuffer.length !== imageSize) {
 			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
 		}
 
 		const iconSize = this.#imagePacker.imageWidth * sourceFormat.length
-		const stride = iconSize * this.KEY_COLUMNS
+		const stride = iconSize * this.#deviceProperties.COLUMNS
 
 		const ps: Array<Promise<void>> = []
-		for (let row = 0; row < this.KEY_ROWS; row++) {
+		for (let row = 0; row < this.#deviceProperties.ROWS; row++) {
 			const rowOffset = stride * row * this.#imagePacker.imageHeight
 
-			for (let column = 0; column < this.KEY_COLUMNS; column++) {
-				const index = row * this.KEY_COLUMNS + column
+			for (let column = 0; column < this.#deviceProperties.COLUMNS; column++) {
+				const index = row * this.#deviceProperties.COLUMNS + column
 				const colOffset = column * iconSize
 
 				ps.push(
@@ -126,7 +140,7 @@ export class ButtonsLcdService {
 	}
 
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
-		if (this.deviceProperties.SUPPORTS_RGB_KEY_FILL || keyIndex >= this.NUM_KEYS) {
+		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || keyIndex >= this.keyCount) {
 			await this.sendKeyRgb(keyIndex, 0, 0, 0)
 		} else {
 			const pixels = Buffer.alloc(this.imageRgbBytes, 0)
@@ -141,7 +155,7 @@ export class ButtonsLcdService {
 	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOptions: InternalFillImageOptions) {
 		// this.checkValidKeyIndex(keyIndex) // TODO - do we want this?
 
-		const keyIndexTransformed = this.transformKeyIndex(keyIndex)
+		const keyIndexTransformed = transformKeyIndex(this.#deviceProperties, keyIndex)
 
 		const byteBuffer = await this.#imagePacker.convertFillImage(imageBuffer, sourceOptions)
 

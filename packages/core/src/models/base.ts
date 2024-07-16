@@ -12,6 +12,7 @@ import type {
 import type { StreamdeckImageWriter } from '../services/imageWriter/types'
 import { ButtonLcdImagePacker, ButtonsLcdService } from '../services/buttonsLcd'
 import type { StreamDeckControlDefinition } from './controlDefinition'
+import { transformKeyIndex } from '../util'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
@@ -117,7 +118,7 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 		const keyData = data.subarray(this.deviceProperties.KEY_DATA_OFFSET || 0)
 		for (let i = 0; i < totalKeyCount; i++) {
 			const keyPressed = Boolean(keyData[i])
-			const keyIndex = this.transformKeyIndex(i)
+			const keyIndex = transformKeyIndex(this.deviceProperties, i)
 			const stateChanged = keyPressed !== this.keyState[keyIndex]
 			if (stateChanged) {
 				this.keyState[keyIndex] = keyPressed
@@ -152,18 +153,6 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	public abstract getFirmwareVersion(): Promise<string>
 	public abstract getSerialNumber(): Promise<string>
 
-	protected transformKeyIndex(keyIndex: KeyIndex): KeyIndex {
-		if (this.deviceProperties.KEY_DIRECTION === 'ltr') {
-			// Normal
-			return keyIndex
-		} else {
-			// Horizontal flip
-			const half = (this.KEY_COLUMNS - 1) / 2
-			const diff = ((keyIndex % this.KEY_COLUMNS) - half) * -half
-			return keyIndex + diff
-		}
-	}
-
 	public abstract fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
 	public abstract fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void>
 	public abstract fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
@@ -183,7 +172,7 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		imagePacker: ButtonLcdImagePacker
 	) {
 		super(device, options, properties)
-		this.buttonsLcdService = new ButtonsLcdService(imageWriter, imagePacker, device)
+		this.buttonsLcdService = new ButtonsLcdService(imageWriter, imagePacker, device, properties)
 	}
 
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
