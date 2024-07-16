@@ -24,7 +24,18 @@ interface GridSpan {
 	maxCol: number
 }
 
-export class ButtonsLcdService {
+export interface ButtonsLcdService {
+	calculateFillPanelDimensions(options: FillPanelDimensionsOptions | undefined): Dimension | null
+
+	clearPanel(): Promise<void>
+	clearKey(keyIndex: KeyIndex): Promise<void>
+
+	fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
+	fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void>
+	fillPanelBuffer(imageBuffer: Buffer, options: FillPanelOptions | undefined): Promise<void>
+}
+
+export class DefaultButtonsLcdService implements ButtonsLcdService {
 	readonly #imageWriter: StreamdeckImageWriter
 	readonly #imagePacker: ButtonLcdImagePacker
 	readonly #device: HIDDevice
@@ -128,6 +139,24 @@ export class ButtonsLcdService {
 		await Promise.all(ps)
 	}
 
+	public async clearKey(keyIndex: KeyIndex): Promise<void> {
+		const control = this.#deviceProperties.CONTROLS.find(
+			(control): control is StreamDeckButtonControlDefinition =>
+				control.type === 'button' && control.index === keyIndex
+		)
+
+		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control?.feedbackType === 'rgb') {
+			await this.sendKeyRgb(keyIndex, 0, 0, 0)
+		} else {
+			const pixels = Buffer.alloc(this.imageRgbBytes, 0)
+			await this.fillImageRange(keyIndex, pixels, {
+				format: 'rgb',
+				offset: 0,
+				stride: this.#imagePacker.imageWidth * 3,
+			})
+		}
+	}
+
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		this.checkRGBValue(r)
 		this.checkRGBValue(g)
@@ -212,24 +241,6 @@ export class ButtonsLcdService {
 
 	private async sendKeyRgb(keyIndex: number, red: number, green: number, blue: number): Promise<void> {
 		await this.#device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, red, green, blue]))
-	}
-
-	public async clearKey(keyIndex: KeyIndex): Promise<void> {
-		const control = this.#deviceProperties.CONTROLS.find(
-			(control): control is StreamDeckButtonControlDefinition =>
-				control.type === 'button' && control.index === keyIndex
-		)
-
-		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control?.feedbackType === 'rgb') {
-			await this.sendKeyRgb(keyIndex, 0, 0, 0)
-		} else {
-			const pixels = Buffer.alloc(this.imageRgbBytes, 0)
-			await this.fillImageRange(keyIndex, pixels, {
-				format: 'rgb',
-				offset: 0,
-				stride: this.#imagePacker.imageWidth * 3,
-			})
-		}
 	}
 
 	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOptions: InternalFillImageOptions) {

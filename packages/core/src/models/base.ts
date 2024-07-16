@@ -10,8 +10,7 @@ import type {
 	StreamDeckEvents,
 	StreamDeckLcdStripService,
 } from '../types'
-import type { StreamdeckImageWriter } from '../services/imageWriter/types'
-import { ButtonLcdImagePacker, ButtonsLcdService } from '../services/buttonsLcd'
+import type { ButtonsLcdService } from '../services/buttonsLcd'
 import type { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from './controlDefinition'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
@@ -42,7 +41,7 @@ export type StreamDeckProperties = Readonly<{
 	KEY_SPACING_VERTICAL: number
 }>
 
-export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
+export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
 	get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
 		return this.deviceProperties.CONTROLS
 	}
@@ -78,14 +77,21 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 
 	protected readonly device: HIDDevice
 	protected readonly deviceProperties: Readonly<StreamDeckProperties>
+	private readonly buttonsLcdService: ButtonsLcdService
 	// private readonly options: Readonly<OpenStreamDeckOptions>
 	private readonly keyState: boolean[]
 
-	constructor(device: HIDDevice, _options: OpenStreamDeckOptions, properties: StreamDeckProperties) {
+	constructor(
+		device: HIDDevice,
+		_options: OpenStreamDeckOptions,
+		properties: StreamDeckProperties,
+		buttonsLcdService: ButtonsLcdService
+	) {
 		super()
 
 		this.deviceProperties = properties
 		this.device = device
+		this.buttonsLcdService = buttonsLcdService
 
 		const maxButtonIndex = properties.CONTROLS.filter(
 			(control): control is StreamDeckButtonControlDefinition => control.type === 'button'
@@ -136,7 +142,9 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 		}
 	}
 
-	public abstract calculateFillPanelDimensions(options?: FillPanelDimensionsOptions): Dimension | null
+	public calculateFillPanelDimensions(options?: FillPanelDimensionsOptions): Dimension | null {
+		return this.buttonsLcdService.calculateFillPanelDimensions(options)
+	}
 
 	public async close(): Promise<void> {
 		return this.device.close()
@@ -152,32 +160,6 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 
 	public abstract getFirmwareVersion(): Promise<string>
 	public abstract getSerialNumber(): Promise<string>
-
-	public abstract fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
-	public abstract fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void>
-	public abstract fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
-
-	public abstract clearKey(keyIndex: KeyIndex): Promise<void>
-	public abstract clearPanel(): Promise<void>
-}
-
-export abstract class StreamDeckBase extends StreamDeckInputBase {
-	protected readonly buttonsLcdService: ButtonsLcdService
-
-	constructor(
-		device: HIDDevice,
-		options: OpenStreamDeckOptions,
-		properties: StreamDeckProperties,
-		imageWriter: StreamdeckImageWriter,
-		imagePacker: ButtonLcdImagePacker
-	) {
-		super(device, options, properties)
-		this.buttonsLcdService = new ButtonsLcdService(imageWriter, imagePacker, device, properties)
-	}
-
-	public calculateFillPanelDimensions(options?: FillPanelDimensionsOptions): Dimension | null {
-		return this.buttonsLcdService.calculateFillPanelDimensions(options)
-	}
 
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		this.checkValidKeyIndex(keyIndex, null)

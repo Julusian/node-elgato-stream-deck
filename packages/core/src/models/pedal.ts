@@ -1,9 +1,10 @@
 import { HIDDevice } from '../hid-device'
-import { OpenStreamDeckOptions, StreamDeckInputBase, StreamDeckProperties } from './base'
+import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { DeviceModelId, Dimension } from '../id'
 import { FillImageOptions, FillPanelDimensionsOptions, FillPanelOptions } from '../types'
 import { StreamDeckControlDefinition } from './controlDefinition'
 import { freezeDefinitions } from './controlsGenerator'
+import type { ButtonsLcdService } from '../services/buttonsLcd'
 
 const pedalControls: StreamDeckControlDefinition[] = [
 	{
@@ -46,9 +47,9 @@ const pedalProperties: StreamDeckProperties = {
 	KEY_SPACING_VERTICAL: 0,
 }
 
-class StreamDeckPedal extends StreamDeckInputBase {
+class StreamDeckPedal extends StreamDeckBase {
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(device, options, pedalProperties)
+		super(device, options, pedalProperties, new PedalLcdService())
 	}
 
 	/**
@@ -74,12 +75,19 @@ class StreamDeckPedal extends StreamDeckInputBase {
 		const val = await this.device.getFeatureReport(6, 32)
 		return val.toString('ascii', 2, 14)
 	}
+}
 
+class PedalLcdService implements ButtonsLcdService {
 	public calculateFillPanelDimensions(_options?: FillPanelDimensionsOptions): Dimension | null {
 		// Not supported
 		return null
 	}
-
+	public async clearKey(_keyIndex: number): Promise<void> {
+		// Not supported
+	}
+	public async clearPanel(): Promise<void> {
+		// Not supported
+	}
 	public async fillKeyColor(_keyIndex: number, _r: number, _g: number, _b: number): Promise<void> {
 		// Not supported
 	}
@@ -87,12 +95,6 @@ class StreamDeckPedal extends StreamDeckInputBase {
 		// Not supported
 	}
 	public async fillPanelBuffer(_imageBuffer: Buffer, _options?: FillPanelOptions): Promise<void> {
-		// Not supported
-	}
-	public async clearKey(_keyIndex: number): Promise<void> {
-		// Not supported
-	}
-	public async clearPanel(): Promise<void> {
 		// Not supported
 	}
 }

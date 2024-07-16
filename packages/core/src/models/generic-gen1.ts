@@ -2,7 +2,7 @@ import { HIDDevice } from '../hid-device'
 import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { StreamdeckImageWriter } from '../services/imageWriter/types'
 import { BMP_HEADER_LENGTH, FillImageTargetOptions, transformImageBuffer, writeBMPHeader } from '../util'
-import { ButtonLcdImagePacker, InternalFillImageOptions } from '../services/buttonsLcd'
+import { ButtonLcdImagePacker, DefaultButtonsLcdService, InternalFillImageOptions } from '../services/buttonsLcd'
 
 function extendDevicePropertiesForGen1(rawProps: StreamDeckGen1Properties): StreamDeckProperties {
 	return {
@@ -25,16 +25,22 @@ export class StreamDeckGen1 extends StreamDeckBase {
 		targetOptions: FillImageTargetOptions,
 		bmpImagePPM: number
 	) {
+		const fullProperties = extendDevicePropertiesForGen1(properties)
+
 		super(
 			device,
 			options,
-			extendDevicePropertiesForGen1(properties),
-			imageWriter,
-			new Gen1ButtonLcdImagePacker(
-				targetOptions,
-				bmpImagePPM,
-				properties.BUTTON_WIDTH_PX,
-				properties.BUTTON_HEIGHT_PX
+			fullProperties,
+			new DefaultButtonsLcdService(
+				imageWriter,
+				new Gen1ButtonLcdImagePacker(
+					targetOptions,
+					bmpImagePPM,
+					properties.BUTTON_WIDTH_PX,
+					properties.BUTTON_HEIGHT_PX
+				),
+				device,
+				fullProperties
 			)
 		)
 	}

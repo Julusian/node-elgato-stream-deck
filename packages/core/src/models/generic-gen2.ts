@@ -5,7 +5,7 @@ import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWrite
 import { StreamdeckGen2ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 import type { StreamDeckLcdStripService, StreamDeckLcdStripServiceInternal } from '../types'
 import { EncoderInputService } from '../services/encoder'
-import { ButtonLcdImagePacker, InternalFillImageOptions } from '../services/buttonsLcd'
+import { ButtonLcdImagePacker, DefaultButtonsLcdService, InternalFillImageOptions } from '../services/buttonsLcd'
 
 function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): StreamDeckProperties {
 	return {
@@ -35,16 +35,22 @@ export class StreamDeckGen2 extends StreamDeckBase {
 		lcdStripService: StreamDeckLcdStripServiceInternal | null,
 		disableXYFlip?: boolean
 	) {
+		const fullProperties = extendDevicePropertiesForGen2(properties)
+
 		super(
 			device,
 			options,
-			extendDevicePropertiesForGen2(properties),
-			new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator()),
-			new Gen2ButtonLcdImagePacker(
-				options.encodeJPEG,
-				!disableXYFlip,
-				properties.BUTTON_WIDTH_PX,
-				properties.BUTTON_HEIGHT_PX
+			fullProperties,
+			new DefaultButtonsLcdService(
+				new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator()),
+				new Gen2ButtonLcdImagePacker(
+					options.encodeJPEG,
+					!disableXYFlip,
+					properties.BUTTON_WIDTH_PX,
+					properties.BUTTON_HEIGHT_PX
+				),
+				device,
+				fullProperties
 			)
 		)
 
