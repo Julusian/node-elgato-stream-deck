@@ -1,3 +1,4 @@
+// @ts-check
 const { listStreamDecks, openStreamDeck } = require('../dist/index')
 
 ;(async () => {
@@ -8,18 +9,20 @@ const { listStreamDecks, openStreamDeck } = require('../dist/index')
 
 	// Fill it white so we can see the brightness changes
 	const buttonControls = streamDeck.CONTROLS.filter((control) => control.type === 'button')
-	for (const control of buttonControls) {
-		streamDeck.fillKeyColor(control.index, 255, 255, 255).catch((e) => console.error('Fill failed:', e))
-	}
-
-	if (streamDeck.LCD_STRIP_SIZE) {
-		const buffer = Buffer.alloc(streamDeck.LCD_STRIP_SIZE.width * streamDeck.LCD_STRIP_SIZE.height * 3).fill(
-			Buffer.from([255, 255, 255])
-		)
-		streamDeck.fillLcd(buffer, { format: 'rgb' }).catch((e) => console.error('Fill lcd failed:', e))
+	for (const control of streamDeck.CONTROLS) {
+		if (control.type === 'button' && control.feedbackType !== 'none') {
+			streamDeck.fillKeyColor(control.index, 255, 255, 255).catch((e) => console.error('Fill failed:', e))
+		} else if (control.type === 'lcd-strip') {
+			const buffer = Buffer.alloc(control.pixelSize.width * control.pixelSize.height * 3).fill(
+				Buffer.from([255, 255, 255])
+			)
+			streamDeck.fillLcd(control.id, buffer, { format: 'rgb' }).catch((e) => console.error('Fill lcd failed:', e))
+		}
 	}
 
 	streamDeck.on('down', (control) => {
+		if (control.type !== 'button') return
+
 		const percentage = (100 / (buttonControls.length - 1)) * control.index
 		console.log(`Setting brightness to ${percentage.toFixed(2)}%`)
 		streamDeck.setBrightness(percentage).catch((e) => console.error('Set brightness failed:', e))

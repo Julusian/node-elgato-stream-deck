@@ -26,6 +26,8 @@ plusControls.push(
 			width: 800,
 			height: 100,
 		}),
+
+		drawRegions: true,
 	},
 	{
 		type: 'encoder',

@@ -33,6 +33,8 @@ neoControls.push(
 			width: 248,
 			height: 58,
 		},
+
+		drawRegions: false,
 	},
 	{
 		type: 'button',

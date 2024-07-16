@@ -1,12 +1,19 @@
+// @ts-check
 const sharp = require('sharp')
 const path = require('path')
-const { openStreamDeck } = require('../dist/index')
+const { listStreamDecks, openStreamDeck } = require('../dist/index')
 
-openStreamDeck().then((streamDeck) => {
-	streamDeck.clearPanel()
+;(async () => {
+	const devices = await listStreamDecks()
+	if (!devices[0]) throw new Error('No device found')
 
-	streamDeck.on('down', async (keyIndex) => {
-		console.log('Filling button #%d', keyIndex)
+	const streamDeck = await openStreamDeck(devices[0].path)
+	await streamDeck.clearPanel()
+
+	streamDeck.on('down', async (control) => {
+		if (control.type !== 'button') return
+
+		console.log('Filling button #%d', control.index)
 
 		try {
 			const finalBuffer = await sharp(
@@ -27,7 +34,7 @@ openStreamDeck().then((streamDeck) => {
                             fill="#fff"
                             text-anchor="middle"
 							stroke="#666"
-                            >FOO #${keyIndex}</text>
+                            >FOO #${control.index}</text>
                     </svg>`
 						),
 						top: 0,
@@ -37,19 +44,19 @@ openStreamDeck().then((streamDeck) => {
 				.flatten()
 				.raw()
 				.toBuffer()
-			await streamDeck.fillKeyBuffer(keyIndex, finalBuffer, { format: 'rgba' })
+			await streamDeck.fillKeyBuffer(control.index, finalBuffer, { format: 'rgba' })
 		} catch (error) {
 			console.error(error)
 		}
 	})
 
-	streamDeck.on('up', (keyIndex) => {
+	streamDeck.on('up', (control) => {
 		// Clear the key when it is released.
-		console.log('Clearing button #%d', keyIndex)
-		streamDeck.clearKey(keyIndex).catch((e) => console.error('Clear failed:', e))
+		console.log('Clearing button #%d', control.index)
+		streamDeck.clearKey(control.index).catch((e) => console.error('Clear failed:', e))
 	})
 
 	streamDeck.on('error', (error) => {
 		console.error(error)
 	})
-})
+})()

@@ -1,3 +1,4 @@
+// @ts-check
 const path = require('path')
 const sharp = require('sharp')
 const { listStreamDecks, openStreamDeck, DeviceModelId } = require('../dist/index')
@@ -23,37 +24,36 @@ const { listStreamDecks, openStreamDeck, DeviceModelId } = require('../dist/inde
 		.raw()
 		.toBuffer()
 
-	await streamDeck.fillLcdRegion(0, 0, img3, {
+	await streamDeck.fillLcdRegion(0, 0, 0, img3, {
 		width: 800,
 		height: 100,
-		stride: 800 * 3,
-		offset: 0,
+		// stride: 800 * 3,
+		// offset: 0,
 		format: 'rgb',
 	})
 
-	streamDeck.on('down', (keyIndex) => {
-		// Fill the pressed key with an image of the GitHub logo.
-		console.log('Filling button #%d', keyIndex)
-		streamDeck.fillKeyBuffer(keyIndex, img).catch((e) => console.error('Fill failed:', e))
+	streamDeck.on('down', (control) => {
+		if (control.type === 'button') {
+			// Fill the pressed key with an image of the GitHub logo.
+			console.log('Filling button #%d', control.index)
+			streamDeck.fillKeyBuffer(control.index, img).catch((e) => console.error('Fill failed:', e))
+		} else {
+			console.log('Encoder down #%d', control.index)
+		}
 	})
 
-	streamDeck.on('up', (keyIndex) => {
-		// Clear the key when it is released.
-		console.log('Clearing button #%d', keyIndex)
-		streamDeck.clearKey(keyIndex).catch((e) => console.error('Clear failed:', e))
+	streamDeck.on('up', (control) => {
+		if (control.type === 'button') {
+			// Clear the key when it is released.
+			console.log('Clearing button #%d', control.index)
+			streamDeck.clearKey(control.index).catch((e) => console.error('Clear failed:', e))
+		} else {
+			console.log('Encoder up #%d', control.index)
+		}
 	})
 
-	streamDeck.on('encoderDown', (index) => {
-		console.log('Encoder down #%d', index)
-	})
-	streamDeck.on('encoderUp', (index) => {
-		console.log('Encoder up #%d', index)
-	})
-	streamDeck.on('rotateLeft', (index, amount) => {
-		console.log('Encoder left #%d (%d)', index, amount)
-	})
-	streamDeck.on('rotateRight', (index, amount) => {
-		console.log('Encoder right #%d (%d)', index, amount)
+	streamDeck.on('rotate', (control, amount) => {
+		console.log('Encoder rotate #%d (%d)', control.index, amount)
 	})
 	streamDeck.on('lcdShortPress', (index, pos) => {
 		console.log('lcd short press #%d (%d, %d)', index, pos.x, pos.y)

@@ -30,6 +30,11 @@ export interface StreamDeckLcdStripControlDefinition extends StreamDeckControlDe
 	columnSpan: number
 
 	pixelSize: Dimension
+
+	/**
+	 * Whether the LCD strip supports drawing regions
+	 */
+	drawRegions: boolean
 }
 
 export type StreamDeckControlDefinition =
