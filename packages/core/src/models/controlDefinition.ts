@@ -1,3 +1,5 @@
+import { Dimension } from '..'
+
 export interface StreamDeckControlDefinitionBase {
 	type: 'button' | 'encoder' | 'lcd-strip'
 
@@ -23,11 +25,11 @@ export interface StreamDeckEncoderControlDefinition extends StreamDeckControlDef
 
 export interface StreamDeckLcdStripControlDefinition extends StreamDeckControlDefinitionBase {
 	type: 'lcd-strip'
+	id: 0 // Future: Maybe there will be more than one LCD strip
 
 	columnSpan: number
 
-	widthPixels: number
-	heightPixels: number
+	pixelSize: Dimension
 }
 
 export type StreamDeckControlDefinition =

@@ -20,5 +20,5 @@ export function StreamDeckOriginalMK2Factory(
 	device: HIDDevice,
 	options: Required<OpenStreamDeckOptions>
 ): StreamDeckGen2 {
-	return new StreamDeckGen2(device, options, origMK2Properties, null)
+	return new StreamDeckGen2(device, options, origMK2Properties, null, null)
 }

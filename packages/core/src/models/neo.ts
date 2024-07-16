@@ -1,14 +1,14 @@
 import { HIDDevice } from '../hid-device'
 import { EncodeJPEGHelper, OpenStreamDeckOptions } from './base'
-import { DeviceModelId } from '../id'
+import { DeviceModelId, Dimension } from '../id'
 import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckNeoLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
-import { FillImageOptions, FillLcdImageOptions, LcdSegmentSize, StreamDeckLcdStripService } from '../types'
+import { FillImageOptions, FillLcdImageOptions, StreamDeckLcdStripService } from '../types'
 import { transformImageBuffer } from '../util'
 import { InternalFillImageOptions } from '../services/buttonsLcd'
 import { freezeDefinitions, generateButtonsGrid } from './controlsGenerator'
-import { StreamDeckControlDefinition } from './controlDefinition'
+import { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from './controlDefinition'
 
 const neoControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2)
 neoControls.push(
@@ -26,8 +26,12 @@ neoControls.push(
 		column: 1,
 		columnSpan: 2,
 
-		widthPixels: 248,
-		heightPixels: 58,
+		id: 0,
+
+		pixelSize: {
+			width: 248,
+			height: 58,
+		},
 	},
 	{
 		type: 'button',
@@ -50,26 +54,39 @@ const neoProperties: StreamDeckGen2Properties = {
 	KEY_SPACING_HORIZONTAL: 30,
 	KEY_SPACING_VERTICAL: 30,
 }
+const lcdStripControls = neoProperties.CONTROLS.filter(
+	(control): control is StreamDeckLcdStripControlDefinition => control.type === 'lcd-strip'
+)
 
 export function StreamDeckNeoFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckGen2 {
-	return new StreamDeckGen2(device, options, neoProperties, new StreamDeckNeoLcdService(options.encodeJPEG, device))
+	return new StreamDeckGen2(
+		device,
+		options,
+		neoProperties,
+		new StreamDeckNeoLcdService(options.encodeJPEG, device, lcdStripControls),
+		null
+	)
 }
 
 class StreamDeckNeoLcdService implements StreamDeckLcdStripService {
 	readonly #encodeJPEG: EncodeJPEGHelper
 	readonly #device: HIDDevice
+	readonly #lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>
 
 	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter<null>(new StreamdeckNeoLcdImageHeaderGenerator())
 
-	constructor(encodeJPEG: EncodeJPEGHelper, device: HIDDevice) {
+	constructor(
+		encodeJPEG: EncodeJPEGHelper,
+		device: HIDDevice,
+		lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>
+	) {
 		this.#encodeJPEG = encodeJPEG
 		this.#device = device
+		this.#lcdControls = lcdControls
 	}
 
-	async fillEncoderLcd(_index: number, _imageBuffer: Buffer, _sourceOptions: FillImageOptions): Promise<void> {
-		throw new Error('Not supported for this model')
-	}
 	async fillLcdRegion(
+		_index: number,
 		_x: number,
 		_y: number,
 		_imageBuffer: Buffer,
@@ -78,39 +95,36 @@ class StreamDeckNeoLcdService implements StreamDeckLcdStripService {
 		throw new Error('Not supported for this model')
 	}
 
-	public get LCD_STRIP_SIZE(): LcdSegmentSize {
-		return {
-			width: 248,
-			height: 58,
-		}
-	}
-	public get LCD_ENCODER_SIZE(): LcdSegmentSize | undefined {
-		return undefined
-	}
+	public async fillLcd(index: number, imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
+		const lcdControl = this.#lcdControls.find((control) => control.id === index)
+		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
 
-	public handleInput(_data: Uint8Array): void {
-		// No input supported
-	}
-
-	public async fillLcd(imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
-		const size = this.LCD_STRIP_SIZE
-		if (!size) throw new Error(`There is no lcd to fill`)
-
-		const imageSize = size.width * size.height * sourceOptions.format.length
+		const imageSize = lcdControl.pixelSize.width * lcdControl.pixelSize.height * sourceOptions.format.length
 		if (imageBuffer.length !== imageSize) {
 			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
 		}
 
 		// A lot of this drawing code is heavily based on the normal button
-		const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, size, sourceOptions)
+		const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, lcdControl.pixelSize, sourceOptions)
 
 		const packets = this.#lcdImageWriter.generateFillImageWrites(null, byteBuffer)
 		await this.#device.sendReports(packets)
 	}
 
+	public async clearLcdStrip(index: number): Promise<void> {
+		const lcdControl = this.#lcdControls.find((control) => control.id === index)
+		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
+
+		const buffer = Buffer.alloc(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4)
+
+		await this.fillLcd(index, buffer, {
+			format: 'rgba',
+		})
+	}
+
 	private async convertFillLcdBuffer(
 		sourceBuffer: Buffer,
-		size: LcdSegmentSize,
+		size: Dimension,
 		sourceOptions: FillImageOptions
 	): Promise<Buffer> {
 		const sourceOptions2: InternalFillImageOptions = {

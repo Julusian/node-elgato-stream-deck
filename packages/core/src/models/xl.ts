@@ -17,5 +17,5 @@ const xlProperties: StreamDeckGen2Properties = {
 }
 
 export function StreamDeckXLFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckGen2 {
-	return new StreamDeckGen2(device, options, xlProperties, null)
+	return new StreamDeckGen2(device, options, xlProperties, null, null)
 }

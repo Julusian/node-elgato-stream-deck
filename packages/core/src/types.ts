@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
-import { DeviceModelId, Dimension, EncoderIndex, KeyIndex } from './id'
+import { DeviceModelId, Dimension, KeyIndex } from './id'
 import { HIDDeviceInfo } from './hid-device'
-import { StreamDeckControlDefinition } from './models/controlDefinition'
+import { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from './models/controlDefinition'
 
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
@@ -27,14 +27,9 @@ export type StreamDeckEvents = {
 	up: [control: StreamDeckControlDefinition]
 	error: [err: unknown]
 	rotate: [control: StreamDeckControlDefinition, amount: number]
-	lcdShortPress: [encoder: EncoderIndex, position: LcdPosition]
-	lcdLongPress: [encoder: EncoderIndex, position: LcdPosition]
-	lcdSwipe: [fromEncoder: EncoderIndex, toEncoder: EncoderIndex, from: LcdPosition, to: LcdPosition]
-}
-
-export interface LcdSegmentSize {
-	width: number
-	height: number
+	lcdShortPress: [control: StreamDeckLcdStripControlDefinition, position: LcdPosition]
+	lcdLongPress: [control: StreamDeckLcdStripControlDefinition, position: LcdPosition]
+	lcdSwipe: [control: StreamDeckLcdStripControlDefinition, from: LcdPosition, to: LcdPosition]
 }
 
 export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
@@ -137,36 +132,41 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 }
 
 export interface StreamDeckLcdStripService {
-	/** The full size of the lcd strip on this streamdeck (if any) */
-	readonly LCD_STRIP_SIZE: LcdSegmentSize
-	/** The size of the lcd per encoder on this streamdeck (if any) */
-	readonly LCD_ENCODER_SIZE: LcdSegmentSize | undefined
-
 	/**
 	 * Fill the whole lcd strip
+	 * @param {number} lcdIndex The id of the lcd strip to draw to
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
 	 */
-	fillLcd(imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
+	fillLcd(lcdIndex: number, imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
 
-	/**
-	 * Fills the lcd strip above an encoder
-	 * @param {number} index The encoder to draw above
-	 * @param {Buffer} imageBuffer The image to write
-	 * @param {Object} sourceOptions Options to control the write
-	 */
-	fillEncoderLcd(index: EncoderIndex, imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
+	// /**
+	//  * Fills the lcd strip above an encoder
+	//  * @param {number} index The encoder to draw above
+	//  * @param {Buffer} imageBuffer The image to write
+	//  * @param {Object} sourceOptions Options to control the write
+	//  */
+	// fillEncoderLcd(index: EncoderIndex, imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
 
 	/**
 	 * Fill a region of the lcd strip, ignoring the boundaries of the encoders
+	 * @param {number} lcdIndex The id of the lcd strip to draw to
 	 * @param {number} x The x position to draw to
 	 * @param {number} y The y position to draw to
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
 	 */
-	fillLcdRegion(x: number, y: number, imageBuffer: Buffer, sourceOptions: FillLcdImageOptions): Promise<void>
-}
+	fillLcdRegion(
+		lcdIndex: number,
+		x: number,
+		y: number,
+		imageBuffer: Buffer,
+		sourceOptions: FillLcdImageOptions
+	): Promise<void>
 
-export interface StreamDeckLcdStripServiceInternal extends StreamDeckLcdStripService {
-	handleInput(data: Uint8Array): void
+	/**
+	 * Clear the lcd strip to black
+	 * @param {number} lcdIndex The id of the lcd strip to clear
+	 */
+	clearLcdStrip(lcdIndex: number): Promise<void>
 }

@@ -3,9 +3,10 @@ import { transformImageBuffer } from '../util'
 import { EncodeJPEGHelper, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckGen2ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
-import type { StreamDeckLcdStripService, StreamDeckLcdStripServiceInternal } from '../types'
+import type { StreamDeckLcdStripService } from '../types'
 import { EncoderInputService } from '../services/encoder'
 import { ButtonLcdImagePacker, DefaultButtonsLcdService, InternalFillImageOptions } from '../services/buttonsLcd'
+import { LcdInputService } from '../services/lcdInputService'
 
 function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): StreamDeckProperties {
 	return {
@@ -21,7 +22,8 @@ export type StreamDeckGen2Properties = Omit<StreamDeckProperties, 'KEY_DATA_OFFS
  * Class for generation 2 hardware (starting with the xl)
  */
 export class StreamDeckGen2 extends StreamDeckBase {
-	protected readonly lcdStripService: StreamDeckLcdStripServiceInternal | null
+	readonly #lcdStripInputService: LcdInputService | null
+	protected readonly lcdStripService: StreamDeckLcdStripService | null
 	protected readonly encoderService: EncoderInputService
 
 	override get lcdStrip(): StreamDeckLcdStripService | null {
@@ -32,7 +34,8 @@ export class StreamDeckGen2 extends StreamDeckBase {
 		device: HIDDevice,
 		options: Required<OpenStreamDeckOptions>,
 		properties: StreamDeckGen2Properties,
-		lcdStripService: StreamDeckLcdStripServiceInternal | null,
+		lcdStripService: StreamDeckLcdStripService | null,
+		lcdStripInputService: LcdInputService | null,
 		disableXYFlip?: boolean
 	) {
 		const fullProperties = extendDevicePropertiesForGen2(properties)
@@ -55,6 +58,7 @@ export class StreamDeckGen2 extends StreamDeckBase {
 		)
 
 		this.lcdStripService = lcdStripService
+		this.#lcdStripInputService = lcdStripInputService
 		this.encoderService = new EncoderInputService(this, properties.CONTROLS)
 	}
 
@@ -65,7 +69,7 @@ export class StreamDeckGen2 extends StreamDeckBase {
 				super.handleInputBuffer(data)
 				break
 			case 0x02: // LCD
-				this.lcdStripService?.handleInput(data)
+				this.#lcdStripInputService?.handleInput(data)
 				break
 			case 0x03: // Encoder
 				this.encoderService.handleInput(data)
@@ -76,15 +80,7 @@ export class StreamDeckGen2 extends StreamDeckBase {
 	public override async clearPanel(): Promise<void> {
 		if (!this.lcdStripService) return super.clearPanel()
 
-		const lcdSize = this.lcdStripService.LCD_STRIP_SIZE
-		const buffer = Buffer.alloc(lcdSize.width * lcdSize.height * 4)
-
-		const ps = [
-			super.clearPanel(),
-			this.lcdStripService.fillLcd(buffer, {
-				format: 'rgba',
-			}),
-		]
+		const ps = [super.clearPanel(), this.lcdStripService.clearLcdStrip(0)]
 
 		await Promise.all(ps)
 	}
