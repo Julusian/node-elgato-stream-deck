@@ -1,4 +1,4 @@
-import type { KeyIndex } from '../id'
+import type { KeyIndex } from '../../id'
 
 export interface StreamdeckImageWriterProps {
 	keyIndex: KeyIndex

@@ -3,7 +3,7 @@ import { BMP_HEADER_LENGTH, transformImageBuffer, writeBMPHeader } from '../util
 import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen1Properties } from './base'
 import { StreamDeckGen1Base } from './base-gen1'
 import { DeviceModelId } from '../id'
-import { StreamdeckOriginalImageWriter } from '../imageWriter/imageWriter'
+import { StreamdeckOriginalImageWriter } from '../services/imageWriter/imageWriter'
 
 const originalProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.ORIGINAL,

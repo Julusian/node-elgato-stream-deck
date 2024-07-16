@@ -1,8 +1,8 @@
 import { HIDDevice } from '../device'
 import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckGen1Properties, StreamDeckProperties } from './base'
-import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
-import { StreamdeckGen1ImageHeaderGenerator } from '../imageWriter/headerGenerator'
-import { StreamdeckImageWriter } from '../imageWriter/types'
+import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
+import { StreamdeckGen1ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
+import { StreamdeckImageWriter } from '../services/imageWriter/types'
 
 function extendDevicePropertiesForGen1(rawProps: StreamDeckGen1Properties): StreamDeckProperties {
 	return {

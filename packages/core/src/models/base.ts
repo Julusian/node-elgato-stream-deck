@@ -3,7 +3,7 @@ import { EventEmitter } from 'events'
 import { HIDDevice, HIDDeviceInfo } from '../device'
 import { DeviceModelId, KeyIndex } from '../id'
 import { FillImageOptions, FillPanelOptions, StreamDeck, StreamDeckEvents, StreamDeckLcdStripService } from '../types'
-import type { StreamdeckImageWriter } from '../imageWriter/types'
+import type { StreamdeckImageWriter } from '../services/imageWriter/types'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 

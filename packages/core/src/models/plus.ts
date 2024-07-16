@@ -11,8 +11,8 @@ import { HIDDevice } from '../device'
 import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckGen2Properties } from './base'
 import { StreamDeckGen2Base } from './base-gen2'
 import { DeviceModelId, EncoderIndex } from '../id'
-import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
-import { StreamdeckPlusLcdImageHeaderGenerator } from '../imageWriter/headerGenerator'
+import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
+import { StreamdeckPlusLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 
 const plusProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.PLUS,

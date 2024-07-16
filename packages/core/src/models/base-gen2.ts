@@ -8,8 +8,8 @@ import {
 	StreamDeckGen2Properties,
 	StreamDeckProperties,
 } from './base'
-import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
-import { StreamdeckGen2ImageHeaderGenerator } from '../imageWriter/headerGenerator'
+import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
+import { StreamdeckGen2ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 import type { StreamDeckLcdStripService, StreamDeckLcdStripServiceInternal } from '../types'
 import { EncoderInputService } from '../services/encoder'
 
