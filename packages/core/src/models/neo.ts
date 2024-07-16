@@ -7,6 +7,37 @@ import { StreamdeckNeoLcdImageHeaderGenerator } from '../services/imageWriter/he
 import { FillImageOptions, FillLcdImageOptions, LcdSegmentSize, StreamDeckLcdStripService } from '../types'
 import { transformImageBuffer } from '../util'
 import { InternalFillImageOptions } from '../services/buttonsLcd'
+import { freezeDefinitions, generateButtonsGrid } from './controlsGenerator'
+import { StreamDeckControlDefinition } from './controlDefinition'
+
+const neoControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2)
+neoControls.push(
+	{
+		type: 'button',
+		row: 2,
+		column: 0,
+		index: 8,
+		hidIndex: 8,
+		feedbackType: 'rgb',
+	},
+	{
+		type: 'lcd-strip',
+		row: 2,
+		column: 1,
+		columnSpan: 2,
+
+		widthPixels: 248,
+		heightPixels: 58,
+	},
+	{
+		type: 'button',
+		row: 2,
+		column: 3,
+		index: 9,
+		hidIndex: 9,
+		feedbackType: 'rgb',
+	}
+)
 
 const neoProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.NEO,
@@ -17,6 +48,8 @@ const neoProperties: StreamDeckGen2Properties = {
 	BUTTON_WIDTH_PX: 96,
 	BUTTON_HEIGHT_PX: 96,
 	ENCODER_COUNT: 0,
+
+	CONTROLS: freezeDefinitions(neoControls),
 
 	KEY_SPACING_HORIZONTAL: 30,
 	KEY_SPACING_VERTICAL: 30,

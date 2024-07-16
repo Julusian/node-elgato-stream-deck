@@ -3,6 +3,7 @@ import { OpenStreamDeckOptions } from './base'
 import { StreamDeckGen1, StreamDeckGen1Properties } from './generic-gen1'
 import { DeviceModelId } from '../id'
 import { StreamdeckOriginalImageWriter } from '../services/imageWriter/imageWriter'
+import { freezeDefinitions, generateButtonsGrid } from './controlsGenerator'
 
 const originalProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.ORIGINAL,
@@ -13,6 +14,8 @@ const originalProperties: StreamDeckGen1Properties = {
 	BUTTON_HEIGHT_PX: 72,
 	KEY_DIRECTION: 'rtl',
 	SUPPORTS_RGB_KEY_FILL: false,
+
+	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3)),
 
 	KEY_SPACING_HORIZONTAL: 25,
 	KEY_SPACING_VERTICAL: 25,

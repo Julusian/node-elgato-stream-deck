@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events'
 import { DeviceModelId, EncoderIndex, KeyIndex } from './id'
 import { HIDDeviceInfo } from './hid-device'
+import { StreamDeckControlDefinition } from './models/controlDefinition'
 
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
@@ -47,6 +48,9 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 
 	/** The number of encoders on this streamdeck (if any) */
 	readonly NUM_ENCODERS: number
+
+	/** List of the controls on this streamdeck */
+	readonly CONTROLS: Readonly<StreamDeckControlDefinition[]>
 
 	/** The horizontal resolution of the buttons */
 	readonly BUTTON_WIDTH_PX: number

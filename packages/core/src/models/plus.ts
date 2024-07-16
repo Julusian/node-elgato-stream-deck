@@ -14,6 +14,49 @@ import { DeviceModelId, EncoderIndex } from '../id'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckPlusLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 import { InternalFillImageOptions } from '../services/buttonsLcd'
+import { freezeDefinitions, generateButtonsGrid } from './controlsGenerator'
+import { StreamDeckControlDefinition } from './controlDefinition'
+
+const plusControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2)
+plusControls.push(
+	{
+		type: 'lcd-strip',
+		row: 2,
+		column: 0,
+		columnSpan: 4,
+
+		widthPixels: 800,
+		heightPixels: 100,
+	},
+	{
+		type: 'encoder',
+		row: 3,
+		column: 0,
+		index: 0,
+		hidIndex: 0,
+	},
+	{
+		type: 'encoder',
+		row: 3,
+		column: 1,
+		index: 1,
+		hidIndex: 1,
+	},
+	{
+		type: 'encoder',
+		row: 3,
+		column: 2,
+		index: 2,
+		hidIndex: 2,
+	},
+	{
+		type: 'encoder',
+		row: 3,
+		column: 3,
+		index: 3,
+		hidIndex: 3,
+	}
+)
 
 const plusProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.PLUS,
@@ -24,6 +67,8 @@ const plusProperties: StreamDeckGen2Properties = {
 	BUTTON_WIDTH_PX: 120,
 	BUTTON_HEIGHT_PX: 120,
 	ENCODER_COUNT: 4,
+
+	CONTROLS: freezeDefinitions(plusControls),
 
 	KEY_SPACING_HORIZONTAL: 99,
 	KEY_SPACING_VERTICAL: 40,

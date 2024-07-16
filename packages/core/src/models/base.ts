@@ -10,8 +10,8 @@ import type {
 	StreamDeckLcdStripService,
 } from '../types'
 import type { StreamdeckImageWriter } from '../services/imageWriter/types'
-import type { ButtonLcdImagePacker, ButtonsLcdService } from '../services/buttonsLcd'
-// import type { StreamDeckControlDefinition } from './controlDefinition'
+import { ButtonLcdImagePacker, ButtonsLcdService } from '../services/buttonsLcd'
+import type { StreamDeckControlDefinition } from './controlDefinition'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
@@ -32,7 +32,7 @@ export type StreamDeckProperties = Readonly<{
 	ENCODER_COUNT: number
 	SUPPORTS_RGB_KEY_FILL: boolean
 
-	// CONTROLS: StreamDeckControlDefinition[]
+	CONTROLS: Readonly<StreamDeckControlDefinition[]>
 
 	KEY_SPACING_HORIZONTAL: number
 	KEY_SPACING_VERTICAL: number
@@ -54,6 +54,10 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 
 	get NUM_ENCODERS(): number {
 		return this.deviceProperties.ENCODER_COUNT
+	}
+
+	get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
+		return this.deviceProperties.CONTROLS
 	}
 
 	get BUTTON_WIDTH_PX(): number {

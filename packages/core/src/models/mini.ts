@@ -2,6 +2,7 @@ import { HIDDevice } from '../hid-device'
 import { OpenStreamDeckOptions } from './base'
 import { StreamDeckGen1, StreamDeckGen1Properties } from './generic-gen1'
 import { DeviceModelId } from '../id'
+import { freezeDefinitions, generateButtonsGrid } from './controlsGenerator'
 
 const miniProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.MINI,
@@ -12,6 +13,8 @@ const miniProperties: StreamDeckGen1Properties = {
 	BUTTON_HEIGHT_PX: 80,
 	KEY_DIRECTION: 'ltr',
 	SUPPORTS_RGB_KEY_FILL: false, // TODO - verify this
+
+	CONTROLS: freezeDefinitions(generateButtonsGrid(3, 2)),
 
 	KEY_SPACING_HORIZONTAL: 28,
 	KEY_SPACING_VERTICAL: 28,

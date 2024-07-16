@@ -1,6 +1,7 @@
 import { DeviceModelId, KeyIndex } from './id'
 import { StreamDeck, FillImageOptions, FillPanelOptions, StreamDeckEvents, StreamDeckLcdStripService } from './types'
 import { HIDDeviceInfo } from './hid-device'
+import { StreamDeckControlDefinition } from './models/controlDefinition'
 
 /**
  * A minimal proxy around a StreamDeck instance.
@@ -28,6 +29,9 @@ export class StreamDeckProxy implements StreamDeck {
 	}
 	public get NUM_ENCODERS(): number {
 		return this.device.NUM_ENCODERS
+	}
+	public get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
+		return this.device.CONTROLS
 	}
 	public get BUTTON_WIDTH_PX(): number {
 		return this.device.BUTTON_WIDTH_PX

@@ -2,6 +2,35 @@ import { HIDDevice } from '../hid-device'
 import { OpenStreamDeckOptions, StreamDeckInputBase, StreamDeckProperties } from './base'
 import { DeviceModelId } from '../id'
 import { FillImageOptions, FillPanelOptions } from '../types'
+import { StreamDeckControlDefinition } from './controlDefinition'
+import { freezeDefinitions } from './controlsGenerator'
+
+const pedalControls: StreamDeckControlDefinition[] = [
+	{
+		type: 'button',
+		row: 0,
+		column: 0,
+		index: 0,
+		hidIndex: 0,
+		feedbackType: 'none',
+	},
+	{
+		type: 'button',
+		row: 0,
+		column: 1,
+		index: 1,
+		hidIndex: 1,
+		feedbackType: 'none',
+	},
+	{
+		type: 'button',
+		row: 0,
+		column: 2,
+		index: 2,
+		hidIndex: 2,
+		feedbackType: 'none',
+	},
+]
 
 const pedalProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.PEDAL,
@@ -15,6 +44,8 @@ const pedalProperties: StreamDeckProperties = {
 	KEY_DATA_OFFSET: 3,
 	ENCODER_COUNT: 0,
 	SUPPORTS_RGB_KEY_FILL: false,
+
+	CONTROLS: freezeDefinitions(pedalControls),
 
 	KEY_SPACING_HORIZONTAL: 0,
 	KEY_SPACING_VERTICAL: 0,

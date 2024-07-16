@@ -2,6 +2,7 @@ import { HIDDevice } from '../hid-device'
 import { OpenStreamDeckOptions } from './base'
 import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
 import { DeviceModelId } from '../id'
+import { freezeDefinitions, generateButtonsGrid } from './controlsGenerator'
 
 const origMK2Properties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.ORIGINALMK2,
@@ -12,6 +13,8 @@ const origMK2Properties: StreamDeckGen2Properties = {
 	BUTTON_WIDTH_PX: 72,
 	BUTTON_HEIGHT_PX: 72,
 	ENCODER_COUNT: 0,
+
+	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3)),
 
 	KEY_SPACING_HORIZONTAL: 25,
 	KEY_SPACING_VERTICAL: 25,
