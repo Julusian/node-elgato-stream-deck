@@ -14,7 +14,7 @@ export interface ButtonLcdImagePacker {
 	readonly imageWidth: number
 	readonly imageHeight: number
 
-	convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer>
+	convertPixelBuffer(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer>
 }
 
 export class ButtonsLcdService {
@@ -172,7 +172,7 @@ export class ButtonsLcdService {
 		if (buttonControl.feedbackType !== 'lcd')
 			throw new TypeError(`keyIndex ${keyIndex} does not support lcd feedback`)
 
-		const byteBuffer = await this.#imagePacker.convertFillImage(imageBuffer, sourceOptions)
+		const byteBuffer = await this.#imagePacker.convertPixelBuffer(imageBuffer, sourceOptions)
 
 		const packets = this.#imageWriter.generateFillImageWrites({ keyIndex: buttonControl.hidIndex }, byteBuffer)
 		await this.#device.sendReports(packets)

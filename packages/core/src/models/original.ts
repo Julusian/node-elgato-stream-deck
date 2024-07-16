@@ -21,7 +21,7 @@ const originalProperties: StreamDeckGen1Properties = {
 	BUTTON_HEIGHT_PX: 72,
 	SUPPORTS_RGB_KEY_FILL: false,
 
-	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3)), // TODO - order of hidIndex is incorrect
+	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3, true)),
 
 	KEY_SPACING_HORIZONTAL: 25,
 	KEY_SPACING_VERTICAL: 25,
@@ -32,8 +32,8 @@ export function StreamDeckOriginalFactory(device: HIDDevice, options: Required<O
 		device,
 		options,
 		originalProperties,
+		new StreamdeckOriginalImageWriter(),
 		{ colorMode: 'bgr', xFlip: true },
-		3780,
-		new StreamdeckOriginalImageWriter()
+		3780
 	)
 }

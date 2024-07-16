@@ -34,6 +34,7 @@ export interface LcdSegmentSize {
 }
 
 export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
+	// TODO - remove these
 	/** The number of keys on this streamdeck */
 	readonly NUM_KEYS: number
 	/** The number of columns on this streamdeck */
@@ -51,8 +52,9 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	/** The total number of pixels of a button */
 	readonly BUTTON_TOTAL_PX: number
 	/** The number of bytes for a RGB encoded image for a button */
-	readonly BUTTON_RGB_BYTES: number
+	readonly BUTTON_RGB_BYTES: number // TODO - remove this?
 
+	// TODO: replace these with a definition on each button control which gives it a coordinate inside of the display
 	/** The horizontal spacing in pixels between each button */
 	readonly KEY_SPACING_HORIZONTAL: number
 	/** The vertical spacing in pixels between each button */
@@ -63,6 +65,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	/** The name of the product/model */
 	readonly PRODUCT_NAME: string
 
+	// TODO - I'm not sure on this, maybe it is better being flattened out, even if this is done internally
 	readonly lcdStrip: StreamDeckLcdStripService | null
 
 	/**

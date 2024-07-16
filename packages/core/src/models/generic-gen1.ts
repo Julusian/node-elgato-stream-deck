@@ -1,7 +1,5 @@
 import { HIDDevice } from '../hid-device'
 import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
-import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
-import { StreamdeckGen1ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 import { StreamdeckImageWriter } from '../services/imageWriter/types'
 import { BMP_HEADER_LENGTH, FillImageTargetOptions, transformImageBuffer, writeBMPHeader } from '../util'
 import { ButtonLcdImagePacker, InternalFillImageOptions } from '../services/buttonsLcd'
@@ -23,15 +21,15 @@ export class StreamDeckGen1 extends StreamDeckBase {
 		device: HIDDevice,
 		options: Required<OpenStreamDeckOptions>,
 		properties: StreamDeckGen1Properties,
+		imageWriter: StreamdeckImageWriter,
 		targetOptions: FillImageTargetOptions,
-		bmpImagePPM: number,
-		imageWriter?: StreamdeckImageWriter
+		bmpImagePPM: number
 	) {
 		super(
 			device,
 			options,
 			extendDevicePropertiesForGen1(properties),
-			imageWriter ?? new StreamdeckDefaultImageWriter(new StreamdeckGen1ImageHeaderGenerator()),
+			imageWriter,
 			new Gen1ButtonLcdImagePacker(
 				targetOptions,
 				bmpImagePPM,
@@ -115,7 +113,7 @@ class Gen1ButtonLcdImagePacker implements ButtonLcdImagePacker {
 		return this.#imageHeight
 	}
 
-	public async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
+	public async convertPixelBuffer(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
 		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
 			sourceOptions,

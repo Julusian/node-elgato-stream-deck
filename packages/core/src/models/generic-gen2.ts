@@ -150,7 +150,7 @@ class Gen2ButtonLcdImagePacker implements ButtonLcdImagePacker {
 		return this.#imageHeight
 	}
 
-	public async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
+	public async convertPixelBuffer(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
 		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
 			sourceOptions,
