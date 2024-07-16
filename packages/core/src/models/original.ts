@@ -5,6 +5,18 @@ import { DeviceModelId } from '../id'
 import { StreamdeckOriginalImageWriter } from '../services/imageWriter/imageWriter'
 import { freezeDefinitions, generateButtonsGrid } from './controlsGenerator'
 
+// export function transformKeyIndex(properties: Readonly<StreamDeckProperties>, keyIndex: KeyIndex): KeyIndex {
+// 	if (properties.KEY_DIRECTION === 'ltr') {
+// 		// Normal
+// 		return keyIndex
+// 	} else {
+// 		// Horizontal flip
+// 		const half = (properties.COLUMNS - 1) / 2
+// 		const diff = ((keyIndex % properties.COLUMNS) - half) * -half
+// 		return keyIndex + diff
+// 	}
+// }
+
 const originalProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.ORIGINAL,
 	PRODUCT_NAME: 'Streamdeck',
@@ -15,7 +27,7 @@ const originalProperties: StreamDeckGen1Properties = {
 	KEY_DIRECTION: 'rtl',
 	SUPPORTS_RGB_KEY_FILL: false,
 
-	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3)),
+	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3)), // TODO - order of hidIndex is incorrect
 
 	KEY_SPACING_HORIZONTAL: 25,
 	KEY_SPACING_VERTICAL: 25,

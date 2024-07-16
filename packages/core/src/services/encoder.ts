@@ -1,41 +1,43 @@
 import type { EventEmitter } from 'events'
 import type { StreamDeckEvents } from '..'
+import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../models/controlDefinition'
 
 export class EncoderInputService {
 	readonly #eventSource: EventEmitter<StreamDeckEvents>
-	readonly #encoderCount: number
+	readonly #encoderControls: Readonly<StreamDeckEncoderControlDefinition[]>
 	readonly #encoderState: boolean[]
 
-	constructor(eventSource: EventEmitter<StreamDeckEvents>, encoderCount: number) {
+	constructor(eventSource: EventEmitter<StreamDeckEvents>, allControls: Readonly<StreamDeckControlDefinition[]>) {
 		this.#eventSource = eventSource
-		this.#encoderCount = encoderCount
-		this.#encoderState = new Array<boolean>(encoderCount).fill(false)
+		this.#encoderControls = allControls.filter(
+			(control): control is StreamDeckEncoderControlDefinition => control.type === 'encoder'
+		)
+		const maxIndex = Math.max(0, ...this.#encoderControls.map((control) => control.index))
+		this.#encoderState = new Array<boolean>(maxIndex).fill(false)
 	}
 
 	public handleInput(data: Uint8Array): void {
 		switch (data[3]) {
 			case 0x00: // press/release
-				for (let keyIndex = 0; keyIndex < this.#encoderCount; keyIndex++) {
-					const keyPressed = Boolean(data[4 + keyIndex])
-					const stateChanged = keyPressed !== this.#encoderState[keyIndex]
+				for (const encoderControl of this.#encoderControls) {
+					const keyPressed = Boolean(data[4 + encoderControl.hidIndex])
+					const stateChanged = keyPressed !== this.#encoderState[encoderControl.index]
 					if (stateChanged) {
-						this.#encoderState[keyIndex] = keyPressed
+						this.#encoderState[encoderControl.index] = keyPressed
 						if (keyPressed) {
-							this.#eventSource.emit('encoderDown', keyIndex)
+							this.#eventSource.emit('down', encoderControl)
 						} else {
-							this.#eventSource.emit('encoderUp', keyIndex)
+							this.#eventSource.emit('up', encoderControl)
 						}
 					}
 				}
 				break
 			case 0x01: // rotate
-				for (let keyIndex = 0; keyIndex < this.#encoderCount; keyIndex++) {
+				for (const encoderControl of this.#encoderControls) {
 					const intArray = new Int8Array(data.buffer, data.byteOffset, data.byteLength)
-					const value = intArray[4 + keyIndex]
-					if (value > 0) {
-						this.#eventSource.emit('rotateRight', keyIndex, value)
-					} else if (value < 0) {
-						this.#eventSource.emit('rotateLeft', keyIndex, -value)
+					const value = intArray[4 + encoderControl.hidIndex]
+					if (value !== 0) {
+						this.#eventSource.emit('rotate', encoderControl, value)
 					}
 				}
 				break

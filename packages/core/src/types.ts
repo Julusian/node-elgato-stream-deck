@@ -19,13 +19,10 @@ export interface LcdPosition {
 }
 
 export type StreamDeckEvents = {
-	down: [key: KeyIndex]
-	up: [key: KeyIndex]
+	down: [control: StreamDeckControlDefinition]
+	up: [control: StreamDeckControlDefinition]
 	error: [err: unknown]
-	rotateLeft: [encoder: EncoderIndex, amount: number]
-	rotateRight: [encoder: EncoderIndex, amount: number]
-	encoderDown: [encoder: EncoderIndex]
-	encoderUp: [encoder: EncoderIndex]
+	rotate: [control: StreamDeckControlDefinition, amount: number]
 	lcdShortPress: [encoder: EncoderIndex, position: LcdPosition]
 	lcdLongPress: [encoder: EncoderIndex, position: LcdPosition]
 	lcdSwipe: [fromEncoder: EncoderIndex, toEncoder: EncoderIndex, from: LcdPosition, to: LcdPosition]

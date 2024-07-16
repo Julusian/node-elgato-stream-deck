@@ -1,6 +1,4 @@
-import { KeyIndex } from './id'
-import { StreamDeckProperties } from './models/base'
-import { InternalFillImageOptions } from './services/buttonsLcd'
+import type { InternalFillImageOptions } from './services/buttonsLcd'
 
 export interface FillImageTargetOptions {
 	colorMode: 'bgr' | 'rgba'
@@ -89,16 +87,4 @@ export function writeBMPHeader(
 	buf.writeInt32LE(imagePPM, 42) // Vertical resolution ppm
 	buf.writeInt32LE(0, 46) // Colour pallette size
 	buf.writeInt32LE(0, 50) // 'Important' Colour count
-}
-
-export function transformKeyIndex(properties: Readonly<StreamDeckProperties>, keyIndex: KeyIndex): KeyIndex {
-	if (properties.KEY_DIRECTION === 'ltr') {
-		// Normal
-		return keyIndex
-	} else {
-		// Horizontal flip
-		const half = (properties.COLUMNS - 1) / 2
-		const diff = ((keyIndex % properties.COLUMNS) - half) * -half
-		return keyIndex + diff
-	}
 }

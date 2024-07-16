@@ -53,7 +53,7 @@ export class StreamDeckGen2 extends StreamDeckBase {
 		)
 
 		this.lcdStripService = lcdStripService
-		this.encoderService = new EncoderInputService(this, this.NUM_ENCODERS)
+		this.encoderService = new EncoderInputService(this, properties.CONTROLS)
 	}
 
 	protected handleInputBuffer(data: Uint8Array): void {

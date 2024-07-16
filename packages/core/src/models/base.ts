@@ -12,7 +12,6 @@ import type {
 import type { StreamdeckImageWriter } from '../services/imageWriter/types'
 import { ButtonLcdImagePacker, ButtonsLcdService } from '../services/buttonsLcd'
 import type { StreamDeckControlDefinition } from './controlDefinition'
-import { transformKeyIndex } from '../util'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
@@ -114,18 +113,19 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	}
 
 	protected handleInputBuffer(data: Uint8Array): void {
-		const totalKeyCount = this.NUM_KEYS + this.NUM_TOUCH_KEYS
-		const keyData = data.subarray(this.deviceProperties.KEY_DATA_OFFSET || 0)
-		for (let i = 0; i < totalKeyCount; i++) {
-			const keyPressed = Boolean(keyData[i])
-			const keyIndex = transformKeyIndex(this.deviceProperties, i)
-			const stateChanged = keyPressed !== this.keyState[keyIndex]
+		const dataOffset = this.deviceProperties.KEY_DATA_OFFSET || 0
+
+		for (const control of this.deviceProperties.CONTROLS) {
+			if (control.type !== 'button') continue
+
+			const keyPressed = Boolean(data[dataOffset + control.hidIndex])
+			const stateChanged = keyPressed !== this.keyState[control.index]
 			if (stateChanged) {
-				this.keyState[keyIndex] = keyPressed
+				this.keyState[control.index] = keyPressed
 				if (keyPressed) {
-					this.emit('down', keyIndex)
+					this.emit('down', control)
 				} else {
-					this.emit('up', keyIndex)
+					this.emit('up', control)
 				}
 			}
 		}

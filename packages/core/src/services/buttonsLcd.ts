@@ -3,7 +3,7 @@ import type { HIDDevice } from '../hid-device'
 import type { KeyIndex } from '../id'
 import type { FillImageOptions, FillPanelOptions } from '../types'
 import type { StreamdeckImageWriter } from './imageWriter/types'
-import { transformKeyIndex } from '../util'
+import type { StreamDeckButtonControlDefinition } from '../models/controlDefinition'
 
 export interface InternalFillImageOptions extends FillImageOptions {
 	offset: number
@@ -153,13 +153,15 @@ export class ButtonsLcdService {
 	}
 
 	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOptions: InternalFillImageOptions) {
-		// this.checkValidKeyIndex(keyIndex) // TODO - do we want this?
-
-		const keyIndexTransformed = transformKeyIndex(this.#deviceProperties, keyIndex)
+		const buttonControl = this.#deviceProperties.CONTROLS.find(
+			(control): control is StreamDeckButtonControlDefinition =>
+				control.type === 'button' && control.index === keyIndex
+		)
+		if (!buttonControl) throw new TypeError(`Expected a valid keyIndex`)
 
 		const byteBuffer = await this.#imagePacker.convertFillImage(imageBuffer, sourceOptions)
 
-		const packets = this.#imageWriter.generateFillImageWrites({ keyIndex: keyIndexTransformed }, byteBuffer)
+		const packets = this.#imageWriter.generateFillImageWrites({ keyIndex: buttonControl.hidIndex }, byteBuffer)
 		await this.#device.sendReports(packets)
 	}
 
