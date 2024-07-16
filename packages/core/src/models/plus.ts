@@ -8,11 +8,12 @@ import {
 	StreamDeckLcdStripService,
 } from '../types'
 import { HIDDevice } from '../hid-device'
-import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions } from './base'
+import { EncodeJPEGHelper, OpenStreamDeckOptions } from './base'
 import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
 import { DeviceModelId, EncoderIndex } from '../id'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckPlusLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
+import { InternalFillImageOptions } from '../services/buttonsLcd'
 
 const plusProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.PLUS,

@@ -2,8 +2,16 @@ import { EventEmitter } from 'events'
 
 import { HIDDevice, HIDDeviceInfo } from '../hid-device'
 import { DeviceModelId, KeyIndex } from '../id'
-import { FillImageOptions, FillPanelOptions, StreamDeck, StreamDeckEvents, StreamDeckLcdStripService } from '../types'
+import type {
+	FillImageOptions,
+	FillPanelOptions,
+	StreamDeck,
+	StreamDeckEvents,
+	StreamDeckLcdStripService,
+} from '../types'
 import type { StreamdeckImageWriter } from '../services/imageWriter/types'
+import type { ButtonLcdImagePacker, ButtonsLcdService } from '../services/buttonsLcd'
+// import type { StreamDeckControlDefinition } from './controlDefinition'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
@@ -24,14 +32,11 @@ export type StreamDeckProperties = Readonly<{
 	ENCODER_COUNT: number
 	SUPPORTS_RGB_KEY_FILL: boolean
 
+	// CONTROLS: StreamDeckControlDefinition[]
+
 	KEY_SPACING_HORIZONTAL: number
 	KEY_SPACING_VERTICAL: number
 }>
-
-export interface InternalFillImageOptions extends FillImageOptions {
-	offset: number
-	stride: number
-}
 
 export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
 	get NUM_KEYS(): number {
@@ -164,167 +169,50 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 }
 
 export abstract class StreamDeckBase extends StreamDeckInputBase {
-	protected readonly imageWriter: StreamdeckImageWriter
+	protected readonly buttonsLcdService: ButtonsLcdService
 
 	constructor(
 		device: HIDDevice,
 		options: OpenStreamDeckOptions,
 		properties: StreamDeckProperties,
-		imageWriter: StreamdeckImageWriter
+		imageWriter: StreamdeckImageWriter,
+		imagePacker: ButtonLcdImagePacker
 	) {
 		super(device, options, properties)
-		this.imageWriter = imageWriter
+		this.buttonsLcdService = new ButtonsLcdService(imageWriter, imagePacker, device)
 	}
 
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		this.checkValidKeyIndex(keyIndex, true)
 
-		this.checkRGBValue(r)
-		this.checkRGBValue(g)
-		this.checkRGBValue(b)
-
-		if (this.deviceProperties.SUPPORTS_RGB_KEY_FILL || keyIndex >= this.NUM_KEYS) {
-			await this.sendKeyRgb(keyIndex, r, g, b)
-		} else {
-			const pixels = Buffer.alloc(this.BUTTON_RGB_BYTES, Buffer.from([r, g, b]))
-			await this.fillImageRange(keyIndex, pixels, {
-				format: 'rgb',
-				offset: 0,
-				stride: this.BUTTON_WIDTH_PX * 3,
-			})
-		}
+		await this.buttonsLcdService.fillKeyColor(keyIndex, r, g, b)
 	}
 
 	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
 		this.checkValidKeyIndex(keyIndex)
 
-		const sourceFormat = options?.format ?? 'rgb'
-		this.checkSourceFormat(sourceFormat)
-
-		const imageSize = this.BUTTON_TOTAL_PX * sourceFormat.length
-		if (imageBuffer.length !== imageSize) {
-			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
-		}
-
-		await this.fillImageRange(keyIndex, imageBuffer, {
-			format: sourceFormat,
-			offset: 0,
-			stride: this.BUTTON_WIDTH_PX * sourceFormat.length,
-		})
+		await this.buttonsLcdService.fillKeyBuffer(keyIndex, imageBuffer, options)
 	}
 
 	public async fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void> {
-		const sourceFormat = options?.format ?? 'rgb'
-		this.checkSourceFormat(sourceFormat)
-
-		const imageSize = this.BUTTON_TOTAL_PX * sourceFormat.length * this.NUM_KEYS
-		if (imageBuffer.length !== imageSize) {
-			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
-		}
-
-		const iconSize = this.BUTTON_WIDTH_PX * sourceFormat.length
-		const stride = iconSize * this.KEY_COLUMNS
-
-		const ps: Array<Promise<void>> = []
-		for (let row = 0; row < this.KEY_ROWS; row++) {
-			const rowOffset = stride * row * this.BUTTON_HEIGHT_PX
-
-			for (let column = 0; column < this.KEY_COLUMNS; column++) {
-				const index = row * this.KEY_COLUMNS + column
-				const colOffset = column * iconSize
-
-				ps.push(
-					this.fillImageRange(index, imageBuffer, {
-						format: sourceFormat,
-						offset: rowOffset + colOffset,
-						stride,
-					})
-				)
-			}
-		}
-		await Promise.all(ps)
-	}
-
-	private async sendKeyRgb(keyIndex: number, red: number, green: number, blue: number): Promise<void> {
-		await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, red, green, blue]))
+		await this.buttonsLcdService.fillPanelBuffer(imageBuffer, options)
 	}
 
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
 		this.checkValidKeyIndex(keyIndex, true)
 
-		if (this.deviceProperties.SUPPORTS_RGB_KEY_FILL || keyIndex >= this.NUM_KEYS) {
-			await this.sendKeyRgb(keyIndex, 0, 0, 0)
-		} else {
-			const pixels = Buffer.alloc(this.BUTTON_RGB_BYTES, 0)
-			await this.fillImageRange(keyIndex, pixels, {
-				format: 'rgb',
-				offset: 0,
-				stride: this.BUTTON_WIDTH_PX * 3,
-			})
-		}
+		await this.buttonsLcdService.clearKey(keyIndex)
 	}
 
-	protected clearPanelInner(): Promise<void>[] {
+	public async clearPanel(): Promise<void> {
 		const ps: Array<Promise<void>> = []
 
-		if (this.deviceProperties.SUPPORTS_RGB_KEY_FILL) {
-			for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
-				ps.push(this.sendKeyRgb(keyIndex, 0, 0, 0))
-			}
-		} else if (this.BUTTON_RGB_BYTES > 0) {
-			const pixels = Buffer.alloc(this.BUTTON_RGB_BYTES, 0)
-			for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
-				ps.push(
-					this.fillImageRange(keyIndex, pixels, {
-						format: 'rgb',
-						offset: 0,
-						stride: this.BUTTON_WIDTH_PX * 3,
-					})
-				)
-			}
-		}
+		ps.push(this.buttonsLcdService.clearPanel())
 
 		for (let buttonIndex = 0; buttonIndex < this.NUM_TOUCH_KEYS; buttonIndex++) {
 			ps.push(this.clearKey(buttonIndex + this.NUM_KEYS))
 		}
 
-		return ps
-	}
-
-	public async clearPanel(): Promise<void> {
-		await Promise.all(this.clearPanelInner())
-	}
-
-	protected abstract convertFillImage(imageBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer>
-
-	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOptions: InternalFillImageOptions) {
-		this.checkValidKeyIndex(keyIndex)
-
-		const keyIndexTransformed = this.transformKeyIndex(keyIndex)
-
-		const byteBuffer = await this.convertFillImage(imageBuffer, sourceOptions)
-
-		const packets = this.imageWriter.generateFillImageWrites({ keyIndex: keyIndexTransformed }, byteBuffer)
-		await this.device.sendReports(packets)
-	}
-
-	private checkRGBValue(value: number): void {
-		if (value < 0 || value > 255) {
-			throw new TypeError('Expected a valid color RGB value 0 - 255')
-		}
-	}
-
-	private checkSourceFormat(format: 'rgb' | 'rgba' | 'bgr' | 'bgra'): void {
-		switch (format) {
-			case 'rgb':
-			case 'rgba':
-			case 'bgr':
-			case 'bgra':
-				break
-			default: {
-				const fmt: never = format
-				throw new TypeError(`Expected a known color format not "${fmt as string}"`)
-			}
-		}
+		await Promise.all(ps)
 	}
 }

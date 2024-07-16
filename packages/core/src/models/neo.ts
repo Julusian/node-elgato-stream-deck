@@ -1,11 +1,12 @@
 import { HIDDevice } from '../hid-device'
-import { EncodeJPEGHelper, InternalFillImageOptions, OpenStreamDeckOptions } from './base'
+import { EncodeJPEGHelper, OpenStreamDeckOptions } from './base'
 import { DeviceModelId } from '../id'
 import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckNeoLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 import { FillImageOptions, FillLcdImageOptions, LcdSegmentSize, StreamDeckLcdStripService } from '../types'
 import { transformImageBuffer } from '../util'
+import { InternalFillImageOptions } from '../services/buttonsLcd'
 
 const neoProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.NEO,

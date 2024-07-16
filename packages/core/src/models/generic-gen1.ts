@@ -1,9 +1,10 @@
 import { HIDDevice } from '../hid-device'
-import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
+import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckGen1ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 import { StreamdeckImageWriter } from '../services/imageWriter/types'
 import { BMP_HEADER_LENGTH, FillImageTargetOptions, transformImageBuffer, writeBMPHeader } from '../util'
+import { ButtonLcdImagePacker, InternalFillImageOptions } from '../services/buttonsLcd'
 
 function extendDevicePropertiesForGen1(rawProps: StreamDeckGen1Properties): StreamDeckProperties {
 	return {
@@ -20,9 +21,6 @@ export type StreamDeckGen1Properties = Omit<StreamDeckProperties, 'KEY_DATA_OFFS
  * Class for generation 1 hardware (before the xl)
  */
 export class StreamDeckGen1 extends StreamDeckBase {
-	readonly #targetOptions: FillImageTargetOptions
-	readonly #bmpImagePPM: number
-
 	constructor(
 		device: HIDDevice,
 		options: Required<OpenStreamDeckOptions>,
@@ -35,30 +33,14 @@ export class StreamDeckGen1 extends StreamDeckBase {
 			device,
 			options,
 			extendDevicePropertiesForGen1(properties),
-			imageWriter ?? new StreamdeckDefaultImageWriter(new StreamdeckGen1ImageHeaderGenerator())
+			imageWriter ?? new StreamdeckDefaultImageWriter(new StreamdeckGen1ImageHeaderGenerator()),
+			new Gen1ButtonLcdImagePacker(
+				targetOptions,
+				bmpImagePPM,
+				properties.BUTTON_WIDTH_PX,
+				properties.BUTTON_HEIGHT_PX
+			)
 		)
-
-		this.#targetOptions = targetOptions
-		this.#bmpImagePPM = bmpImagePPM
-	}
-
-	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
-		const byteBuffer = transformImageBuffer(
-			sourceBuffer,
-			sourceOptions,
-			this.#targetOptions,
-			BMP_HEADER_LENGTH,
-			this.BUTTON_WIDTH_PX,
-			this.BUTTON_HEIGHT_PX
-		)
-		writeBMPHeader(
-			byteBuffer,
-			this.BUTTON_WIDTH_PX,
-			this.BUTTON_HEIGHT_PX,
-			this.BUTTON_RGB_BYTES,
-			this.#bmpImagePPM
-		)
-		return byteBuffer
 	}
 
 	/**
@@ -111,5 +93,46 @@ export class StreamDeckGen1 extends StreamDeckBase {
 			val = await this.device.getFeatureReport(3, 17)
 		}
 		return val.toString('ascii', 5, 17)
+	}
+}
+
+class Gen1ButtonLcdImagePacker implements ButtonLcdImagePacker {
+	readonly #targetOptions: FillImageTargetOptions
+	readonly #bmpImagePPM: number
+	readonly #imageWidth: number
+	readonly #imageHeight: number
+
+	constructor(targetOptions: FillImageTargetOptions, bmpImagePPM: number, imageWidth: number, imageHeight: number) {
+		this.#targetOptions = targetOptions
+		this.#bmpImagePPM = bmpImagePPM
+		this.#imageWidth = imageWidth
+		this.#imageHeight = imageHeight
+	}
+
+	get imageWidth(): number {
+		return this.#imageWidth
+	}
+
+	get imageHeight(): number {
+		return this.#imageHeight
+	}
+
+	public async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
+		const byteBuffer = transformImageBuffer(
+			sourceBuffer,
+			sourceOptions,
+			this.#targetOptions,
+			BMP_HEADER_LENGTH,
+			this.#imageWidth,
+			this.#imageHeight
+		)
+		writeBMPHeader(
+			byteBuffer,
+			this.#imageWidth,
+			this.#imageHeight,
+			byteBuffer.length - BMP_HEADER_LENGTH,
+			this.#bmpImagePPM
+		)
+		return byteBuffer
 	}
 }

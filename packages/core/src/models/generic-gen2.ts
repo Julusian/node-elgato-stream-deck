@@ -1,16 +1,11 @@
 import { HIDDevice } from '../hid-device'
 import { transformImageBuffer } from '../util'
-import {
-	EncodeJPEGHelper,
-	InternalFillImageOptions,
-	OpenStreamDeckOptions,
-	StreamDeckBase,
-	StreamDeckProperties,
-} from './base'
+import { EncodeJPEGHelper, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckGen2ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 import type { StreamDeckLcdStripService, StreamDeckLcdStripServiceInternal } from '../types'
 import { EncoderInputService } from '../services/encoder'
+import { ButtonLcdImagePacker, InternalFillImageOptions } from '../services/buttonsLcd'
 
 function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): StreamDeckProperties {
 	return {
@@ -30,9 +25,6 @@ export type StreamDeckGen2Properties = Omit<
  * Class for generation 2 hardware (starting with the xl)
  */
 export class StreamDeckGen2 extends StreamDeckBase {
-	protected readonly encodeJPEG: EncodeJPEGHelper
-	protected readonly xyFlip: boolean
-
 	protected readonly lcdStripService: StreamDeckLcdStripServiceInternal | null
 	protected readonly encoderService: EncoderInputService
 
@@ -51,11 +43,14 @@ export class StreamDeckGen2 extends StreamDeckBase {
 			device,
 			options,
 			extendDevicePropertiesForGen2(properties),
-			new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator())
+			new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator()),
+			new Gen2ButtonLcdImagePacker(
+				options.encodeJPEG,
+				!disableXYFlip,
+				properties.BUTTON_WIDTH_PX,
+				properties.BUTTON_HEIGHT_PX
+			)
 		)
-
-		this.encodeJPEG = options.encodeJPEG
-		this.xyFlip = !disableXYFlip
 
 		this.lcdStripService = lcdStripService
 		this.encoderService = new EncoderInputService(this, this.NUM_ENCODERS)
@@ -76,20 +71,20 @@ export class StreamDeckGen2 extends StreamDeckBase {
 		}
 	}
 
-	protected clearPanelInner(): Promise<void>[] {
-		const ps = super.clearPanelInner()
+	public override async clearPanel(): Promise<void> {
+		if (!this.lcdStripService) return super.clearPanel()
 
-		if (this.lcdStripService) {
-			const lcdSize = this.lcdStripService.LCD_STRIP_SIZE
-			const buffer = Buffer.alloc(lcdSize.width * lcdSize.height * 4)
-			ps.push(
-				this.lcdStripService.fillLcd(buffer, {
-					format: 'rgba',
-				})
-			)
-		}
+		const lcdSize = this.lcdStripService.LCD_STRIP_SIZE
+		const buffer = Buffer.alloc(lcdSize.width * lcdSize.height * 4)
 
-		return ps
+		const ps = [
+			super.clearPanel(),
+			this.lcdStripService.fillLcd(buffer, {
+				format: 'rgba',
+			}),
+		]
+
+		await Promise.all(ps)
 	}
 
 	/**
@@ -136,17 +131,39 @@ export class StreamDeckGen2 extends StreamDeckBase {
 		const end = val.readUInt8(1) + 2
 		return val.toString('ascii', 2, end)
 	}
+}
 
-	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
+class Gen2ButtonLcdImagePacker implements ButtonLcdImagePacker {
+	readonly #encodeJPEG: EncodeJPEGHelper
+	readonly #xyFlip: boolean
+	readonly #imageWidth: number
+	readonly #imageHeight: number
+
+	constructor(encodeJPEG: EncodeJPEGHelper, xyFlip: boolean, imageWidth: number, imageHeight: number) {
+		this.#encodeJPEG = encodeJPEG
+		this.#xyFlip = xyFlip
+		this.#imageWidth = imageWidth
+		this.#imageHeight = imageHeight
+	}
+
+	get imageWidth(): number {
+		return this.#imageWidth
+	}
+
+	get imageHeight(): number {
+		return this.#imageHeight
+	}
+
+	public async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
 		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
 			sourceOptions,
-			{ colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip },
+			{ colorMode: 'rgba', xFlip: this.#xyFlip, yFlip: this.#xyFlip },
 			0,
-			this.BUTTON_WIDTH_PX,
-			this.BUTTON_HEIGHT_PX
+			this.#imageWidth,
+			this.#imageHeight
 		)
 
-		return this.encodeJPEG(byteBuffer, this.BUTTON_WIDTH_PX, this.BUTTON_HEIGHT_PX)
+		return this.#encodeJPEG(byteBuffer, this.#imageWidth, this.#imageHeight)
 	}
 }

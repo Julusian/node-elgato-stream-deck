@@ -1,4 +1,4 @@
-import { InternalFillImageOptions } from './models/base'
+import { InternalFillImageOptions } from './services/buttonsLcd'
 
 export interface FillImageTargetOptions {
 	colorMode: 'bgr' | 'rgba'
