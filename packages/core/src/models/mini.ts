@@ -11,7 +11,6 @@ const miniProperties: StreamDeckGen1Properties = {
 	ROWS: 2,
 	BUTTON_WIDTH_PX: 80,
 	BUTTON_HEIGHT_PX: 80,
-	KEY_DIRECTION: 'ltr',
 	SUPPORTS_RGB_KEY_FILL: false, // TODO - verify this
 
 	CONTROLS: freezeDefinitions(generateButtonsGrid(3, 2)),

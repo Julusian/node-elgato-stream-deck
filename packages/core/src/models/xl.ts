@@ -9,10 +9,8 @@ const xlProperties: StreamDeckGen2Properties = {
 	PRODUCT_NAME: 'Streamdeck XL',
 	COLUMNS: 8,
 	ROWS: 4,
-	TOUCH_BUTTONS: 0,
 	BUTTON_WIDTH_PX: 96,
 	BUTTON_HEIGHT_PX: 96,
-	ENCODER_COUNT: 0,
 
 	CONTROLS: freezeDefinitions(generateButtonsGrid(8, 4)),
 

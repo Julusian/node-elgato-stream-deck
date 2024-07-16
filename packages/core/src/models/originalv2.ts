@@ -9,10 +9,8 @@ const origV2Properties: StreamDeckGen2Properties = {
 	PRODUCT_NAME: 'Streamdeck',
 	COLUMNS: 5,
 	ROWS: 3,
-	TOUCH_BUTTONS: 0,
 	BUTTON_WIDTH_PX: 72,
 	BUTTON_HEIGHT_PX: 72,
-	ENCODER_COUNT: 0,
 	// SUPPORTS_RGB_KEY_FILL: false, // TODO - verify SUPPORTS_RGB_KEY_FILL
 
 	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3)),

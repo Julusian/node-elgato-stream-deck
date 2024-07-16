@@ -44,10 +44,8 @@ const neoProperties: StreamDeckGen2Properties = {
 	PRODUCT_NAME: 'Streamdeck Neo',
 	COLUMNS: 4,
 	ROWS: 2,
-	TOUCH_BUTTONS: 2,
 	BUTTON_WIDTH_PX: 96,
 	BUTTON_HEIGHT_PX: 96,
-	ENCODER_COUNT: 0,
 
 	CONTROLS: freezeDefinitions(neoControls),
 

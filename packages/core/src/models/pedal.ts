@@ -37,12 +37,9 @@ const pedalProperties: StreamDeckProperties = {
 	PRODUCT_NAME: 'Streamdeck Pedal',
 	COLUMNS: 3,
 	ROWS: 1,
-	TOUCH_BUTTONS: 0,
 	BUTTON_WIDTH_PX: 0,
 	BUTTON_HEIGHT_PX: 0,
-	KEY_DIRECTION: 'ltr',
 	KEY_DATA_OFFSET: 3,
-	ENCODER_COUNT: 0,
 	SUPPORTS_RGB_KEY_FILL: false,
 
 	CONTROLS: freezeDefinitions(pedalControls),

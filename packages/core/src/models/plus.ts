@@ -63,16 +63,15 @@ const plusProperties: StreamDeckGen2Properties = {
 	PRODUCT_NAME: 'Streamdeck +',
 	COLUMNS: 4,
 	ROWS: 2,
-	TOUCH_BUTTONS: 0,
 	BUTTON_WIDTH_PX: 120,
 	BUTTON_HEIGHT_PX: 120,
-	ENCODER_COUNT: 4,
 
 	CONTROLS: freezeDefinitions(plusControls),
 
 	KEY_SPACING_HORIZONTAL: 99,
 	KEY_SPACING_VERTICAL: 40,
 }
+const ENCODER_COUNT = plusProperties.CONTROLS.filter((control) => control.type === 'encoder').length
 
 class StreamDeckPlus extends StreamDeckGen2 {
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
@@ -84,7 +83,7 @@ class StreamDeckPlus extends StreamDeckGen2 {
 				options.encodeJPEG,
 				device,
 				(key, ...args) => this.emit(key, ...args),
-				plusProperties.ENCODER_COUNT
+				ENCODER_COUNT
 			),
 			true
 		)

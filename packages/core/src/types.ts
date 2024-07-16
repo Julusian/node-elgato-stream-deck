@@ -40,11 +40,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	readonly KEY_COLUMNS: number
 	/** The number of rows on this streamdeck */
 	readonly KEY_ROWS: number
-	/** The number of touch keys on this streamdeck */
-	readonly NUM_TOUCH_KEYS: number
-
-	/** The number of encoders on this streamdeck (if any) */
-	readonly NUM_ENCODERS: number
 
 	/** List of the controls on this streamdeck */
 	readonly CONTROLS: Readonly<StreamDeckControlDefinition[]>
@@ -69,12 +64,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	readonly PRODUCT_NAME: string
 
 	readonly lcdStrip: StreamDeckLcdStripService | null
-
-	/**
-	 * Checks if a keyIndex is valid. Throws an error on failure
-	 * @param keyIndex The key to check
-	 */
-	checkValidKeyIndex(keyIndex: KeyIndex, includeTouchKeys?: boolean): void
 
 	/**
 	 * Close the device

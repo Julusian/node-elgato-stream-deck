@@ -24,12 +24,6 @@ export class StreamDeckProxy implements StreamDeck {
 	public get KEY_ROWS(): number {
 		return this.device.KEY_ROWS
 	}
-	get NUM_TOUCH_KEYS(): number {
-		return this.device.NUM_TOUCH_KEYS
-	}
-	public get NUM_ENCODERS(): number {
-		return this.device.NUM_ENCODERS
-	}
 	public get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
 		return this.device.CONTROLS
 	}
@@ -60,10 +54,6 @@ export class StreamDeckProxy implements StreamDeck {
 
 	public get lcdStrip(): StreamDeckLcdStripService | null {
 		return this.device.lcdStrip
-	}
-
-	public checkValidKeyIndex(keyIndex: KeyIndex, includeTouchKeys?: boolean): void {
-		this.device.checkValidKeyIndex(keyIndex, includeTouchKeys)
 	}
 
 	public async close(): Promise<void> {

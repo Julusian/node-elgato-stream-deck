@@ -50,20 +50,31 @@ export class ButtonsLcdService {
 	public async clearPanel(): Promise<void> {
 		const ps: Promise<void>[] = []
 
-		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL) {
-			for (let keyIndex = 0; keyIndex < this.keyCount; keyIndex++) {
-				ps.push(this.sendKeyRgb(keyIndex, 0, 0, 0))
-			}
-		} else if (this.imagePixelCount > 0) {
-			const pixels = Buffer.alloc(this.imageRgbBytes, 0)
-			for (let keyIndex = 0; keyIndex < this.keyCount; keyIndex++) {
-				ps.push(
-					this.fillImageRange(keyIndex, pixels, {
-						format: 'rgb',
-						offset: 0,
-						stride: this.#imagePacker.imageWidth * 3,
-					})
-				)
+		for (const control of this.#deviceProperties.CONTROLS) {
+			if (control.type !== 'button') continue
+
+			switch (control.feedbackType) {
+				case 'rgb':
+					ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0))
+					break
+				case 'lcd':
+					if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL) {
+						ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0))
+					} else {
+						const pixels = Buffer.alloc(this.imageRgbBytes, 0)
+						ps.push(
+							this.fillImageRange(control.hidIndex, pixels, {
+								format: 'rgb',
+								offset: 0,
+								stride: this.#imagePacker.imageWidth * 3,
+							})
+						)
+					}
+
+					break
+				case 'none':
+					// Do nothing
+					break
 			}
 		}
 
@@ -158,6 +169,8 @@ export class ButtonsLcdService {
 				control.type === 'button' && control.index === keyIndex
 		)
 		if (!buttonControl) throw new TypeError(`Expected a valid keyIndex`)
+		if (buttonControl.feedbackType !== 'lcd')
+			throw new TypeError(`keyIndex ${keyIndex} does not support lcd feedback`)
 
 		const byteBuffer = await this.#imagePacker.convertFillImage(imageBuffer, sourceOptions)
 

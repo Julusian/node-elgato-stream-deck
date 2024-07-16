@@ -10,12 +10,10 @@ function extendDevicePropertiesForGen1(rawProps: StreamDeckGen1Properties): Stre
 	return {
 		...rawProps,
 		KEY_DATA_OFFSET: 0,
-		TOUCH_BUTTONS: 0,
-		ENCODER_COUNT: 0,
 	}
 }
 
-export type StreamDeckGen1Properties = Omit<StreamDeckProperties, 'KEY_DATA_OFFSET' | 'TOUCH_BUTTONS' | 'ENCODER_COUNT'>
+export type StreamDeckGen1Properties = Omit<StreamDeckProperties, 'KEY_DATA_OFFSET'>
 
 /**
  * Class for generation 1 hardware (before the xl)

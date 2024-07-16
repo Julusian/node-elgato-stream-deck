@@ -11,7 +11,7 @@ import type {
 } from '../types'
 import type { StreamdeckImageWriter } from '../services/imageWriter/types'
 import { ButtonLcdImagePacker, ButtonsLcdService } from '../services/buttonsLcd'
-import type { StreamDeckControlDefinition } from './controlDefinition'
+import type { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from './controlDefinition'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
@@ -24,12 +24,9 @@ export type StreamDeckProperties = Readonly<{
 	PRODUCT_NAME: string
 	COLUMNS: number
 	ROWS: number
-	TOUCH_BUTTONS: number
 	BUTTON_WIDTH_PX: number
 	BUTTON_HEIGHT_PX: number
-	KEY_DIRECTION: 'ltr' | 'rtl'
 	KEY_DATA_OFFSET: number
-	ENCODER_COUNT: number
 	SUPPORTS_RGB_KEY_FILL: boolean
 
 	CONTROLS: Readonly<StreamDeckControlDefinition[]>
@@ -47,13 +44,6 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 	}
 	get KEY_ROWS(): number {
 		return this.deviceProperties.ROWS
-	}
-	get NUM_TOUCH_KEYS(): number {
-		return this.deviceProperties.TOUCH_BUTTONS
-	}
-
-	get NUM_ENCODERS(): number {
-		return this.deviceProperties.ENCODER_COUNT
 	}
 
 	get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
@@ -103,7 +93,10 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 		this.deviceProperties = properties
 		this.device = device
 
-		this.keyState = new Array<boolean>(this.NUM_KEYS + this.NUM_TOUCH_KEYS).fill(false)
+		const maxButtonIndex = properties.CONTROLS.filter(
+			(control): control is StreamDeckButtonControlDefinition => control.type === 'button'
+		).map((control) => control.index)
+		this.keyState = new Array<boolean>(Math.max(0, ...maxButtonIndex)).fill(false)
 
 		this.device.on('input', (data: Uint8Array) => this.handleInputBuffer(data))
 
@@ -131,10 +124,21 @@ export abstract class StreamDeckInputBase extends EventEmitter<StreamDeckEvents>
 		}
 	}
 
-	public checkValidKeyIndex(keyIndex: KeyIndex, includeTouchKeys?: boolean): void {
-		const totalKeys = this.NUM_KEYS + (includeTouchKeys ? this.NUM_TOUCH_KEYS : 0)
-		if (keyIndex < 0 || keyIndex >= totalKeys) {
-			throw new TypeError(`Expected a valid keyIndex 0 - ${totalKeys - 1}`)
+	protected checkValidKeyIndex(
+		keyIndex: KeyIndex,
+		feedbackType: StreamDeckButtonControlDefinition['feedbackType'] | null
+	): void {
+		const buttonControl = this.deviceProperties.CONTROLS.find(
+			(control): control is StreamDeckButtonControlDefinition =>
+				control.type === 'button' && control.index === keyIndex
+		)
+
+		if (!buttonControl) {
+			throw new TypeError(`Expected a valid keyIndex`)
+		}
+
+		if (feedbackType && buttonControl.feedbackType !== feedbackType) {
+			throw new TypeError(`Expected a keyIndex with expected feedbackType`)
 		}
 	}
 
@@ -176,13 +180,13 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 	}
 
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
-		this.checkValidKeyIndex(keyIndex, true)
+		this.checkValidKeyIndex(keyIndex, null)
 
 		await this.buttonsLcdService.fillKeyColor(keyIndex, r, g, b)
 	}
 
 	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
-		this.checkValidKeyIndex(keyIndex)
+		this.checkValidKeyIndex(keyIndex, 'lcd')
 
 		await this.buttonsLcdService.fillKeyBuffer(keyIndex, imageBuffer, options)
 	}
@@ -192,7 +196,7 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 	}
 
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
-		this.checkValidKeyIndex(keyIndex, true)
+		this.checkValidKeyIndex(keyIndex, null)
 
 		await this.buttonsLcdService.clearKey(keyIndex)
 	}
@@ -201,10 +205,6 @@ export abstract class StreamDeckBase extends StreamDeckInputBase {
 		const ps: Array<Promise<void>> = []
 
 		ps.push(this.buttonsLcdService.clearPanel())
-
-		for (let buttonIndex = 0; buttonIndex < this.NUM_TOUCH_KEYS; buttonIndex++) {
-			ps.push(this.clearKey(buttonIndex + this.NUM_KEYS))
-		}
 
 		await Promise.all(ps)
 	}
