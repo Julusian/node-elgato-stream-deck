@@ -4,7 +4,7 @@ import { DeviceModelId, Dimension } from '../id'
 import { FillImageOptions, FillPanelDimensionsOptions, FillPanelOptions } from '../types'
 import { StreamDeckControlDefinition } from '../controlDefinition'
 import { freezeDefinitions } from '../controlsGenerator'
-import type { ButtonsLcdService } from '../services/buttonsLcd'
+import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay'
 
 const pedalControls: StreamDeckControlDefinition[] = [
 	{
@@ -77,7 +77,7 @@ class StreamDeckPedal extends StreamDeckBase {
 	}
 }
 
-class PedalLcdService implements ButtonsLcdService {
+class PedalLcdService implements ButtonsLcdDisplayService {
 	public calculateFillPanelDimensions(_options?: FillPanelDimensionsOptions): Dimension | null {
 		// Not supported
 		return null

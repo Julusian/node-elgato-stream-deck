@@ -2,7 +2,7 @@ import { LcdPosition } from '../types'
 import { StreamDeckLcdStripControlDefinition } from '../controlDefinition'
 import { SomeEmitEventFn } from '../models/plus'
 
-export class LcdInputService {
+export class LcdStripInputService {
 	readonly #lcdStripControls: Readonly<StreamDeckLcdStripControlDefinition[]>
 	readonly #emitEvent: SomeEmitEventFn
 

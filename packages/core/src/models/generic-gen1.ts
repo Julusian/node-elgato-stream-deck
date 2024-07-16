@@ -2,7 +2,7 @@ import { HIDDevice } from '../hid-device'
 import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { StreamdeckImageWriter } from '../services/imageWriter/types'
 import { BMP_HEADER_LENGTH, FillImageTargetOptions, transformImageBuffer, writeBMPHeader } from '../util'
-import { ButtonLcdImagePacker, DefaultButtonsLcdService, InternalFillImageOptions } from '../services/buttonsLcd'
+import { ButtonLcdImagePacker, DefaultButtonsLcdService, InternalFillImageOptions } from '../services/buttonsLcdDisplay'
 
 function extendDevicePropertiesForGen1(rawProps: StreamDeckGen1Properties): StreamDeckProperties {
 	return {

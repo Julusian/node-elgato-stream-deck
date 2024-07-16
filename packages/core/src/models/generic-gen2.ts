@@ -3,10 +3,10 @@ import { transformImageBuffer } from '../util'
 import { EncodeJPEGHelper, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckGen2ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
-import { EncoderInputService } from '../services/encoder'
-import { ButtonLcdImagePacker, DefaultButtonsLcdService, InternalFillImageOptions } from '../services/buttonsLcd'
-import { LcdInputService } from '../services/lcdInputService'
-import { LcdStripService } from '../services/lcdStrip'
+import { EncoderInputService } from '../services/encoderInput'
+import { ButtonLcdImagePacker, DefaultButtonsLcdService, InternalFillImageOptions } from '../services/buttonsLcdDisplay'
+import { LcdStripInputService } from '../services/lcdStripInput'
+import { LcdStripDisplayService } from '../services/lcdStripDisplay'
 
 function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): StreamDeckProperties {
 	return {
@@ -22,15 +22,15 @@ export type StreamDeckGen2Properties = Omit<StreamDeckProperties, 'KEY_DATA_OFFS
  * Class for generation 2 hardware (starting with the xl)
  */
 export class StreamDeckGen2 extends StreamDeckBase {
-	readonly #lcdStripInputService: LcdInputService | null
+	readonly #lcdStripInputService: LcdStripInputService | null
 	protected readonly encoderService: EncoderInputService
 
 	constructor(
 		device: HIDDevice,
 		options: Required<OpenStreamDeckOptions>,
 		properties: StreamDeckGen2Properties,
-		lcdStripService: LcdStripService | null,
-		lcdStripInputService: LcdInputService | null,
+		lcdStripDisplayService: LcdStripDisplayService | null,
+		lcdStripInputService: LcdStripInputService | null,
 		disableXYFlip?: boolean
 	) {
 		const fullProperties = extendDevicePropertiesForGen2(properties)
@@ -50,7 +50,7 @@ export class StreamDeckGen2 extends StreamDeckBase {
 				device,
 				fullProperties
 			),
-			lcdStripService
+			lcdStripDisplayService
 		)
 
 		this.#lcdStripInputService = lcdStripInputService

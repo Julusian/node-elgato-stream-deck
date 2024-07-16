@@ -6,10 +6,10 @@ import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWrite
 import { StreamdeckNeoLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 import { FillImageOptions, FillLcdImageOptions } from '../types'
 import { transformImageBuffer } from '../util'
-import { InternalFillImageOptions } from '../services/buttonsLcd'
+import { InternalFillImageOptions } from '../services/buttonsLcdDisplay'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
 import { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition'
-import { LcdStripService } from '../services/lcdStrip'
+import { LcdStripDisplayService } from '../services/lcdStripDisplay'
 
 const neoControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2)
 neoControls.push(
@@ -69,7 +69,7 @@ export function StreamDeckNeoFactory(device: HIDDevice, options: Required<OpenSt
 	)
 }
 
-class StreamDeckNeoLcdService implements LcdStripService {
+class StreamDeckNeoLcdService implements LcdStripDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper
 	readonly #device: HIDDevice
 	readonly #lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>

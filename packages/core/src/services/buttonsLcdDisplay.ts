@@ -24,7 +24,7 @@ interface GridSpan {
 	maxCol: number
 }
 
-export interface ButtonsLcdService {
+export interface ButtonsLcdDisplayService {
 	calculateFillPanelDimensions(options: FillPanelDimensionsOptions | undefined): Dimension | null
 
 	clearPanel(): Promise<void>
@@ -35,7 +35,7 @@ export interface ButtonsLcdService {
 	fillPanelBuffer(imageBuffer: Buffer, options: FillPanelOptions | undefined): Promise<void>
 }
 
-export class DefaultButtonsLcdService implements ButtonsLcdService {
+export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	readonly #imageWriter: StreamdeckImageWriter
 	readonly #imagePacker: ButtonLcdImagePacker
 	readonly #device: HIDDevice

@@ -9,9 +9,9 @@ import type {
 	StreamDeck,
 	StreamDeckEvents,
 } from '../types'
-import type { ButtonsLcdService } from '../services/buttonsLcd'
+import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay'
 import type { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from '../controlDefinition'
-import type { LcdStripService } from '../services/lcdStrip'
+import type { LcdStripDisplayService } from '../services/lcdStripDisplay'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
@@ -72,8 +72,8 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 
 	protected readonly device: HIDDevice
 	protected readonly deviceProperties: Readonly<StreamDeckProperties>
-	private readonly buttonsLcdService: ButtonsLcdService
-	private readonly lcdStripService: LcdStripService | null
+	private readonly buttonsLcdService: ButtonsLcdDisplayService
+	private readonly lcdStripDisplayService: LcdStripDisplayService | null
 	// private readonly options: Readonly<OpenStreamDeckOptions>
 	private readonly keyState: boolean[]
 
@@ -81,15 +81,15 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 		device: HIDDevice,
 		_options: OpenStreamDeckOptions,
 		properties: StreamDeckProperties,
-		buttonsLcdService: ButtonsLcdService,
-		lcdStripService: LcdStripService | null
+		buttonsLcdService: ButtonsLcdDisplayService,
+		lcdStripDisplayService: LcdStripDisplayService | null
 	) {
 		super()
 
 		this.deviceProperties = properties
 		this.device = device
 		this.buttonsLcdService = buttonsLcdService
-		this.lcdStripService = lcdStripService
+		this.lcdStripDisplayService = lcdStripDisplayService
 
 		const maxButtonIndex = properties.CONTROLS.filter(
 			(control): control is StreamDeckButtonControlDefinition => control.type === 'button'
@@ -186,10 +186,10 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 
 		ps.push(this.buttonsLcdService.clearPanel())
 
-		if (this.lcdStripService) {
+		if (this.lcdStripDisplayService) {
 			for (const control of this.deviceProperties.CONTROLS) {
 				if (control.type !== 'lcd-strip') continue
-				ps.push(this.lcdStripService.clearLcdStrip(control.id))
+				ps.push(this.lcdStripDisplayService.clearLcdStrip(control.id))
 			}
 		}
 
@@ -197,9 +197,9 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 	}
 
 	public async fillLcd(...args: Parameters<StreamDeck['fillLcd']>): ReturnType<StreamDeck['fillLcd']> {
-		if (!this.lcdStripService) throw new Error('Not supported for this model')
+		if (!this.lcdStripDisplayService) throw new Error('Not supported for this model')
 
-		return this.lcdStripService.fillLcd(...args)
+		return this.lcdStripDisplayService.fillLcd(...args)
 	}
 
 	// public async fillEncoderLcd(
@@ -211,16 +211,16 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 	public async fillLcdRegion(
 		...args: Parameters<StreamDeck['fillLcdRegion']>
 	): ReturnType<StreamDeck['fillLcdRegion']> {
-		if (!this.lcdStripService) throw new Error('Not supported for this model')
+		if (!this.lcdStripDisplayService) throw new Error('Not supported for this model')
 
-		return this.lcdStripService.fillLcdRegion(...args)
+		return this.lcdStripDisplayService.fillLcdRegion(...args)
 	}
 
 	public async clearLcdStrip(
 		...args: Parameters<StreamDeck['clearLcdStrip']>
 	): ReturnType<StreamDeck['clearLcdStrip']> {
-		if (!this.lcdStripService) throw new Error('Not supported for this model')
+		if (!this.lcdStripDisplayService) throw new Error('Not supported for this model')
 
-		return this.lcdStripService.clearLcdStrip(...args)
+		return this.lcdStripDisplayService.clearLcdStrip(...args)
 	}
 }

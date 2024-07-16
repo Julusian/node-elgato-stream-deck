@@ -6,11 +6,11 @@ import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
 import { DeviceModelId } from '../id'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
 import { StreamdeckPlusLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
-import { InternalFillImageOptions } from '../services/buttonsLcd'
+import { InternalFillImageOptions } from '../services/buttonsLcdDisplay'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
 import { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition'
-import { LcdInputService } from '../services/lcdInputService'
-import { LcdStripService } from '../services/lcdStrip'
+import { LcdStripInputService } from '../services/lcdStripInput'
+import { LcdStripDisplayService } from '../services/lcdStripDisplay'
 
 const plusControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2)
 plusControls.push(
@@ -79,7 +79,7 @@ class StreamDeckPlus extends StreamDeckGen2 {
 			options,
 			plusProperties,
 			new StreamDeckPlusLcdService(options.encodeJPEG, device, lcdStripControls),
-			new LcdInputService(lcdStripControls, (key, ...args) => this.emit(key, ...args)),
+			new LcdStripInputService(lcdStripControls, (key, ...args) => this.emit(key, ...args)),
 			true
 		)
 	}
@@ -90,7 +90,7 @@ export function StreamDeckPlusFactory(device: HIDDevice, options: Required<OpenS
 	return new StreamDeckPlus(device, options)
 }
 
-class StreamDeckPlusLcdService implements LcdStripService {
+class StreamDeckPlusLcdService implements LcdStripDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper
 	readonly #device: HIDDevice
 	readonly #lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>

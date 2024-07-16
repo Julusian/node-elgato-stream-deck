@@ -1,6 +1,6 @@
 import type { FillImageOptions, FillLcdImageOptions } from '../types'
 
-export interface LcdStripService {
+export interface LcdStripDisplayService {
 	/**
 	 * Fill the whole lcd strip
 	 * @param {number} lcdIndex The id of the lcd strip to draw to
