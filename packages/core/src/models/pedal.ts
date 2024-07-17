@@ -5,6 +5,7 @@ import { FillImageOptions, FillPanelDimensionsOptions, FillPanelOptions } from '
 import { StreamDeckControlDefinition } from '../controlDefinition'
 import { freezeDefinitions } from '../controlsGenerator'
 import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay'
+import { PropertiesService } from '../services/propertiesService'
 
 const pedalControls: StreamDeckControlDefinition[] = [
 	{
@@ -47,36 +48,6 @@ const pedalProperties: StreamDeckProperties = {
 	KEY_SPACING_VERTICAL: 0,
 }
 
-class StreamDeckPedal extends StreamDeckBase {
-	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(device, options, pedalProperties, new PedalLcdService(), null)
-	}
-
-	/**
-	 * Sets the brightness of the keys on the Stream Deck
-	 *
-	 * @param {number} percentage The percentage brightness
-	 */
-	public async setBrightness(_percentage: number): Promise<void> {
-		// Not supported
-	}
-
-	public async resetToLogo(): Promise<void> {
-		// Not supported
-	}
-
-	public async getFirmwareVersion(): Promise<string> {
-		const val = await this.device.getFeatureReport(5, 32)
-		const end = val.indexOf(0, 6)
-		return val.toString('ascii', 6, end === -1 ? undefined : end)
-	}
-
-	public async getSerialNumber(): Promise<string> {
-		const val = await this.device.getFeatureReport(6, 32)
-		return val.toString('ascii', 2, 14)
-	}
-}
-
 class PedalLcdService implements ButtonsLcdDisplayService {
 	public calculateFillPanelDimensions(_options?: FillPanelDimensionsOptions): Dimension | null {
 		// Not supported
@@ -99,6 +70,40 @@ class PedalLcdService implements ButtonsLcdDisplayService {
 	}
 }
 
-export function StreamDeckPedalFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckPedal {
-	return new StreamDeckPedal(device, options)
+class PedalPropertiesService implements PropertiesService {
+	readonly #device: HIDDevice
+
+	constructor(device: HIDDevice) {
+		this.#device = device
+	}
+
+	public async setBrightness(_percentage: number): Promise<void> {
+		// Not supported
+	}
+
+	public async resetToLogo(): Promise<void> {
+		// Not supported
+	}
+
+	public async getFirmwareVersion(): Promise<string> {
+		const val = await this.#device.getFeatureReport(5, 32)
+		const end = val.indexOf(0, 6)
+		return val.toString('ascii', 6, end === -1 ? undefined : end)
+	}
+
+	public async getSerialNumber(): Promise<string> {
+		const val = await this.#device.getFeatureReport(6, 32)
+		return val.toString('ascii', 2, 14)
+	}
+}
+
+export function StreamDeckPedalFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
+	return new StreamDeckBase(
+		device,
+		options,
+		pedalProperties,
+		new PedalPropertiesService(device),
+		new PedalLcdService(),
+		null
+	)
 }

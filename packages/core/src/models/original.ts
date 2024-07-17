@@ -1,6 +1,6 @@
 import { HIDDevice } from '../hid-device'
-import { OpenStreamDeckOptions } from './base'
-import { StreamDeckGen1, StreamDeckGen1Properties } from './generic-gen1'
+import { OpenStreamDeckOptions, StreamDeckBase } from './base'
+import { StreamDeckGen1Factory, StreamDeckGen1Properties } from './generic-gen1'
 import { DeviceModelId } from '../id'
 import { StreamdeckOriginalImageWriter } from '../services/imageWriter/imageWriter'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
@@ -18,8 +18,8 @@ const originalProperties: StreamDeckGen1Properties = {
 	KEY_SPACING_VERTICAL: 25,
 }
 
-export function StreamDeckOriginalFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckGen1 {
-	return new StreamDeckGen1(
+export function StreamDeckOriginalFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
+	return StreamDeckGen1Factory(
 		device,
 		options,
 		originalProperties,

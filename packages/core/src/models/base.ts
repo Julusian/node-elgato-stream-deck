@@ -12,6 +12,7 @@ import type {
 import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay'
 import type { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from '../controlDefinition'
 import type { LcdStripDisplayService } from '../services/lcdStripDisplay'
+import { PropertiesService } from '../services/propertiesService'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
@@ -41,7 +42,7 @@ export type StreamDeckProperties = Readonly<{
 	KEY_SPACING_VERTICAL: number
 }>
 
-export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
+export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
 	get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
 		return this.deviceProperties.CONTROLS
 	}
@@ -72,6 +73,7 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 
 	protected readonly device: HIDDevice
 	protected readonly deviceProperties: Readonly<StreamDeckProperties>
+	private readonly propertiesService: PropertiesService
 	private readonly buttonsLcdService: ButtonsLcdDisplayService
 	private readonly lcdStripDisplayService: LcdStripDisplayService | null
 	// private readonly options: Readonly<OpenStreamDeckOptions>
@@ -81,6 +83,7 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 		device: HIDDevice,
 		_options: OpenStreamDeckOptions,
 		properties: StreamDeckProperties,
+		propertiesService: PropertiesService,
 		buttonsLcdService: ButtonsLcdDisplayService,
 		lcdStripDisplayService: LcdStripDisplayService | null
 	) {
@@ -88,6 +91,7 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 
 		this.deviceProperties = properties
 		this.device = device
+		this.propertiesService = propertiesService
 		this.buttonsLcdService = buttonsLcdService
 		this.lcdStripDisplayService = lcdStripDisplayService
 
@@ -152,12 +156,20 @@ export abstract class StreamDeckBase extends EventEmitter<StreamDeckEvents> impl
 		return this.device.getDeviceInfo()
 	}
 
-	public abstract setBrightness(percentage: number): Promise<void>
+	public async setBrightness(percentage: number): Promise<void> {
+		return this.propertiesService.setBrightness(percentage)
+	}
 
-	public abstract resetToLogo(): Promise<void>
+	public async resetToLogo(): Promise<void> {
+		return this.propertiesService.resetToLogo()
+	}
 
-	public abstract getFirmwareVersion(): Promise<string>
-	public abstract getSerialNumber(): Promise<string>
+	public async getFirmwareVersion(): Promise<string> {
+		return this.propertiesService.getFirmwareVersion()
+	}
+	public async getSerialNumber(): Promise<string> {
+		return this.propertiesService.getSerialNumber()
+	}
 
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		this.checkValidKeyIndex(keyIndex, null)

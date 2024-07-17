@@ -7,6 +7,7 @@ import { EncoderInputService } from '../services/encoderInput'
 import { ButtonLcdImagePacker, DefaultButtonsLcdService, InternalFillImageOptions } from '../services/buttonsLcdDisplay'
 import { LcdStripInputService } from '../services/lcdStripInput'
 import { LcdStripDisplayService } from '../services/lcdStripDisplay'
+import { PropertiesService } from '../services/propertiesService'
 
 function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): StreamDeckProperties {
 	return {
@@ -39,6 +40,7 @@ export class StreamDeckGen2 extends StreamDeckBase {
 			device,
 			options,
 			fullProperties,
+			new Gen2PropertiesService(device),
 			new DefaultButtonsLcdService(
 				new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator()),
 				new Gen2ButtonLcdImagePacker(
@@ -70,51 +72,6 @@ export class StreamDeckGen2 extends StreamDeckBase {
 				this.encoderService.handleInput(data)
 				break
 		}
-	}
-
-	/**
-	 * Sets the brightness of the keys on the Stream Deck
-	 *
-	 * @param {number} percentage The percentage brightness
-	 */
-	public async setBrightness(percentage: number): Promise<void> {
-		if (percentage < 0 || percentage > 100) {
-			throw new RangeError('Expected brightness percentage to be between 0 and 100')
-		}
-
-		// prettier-ignore
-		const brightnessCommandBuffer = Buffer.from([
-			0x03,
-			0x08, percentage, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		])
-		await this.device.sendFeatureReport(brightnessCommandBuffer)
-	}
-
-	public async resetToLogo(): Promise<void> {
-		// prettier-ignore
-		const resetCommandBuffer = Buffer.from([
-			0x03,
-			0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-		])
-		await this.device.sendFeatureReport(resetCommandBuffer)
-	}
-
-	public async getFirmwareVersion(): Promise<string> {
-		const val = await this.device.getFeatureReport(5, 32)
-		const end = val.readUInt8(1) + 2
-		return val.toString('ascii', 6, end)
-	}
-
-	public async getSerialNumber(): Promise<string> {
-		const val = await this.device.getFeatureReport(6, 32)
-		const end = val.readUInt8(1) + 2
-		return val.toString('ascii', 2, end)
 	}
 }
 
@@ -150,5 +107,53 @@ class Gen2ButtonLcdImagePacker implements ButtonLcdImagePacker {
 		)
 
 		return this.#encodeJPEG(byteBuffer, this.#imageWidth, this.#imageHeight)
+	}
+}
+
+export class Gen2PropertiesService implements PropertiesService {
+	readonly #device: HIDDevice
+
+	constructor(device: HIDDevice) {
+		this.#device = device
+	}
+
+	public async setBrightness(percentage: number): Promise<void> {
+		if (percentage < 0 || percentage > 100) {
+			throw new RangeError('Expected brightness percentage to be between 0 and 100')
+		}
+
+		// prettier-ignore
+		const brightnessCommandBuffer = Buffer.from([
+			0x03,
+			0x08, percentage, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+		])
+		await this.#device.sendFeatureReport(brightnessCommandBuffer)
+	}
+
+	public async resetToLogo(): Promise<void> {
+		// prettier-ignore
+		const resetCommandBuffer = Buffer.from([
+			0x03,
+			0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+		])
+		await this.#device.sendFeatureReport(resetCommandBuffer)
+	}
+
+	public async getFirmwareVersion(): Promise<string> {
+		const val = await this.#device.getFeatureReport(5, 32)
+		const end = val.readUInt8(1) + 2
+		return val.toString('ascii', 6, end)
+	}
+
+	public async getSerialNumber(): Promise<string> {
+		const val = await this.#device.getFeatureReport(6, 32)
+		const end = val.readUInt8(1) + 2
+		return val.toString('ascii', 2, end)
 	}
 }
