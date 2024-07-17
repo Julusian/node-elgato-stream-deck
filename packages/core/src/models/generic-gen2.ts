@@ -24,7 +24,7 @@ export type StreamDeckGen2Properties = Omit<StreamDeckProperties, 'KEY_DATA_OFFS
  */
 export class StreamDeckGen2 extends StreamDeckBase {
 	readonly #lcdStripInputService: LcdStripInputService | null
-	protected readonly encoderService: EncoderInputService
+	readonly #encoderInputService: EncoderInputService
 
 	constructor(
 		device: HIDDevice,
@@ -56,7 +56,7 @@ export class StreamDeckGen2 extends StreamDeckBase {
 		)
 
 		this.#lcdStripInputService = lcdStripInputService
-		this.encoderService = new EncoderInputService(this, properties.CONTROLS)
+		this.#encoderInputService = new EncoderInputService(this, properties.CONTROLS)
 	}
 
 	protected handleInputBuffer(data: Uint8Array): void {
@@ -69,7 +69,7 @@ export class StreamDeckGen2 extends StreamDeckBase {
 				this.#lcdStripInputService?.handleInput(data)
 				break
 			case 0x03: // Encoder
-				this.encoderService.handleInput(data)
+				this.#encoderInputService.handleInput(data)
 				break
 		}
 	}
