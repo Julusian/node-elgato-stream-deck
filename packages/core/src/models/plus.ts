@@ -1,163 +1,173 @@
 import { transformImageBuffer } from '../util'
-import { FillImageOptions, FillLcdImageOptions, LcdPosition, LcdSegmentSize } from '../types'
-import { HIDDevice } from '../device'
-import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
-import { StreamDeckGen2Base } from './base-gen2'
-import { DeviceModelId, EncoderIndex } from '../id'
-import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter'
-import { StreamdeckPlusLcdImageHeaderGenerator } from '../imageWriter/headerGenerator'
+import { FillImageOptions, FillLcdImageOptions, StreamDeckEvents } from '../types'
+import { HIDDevice } from '../hid-device'
+import { EncodeJPEGHelper, OpenStreamDeckOptions } from './base'
+import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
+import { DeviceModelId } from '../id'
+import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
+import { StreamdeckPlusLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
+import { InternalFillImageOptions } from '../services/buttonsLcdDisplay'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
+import { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition'
+import { LcdStripInputService } from '../services/lcdStripInput'
+import { LcdStripDisplayService } from '../services/lcdStripDisplay'
 
-const plusProperties: StreamDeckProperties = {
+const plusControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2)
+plusControls.push(
+	{
+		type: 'lcd-strip',
+		row: 2,
+		column: 0,
+		columnSpan: 4,
+
+		id: 0,
+
+		pixelSize: Object.freeze({
+			width: 800,
+			height: 100,
+		}),
+
+		drawRegions: true,
+	},
+	{
+		type: 'encoder',
+		row: 3,
+		column: 0,
+		index: 0,
+		hidIndex: 0,
+	},
+	{
+		type: 'encoder',
+		row: 3,
+		column: 1,
+		index: 1,
+		hidIndex: 1,
+	},
+	{
+		type: 'encoder',
+		row: 3,
+		column: 2,
+		index: 2,
+		hidIndex: 2,
+	},
+	{
+		type: 'encoder',
+		row: 3,
+		column: 3,
+		index: 3,
+		hidIndex: 3,
+	}
+)
+
+const plusProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.PLUS,
 	PRODUCT_NAME: 'Streamdeck +',
-	COLUMNS: 4,
-	ROWS: 2,
-	TOUCH_BUTTONS: 0,
-	ICON_SIZE: 120,
-	KEY_DIRECTION: 'ltr',
-	KEY_DATA_OFFSET: 3,
+	BUTTON_WIDTH_PX: 120,
+	BUTTON_HEIGHT_PX: 120,
+
+	CONTROLS: freezeDefinitions(plusControls),
 
 	KEY_SPACING_HORIZONTAL: 99,
 	KEY_SPACING_VERTICAL: 40,
 }
+const lcdStripControls = plusProperties.CONTROLS.filter(
+	(control): control is StreamDeckLcdStripControlDefinition => control.type === 'lcd-strip'
+)
 
-export class StreamDeckPlus extends StreamDeckGen2Base {
-	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter(new StreamdeckPlusLcdImageHeaderGenerator())
-	readonly #encoderState: boolean[]
-
+class StreamDeckPlus extends StreamDeckGen2 {
 	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(device, options, plusProperties, true)
+		super(
+			device,
+			options,
+			plusProperties,
+			new StreamDeckPlusLcdService(options.encodeJPEG, device, lcdStripControls),
+			new LcdStripInputService(lcdStripControls, (key, ...args) => this.emit(key, ...args)),
+			true
+		)
+	}
+}
 
-		this.#encoderState = new Array<boolean>(4).fill(false)
+export function StreamDeckPlusFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckGen2 {
+	// TODO - remove this class, once the event emitting is possible
+	return new StreamDeckPlus(device, options)
+}
+
+class StreamDeckPlusLcdService implements LcdStripDisplayService {
+	readonly #encodeJPEG: EncodeJPEGHelper
+	readonly #device: HIDDevice
+	readonly #lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>
+
+	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter(new StreamdeckPlusLcdImageHeaderGenerator())
+
+	constructor(
+		encodeJPEG: EncodeJPEGHelper,
+		device: HIDDevice,
+		lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>
+	) {
+		this.#encodeJPEG = encodeJPEG
+		this.#device = device
+		this.#lcdControls = lcdControls
 	}
 
-	public get NUM_ENCODERS(): number {
-		return 4
-	}
+	public async fillLcd(index: number, buffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
+		const lcdControl = this.#lcdControls.find((control) => control.id === index)
+		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
 
-	public get LCD_STRIP_SIZE(): LcdSegmentSize {
-		const size = this.LCD_ENCODER_SIZE
-		size.width *= this.NUM_ENCODERS
-		return size
-	}
-	public get LCD_ENCODER_SIZE(): LcdSegmentSize {
-		return { width: 200, height: 100 }
-	}
-
-	private calculateEncoderForX(x: number): EncoderIndex {
-		const encoderWidth = this.LCD_ENCODER_SIZE.width
-		return Math.floor(x / encoderWidth)
-	}
-
-	protected handleInputBuffer(data: Uint8Array): void {
-		const inputType = data[0]
-		switch (inputType) {
-			case 0x00: // Button
-				super.handleInputBuffer(data)
-				break
-			case 0x02: // LCD
-				this.handleLcdInput(data)
-				break
-			case 0x03: // Encoder
-				this.handleEncoderInput(data)
-				break
-		}
-	}
-
-	private handleLcdInput(data: Uint8Array): void {
-		const buffer = Buffer.from(data)
-		const position: LcdPosition = {
-			x: buffer.readUint16LE(5),
-			y: buffer.readUint16LE(7),
-		}
-		const index = this.calculateEncoderForX(position.x)
-
-		switch (data[3]) {
-			case 0x01: // short press
-				this.emit('lcdShortPress', index, position)
-				break
-			case 0x02: // long press
-				this.emit('lcdLongPress', index, position)
-				break
-			case 0x03: {
-				// swipe
-				const position2: LcdPosition = {
-					x: buffer.readUint16LE(9),
-					y: buffer.readUint16LE(11),
-				}
-				const index2 = this.calculateEncoderForX(position2.x)
-				this.emit('lcdSwipe', index, index2, position, position2)
-				break
-			}
-		}
-	}
-
-	private handleEncoderInput(data: Uint8Array): void {
-		switch (data[3]) {
-			case 0x00: // press/release
-				for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
-					const keyPressed = Boolean(data[4 + keyIndex])
-					const stateChanged = keyPressed !== this.#encoderState[keyIndex]
-					if (stateChanged) {
-						this.#encoderState[keyIndex] = keyPressed
-						if (keyPressed) {
-							this.emit('encoderDown', keyIndex)
-						} else {
-							this.emit('encoderUp', keyIndex)
-						}
-					}
-				}
-				break
-			case 0x01: // rotate
-				for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
-					const intArray = new Int8Array(data.buffer, data.byteOffset, data.byteLength)
-					const value = intArray[4 + keyIndex]
-					if (value > 0) {
-						this.emit('rotateRight', keyIndex, value)
-					} else if (value < 0) {
-						this.emit('rotateLeft', keyIndex, -value)
-					}
-				}
-				break
-		}
-	}
-
-	public override async fillLcd(buffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
-		const size = this.LCD_STRIP_SIZE
-		if (!size) throw new Error(`There is no lcd to fill`)
-
-		return this.fillLcdRegion(0, 0, buffer, {
+		return this.fillControlRegion(lcdControl, 0, 0, buffer, {
 			format: sourceOptions.format,
-			width: size.width,
-			height: size.height,
+			width: lcdControl.pixelSize.width,
+			height: lcdControl.pixelSize.height,
 		})
 	}
 
-	public override async fillEncoderLcd(
-		index: EncoderIndex,
-		buffer: Buffer,
-		sourceOptions: FillImageOptions
+	// public async fillEncoderLcd(index: EncoderIndex, buffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
+	// 	if (this.#encoderCount === 0) throw new Error(`There are no encoders`)
+
+	// 	const size = this.LCD_ENCODER_SIZE
+	// 	const x = index * size.width
+
+	// 	return this.fillLcdRegion(x, 0, buffer, {
+	// 		format: sourceOptions.format,
+	// 		width: size.width,
+	// 		height: size.height,
+	// 	})
+	// }
+
+	public async fillLcdRegion(
+		index: number,
+		x: number,
+		y: number,
+		imageBuffer: Buffer,
+		sourceOptions: FillLcdImageOptions
 	): Promise<void> {
-		if (this.NUM_ENCODERS === 0) throw new Error(`There are no encoders`)
+		const lcdControl = this.#lcdControls.find((control) => control.id === index)
+		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
 
-		const size = this.LCD_ENCODER_SIZE
-		const x = index * size.width
+		return this.fillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions)
+	}
 
-		return this.fillLcdRegion(x, 0, buffer, {
-			format: sourceOptions.format,
-			width: size.width,
-			height: size.height,
+	public async clearLcdStrip(index: number): Promise<void> {
+		const lcdControl = this.#lcdControls.find((control) => control.id === index)
+		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
+
+		const buffer = Buffer.alloc(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4)
+
+		await this.fillControlRegion(lcdControl, 0, 0, buffer, {
+			format: 'rgba',
+			width: lcdControl.pixelSize.width,
+			height: lcdControl.pixelSize.height,
 		})
 	}
 
-	public override async fillLcdRegion(
+	private async fillControlRegion(
+		lcdControl: StreamDeckLcdStripControlDefinition,
 		x: number,
 		y: number,
 		imageBuffer: Buffer,
 		sourceOptions: FillLcdImageOptions
 	): Promise<void> {
 		// Basic bounds checking
-		const maxSize = this.LCD_STRIP_SIZE
+		const maxSize = lcdControl.pixelSize
 		if (x < 0 || x + sourceOptions.width > maxSize.width) {
 			throw new TypeError(`Image will not fit within the lcd strip`)
 		}
@@ -174,7 +184,7 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions)
 
 		const packets = this.#lcdImageWriter.generateFillImageWrites({ ...sourceOptions, x, y }, byteBuffer)
-		await this.device.sendReports(packets)
+		await this.#device.sendReports(packets)
 	}
 
 	private async convertFillLcdBuffer(sourceBuffer: Buffer, sourceOptions: FillLcdImageOptions): Promise<Buffer> {
@@ -187,12 +197,15 @@ export class StreamDeckPlus extends StreamDeckGen2Base {
 		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
 			sourceOptions2,
-			{ colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip },
+			{ colorMode: 'rgba' },
 			0,
 			sourceOptions.width,
 			sourceOptions.height
 		)
 
-		return this.encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height)
+		return this.#encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height)
 	}
 }
+
+export type SomeEmitEventFn = EmitEventFn<keyof StreamDeckEvents>
+type EmitEventFn<K extends keyof StreamDeckEvents> = (key: K, ...args: StreamDeckEvents[K]) => void

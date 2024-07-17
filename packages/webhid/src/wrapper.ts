@@ -1,5 +1,5 @@
 import { KeyIndex, StreamDeck, StreamDeckProxy } from '@elgato-stream-deck/core'
-import { WebHIDDevice } from './device'
+import { WebHIDDevice } from './hid-device'
 
 /**
  * A StreamDeck instance.
@@ -21,14 +21,14 @@ export class StreamDeckWeb extends StreamDeckProxy {
 	}
 
 	public async fillKeyCanvas(keyIndex: KeyIndex, canvas: HTMLCanvasElement): Promise<void> {
-		this.checkValidKeyIndex(keyIndex)
+		// this.checkValidKeyIndex(keyIndex)
 
 		const ctx = canvas.getContext('2d')
 		if (!ctx) {
 			throw new Error('Failed to get canvas context')
 		}
 
-		const data = ctx.getImageData(0, 0, this.ICON_SIZE, this.ICON_SIZE)
+		const data = ctx.getImageData(0, 0, this.BUTTON_WIDTH_PX, this.BUTTON_HEIGHT_PX)
 		return this.device.fillKeyBuffer(keyIndex, Buffer.from(data.data), { format: 'rgba' })
 	}
 
@@ -38,7 +38,12 @@ export class StreamDeckWeb extends StreamDeckProxy {
 			throw new Error('Failed to get canvas context')
 		}
 
-		const data = ctx.getImageData(0, 0, this.ICON_SIZE * this.KEY_COLUMNS, this.ICON_SIZE * this.KEY_ROWS)
+		const dimensions = this.device.calculateFillPanelDimensions()
+		if (!dimensions) {
+			throw new Error('Panel does not support filling')
+		}
+
+		const data = ctx.getImageData(0, 0, dimensions.width, dimensions.height)
 		return this.device.fillPanelBuffer(Buffer.from(data.data), { format: 'rgba' })
 	}
 }

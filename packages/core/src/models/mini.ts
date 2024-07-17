@@ -1,41 +1,31 @@
-import { HIDDevice } from '../device'
-import { BMP_HEADER_LENGTH, transformImageBuffer, writeBMPHeader } from '../util'
-import { InternalFillImageOptions, OpenStreamDeckOptions, StreamDeckProperties } from './base'
-import { StreamDeckGen1Base } from './base-gen1'
+import { HIDDevice } from '../hid-device'
+import { OpenStreamDeckOptions, StreamDeckBase } from './base'
+import { StreamDeckGen1Factory, StreamDeckGen1Properties } from './generic-gen1'
 import { DeviceModelId } from '../id'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
+import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
+import { StreamdeckGen1ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
 
-const miniProperties: StreamDeckProperties = {
+const miniProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.MINI,
 	PRODUCT_NAME: 'Streamdeck Mini',
-	COLUMNS: 3,
-	ROWS: 2,
-	TOUCH_BUTTONS: 0,
-	ICON_SIZE: 80,
-	KEY_DIRECTION: 'ltr',
-	KEY_DATA_OFFSET: 0,
+	BUTTON_WIDTH_PX: 80,
+	BUTTON_HEIGHT_PX: 80,
+	SUPPORTS_RGB_KEY_FILL: false, // TODO - verify this
+
+	CONTROLS: freezeDefinitions(generateButtonsGrid(3, 2)),
 
 	KEY_SPACING_HORIZONTAL: 28,
 	KEY_SPACING_VERTICAL: 28,
 }
 
-export class StreamDeckMini extends StreamDeckGen1Base {
-	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(device, options, miniProperties)
-	}
-
-	protected async convertFillImage(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
-		const byteBuffer = transformImageBuffer(
-			sourceBuffer,
-			sourceOptions,
-			{ colorMode: 'bgr', rotate: true, yFlip: true },
-			BMP_HEADER_LENGTH,
-			this.ICON_SIZE
-		)
-		writeBMPHeader(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 2835)
-		return Promise.resolve(byteBuffer)
-	}
-
-	protected getFillImagePacketLength(): number {
-		return 1024
-	}
+export function StreamDeckMiniFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
+	return StreamDeckGen1Factory(
+		device,
+		options,
+		miniProperties,
+		new StreamdeckDefaultImageWriter(new StreamdeckGen1ImageHeaderGenerator()),
+		{ colorMode: 'bgr', rotate: true, yFlip: true },
+		2835
+	)
 }

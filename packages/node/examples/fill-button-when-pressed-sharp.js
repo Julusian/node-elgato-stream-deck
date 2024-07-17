@@ -1,3 +1,4 @@
+// @ts-check
 const path = require('path')
 const sharp = require('sharp')
 const { listStreamDecks, openStreamDeck } = require('../dist/index')
@@ -11,24 +12,28 @@ const { listStreamDecks, openStreamDeck } = require('../dist/index')
 
 	const img = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 		.flatten()
-		.resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
+		.resize(streamDeck.BUTTON_WIDTH_PX, streamDeck.BUTTON_HEIGHT_PX)
 		.raw()
 		.toBuffer()
 
-	streamDeck.on('down', (keyIndex) => {
+	streamDeck.on('down', (control) => {
+		if (control.type !== 'button') return
+
 		// Fill the pressed key with an image of the GitHub logo.
-		console.log('Filling button #%d', keyIndex)
-		if (keyIndex >= streamDeck.NUM_KEYS) {
-			streamDeck.fillKeyColor(keyIndex, 255, 255, 255).catch((e) => console.error('Fill failed:', e))
+		console.log('Filling button #%d', control.index)
+		if (control.feedbackType === 'lcd') {
+			streamDeck.fillKeyBuffer(control.index, img).catch((e) => console.error('Fill failed:', e))
 		} else {
-			streamDeck.fillKeyBuffer(keyIndex, img).catch((e) => console.error('Fill failed:', e))
+			streamDeck.fillKeyColor(control.index, 255, 255, 255).catch((e) => console.error('Fill failed:', e))
 		}
 	})
 
-	streamDeck.on('up', (keyIndex) => {
+	streamDeck.on('up', (control) => {
+		if (control.type !== 'button') return
+
 		// Clear the key when it is released.
-		console.log('Clearing button #%d', keyIndex)
-		streamDeck.clearKey(keyIndex).catch((e) => console.error('Clear failed:', e))
+		console.log('Clearing button #%d', control.index)
+		streamDeck.clearKey(control.index).catch((e) => console.error('Clear failed:', e))
 	})
 
 	streamDeck.on('error', (error) => {

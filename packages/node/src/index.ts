@@ -1,21 +1,29 @@
 import { DEVICE_MODELS, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from '@elgato-stream-deck/core'
 import * as HID from 'node-hid'
-import { NodeHIDDevice, NodeHIDSyncDevice, StreamDeckDeviceInfo } from './device'
+import { NodeHIDDevice, StreamDeckDeviceInfo } from './hid-device'
 import { encodeJPEG, JPEGEncodeOptions } from './jpeg'
 import { StreamDeckNode } from './wrapper'
 
-export { DeviceModelId, KeyIndex, StreamDeck } from '@elgato-stream-deck/core'
+export {
+	VENDOR_ID,
+	DeviceModelId,
+	KeyIndex,
+	StreamDeck,
+	LcdPosition,
+	Dimension,
+	StreamDeckControlDefinitionBase,
+	StreamDeckButtonControlDefinition,
+	StreamDeckEncoderControlDefinition,
+	StreamDeckLcdStripControlDefinition,
+	StreamDeckControlDefinition,
+	OpenStreamDeckOptions,
+} from '@elgato-stream-deck/core'
+
+export { StreamDeckDeviceInfo, JPEGEncodeOptions }
 
 export interface OpenStreamDeckOptionsNode extends OpenStreamDeckOptions {
 	jpegOptions?: JPEGEncodeOptions
 	resetToLogoOnClose?: boolean
-
-	/**
-	 * @deprecated
-	 * Backwards compatibility option, for using the sync node-hid implementation.
-	 * This should not be used and will be removed in a future minor version
-	 */
-	useSyncNodeHid?: boolean
 }
 
 /**
@@ -36,7 +44,7 @@ export async function listStreamDecks(): Promise<StreamDeckDeviceInfo[]> {
  * If the provided device is a streamdeck, get the info about it
  */
 export function getStreamDeckDeviceInfo(dev: HID.Device): StreamDeckDeviceInfo | null {
-	const model = DEVICE_MODELS.find((m) => m.productId === dev.productId)
+	const model = DEVICE_MODELS.find((m) => m.productIds.includes(dev.productId))
 
 	if (model && dev.vendorId === VENDOR_ID && dev.path) {
 		return {
@@ -69,32 +77,26 @@ export async function openStreamDeck(devicePath: string, userOptions?: OpenStrea
 		: undefined
 
 	const options: Required<OpenStreamDeckOptions> = {
-		useOriginalKeyOrder: false,
 		encodeJPEG: async (buffer: Buffer, width: number, height: number) =>
 			encodeJPEG(buffer, width, height, jpegOptions),
 		...userOptions,
 	}
 
-	let device: NodeHIDDevice | NodeHIDSyncDevice | undefined
+	let device: NodeHIDDevice | undefined
 	try {
-		if (userOptions?.useSyncNodeHid) {
-			const hidDevice = new HID.HID(devicePath)
-			device = new NodeHIDSyncDevice(hidDevice)
-		} else {
-			const hidDevice = await HID.HIDAsync.open(devicePath)
-			device = new NodeHIDDevice(hidDevice)
-		}
+		const hidDevice = await HID.HIDAsync.open(devicePath)
+		device = new NodeHIDDevice(hidDevice)
 
 		const deviceInfo = await device.getDeviceInfo()
 
 		const model = DEVICE_MODELS.find(
-			(m) => m.productId === deviceInfo.productId && deviceInfo.vendorId === VENDOR_ID
+			(m) => deviceInfo.vendorId === VENDOR_ID && m.productIds.includes(deviceInfo.productId)
 		)
 		if (!model) {
 			throw new Error('Stream Deck is of unexpected type.')
 		}
 
-		const rawSteamdeck = new model.class(device, options)
+		const rawSteamdeck = model.factory(device, options)
 		return new StreamDeckNode(rawSteamdeck, userOptions?.resetToLogoOnClose ?? false)
 	} catch (e) {
 		if (device) await device.close().catch(() => null) // Suppress error

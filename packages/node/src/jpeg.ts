@@ -58,5 +58,5 @@ export async function encodeJPEG(
 		},
 		options ? options.quality : DEFAULT_QUALITY
 	)
-	return Promise.resolve(jpegBuffer2.data)
+	return jpegBuffer2.data
 }

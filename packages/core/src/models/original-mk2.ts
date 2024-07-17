@@ -1,24 +1,24 @@
-import { HIDDevice } from '../device'
-import { OpenStreamDeckOptions, StreamDeckProperties } from './base'
-import { StreamDeckGen2Base } from './base-gen2'
+import { HIDDevice } from '../hid-device'
+import { OpenStreamDeckOptions } from './base'
+import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
 import { DeviceModelId } from '../id'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
 
-const origMK2Properties: StreamDeckProperties = {
+const origMK2Properties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.ORIGINALMK2,
 	PRODUCT_NAME: 'Streamdeck MK2',
-	COLUMNS: 5,
-	ROWS: 3,
-	TOUCH_BUTTONS: 0,
-	ICON_SIZE: 72,
-	KEY_DIRECTION: 'ltr',
-	KEY_DATA_OFFSET: 3,
+	BUTTON_WIDTH_PX: 72,
+	BUTTON_HEIGHT_PX: 72,
+
+	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3)),
 
 	KEY_SPACING_HORIZONTAL: 25,
 	KEY_SPACING_VERTICAL: 25,
 }
 
-export class StreamDeckOriginalMK2 extends StreamDeckGen2Base {
-	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(device, options, origMK2Properties)
-	}
+export function StreamDeckOriginalMK2Factory(
+	device: HIDDevice,
+	options: Required<OpenStreamDeckOptions>
+): StreamDeckGen2 {
+	return new StreamDeckGen2(device, options, origMK2Properties, null, null)
 }

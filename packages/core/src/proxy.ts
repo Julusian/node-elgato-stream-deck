@@ -1,14 +1,6 @@
-import * as EventEmitter from 'eventemitter3'
-import { DeviceModelId, EncoderIndex, KeyIndex } from './id'
-import {
-	StreamDeck,
-	FillImageOptions,
-	FillPanelOptions,
-	FillLcdImageOptions,
-	LcdSegmentSize,
-	StreamDeckEvents,
-} from './types'
-import { HIDDeviceInfo } from './device'
+import type { DeviceModelId } from './id'
+import type { StreamDeck, StreamDeckEvents } from './types'
+import type { StreamDeckControlDefinition } from './controlDefinition'
 
 /**
  * A minimal proxy around a StreamDeck instance.
@@ -22,35 +14,17 @@ export class StreamDeckProxy implements StreamDeck {
 		this.device = device
 	}
 
-	public get NUM_KEYS(): number {
-		return this.device.NUM_KEYS
+	public get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
+		return this.device.CONTROLS
 	}
-	public get KEY_COLUMNS(): number {
-		return this.device.KEY_COLUMNS
+	public get BUTTON_WIDTH_PX(): number {
+		return this.device.BUTTON_WIDTH_PX
 	}
-	public get KEY_ROWS(): number {
-		return this.device.KEY_ROWS
+	public get BUTTON_HEIGHT_PX(): number {
+		return this.device.BUTTON_HEIGHT_PX
 	}
-	get NUM_TOUCH_KEYS(): number {
-		return this.device.NUM_TOUCH_KEYS
-	}
-	public get NUM_ENCODERS(): number {
-		return this.device.NUM_ENCODERS
-	}
-	public get LCD_STRIP_SIZE(): LcdSegmentSize | undefined {
-		return this.device.LCD_STRIP_SIZE
-	}
-	public get LCD_ENCODER_SIZE(): LcdSegmentSize | undefined {
-		return this.device.LCD_ENCODER_SIZE
-	}
-	public get ICON_SIZE(): number {
-		return this.device.ICON_SIZE
-	}
-	public get ICON_BYTES(): number {
-		return this.device.ICON_BYTES
-	}
-	public get ICON_PIXELS(): number {
-		return this.device.ICON_PIXELS
+	public get BUTTON_TOTAL_PX(): number {
+		return this.device.BUTTON_TOTAL_PX
 	}
 	public get KEY_SPACING_VERTICAL(): number {
 		return this.device.KEY_SPACING_VERTICAL
@@ -65,36 +39,46 @@ export class StreamDeckProxy implements StreamDeck {
 		return this.device.PRODUCT_NAME
 	}
 
-	public checkValidKeyIndex(keyIndex: KeyIndex, includeTouchKeys?: boolean): void {
-		this.device.checkValidKeyIndex(keyIndex, includeTouchKeys)
+	public calculateFillPanelDimensions(
+		...args: Parameters<StreamDeck['calculateFillPanelDimensions']>
+	): ReturnType<StreamDeck['calculateFillPanelDimensions']> {
+		return this.device.calculateFillPanelDimensions(...args)
 	}
 
 	public async close(): Promise<void> {
 		return this.device.close()
 	}
-	public async getHidDeviceInfo(): Promise<HIDDeviceInfo> {
-		return this.device.getHidDeviceInfo()
+	public async getHidDeviceInfo(
+		...args: Parameters<StreamDeck['getHidDeviceInfo']>
+	): ReturnType<StreamDeck['getHidDeviceInfo']> {
+		return this.device.getHidDeviceInfo(...args)
 	}
-	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
-		return this.device.fillKeyColor(keyIndex, r, g, b)
+	public async fillKeyColor(...args: Parameters<StreamDeck['fillKeyColor']>): ReturnType<StreamDeck['fillKeyColor']> {
+		return this.device.fillKeyColor(...args)
 	}
-	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
-		return this.device.fillKeyBuffer(keyIndex, imageBuffer, options)
+	public async fillKeyBuffer(
+		...args: Parameters<StreamDeck['fillKeyBuffer']>
+	): ReturnType<StreamDeck['fillKeyBuffer']> {
+		return this.device.fillKeyBuffer(...args)
 	}
-	public async fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void> {
-		return this.device.fillPanelBuffer(imageBuffer, options)
+	public async fillPanelBuffer(
+		...args: Parameters<StreamDeck['fillPanelBuffer']>
+	): ReturnType<StreamDeck['fillPanelBuffer']> {
+		return this.device.fillPanelBuffer(...args)
 	}
-	public async clearKey(keyIndex: KeyIndex): Promise<void> {
-		return this.device.clearKey(keyIndex)
+	public async clearKey(...args: Parameters<StreamDeck['clearKey']>): ReturnType<StreamDeck['clearKey']> {
+		return this.device.clearKey(...args)
 	}
-	public async clearPanel(): Promise<void> {
-		return this.device.clearPanel()
+	public async clearPanel(...args: Parameters<StreamDeck['clearPanel']>): ReturnType<StreamDeck['clearPanel']> {
+		return this.device.clearPanel(...args)
 	}
-	public async setBrightness(percentage: number): Promise<void> {
-		return this.device.setBrightness(percentage)
+	public async setBrightness(
+		...args: Parameters<StreamDeck['setBrightness']>
+	): ReturnType<StreamDeck['setBrightness']> {
+		return this.device.setBrightness(...args)
 	}
-	public async resetToLogo(): Promise<void> {
-		return this.device.resetToLogo()
+	public async resetToLogo(...args: Parameters<StreamDeck['resetToLogo']>): ReturnType<StreamDeck['resetToLogo']> {
+		return this.device.resetToLogo(...args)
 	}
 	public async getFirmwareVersion(): Promise<string> {
 		return this.device.getFirmwareVersion()
@@ -103,108 +87,111 @@ export class StreamDeckProxy implements StreamDeck {
 		return this.device.getSerialNumber()
 	}
 
-	public async fillLcd(imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
-		return this.device.fillLcd(imageBuffer, sourceOptions)
+	public async fillLcd(...args: Parameters<StreamDeck['fillLcd']>): ReturnType<StreamDeck['fillLcd']> {
+		return this.device.fillLcd(...args)
 	}
 
-	public async fillEncoderLcd(
-		index: EncoderIndex,
-		imageBuffer: Buffer,
-		sourceOptions: FillImageOptions
-	): Promise<void> {
-		return this.device.fillEncoderLcd(index, imageBuffer, sourceOptions)
-	}
+	// public async fillEncoderLcd(
+	// 	...args: Parameters<StreamDeck['fillEncoderLcd']>
+	// ): ReturnType<StreamDeck['fillEncoderLcd']> {
+	// 	return this.device.fillEncoderLcd(...args)
+	// }
 
 	public async fillLcdRegion(
-		x: number,
-		y: number,
-		imageBuffer: Buffer,
-		sourceOptions: FillLcdImageOptions
-	): Promise<void> {
-		return this.device.fillLcdRegion(x, y, imageBuffer, sourceOptions)
+		...args: Parameters<StreamDeck['fillLcdRegion']>
+	): ReturnType<StreamDeck['fillLcdRegion']> {
+		return this.device.fillLcdRegion(...args)
+	}
+
+	public async clearLcdStrip(
+		...args: Parameters<StreamDeck['clearLcdStrip']>
+	): ReturnType<StreamDeck['clearLcdStrip']> {
+		return this.device.clearLcdStrip(...args)
 	}
 
 	/**
 	 * EventEmitter
 	 */
 
-	public eventNames(): Array<EventEmitter.EventNames<StreamDeckEvents>> {
+	public eventNames(): (keyof StreamDeckEvents)[] {
 		return this.device.eventNames()
 	}
 
-	public listeners<T extends EventEmitter.EventNames<StreamDeckEvents>>(
-		event: T
-	): Array<EventEmitter.EventListener<StreamDeckEvents, T>> {
-		return this.device.listeners(event)
+	public listeners<K>(eventName: K | keyof StreamDeckEvents): TListener<K>[] {
+		return this.device.listeners(eventName)
 	}
 
-	public listenerCount(event: EventEmitter.EventNames<StreamDeckEvents>): number {
-		return this.device.listenerCount(event)
+	public rawListeners<K>(eventName: K | keyof StreamDeckEvents): TListener<K>[] {
+		return this.device.rawListeners(eventName)
 	}
 
-	public emit<T extends EventEmitter.EventNames<StreamDeckEvents>>(
-		event: T,
-		...args: EventEmitter.EventArgs<StreamDeckEvents, T>
+	public getMaxListeners(): number {
+		return this.device.getMaxListeners()
+	}
+
+	public setMaxListeners(n: number): this {
+		this.device.setMaxListeners(n)
+		return this
+	}
+
+	public emit<K extends keyof StreamDeckEvents>(
+		event: K,
+		...args: K extends keyof StreamDeckEvents
+			? StreamDeckEvents[K] extends unknown[]
+				? StreamDeckEvents[K]
+				: never
+			: never
 	): boolean {
 		return this.device.emit(event, ...args)
 	}
 
-	/**
-	 * Add a listener for a given event.
-	 */
-	public on<T extends EventEmitter.EventNames<StreamDeckEvents>>(
-		event: T,
-		fn: EventEmitter.EventListener<StreamDeckEvents, T>,
-		context?: unknown
-	): this {
-		this.device.on(event, fn, context)
-		return this
-	}
-	public addListener<T extends EventEmitter.EventNames<StreamDeckEvents>>(
-		event: T,
-		fn: EventEmitter.EventListener<StreamDeckEvents, T>,
-		context?: unknown
-	): this {
-		this.device.addListener(event, fn, context)
+	public addListener<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
+		this.device.addListener(event, listener)
 		return this
 	}
 
-	/**
-	 * Add a one-time listener for a given event.
-	 */
-	public once<T extends EventEmitter.EventNames<StreamDeckEvents>>(
-		event: T,
-		fn: EventEmitter.EventListener<StreamDeckEvents, T>,
-		context?: unknown
-	): this {
-		this.device.once(event, fn, context)
+	public listenerCount<K>(eventName: K | keyof StreamDeckEvents, listener?: TListener<K> | undefined): number {
+		return this.device.listenerCount(eventName, listener)
+	}
+
+	public prependListener<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
+		this.device.prependListener(event, listener)
 		return this
 	}
 
-	/**
-	 * Remove the listeners of a given event.
-	 */
-	public removeListener<T extends EventEmitter.EventNames<StreamDeckEvents>>(
-		event: T,
-		fn?: EventEmitter.EventListener<StreamDeckEvents, T>,
-		context?: unknown,
-		once?: boolean
-	): this {
-		this.device.removeListener(event, fn, context, once)
-		return this
-	}
-	public off<T extends EventEmitter.EventNames<StreamDeckEvents>>(
-		event: T,
-		fn?: EventEmitter.EventListener<StreamDeckEvents, T>,
-		context?: unknown,
-		once?: boolean
-	): this {
-		this.device.off(event, fn, context, once)
+	public prependOnceListener<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
+		this.device.prependOnceListener(event, listener)
 		return this
 	}
 
-	public removeAllListeners(event?: EventEmitter.EventNames<StreamDeckEvents>): this {
+	public on<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
+		this.device.on(event, listener)
+		return this
+	}
+
+	public once<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
+		this.device.once(event, listener)
+		return this
+	}
+
+	public removeListener<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
+		this.device.removeListener(event, listener)
+		return this
+	}
+
+	public off<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
+		this.device.off(event, listener)
+		return this
+	}
+
+	public removeAllListeners<K extends keyof StreamDeckEvents>(event?: K): this {
 		this.device.removeAllListeners(event)
 		return this
 	}
 }
+
+type TListener<K> = K extends keyof StreamDeckEvents
+	? StreamDeckEvents[K] extends unknown[]
+		? (...args: StreamDeckEvents[K]) => void
+		: never
+	: never

@@ -1,9 +1,22 @@
 import { DEVICE_MODELS, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from '@elgato-stream-deck/core'
-import { WebHIDDevice } from './device'
+import { WebHIDDevice } from './hid-device'
 import { encodeJPEG } from './jpeg'
 import { StreamDeckWeb } from './wrapper'
 
-export { DeviceModelId, KeyIndex, StreamDeck, LcdPosition } from '@elgato-stream-deck/core'
+export {
+	VENDOR_ID,
+	DeviceModelId,
+	KeyIndex,
+	StreamDeck,
+	LcdPosition,
+	Dimension,
+	StreamDeckControlDefinitionBase,
+	StreamDeckButtonControlDefinition,
+	StreamDeckEncoderControlDefinition,
+	StreamDeckLcdStripControlDefinition,
+	StreamDeckControlDefinition,
+	OpenStreamDeckOptions,
+} from '@elgato-stream-deck/core'
 export { StreamDeckWeb } from './wrapper'
 
 /**
@@ -48,7 +61,9 @@ export async function openDevice(
 	browserDevice: HIDDevice,
 	userOptions?: OpenStreamDeckOptions
 ): Promise<StreamDeckWeb> {
-	const model = DEVICE_MODELS.find((m) => m.productId === browserDevice.productId)
+	const model = DEVICE_MODELS.find(
+		(m) => browserDevice.vendorId === VENDOR_ID && m.productIds.includes(browserDevice.productId)
+	)
 	if (!model) {
 		throw new Error('Stream Deck is of unexpected type.')
 	}
@@ -57,13 +72,12 @@ export async function openDevice(
 
 	try {
 		const options: Required<OpenStreamDeckOptions> = {
-			useOriginalKeyOrder: false,
 			encodeJPEG: encodeJPEG,
 			...userOptions,
 		}
 
 		const browserHid = new WebHIDDevice(browserDevice)
-		const device: StreamDeck = new model.class(browserHid, options || {})
+		const device: StreamDeck = model.factory(browserHid, options || {})
 		return new StreamDeckWeb(device, browserHid)
 	} catch (e) {
 		await browserDevice.close().catch(() => null) // Suppress error
