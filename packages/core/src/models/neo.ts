@@ -48,7 +48,7 @@ neoControls.push(
 
 const neoProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.NEO,
-	PRODUCT_NAME: 'Streamdeck Neo',
+	PRODUCT_NAME: 'Stream Deck Neo',
 	BUTTON_WIDTH_PX: 96,
 	BUTTON_HEIGHT_PX: 96,
 

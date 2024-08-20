@@ -36,7 +36,7 @@ const pedalControls: StreamDeckControlDefinition[] = [
 
 const pedalProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.PEDAL,
-	PRODUCT_NAME: 'Streamdeck Pedal',
+	PRODUCT_NAME: 'Stream Deck Pedal',
 	BUTTON_WIDTH_PX: 0,
 	BUTTON_HEIGHT_PX: 0,
 	KEY_DATA_OFFSET: 3,

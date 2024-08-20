@@ -8,7 +8,7 @@ import { StreamdeckGen1ImageHeaderGenerator } from '../services/imageWriter/head
 
 const miniProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.MINI,
-	PRODUCT_NAME: 'Streamdeck Mini',
+	PRODUCT_NAME: 'Stream Deck Mini',
 	BUTTON_WIDTH_PX: 80,
 	BUTTON_HEIGHT_PX: 80,
 	SUPPORTS_RGB_KEY_FILL: false, // TODO - verify this
