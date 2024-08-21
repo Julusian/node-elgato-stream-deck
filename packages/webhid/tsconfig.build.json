@@ -9,8 +9,9 @@
 			"*": ["./node_modules/*"],
 			"@elgato-stream-deck/webhid": ["./src/index.ts"]
 		},
-		"lib": ["dom"],
+		"lib": ["ES2023", "dom"],
 		"types": ["w3c-web-hid"],
-		"importHelpers": false
+		"importHelpers": false,
+		"target": "es2022"
 	}
 }
