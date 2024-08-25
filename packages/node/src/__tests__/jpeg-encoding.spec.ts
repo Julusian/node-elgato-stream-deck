@@ -6,10 +6,6 @@ import { readFixtureJSON } from './helpers.js'
 const iconSize = 96
 
 describe('jpeg-encoding', () => {
-	beforeEach(() => {
-		// jest.resetModules()
-	})
-
 	function addAlphaChannel(raw: Buffer): Buffer {
 		const pixels = raw.length / 3
 		const res = Buffer.alloc(pixels * 4)
@@ -41,6 +37,10 @@ describe('jpeg-encoding', () => {
 
 	test('jpeg-js: encoded successfully', async () => {
 		const img = addAlphaChannel(readFixtureJSON('fillImage-sample-icon-96.json'))
+
+		// Ensure real jpeg-js is enabled
+		const jpegJS: typeof import('jpeg-js') = require('jpeg-js')
+		mocked(jpegJS.encode).mockImplementation(jest.requireActual('jpeg-js').encode)
 
 		jest.doMock('@julusian/jpeg-turbo', undefined)
 		const { encodeJPEG } = require('../jpeg.js') as typeof import('../jpeg.js')
