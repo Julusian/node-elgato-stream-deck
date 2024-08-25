@@ -214,7 +214,8 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 	})
 
 	test('fillPanelBuffer', async () => {
-		const buffer = Buffer.alloc(streamDeck.NUM_KEYS * streamDeck.BUTTON_TOTAL_PX * 3)
+		const buttonControls = streamDeck.CONTROLS.filter((c) => c.type === 'button' && c.feedbackType === 'lcd')
+		const buffer = Buffer.alloc(buttonControls.length * streamDeck.BUTTON_TOTAL_PX * 3)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await streamDeck.fillPanelBuffer(buffer)

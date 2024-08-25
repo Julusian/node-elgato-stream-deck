@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3'
+import { EventEmitter } from 'events'
 import type { Device, HIDAsync } from 'node-hid'
 export class DummyHID extends EventEmitter implements HIDAsync {
 	constructor() {

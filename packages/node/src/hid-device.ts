@@ -1,5 +1,5 @@
 import type { DeviceModelId, HIDDevice, HIDDeviceEvents, HIDDeviceInfo } from '@elgato-stream-deck/core'
-import EventEmitter from 'eventemitter3'
+import * as EventEmitter from 'eventemitter3'
 import type { HIDAsync, Device as NodeHIDDeviceInfo } from 'node-hid'
 
 /**

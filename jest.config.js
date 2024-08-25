@@ -35,5 +35,6 @@ module.exports = {
 
 	moduleNameMapper: {
 		'@elgato-stream-deck/(.+)': '<rootDir>/packages/$1/src',
+		'^(..?/.+).js?$': '$1',
 	},
 }
