@@ -6,7 +6,7 @@
 		"moduleResolution": "node",
 		"importHelpers": true,
 		"noEmitOnError": false,
-		"esModuleInterop": true,
+		"esModuleInterop": false,
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
 		"skipLibCheck": true,

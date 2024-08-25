@@ -1,4 +1,4 @@
-import type EventEmitter from 'eventemitter3'
+import type * as EventEmitter from 'eventemitter3'
 
 export interface HIDDeviceEvents {
 	error: [data: any]

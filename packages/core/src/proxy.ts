@@ -1,4 +1,4 @@
-import type EventEmitter from 'eventemitter3'
+import type * as EventEmitter from 'eventemitter3'
 import type { DeviceModelId } from './id.js'
 import type { StreamDeck, StreamDeckEvents } from './types.js'
 import type { StreamDeckControlDefinition } from './controlDefinition.js'

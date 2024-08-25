@@ -1,4 +1,4 @@
-import type EventEmitter from 'eventemitter3'
+import type * as EventEmitter from 'eventemitter3'
 import type { StreamDeckEvents } from '../types.js'
 import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../controlDefinition.js'
 
