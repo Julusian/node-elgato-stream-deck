@@ -24,8 +24,6 @@ export interface OpenStreamDeckOptions {
 export type StreamDeckProperties = Readonly<{
 	MODEL: DeviceModelId
 	PRODUCT_NAME: string
-	BUTTON_WIDTH_PX: number
-	BUTTON_HEIGHT_PX: number
 	KEY_DATA_OFFSET: number
 	SUPPORTS_RGB_KEY_FILL: boolean
 
@@ -55,16 +53,6 @@ export interface StreamDeckServicesDefinition {
 export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
 	get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
 		return this.deviceProperties.CONTROLS
-	}
-
-	get BUTTON_WIDTH_PX(): number {
-		return this.deviceProperties.BUTTON_WIDTH_PX
-	}
-	get BUTTON_HEIGHT_PX(): number {
-		return this.deviceProperties.BUTTON_HEIGHT_PX
-	}
-	get BUTTON_TOTAL_PX(): number {
-		return this.BUTTON_WIDTH_PX * this.BUTTON_HEIGHT_PX
 	}
 
 	// get KEY_SPACING_HORIZONTAL(): number {

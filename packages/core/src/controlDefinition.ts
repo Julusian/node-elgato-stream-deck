@@ -7,7 +7,7 @@ export interface StreamDeckControlDefinitionBase {
 	column: number
 }
 
-export interface StreamDeckButtonControlDefinition extends StreamDeckControlDefinitionBase {
+export interface StreamDeckButtonControlDefinitionBase extends StreamDeckControlDefinitionBase {
 	type: 'button'
 
 	index: number
@@ -15,6 +15,23 @@ export interface StreamDeckButtonControlDefinition extends StreamDeckControlDefi
 
 	feedbackType: 'none' | 'rgb' | 'lcd'
 }
+export interface StreamDeckButtonControlDefinitionNoFeedback extends StreamDeckButtonControlDefinitionBase {
+	feedbackType: 'none'
+}
+export interface StreamDeckButtonControlDefinitionRgbFeedback extends StreamDeckButtonControlDefinitionBase {
+	feedbackType: 'rgb'
+}
+
+export interface StreamDeckButtonControlDefinitionLcdFeedback extends StreamDeckButtonControlDefinitionBase {
+	feedbackType: 'lcd'
+
+	pixelSize: Dimension
+}
+
+export type StreamDeckButtonControlDefinition =
+	| StreamDeckButtonControlDefinitionNoFeedback
+	| StreamDeckButtonControlDefinitionRgbFeedback
+	| StreamDeckButtonControlDefinitionLcdFeedback
 
 export interface StreamDeckEncoderControlDefinition extends StreamDeckControlDefinitionBase {
 	type: 'encoder'

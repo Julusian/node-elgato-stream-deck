@@ -9,11 +9,9 @@ import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 const originalProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.ORIGINAL,
 	PRODUCT_NAME: 'Stream Deck',
-	BUTTON_WIDTH_PX: 72,
-	BUTTON_HEIGHT_PX: 72,
 	SUPPORTS_RGB_KEY_FILL: false,
 
-	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3, true)),
+	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3, { width: 72, height: 72 }, true)),
 
 	KEY_SPACING_HORIZONTAL: 25,
 	KEY_SPACING_VERTICAL: 25,

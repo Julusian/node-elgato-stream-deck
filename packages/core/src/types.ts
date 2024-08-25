@@ -41,13 +41,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	/** List of the controls on this streamdeck */
 	readonly CONTROLS: Readonly<StreamDeckControlDefinition[]>
 
-	/** The horizontal resolution of the buttons */
-	readonly BUTTON_WIDTH_PX: number
-	/** The vertical resolution of the buttons */
-	readonly BUTTON_HEIGHT_PX: number
-	/** The total number of pixels of a button */
-	readonly BUTTON_TOTAL_PX: number
-
 	// TODO: replace these with a definition on each button control which gives it a coordinate inside of the display
 	// These are removed temporarily until this is done, to avoid this being another breaking change if it does want to change
 	// /** The horizontal spacing in pixels between each button */

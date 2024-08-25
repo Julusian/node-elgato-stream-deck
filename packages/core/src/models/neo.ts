@@ -8,7 +8,7 @@ import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 import type { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
 import { StreamDeckNeoLcdService } from '../services/lcdStripDisplay/neo.js'
 
-const neoControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2)
+const neoControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2, { width: 96, height: 96 })
 neoControls.push(
 	{
 		type: 'button',
@@ -46,8 +46,6 @@ neoControls.push(
 const neoProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.NEO,
 	PRODUCT_NAME: 'Stream Deck Neo',
-	BUTTON_WIDTH_PX: 96,
-	BUTTON_HEIGHT_PX: 96,
 
 	CONTROLS: freezeDefinitions(neoControls),
 

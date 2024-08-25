@@ -10,11 +10,9 @@ import { StreamdeckGen1ImageHeaderGenerator } from '../services/imageWriter/head
 const miniProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.MINI,
 	PRODUCT_NAME: 'Stream Deck Mini',
-	BUTTON_WIDTH_PX: 80,
-	BUTTON_HEIGHT_PX: 80,
 	SUPPORTS_RGB_KEY_FILL: false, // TODO - verify this
 
-	CONTROLS: freezeDefinitions(generateButtonsGrid(3, 2)),
+	CONTROLS: freezeDefinitions(generateButtonsGrid(3, 2, { width: 80, height: 80 })),
 
 	KEY_SPACING_HORIZONTAL: 28,
 	KEY_SPACING_VERTICAL: 28,

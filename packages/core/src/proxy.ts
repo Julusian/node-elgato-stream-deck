@@ -18,15 +18,6 @@ export class StreamDeckProxy implements StreamDeck {
 	public get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
 		return this.device.CONTROLS
 	}
-	public get BUTTON_WIDTH_PX(): number {
-		return this.device.BUTTON_WIDTH_PX
-	}
-	public get BUTTON_HEIGHT_PX(): number {
-		return this.device.BUTTON_HEIGHT_PX
-	}
-	public get BUTTON_TOTAL_PX(): number {
-		return this.device.BUTTON_TOTAL_PX
-	}
 	// public get KEY_SPACING_VERTICAL(): number {
 	// 	return this.device.KEY_SPACING_VERTICAL
 	// }

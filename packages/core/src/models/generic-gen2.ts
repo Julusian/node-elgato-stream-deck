@@ -35,12 +35,7 @@ export function createBaseGen2Properties(
 		properties: new Gen2PropertiesService(device),
 		buttonsLcd: new DefaultButtonsLcdService(
 			new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator()),
-			new JpegButtonLcdImagePacker(
-				options.encodeJPEG,
-				!disableXYFlip,
-				properties.BUTTON_WIDTH_PX,
-				properties.BUTTON_HEIGHT_PX,
-			),
+			new JpegButtonLcdImagePacker(options.encodeJPEG, !disableXYFlip),
 			device,
 			fullProperties,
 		),

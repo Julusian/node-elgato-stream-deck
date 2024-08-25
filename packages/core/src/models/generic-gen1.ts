@@ -37,12 +37,7 @@ export function StreamDeckGen1Factory(
 		properties: new Gen1PropertiesService(device),
 		buttonsLcd: new DefaultButtonsLcdService(
 			imageWriter,
-			new BitmapButtonLcdImagePacker(
-				targetOptions,
-				bmpImagePPM,
-				properties.BUTTON_WIDTH_PX,
-				properties.BUTTON_HEIGHT_PX,
-			),
+			new BitmapButtonLcdImagePacker(targetOptions, bmpImagePPM),
 			device,
 			fullProperties,
 		),

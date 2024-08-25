@@ -1,6 +1,12 @@
 import type { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from './controlDefinition.js'
+import type { Dimension } from './id.js'
 
-export function generateButtonsGrid(width: number, height: number, rtl = false): StreamDeckButtonControlDefinition[] {
+export function generateButtonsGrid(
+	width: number,
+	height: number,
+	pixelSize: Dimension,
+	rtl = false,
+): StreamDeckButtonControlDefinition[] {
 	const controls: StreamDeckButtonControlDefinition[] = []
 
 	for (let row = 0; row < height; row++) {
@@ -15,6 +21,7 @@ export function generateButtonsGrid(width: number, height: number, rtl = false):
 				index,
 				hidIndex,
 				feedbackType: 'lcd',
+				pixelSize,
 			})
 		}
 	}

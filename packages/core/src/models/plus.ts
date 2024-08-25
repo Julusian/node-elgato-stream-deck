@@ -8,7 +8,7 @@ import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 import type { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
 import { StreamDeckPlusLcdService } from '../services/lcdStripDisplay/plus.js'
 
-const plusControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2)
+const plusControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2, { width: 120, height: 120 })
 plusControls.push(
 	{
 		type: 'lcd-strip',
@@ -58,8 +58,6 @@ plusControls.push(
 const plusProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.PLUS,
 	PRODUCT_NAME: 'Stream Deck +',
-	BUTTON_WIDTH_PX: 120,
-	BUTTON_HEIGHT_PX: 120,
 
 	CONTROLS: freezeDefinitions(plusControls),
 

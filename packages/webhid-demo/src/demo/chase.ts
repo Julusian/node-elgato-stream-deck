@@ -1,5 +1,10 @@
-import type { StreamDeck, StreamDeckButtonControlDefinition } from '@elgato-stream-deck/webhid'
+import type { StreamDeck, StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-stream-deck/webhid'
 import type { Demo } from './demo.js'
+
+interface ControlAndCanvas {
+	control: StreamDeckButtonControlDefinitionLcdFeedback
+	canvas: HTMLCanvasElement
+}
 
 export class ChaseDemo implements Demo {
 	private pressed: number[] = []
@@ -7,18 +12,14 @@ export class ChaseDemo implements Demo {
 	private interval: number | undefined
 	private running: Promise<void> | undefined
 
-	private async drawButtons(device: StreamDeck, canvas: HTMLCanvasElement, c: number): Promise<void> {
-		// We probably should reuse this instead of creating it each time.
-		const ctx = canvas.getContext('2d')
-
+	private async drawButtons(device: StreamDeck, controls: ControlAndCanvas[], c: number): Promise<void> {
 		const ps: Array<Promise<void>> = []
 
-		const controls = device.CONTROLS.filter(
-			(control): control is StreamDeckButtonControlDefinition => control.type === 'button',
-		).sort((a, b) => b.index - a.index)
+		for (const { control, canvas } of controls) {
+			// We probably should reuse this instead of creating it each time.
+			const ctx = canvas.getContext('2d')
 
-		if (ctx) {
-			for (const control of controls) {
+			if (ctx) {
 				const n = c + control.index
 				ctx.save()
 				ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -45,16 +46,25 @@ export class ChaseDemo implements Demo {
 
 		this.counter = 0
 
-		const canvas = document.createElement('canvas')
-		canvas.width = device.BUTTON_WIDTH_PX
-		canvas.height = device.BUTTON_HEIGHT_PX
+		const controls = device.CONTROLS.filter(
+			(control): control is StreamDeckButtonControlDefinitionLcdFeedback =>
+				control.type === 'button' && control.feedbackType === 'lcd',
+		).sort((a, b) => b.index - a.index)
 
-		await this.drawButtons(device, canvas, this.counter)
+		const controlsAndCanvases: ControlAndCanvas[] = controls.map((control) => {
+			const canvas = document.createElement('canvas')
+			canvas.width = control.pixelSize.width
+			canvas.height = control.pixelSize.height
+
+			return { control, canvas }
+		})
+
+		await this.drawButtons(device, controlsAndCanvases, this.counter)
 
 		if (!this.interval) {
 			const doThing = async () => {
 				if (!this.running) {
-					this.running = this.drawButtons(device, canvas, ++this.counter)
+					this.running = this.drawButtons(device, controlsAndCanvases, ++this.counter)
 					await this.running
 					this.running = undefined
 				}
