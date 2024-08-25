@@ -1,4 +1,4 @@
-import type { InternalFillImageOptions } from './services/buttonsLcdDisplay.js'
+import type { InternalFillImageOptions } from './services/imagePacker/interface.js'
 
 export interface FillImageTargetOptions {
 	colorMode: 'bgr' | 'rgba'

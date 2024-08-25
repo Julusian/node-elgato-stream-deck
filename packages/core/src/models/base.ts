@@ -8,10 +8,10 @@ import type {
 	StreamDeck,
 	StreamDeckEvents,
 } from '../types.js'
-import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay.js'
+import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay/interface.js'
 import type { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from '../controlDefinition.js'
-import type { LcdStripDisplayService } from '../services/lcdStripDisplay.js'
-import type { PropertiesService } from '../services/propertiesService.js'
+import type { LcdStripDisplayService } from '../services/lcdStripDisplay/interface.js'
+import type { PropertiesService } from '../services/properties/interface.js'
 import type { EncoderInputService } from '../services/encoderInput.js'
 import type { LcdStripInputService } from '../services/lcdStripInput.js'
 import type { CallbackHook } from '../services/callback-hook.js'

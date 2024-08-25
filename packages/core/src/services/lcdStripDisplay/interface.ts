@@ -1,4 +1,4 @@
-import type { FillImageOptions, FillLcdImageOptions } from '../types.js'
+import type { FillImageOptions, FillLcdImageOptions } from '../../types.js'
 
 export interface LcdStripDisplayService {
 	/**

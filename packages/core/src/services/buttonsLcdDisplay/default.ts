@@ -1,39 +1,11 @@
-import type { StreamDeckProperties } from '../models/base.js'
-import type { HIDDevice } from '../hid-device.js'
-import type { Dimension, KeyIndex } from '../id.js'
-import type { FillImageOptions, FillPanelDimensionsOptions, FillPanelOptions } from '../types.js'
-import type { StreamdeckImageWriter } from './imageWriter/types.js'
-import type { StreamDeckButtonControlDefinition } from '../controlDefinition.js'
-
-export interface InternalFillImageOptions extends FillImageOptions {
-	offset: number
-	stride: number
-}
-
-export interface ButtonLcdImagePacker {
-	readonly imageWidth: number
-	readonly imageHeight: number
-
-	convertPixelBuffer(sourceBuffer: Uint8Array, sourceOptions: InternalFillImageOptions): Promise<Uint8Array>
-}
-
-interface GridSpan {
-	minRow: number
-	maxRow: number
-	minCol: number
-	maxCol: number
-}
-
-export interface ButtonsLcdDisplayService {
-	calculateFillPanelDimensions(options: FillPanelDimensionsOptions | undefined): Dimension | null
-
-	clearPanel(): Promise<void>
-	clearKey(keyIndex: KeyIndex): Promise<void>
-
-	fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
-	fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Uint8Array, options?: FillImageOptions): Promise<void>
-	fillPanelBuffer(imageBuffer: Uint8Array, options: FillPanelOptions | undefined): Promise<void>
-}
+import type { StreamDeckButtonControlDefinition } from '../../controlDefinition.js'
+import type { HIDDevice } from '../../hid-device.js'
+import type { Dimension, KeyIndex } from '../../id.js'
+import type { StreamDeckProperties } from '../../models/base.js'
+import type { FillPanelDimensionsOptions, FillImageOptions, FillPanelOptions } from '../../types.js'
+import type { StreamdeckImageWriter } from '../imageWriter/types.js'
+import type { ButtonsLcdDisplayService, GridSpan } from './interface.js'
+import type { ButtonLcdImagePacker, InternalFillImageOptions } from '../imagePacker/interface.js'
 
 export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	readonly #imageWriter: StreamdeckImageWriter
@@ -243,7 +215,6 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 			const colOffset = controlCol * iconSize
 
 			// TODO: Implement padding
-
 			ps.push(
 				this.fillImageRangeControl(control, imageBuffer, {
 					format: sourceFormat,
