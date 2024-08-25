@@ -25,7 +25,7 @@ export async function encodeJPEG(
 		const jpegTurbo = await import('@julusian/jpeg-turbo')
 
 		// Try using jpeg-turbo if it is available
-		if (jpegTurbo && jpegTurbo.bufferSize && !!jpegTurbo.compressSync) {
+		if (jpegTurbo.bufferSize && !!jpegTurbo.compress) {
 			const encodeOptions: EncodeOptions = {
 				format: jpegTurbo.FORMAT_RGBA,
 				width,
