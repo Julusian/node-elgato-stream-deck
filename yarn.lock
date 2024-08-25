@@ -471,6 +471,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@elgato-stream-deck/core@workspace:packages/core"
   dependencies:
+    eventemitter3: "npm:^4.0.7"
     tslib: "npm:^2.6.3"
   languageName: unknown
   linkType: soft
@@ -480,6 +481,7 @@ __metadata:
   resolution: "@elgato-stream-deck/node@workspace:packages/node"
   dependencies:
     "@elgato-stream-deck/core": "npm:6.2.2"
+    eventemitter3: "npm:^4.0.7"
     jpeg-js: "npm:^0.4.4"
     node-hid: "npm:^3.1.0"
     tslib: "npm:^2.6.3"
@@ -510,6 +512,7 @@ __metadata:
   dependencies:
     "@elgato-stream-deck/core": "npm:6.2.2"
     "@types/w3c-web-hid": "npm:^1.0.6"
+    eventemitter3: "npm:^4.0.7"
     p-queue: "npm:^6.6.2"
     tslib: "npm:^2.6.3"
   languageName: unknown
@@ -5487,7 +5490,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eventemitter3@npm:^4.0.0, eventemitter3@npm:^4.0.4":
+"eventemitter3@npm:^4.0.0, eventemitter3@npm:^4.0.4, eventemitter3@npm:^4.0.7":
   version: 4.0.7
   resolution: "eventemitter3@npm:4.0.7"
   checksum: 10c0/5f6d97cbcbac47be798e6355e3a7639a84ee1f7d9b199a07017f1d2f1e2fe236004d14fa5dfaeba661f94ea57805385e326236a6debbc7145c8877fbc0297c6b

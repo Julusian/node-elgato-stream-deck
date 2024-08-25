@@ -1,3 +1,4 @@
+import type EventEmitter from 'eventemitter3'
 import type { DeviceModelId } from './id.js'
 import type { StreamDeck, StreamDeckEvents } from './types.js'
 import type { StreamDeckControlDefinition } from './controlDefinition.js'
@@ -113,85 +114,83 @@ export class StreamDeckProxy implements StreamDeck {
 	 * EventEmitter
 	 */
 
-	public eventNames(): (keyof StreamDeckEvents)[] {
+	public eventNames(): Array<EventEmitter.EventNames<StreamDeckEvents>> {
 		return this.device.eventNames()
 	}
 
-	public listeners<K>(eventName: K | keyof StreamDeckEvents): TListener<K>[] {
-		return this.device.listeners(eventName)
+	public listeners<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+	): Array<EventEmitter.EventListener<StreamDeckEvents, T>> {
+		return this.device.listeners(event)
 	}
 
-	public rawListeners<K>(eventName: K | keyof StreamDeckEvents): TListener<K>[] {
-		return this.device.rawListeners(eventName)
+	public listenerCount(event: EventEmitter.EventNames<StreamDeckEvents>): number {
+		return this.device.listenerCount(event)
 	}
 
-	public getMaxListeners(): number {
-		return this.device.getMaxListeners()
-	}
-
-	public setMaxListeners(n: number): this {
-		this.device.setMaxListeners(n)
-		return this
-	}
-
-	public emit<K extends keyof StreamDeckEvents>(
-		event: K,
-		...args: K extends keyof StreamDeckEvents
-			? StreamDeckEvents[K] extends unknown[]
-				? StreamDeckEvents[K]
-				: never
-			: never
+	public emit<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+		...args: EventEmitter.EventArgs<StreamDeckEvents, T>
 	): boolean {
 		return this.device.emit(event, ...args)
 	}
 
-	public addListener<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
-		this.device.addListener(event, listener)
+	/**
+	 * Add a listener for a given event.
+	 */
+	public on<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+		fn: EventEmitter.EventListener<StreamDeckEvents, T>,
+		context?: unknown,
+	): this {
+		this.device.on(event, fn, context)
+		return this
+	}
+	public addListener<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+		fn: EventEmitter.EventListener<StreamDeckEvents, T>,
+		context?: unknown,
+	): this {
+		this.device.addListener(event, fn, context)
 		return this
 	}
 
-	public listenerCount<K>(eventName: K | keyof StreamDeckEvents, listener?: TListener<K> | undefined): number {
-		return this.device.listenerCount(eventName, listener)
-	}
-
-	public prependListener<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
-		this.device.prependListener(event, listener)
+	/**
+	 * Add a one-time listener for a given event.
+	 */
+	public once<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+		fn: EventEmitter.EventListener<StreamDeckEvents, T>,
+		context?: unknown,
+	): this {
+		this.device.once(event, fn, context)
 		return this
 	}
 
-	public prependOnceListener<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
-		this.device.prependOnceListener(event, listener)
+	/**
+	 * Remove the listeners of a given event.
+	 */
+	public removeListener<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+		fn?: EventEmitter.EventListener<StreamDeckEvents, T>,
+		context?: unknown,
+		once?: boolean,
+	): this {
+		this.device.removeListener(event, fn, context, once)
+		return this
+	}
+	public off<T extends EventEmitter.EventNames<StreamDeckEvents>>(
+		event: T,
+		fn?: EventEmitter.EventListener<StreamDeckEvents, T>,
+		context?: unknown,
+		once?: boolean,
+	): this {
+		this.device.off(event, fn, context, once)
 		return this
 	}
 
-	public on<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
-		this.device.on(event, listener)
-		return this
-	}
-
-	public once<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
-		this.device.once(event, listener)
-		return this
-	}
-
-	public removeListener<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
-		this.device.removeListener(event, listener)
-		return this
-	}
-
-	public off<K extends keyof StreamDeckEvents>(event: K, listener: TListener<K>): this {
-		this.device.off(event, listener)
-		return this
-	}
-
-	public removeAllListeners<K extends keyof StreamDeckEvents>(event?: K): this {
+	public removeAllListeners(event?: EventEmitter.EventNames<StreamDeckEvents>): this {
 		this.device.removeAllListeners(event)
 		return this
 	}
 }
-
-type TListener<K> = K extends keyof StreamDeckEvents
-	? StreamDeckEvents[K] extends unknown[]
-		? (...args: StreamDeckEvents[K]) => void
-		: never
-	: never

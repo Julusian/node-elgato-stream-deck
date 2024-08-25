@@ -1,5 +1,5 @@
 import { HIDDevice as CoreHIDDevice, HIDDeviceEvents, HIDDeviceInfo } from '@elgato-stream-deck/core'
-import { EventEmitter } from 'events'
+import EventEmitter from 'eventemitter3'
 import Queue from 'p-queue'
 
 /**
