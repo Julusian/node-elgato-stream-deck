@@ -1,4 +1,4 @@
-import * as EventEmitter from 'eventemitter3'
+import EventEmitter from 'eventemitter3'
 import { EncodeJPEGHelper } from '../models/base.js'
 import { HIDDevice, HIDDeviceEvents, HIDDeviceInfo } from '../hid-device.js'
 export class DummyHID extends EventEmitter<HIDDeviceEvents> implements HIDDevice {
