@@ -1,7 +1,7 @@
 import { HIDDevice } from '../hid-device.js'
-import { EncodeJPEGHelper, OpenStreamDeckOptions } from './base.js'
+import { EncodeJPEGHelper, OpenStreamDeckOptions, StreamDeckBase } from './base.js'
 import { DeviceModelId, Dimension } from '../id.js'
-import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2.js'
+import { createBaseGen2Properties, StreamDeckGen2Properties } from './generic-gen2.js'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter.js'
 import { StreamdeckNeoLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator.js'
 import { FillImageOptions, FillLcdImageOptions } from '../types.js'
@@ -61,14 +61,11 @@ const lcdStripControls = neoProperties.CONTROLS.filter(
 	(control): control is StreamDeckLcdStripControlDefinition => control.type === 'lcd-strip',
 )
 
-export function StreamDeckNeoFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckGen2 {
-	return new StreamDeckGen2(
-		device,
-		options,
-		neoProperties,
-		new StreamDeckNeoLcdService(options.encodeJPEG, device, lcdStripControls),
-		null,
-	)
+export function StreamDeckNeoFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
+	const services = createBaseGen2Properties(device, options, neoProperties)
+	services.lcdStripDisplay = new StreamDeckNeoLcdService(options.encodeJPEG, device, lcdStripControls)
+
+	return new StreamDeckBase(device, options, services)
 }
 
 class StreamDeckNeoLcdService implements LcdStripDisplayService {
@@ -123,6 +120,15 @@ class StreamDeckNeoLcdService implements LcdStripDisplayService {
 		await this.fillLcd(index, buffer, {
 			format: 'rgba',
 		})
+	}
+
+	public async clearAllLcdStrips(): Promise<void> {
+		const ps: Array<Promise<void>> = []
+		for (const control of this.#lcdControls) {
+			ps.push(this.clearLcdStrip(control.id))
+		}
+
+		await Promise.all(ps)
 	}
 
 	private async convertFillLcdBuffer(

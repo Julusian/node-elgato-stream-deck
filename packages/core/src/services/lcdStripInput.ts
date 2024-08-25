@@ -1,15 +1,18 @@
-import { LcdPosition } from '../types.js'
-import { StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
-import { SomeEmitEventFn } from '../models/plus.js'
+import { LcdPosition, type StreamDeckEvents } from '../types.js'
+import type { StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
 import { uint8ArrayToDataView } from '../util.js'
+import type { CallbackHook } from './callback-hook.js'
 
 export class LcdStripInputService {
 	readonly #lcdStripControls: Readonly<StreamDeckLcdStripControlDefinition[]>
-	readonly #emitEvent: SomeEmitEventFn
+	readonly #eventSource: CallbackHook<StreamDeckEvents>
 
-	constructor(lcdStripControls: Readonly<StreamDeckLcdStripControlDefinition[]>, emitEvent: SomeEmitEventFn) {
+	constructor(
+		lcdStripControls: Readonly<StreamDeckLcdStripControlDefinition[]>,
+		eventSource: CallbackHook<StreamDeckEvents>,
+	) {
 		this.#lcdStripControls = lcdStripControls
-		this.#emitEvent = emitEvent
+		this.#eventSource = eventSource
 	}
 
 	public handleInput(data: Uint8Array): void {
@@ -25,10 +28,10 @@ export class LcdStripInputService {
 
 		switch (data[3]) {
 			case 1: // short press
-				this.#emitEvent('lcdShortPress', lcdStripControl, position)
+				this.#eventSource.emit('lcdShortPress', lcdStripControl, position)
 				break
 			case 2: // long press
-				this.#emitEvent('lcdLongPress', lcdStripControl, position)
+				this.#eventSource.emit('lcdLongPress', lcdStripControl, position)
 				break
 			case 3: {
 				// swipe
@@ -36,7 +39,7 @@ export class LcdStripInputService {
 					x: bufferView.getUint16(9, true),
 					y: bufferView.getUint16(11, true),
 				}
-				this.#emitEvent('lcdSwipe', lcdStripControl, position, positionTo)
+				this.#eventSource.emit('lcdSwipe', lcdStripControl, position, positionTo)
 				break
 			}
 		}

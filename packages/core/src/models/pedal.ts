@@ -102,12 +102,13 @@ class PedalPropertiesService implements PropertiesService {
 }
 
 export function StreamDeckPedalFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
-	return new StreamDeckBase(
-		device,
-		options,
-		pedalProperties,
-		new PedalPropertiesService(device),
-		new PedalLcdService(),
-		null,
-	)
+	return new StreamDeckBase(device, options, {
+		deviceProperties: pedalProperties,
+		events: null,
+		properties: new PedalPropertiesService(device),
+		buttonsLcd: new PedalLcdService(),
+		lcdStripDisplay: null,
+		lcdStripInput: null,
+		encoderInput: null,
+	})
 }

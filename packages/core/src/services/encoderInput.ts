@@ -1,13 +1,13 @@
-import type * as EventEmitter from 'eventemitter3'
 import type { StreamDeckEvents } from '../types.js'
 import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../controlDefinition.js'
+import type { CallbackHook } from './callback-hook.js'
 
 export class EncoderInputService {
-	readonly #eventSource: EventEmitter<StreamDeckEvents>
+	readonly #eventSource: CallbackHook<StreamDeckEvents>
 	readonly #encoderControls: Readonly<StreamDeckEncoderControlDefinition[]>
 	readonly #encoderState: boolean[]
 
-	constructor(eventSource: EventEmitter<StreamDeckEvents>, allControls: Readonly<StreamDeckControlDefinition[]>) {
+	constructor(eventSource: CallbackHook<StreamDeckEvents>, allControls: Readonly<StreamDeckControlDefinition[]>) {
 		this.#eventSource = eventSource
 		this.#encoderControls = allControls.filter(
 			(control): control is StreamDeckEncoderControlDefinition => control.type === 'encoder',

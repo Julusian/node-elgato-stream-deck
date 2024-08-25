@@ -1,8 +1,8 @@
 import { transformImageBuffer } from '../util.js'
-import { FillImageOptions, FillLcdImageOptions, StreamDeckEvents } from '../types.js'
+import { FillImageOptions, FillLcdImageOptions } from '../types.js'
 import { HIDDevice } from '../hid-device.js'
-import { EncodeJPEGHelper, OpenStreamDeckOptions } from './base.js'
-import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2.js'
+import { EncodeJPEGHelper, OpenStreamDeckOptions, StreamDeckBase } from './base.js'
+import { createBaseGen2Properties, StreamDeckGen2Properties } from './generic-gen2.js'
 import { DeviceModelId } from '../id.js'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter.js'
 import { StreamdeckPlusLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator.js'
@@ -74,22 +74,12 @@ const lcdStripControls = plusProperties.CONTROLS.filter(
 	(control): control is StreamDeckLcdStripControlDefinition => control.type === 'lcd-strip',
 )
 
-class StreamDeckPlus extends StreamDeckGen2 {
-	constructor(device: HIDDevice, options: Required<OpenStreamDeckOptions>) {
-		super(
-			device,
-			options,
-			plusProperties,
-			new StreamDeckPlusLcdService(options.encodeJPEG, device, lcdStripControls),
-			new LcdStripInputService(lcdStripControls, (key, ...args) => this.emit(key, ...args)),
-			true,
-		)
-	}
-}
+export function StreamDeckPlusFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
+	const services = createBaseGen2Properties(device, options, plusProperties, true)
+	services.lcdStripDisplay = new StreamDeckPlusLcdService(options.encodeJPEG, device, lcdStripControls)
+	services.lcdStripInput = new LcdStripInputService(lcdStripControls, services.events)
 
-export function StreamDeckPlusFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckGen2 {
-	// TODO - remove this class, once the event emitting is possible
-	return new StreamDeckPlus(device, options)
+	return new StreamDeckBase(device, options, services)
 }
 
 class StreamDeckPlusLcdService implements LcdStripDisplayService {
@@ -163,6 +153,15 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		})
 	}
 
+	public async clearAllLcdStrips(): Promise<void> {
+		const ps: Array<Promise<void>> = []
+		for (const control of this.#lcdControls) {
+			ps.push(this.clearLcdStrip(control.id))
+		}
+
+		await Promise.all(ps)
+	}
+
 	private async fillControlRegion(
 		lcdControl: StreamDeckLcdStripControlDefinition,
 		x: number,
@@ -213,6 +212,3 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		return this.#encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height)
 	}
 }
-
-export type SomeEmitEventFn = EmitEventFn<keyof StreamDeckEvents>
-type EmitEventFn<K extends keyof StreamDeckEvents> = (key: K, ...args: StreamDeckEvents[K]) => void

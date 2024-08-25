@@ -11,7 +11,10 @@ import type {
 import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay.js'
 import type { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from '../controlDefinition.js'
 import type { LcdStripDisplayService } from '../services/lcdStripDisplay.js'
-import { PropertiesService } from '../services/propertiesService.js'
+import type { PropertiesService } from '../services/propertiesService.js'
+import type { EncoderInputService } from '../services/encoderInput.js'
+import type { LcdStripInputService } from '../services/lcdStripInput.js'
+import type { CallbackHook } from '../services/callback-hook.js'
 
 export type EncodeJPEGHelper = (buffer: Uint8Array, width: number, height: number) => Promise<Uint8Array>
 
@@ -40,6 +43,16 @@ export type StreamDeckProperties = Readonly<{
 	 */
 	KEY_SPACING_VERTICAL: number
 }>
+
+export interface StreamDeckServicesDefinition {
+	deviceProperties: StreamDeckProperties
+	events: CallbackHook<StreamDeckEvents> | null
+	properties: PropertiesService
+	buttonsLcd: ButtonsLcdDisplayService
+	lcdStripDisplay: LcdStripDisplayService | null
+	lcdStripInput: LcdStripInputService | null
+	encoderInput: EncoderInputService | null
+}
 
 export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
 	get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
@@ -75,38 +88,53 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	readonly #propertiesService: PropertiesService
 	readonly #buttonsLcdService: ButtonsLcdDisplayService
 	readonly #lcdStripDisplayService: LcdStripDisplayService | null
+	readonly #lcdStripInputService: LcdStripInputService | null
+	readonly #encoderInputService: EncoderInputService | null
 	// private readonly options: Readonly<OpenStreamDeckOptions>
 	readonly #keyState: boolean[]
 
-	constructor(
-		device: HIDDevice,
-		_options: OpenStreamDeckOptions,
-		properties: StreamDeckProperties,
-		propertiesService: PropertiesService,
-		buttonsLcdService: ButtonsLcdDisplayService,
-		lcdStripDisplayService: LcdStripDisplayService | null,
-	) {
+	constructor(device: HIDDevice, _options: OpenStreamDeckOptions, services: StreamDeckServicesDefinition) {
 		super()
 
-		this.deviceProperties = properties
 		this.device = device
-		this.#propertiesService = propertiesService
-		this.#buttonsLcdService = buttonsLcdService
-		this.#lcdStripDisplayService = lcdStripDisplayService
+		this.deviceProperties = services.deviceProperties
+		this.#propertiesService = services.properties
+		this.#buttonsLcdService = services.buttonsLcd
+		this.#lcdStripDisplayService = services.lcdStripDisplay
+		this.#lcdStripInputService = services.lcdStripInput
+		this.#encoderInputService = services.encoderInput
 
-		const maxButtonIndex = properties.CONTROLS.filter(
+		// propogate events
+		services.events?.listen((key, ...args) => this.emit(key, ...args))
+
+		const maxButtonIndex = this.deviceProperties.CONTROLS.filter(
 			(control): control is StreamDeckButtonControlDefinition => control.type === 'button',
 		).map((control) => control.index)
 		this.#keyState = new Array<boolean>(Math.max(-1, ...maxButtonIndex) + 1).fill(false)
 
-		this.device.on('input', (data: Uint8Array) => this.handleInputBuffer(data))
+		this.device.on('input', (data: Uint8Array) => this.#handleInputBuffer(data))
 
 		this.device.on('error', (err) => {
 			this.emit('error', err)
 		})
 	}
 
-	protected handleInputBuffer(data: Uint8Array): void {
+	#handleInputBuffer(data: Uint8Array): void {
+		const inputType = data[0]
+		switch (inputType) {
+			case 0x00: // Button
+				this.#handleButtonInputBuffer(data)
+				break
+			case 0x02: // LCD
+				this.#lcdStripInputService?.handleInput(data)
+				break
+			case 0x03: // Encoder
+				this.#encoderInputService?.handleInput(data)
+				break
+		}
+	}
+
+	#handleButtonInputBuffer(data: Uint8Array): void {
 		const dataOffset = this.deviceProperties.KEY_DATA_OFFSET || 0
 
 		for (const control of this.deviceProperties.CONTROLS) {
@@ -197,12 +225,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 
 		ps.push(this.#buttonsLcdService.clearPanel())
 
-		if (this.#lcdStripDisplayService) {
-			for (const control of this.deviceProperties.CONTROLS) {
-				if (control.type !== 'lcd-strip') continue
-				ps.push(this.#lcdStripDisplayService.clearLcdStrip(control.id))
-			}
-		}
+		if (this.#lcdStripDisplayService) ps.push(this.#lcdStripDisplayService.clearAllLcdStrips())
 
 		await Promise.all(ps)
 	}

@@ -28,12 +28,11 @@ export function StreamDeckGen1Factory(
 ): StreamDeckBase {
 	const fullProperties = extendDevicePropertiesForGen1(properties)
 
-	return new StreamDeckBase(
-		device,
-		options,
-		fullProperties,
-		new Gen1PropertiesService(device),
-		new DefaultButtonsLcdService(
+	return new StreamDeckBase(device, options, {
+		deviceProperties: fullProperties,
+		events: null,
+		properties: new Gen1PropertiesService(device),
+		buttonsLcd: new DefaultButtonsLcdService(
 			imageWriter,
 			new Gen1ButtonLcdImagePacker(
 				targetOptions,
@@ -44,8 +43,10 @@ export function StreamDeckGen1Factory(
 			device,
 			fullProperties,
 		),
-		null,
-	)
+		lcdStripDisplay: null,
+		lcdStripInput: null,
+		encoderInput: null,
+	})
 }
 
 class Gen1ButtonLcdImagePacker implements ButtonLcdImagePacker {

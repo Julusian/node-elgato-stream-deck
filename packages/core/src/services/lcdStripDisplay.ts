@@ -42,4 +42,9 @@ export interface LcdStripDisplayService {
 	 * @param {number} lcdIndex The id of the lcd strip to clear
 	 */
 	clearLcdStrip(lcdIndex: number): Promise<void>
+
+	/**
+	 * Clear all lcd strips to black
+	 */
+	clearAllLcdStrips(): Promise<void>
 }
