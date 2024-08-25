@@ -27,12 +27,12 @@ export class StreamDeckProxy implements StreamDeck {
 	public get BUTTON_TOTAL_PX(): number {
 		return this.device.BUTTON_TOTAL_PX
 	}
-	public get KEY_SPACING_VERTICAL(): number {
-		return this.device.KEY_SPACING_VERTICAL
-	}
-	public get KEY_SPACING_HORIZONTAL(): number {
-		return this.device.KEY_SPACING_HORIZONTAL
-	}
+	// public get KEY_SPACING_VERTICAL(): number {
+	// 	return this.device.KEY_SPACING_VERTICAL
+	// }
+	// public get KEY_SPACING_HORIZONTAL(): number {
+	// 	return this.device.KEY_SPACING_HORIZONTAL
+	// }
 	public get MODEL(): DeviceModelId {
 		return this.device.MODEL
 	}

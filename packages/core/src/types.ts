@@ -49,10 +49,11 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	readonly BUTTON_TOTAL_PX: number
 
 	// TODO: replace these with a definition on each button control which gives it a coordinate inside of the display
-	/** The horizontal spacing in pixels between each button */
-	readonly KEY_SPACING_HORIZONTAL: number
-	/** The vertical spacing in pixels between each button */
-	readonly KEY_SPACING_VERTICAL: number
+	// These are removed temporarily until this is done, to avoid this being another breaking change if it does want to change
+	// /** The horizontal spacing in pixels between each button */
+	// readonly KEY_SPACING_HORIZONTAL: number
+	// /** The vertical spacing in pixels between each button */
+	// readonly KEY_SPACING_VERTICAL: number
 
 	/** The model of this device */
 	readonly MODEL: DeviceModelId

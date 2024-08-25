@@ -69,12 +69,12 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		return this.BUTTON_WIDTH_PX * this.BUTTON_HEIGHT_PX
 	}
 
-	get KEY_SPACING_HORIZONTAL(): number {
-		return this.deviceProperties.KEY_SPACING_HORIZONTAL
-	}
-	get KEY_SPACING_VERTICAL(): number {
-		return this.deviceProperties.KEY_SPACING_VERTICAL
-	}
+	// get KEY_SPACING_HORIZONTAL(): number {
+	// 	return this.deviceProperties.KEY_SPACING_HORIZONTAL
+	// }
+	// get KEY_SPACING_VERTICAL(): number {
+	// 	return this.deviceProperties.KEY_SPACING_VERTICAL
+	// }
 
 	get MODEL(): DeviceModelId {
 		return this.deviceProperties.MODEL
