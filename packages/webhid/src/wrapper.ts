@@ -29,7 +29,7 @@ export class StreamDeckWeb extends StreamDeckProxy {
 		}
 
 		const data = ctx.getImageData(0, 0, this.BUTTON_WIDTH_PX, this.BUTTON_HEIGHT_PX)
-		return this.device.fillKeyBuffer(keyIndex, Buffer.from(data.data), { format: 'rgba' })
+		return this.device.fillKeyBuffer(keyIndex, data.data, { format: 'rgba' })
 	}
 
 	public async fillPanelCanvas(canvas: HTMLCanvasElement): Promise<void> {
@@ -44,6 +44,6 @@ export class StreamDeckWeb extends StreamDeckProxy {
 		}
 
 		const data = ctx.getImageData(0, 0, dimensions.width, dimensions.height)
-		return this.device.fillPanelBuffer(Buffer.from(data.data), { format: 'rgba' })
+		return this.device.fillPanelBuffer(data.data, { format: 'rgba' })
 	}
 }

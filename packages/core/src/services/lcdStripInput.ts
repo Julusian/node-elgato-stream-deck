@@ -1,6 +1,7 @@
 import { LcdPosition } from '../types.js'
 import { StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
 import { SomeEmitEventFn } from '../models/plus.js'
+import { uint8ArrayToDataView } from '../util.js'
 
 export class LcdStripInputService {
 	readonly #lcdStripControls: Readonly<StreamDeckLcdStripControlDefinition[]>
@@ -16,10 +17,10 @@ export class LcdStripInputService {
 		const lcdStripControl = this.#lcdStripControls.find((control) => control.id === 0)
 		if (!lcdStripControl) return
 
-		const buffer = Buffer.from(data)
+		const bufferView = uint8ArrayToDataView(data)
 		const position: LcdPosition = {
-			x: buffer.readUint16LE(5),
-			y: buffer.readUint16LE(7),
+			x: bufferView.getUint16(5, true),
+			y: bufferView.getUint16(7, true),
 		}
 
 		switch (data[3]) {
@@ -32,8 +33,8 @@ export class LcdStripInputService {
 			case 3: {
 				// swipe
 				const positionTo: LcdPosition = {
-					x: buffer.readUint16LE(9),
-					y: buffer.readUint16LE(11),
+					x: bufferView.getUint16(9, true),
+					y: bufferView.getUint16(11, true),
 				}
 				this.#emitEvent('lcdSwipe', lcdStripControl, position, positionTo)
 				break

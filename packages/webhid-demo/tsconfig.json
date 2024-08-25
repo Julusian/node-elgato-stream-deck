@@ -12,8 +12,6 @@
 		"lib": ["es6", "dom"],
 		"types": ["w3c-web-hid"],
 		"module": "Node16",
-		"moduleResolution": "Node16",
-		"allowImportingTsExtensions": true,
-		"noEmit": true
+		"moduleResolution": "Node16"
 	}
 }

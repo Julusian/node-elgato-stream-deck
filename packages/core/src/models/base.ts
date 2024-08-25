@@ -13,7 +13,7 @@ import type { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } f
 import type { LcdStripDisplayService } from '../services/lcdStripDisplay.js'
 import { PropertiesService } from '../services/propertiesService.js'
 
-export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
+export type EncodeJPEGHelper = (buffer: Uint8Array, width: number, height: number) => Promise<Uint8Array>
 
 export interface OpenStreamDeckOptions {
 	encodeJPEG?: EncodeJPEGHelper
@@ -176,13 +176,13 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		await this.#buttonsLcdService.fillKeyColor(keyIndex, r, g, b)
 	}
 
-	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
+	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Uint8Array, options?: FillImageOptions): Promise<void> {
 		this.checkValidKeyIndex(keyIndex, 'lcd')
 
 		await this.#buttonsLcdService.fillKeyBuffer(keyIndex, imageBuffer, options)
 	}
 
-	public async fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void> {
+	public async fillPanelBuffer(imageBuffer: Uint8Array, options?: FillPanelOptions): Promise<void> {
 		await this.#buttonsLcdService.fillPanelBuffer(imageBuffer, options)
 	}
 

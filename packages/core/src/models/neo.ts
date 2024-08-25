@@ -92,13 +92,13 @@ class StreamDeckNeoLcdService implements LcdStripDisplayService {
 		_index: number,
 		_x: number,
 		_y: number,
-		_imageBuffer: Buffer,
+		_imageBuffer: Uint8Array,
 		_sourceOptions: FillLcdImageOptions,
 	): Promise<void> {
 		throw new Error('Not supported for this model')
 	}
 
-	public async fillLcd(index: number, imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
+	public async fillLcd(index: number, imageBuffer: Uint8Array, sourceOptions: FillImageOptions): Promise<void> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
 		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
 
@@ -126,10 +126,10 @@ class StreamDeckNeoLcdService implements LcdStripDisplayService {
 	}
 
 	private async convertFillLcdBuffer(
-		sourceBuffer: Buffer,
+		sourceBuffer: Uint8Array,
 		size: Dimension,
 		sourceOptions: FillImageOptions,
-	): Promise<Buffer> {
+	): Promise<Uint8Array> {
 		const sourceOptions2: InternalFillImageOptions = {
 			format: sourceOptions.format,
 			offset: 0,

@@ -5,7 +5,7 @@
  * @param width Width of the image
  * @param height Hieght of the image
  */
-export async function encodeJPEG(buffer: Buffer, width: number, height: number): Promise<Buffer> {
+export async function encodeJPEG(buffer: Uint8Array, width: number, height: number): Promise<Uint8Array> {
 	const blob = await new Promise<Blob>((resolve, reject) => {
 		const canvas = document.createElement('canvas')
 		canvas.width = width
@@ -30,5 +30,5 @@ export async function encodeJPEG(buffer: Buffer, width: number, height: number):
 			reject(new Error('Failed to get canvas context'))
 		}
 	})
-	return Buffer.from(await blob.arrayBuffer())
+	return new Uint8Array(await blob.arrayBuffer())
 }

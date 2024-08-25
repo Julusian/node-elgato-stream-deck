@@ -88,7 +88,11 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} options Options to control the write
 	 */
-	fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void>
+	fillKeyBuffer(
+		keyIndex: KeyIndex,
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		options?: FillImageOptions,
+	): Promise<void>
 
 	/**
 	 * Fills the whole panel with an image in a Buffer.
@@ -96,7 +100,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} options Options to control the write
 	 */
-	fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
+	fillPanelBuffer(imageBuffer: Uint8Array | Uint8ClampedArray, options?: FillPanelOptions): Promise<void>
 
 	/**
 	 * Fill the whole lcd strip
@@ -104,7 +108,11 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
 	 */
-	fillLcd(lcdIndex: number, imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
+	fillLcd(
+		lcdIndex: number,
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		sourceOptions: FillImageOptions,
+	): Promise<void>
 
 	// /**
 	//  * Fills the lcd strip above an encoder
@@ -112,7 +120,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	//  * @param {Buffer} imageBuffer The image to write
 	//  * @param {Object} sourceOptions Options to control the write
 	//  */
-	// fillEncoderLcd(index: EncoderIndex, imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
+	// fillEncoderLcd(index: EncoderIndex, imageBuffer: Uint8Array, sourceOptions: FillImageOptions): Promise<void>
 
 	/**
 	 * Fill a region of the lcd strip, ignoring the boundaries of the encoders
@@ -126,7 +134,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 		lcdIndex: number,
 		x: number,
 		y: number,
-		imageBuffer: Buffer,
+		imageBuffer: Uint8Array,
 		sourceOptions: FillLcdImageOptions,
 	): Promise<void>
 

@@ -20,7 +20,7 @@ export class WebHIDDevice extends EventEmitter<HIDDeviceEvents> implements CoreH
 		this.device.addEventListener('inputreport', (event) => {
 			// Button press
 			if (event.reportId === 0x01) {
-				const data = new Uint8Array(event.data.buffer)
+				const data = new Uint8Array(event.data.buffer, event.data.byteOffset, event.data.byteLength)
 				this.emit('input', data)
 			}
 		})
@@ -34,17 +34,17 @@ export class WebHIDDevice extends EventEmitter<HIDDeviceEvents> implements CoreH
 		return this.device.forget()
 	}
 
-	public async sendFeatureReport(data: Buffer): Promise<void> {
-		return this.device.sendFeatureReport(data[0], new Uint8Array(data.subarray(1)))
+	public async sendFeatureReport(data: Uint8Array): Promise<void> {
+		return this.device.sendFeatureReport(data[0], data.subarray(1))
 	}
-	public async getFeatureReport(reportId: number, _reportLength: number): Promise<Buffer> {
+	public async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
 		const view = await this.device.receiveFeatureReport(reportId)
-		return Buffer.from(view.buffer)
+		return new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
 	}
-	public async sendReports(buffers: Buffer[]): Promise<void> {
+	public async sendReports(buffers: Uint8Array[]): Promise<void> {
 		return this.reportQueue.add(async () => {
 			for (const data of buffers) {
-				await this.device.sendReport(data[0], new Uint8Array(data.subarray(1)))
+				await this.device.sendReport(data[0], data.subarray(1))
 			}
 		})
 	}

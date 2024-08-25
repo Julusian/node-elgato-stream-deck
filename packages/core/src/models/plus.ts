@@ -109,7 +109,11 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		this.#lcdControls = lcdControls
 	}
 
-	public async fillLcd(index: number, buffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
+	public async fillLcd(
+		index: number,
+		buffer: Uint8Array | Uint8ClampedArray,
+		sourceOptions: FillImageOptions,
+	): Promise<void> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
 		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
 
@@ -120,7 +124,7 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		})
 	}
 
-	// public async fillEncoderLcd(index: EncoderIndex, buffer: Buffer, sourceOptions: FillImageOptions): Promise<void> {
+	// public async fillEncoderLcd(index: EncoderIndex, buffer: Uint8Array, sourceOptions: FillImageOptions): Promise<void> {
 	// 	if (this.#encoderCount === 0) throw new Error(`There are no encoders`)
 
 	// 	const size = this.LCD_ENCODER_SIZE
@@ -137,7 +141,7 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		index: number,
 		x: number,
 		y: number,
-		imageBuffer: Buffer,
+		imageBuffer: Uint8Array,
 		sourceOptions: FillLcdImageOptions,
 	): Promise<void> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
@@ -163,7 +167,7 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		lcdControl: StreamDeckLcdStripControlDefinition,
 		x: number,
 		y: number,
-		imageBuffer: Buffer,
+		imageBuffer: Uint8Array | Uint8ClampedArray,
 		sourceOptions: FillLcdImageOptions,
 	): Promise<void> {
 		// Basic bounds checking
@@ -187,7 +191,10 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		await this.#device.sendReports(packets)
 	}
 
-	private async convertFillLcdBuffer(sourceBuffer: Buffer, sourceOptions: FillLcdImageOptions): Promise<Buffer> {
+	private async convertFillLcdBuffer(
+		sourceBuffer: Uint8Array | Uint8ClampedArray,
+		sourceOptions: FillLcdImageOptions,
+	): Promise<Uint8Array> {
 		const sourceOptions2: InternalFillImageOptions = {
 			format: sourceOptions.format,
 			offset: 0,

@@ -69,7 +69,10 @@ class Gen1ButtonLcdImagePacker implements ButtonLcdImagePacker {
 		return this.#imageHeight
 	}
 
-	public async convertPixelBuffer(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer> {
+	public async convertPixelBuffer(
+		sourceBuffer: Uint8Array,
+		sourceOptions: InternalFillImageOptions,
+	): Promise<Uint8Array> {
 		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
 			sourceOptions,
@@ -121,7 +124,7 @@ class Gen1PropertiesService implements PropertiesService {
 	}
 
 	public async getFirmwareVersion(): Promise<string> {
-		let val: Buffer
+		let val: Uint8Array
 		try {
 			val = await this.#device.getFeatureReport(4, 32)
 		} catch (_e) {
@@ -129,17 +132,17 @@ class Gen1PropertiesService implements PropertiesService {
 			val = await this.#device.getFeatureReport(4, 17)
 		}
 		const end = val.indexOf(0, 5)
-		return val.toString('ascii', 5, end === -1 ? undefined : end)
+		return new TextDecoder('ascii').decode(val.subarray(5, end === -1 ? undefined : end))
 	}
 
 	public async getSerialNumber(): Promise<string> {
-		let val: Buffer
+		let val: Uint8Array
 		try {
 			val = await this.#device.getFeatureReport(3, 32)
 		} catch (_e) {
 			// In case some devices can't handle the different report length
 			val = await this.#device.getFeatureReport(3, 17)
 		}
-		return val.toString('ascii', 5, 17)
+		return new TextDecoder('ascii').decode(val.subarray(5, 17))
 	}
 }

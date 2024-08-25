@@ -6,7 +6,7 @@ import { OpenStreamDeckOptions, EncodeJPEGHelper } from '../models/base.js'
 import { DummyHID } from './hid.js'
 
 function openStreamDeck(path: string, deviceModel: DeviceModelId, userOptions?: OpenStreamDeckOptions): StreamDeck {
-	const encodeJpegMock: jest.MockedFunction<EncodeJPEGHelper> = jest.fn((_b: Buffer, _w: number, _h: number) => {
+	const encodeJpegMock: jest.MockedFunction<EncodeJPEGHelper> = jest.fn((_b: Uint8Array, _w: number, _h: number) => {
 		throw new Error('Not implemented')
 	})
 	const options: Required<OpenStreamDeckOptions> = {
@@ -562,7 +562,7 @@ describe('StreamDeck XL', () => {
 
 	test('fillImage', async () => {
 		const device = getDevice()
-		device.encodeJPEG.mockImplementationOnce(async (buffer: Buffer) => {
+		device.encodeJPEG.mockImplementationOnce(async (buffer: Uint8Array) => {
 			const start = buffer.length / 8
 			return buffer.subarray(start, start * 2)
 		})
@@ -615,7 +615,7 @@ describe('StreamDeck Original V2', () => {
 
 	test('fillImage', async () => {
 		const device = getDevice()
-		device.encodeJPEG.mockImplementationOnce(async (buffer: Buffer) => {
+		device.encodeJPEG.mockImplementationOnce(async (buffer: Uint8Array) => {
 			const start = buffer.length / 8
 			return buffer.subarray(start, start * 2)
 		})

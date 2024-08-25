@@ -12,10 +12,10 @@ export interface HIDDeviceEvents {
 export interface HIDDevice extends EventEmitter<HIDDeviceEvents> {
 	close(): Promise<void>
 
-	sendFeatureReport(data: Buffer): Promise<void>
-	getFeatureReport(reportId: number, reportLength: number): Promise<Buffer>
+	sendFeatureReport(data: Uint8Array): Promise<void>
+	getFeatureReport(reportId: number, reportLength: number): Promise<Uint8Array>
 
-	sendReports(buffers: Buffer[]): Promise<void>
+	sendReports(buffers: Uint8Array[]): Promise<void>
 
 	getDeviceInfo(): Promise<HIDDeviceInfo>
 }

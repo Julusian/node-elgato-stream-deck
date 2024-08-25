@@ -14,7 +14,7 @@ export interface ButtonLcdImagePacker {
 	readonly imageWidth: number
 	readonly imageHeight: number
 
-	convertPixelBuffer(sourceBuffer: Buffer, sourceOptions: InternalFillImageOptions): Promise<Buffer>
+	convertPixelBuffer(sourceBuffer: Uint8Array, sourceOptions: InternalFillImageOptions): Promise<Uint8Array>
 }
 
 interface GridSpan {
@@ -31,8 +31,8 @@ export interface ButtonsLcdDisplayService {
 	clearKey(keyIndex: KeyIndex): Promise<void>
 
 	fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
-	fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void>
-	fillPanelBuffer(imageBuffer: Buffer, options: FillPanelOptions | undefined): Promise<void>
+	fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Uint8Array, options?: FillImageOptions): Promise<void>
+	fillPanelBuffer(imageBuffer: Uint8Array, options: FillPanelOptions | undefined): Promise<void>
 }
 
 export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
@@ -179,7 +179,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		}
 	}
 
-	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void> {
+	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Uint8Array, options?: FillImageOptions): Promise<void> {
 		const sourceFormat = options?.format ?? 'rgb'
 		this.checkSourceFormat(sourceFormat)
 
@@ -195,7 +195,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		})
 	}
 
-	public async fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void> {
+	public async fillPanelBuffer(imageBuffer: Uint8Array, options?: FillPanelOptions): Promise<void> {
 		const sourceFormat = options?.format ?? 'rgb'
 		this.checkSourceFormat(sourceFormat)
 
@@ -243,7 +243,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		await this.#device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, red, green, blue]))
 	}
 
-	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOptions: InternalFillImageOptions) {
+	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Uint8Array, sourceOptions: InternalFillImageOptions) {
 		const buttonControl = this.#deviceProperties.CONTROLS.find(
 			(control): control is StreamDeckButtonControlDefinition =>
 				control.type === 'button' && control.index === keyIndex,
@@ -254,7 +254,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 
 	private async fillImageRangeControl(
 		buttonControl: StreamDeckButtonControlDefinition,
-		imageBuffer: Buffer,
+		imageBuffer: Uint8Array,
 		sourceOptions: InternalFillImageOptions,
 	) {
 		if (buttonControl.feedbackType !== 'lcd')
