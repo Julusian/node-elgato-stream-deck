@@ -1,6 +1,7 @@
 {
-	"extends": "@sofie-automation/code-standard-preset/ts/tsconfig.bin",
+	"extends": "../../tsconfig.base.json",
 	"exclude": ["node_modules/**", "src/**/*spec.ts", "src/**/__tests__/*", "src/**/__mocks__/*", "dist/**"],
+	"include": ["src/**/*.ts"],
 	"compilerOptions": {
 		"outDir": "./dist",
 		"baseUrl": "./",
@@ -9,7 +10,6 @@
 			"@elgato-stream-deck/webhid-demo": ["./src/index.ts"]
 		},
 		"lib": ["es6", "dom"],
-		"types": ["w3c-web-hid"],
-		"importHelpers": false
+		"types": ["w3c-web-hid"]
 	}
 }

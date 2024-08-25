@@ -1,5 +1,5 @@
 {
-	"extends": "@sofie-automation/code-standard-preset/ts/tsconfig.lib",
+	"extends": "../../tsconfig.base.json",
 	"exclude": ["node_modules/**", "src/**/*spec.ts", "src/**/__tests__/*", "src/**/__mocks__/*"],
 	"include": ["src/**/*"],
 	"compilerOptions": {
@@ -9,10 +9,6 @@
 			"*": ["./node_modules/*"],
 			"@elgato-stream-deck/node": ["./src/index.ts"]
 		},
-		"types": ["node"],
-		"importHelpers": false,
-		"noEmitOnError": false,
-		"target": "es2022",
-		"lib": ["es2023"]
+		"types": ["node"]
 	}
 }

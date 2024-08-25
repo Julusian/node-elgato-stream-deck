@@ -2307,6 +2307,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tsconfig/node18@npm:^18.2.4":
+  version: 18.2.4
+  resolution: "@tsconfig/node18@npm:18.2.4"
+  checksum: 10c0/cdfd17f212660374eb2765cd5907b2252e43cfa2623cd52307a49f004327ef49bbe7d53c78b0aca57f33e9a5cb0d7d2eb5ded9be1235e6212f65c9f0699322b6
+  languageName: node
+  linkType: hard
+
 "@tufjs/canonical-json@npm:2.0.0":
   version: 2.0.0
   resolution: "@tufjs/canonical-json@npm:2.0.0"
@@ -5091,6 +5098,7 @@ __metadata:
   dependencies:
     "@julusian/jpeg-turbo": "npm:^2.1.0"
     "@sofie-automation/code-standard-preset": "npm:^2.5.2"
+    "@tsconfig/node18": "npm:^18.2.4"
     "@types/jest": "npm:^29.5.12"
     "@types/node": "npm:^18.19.39"
     jest: "npm:^29.7.0"
