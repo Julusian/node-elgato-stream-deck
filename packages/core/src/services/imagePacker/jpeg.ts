@@ -12,14 +12,6 @@ export class JpegButtonLcdImagePacker implements ButtonLcdImagePacker {
 		this.#xyFlip = xyFlip
 	}
 
-	// get imageWidth(): number {
-	// 	return this.#imageWidth
-	// }
-
-	// get imageHeight(): number {
-	// 	return this.#imageHeight
-	// }
-
 	public async convertPixelBuffer(
 		sourceBuffer: Uint8Array,
 		sourceOptions: InternalFillImageOptions,

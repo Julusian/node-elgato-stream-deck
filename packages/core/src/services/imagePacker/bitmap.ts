@@ -12,14 +12,6 @@ export class BitmapButtonLcdImagePacker implements ButtonLcdImagePacker {
 		this.#bmpImagePPM = bmpImagePPM
 	}
 
-	// get imageWidth(): number {
-	// 	return this.#imageWidth
-	// }
-
-	// get imageHeight(): number {
-	// 	return this.#imageHeight
-	// }
-
 	public async convertPixelBuffer(
 		sourceBuffer: Uint8Array,
 		sourceOptions: InternalFillImageOptions,

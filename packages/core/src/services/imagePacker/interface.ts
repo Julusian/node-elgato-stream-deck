@@ -7,9 +7,6 @@ export interface InternalFillImageOptions extends FillImageOptions {
 }
 
 export interface ButtonLcdImagePacker {
-	// readonly imageWidth: number
-	// readonly imageHeight: number
-
 	convertPixelBuffer(
 		sourceBuffer: Uint8Array,
 		sourceOptions: InternalFillImageOptions,
