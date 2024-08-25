@@ -1,9 +1,9 @@
-import type { StreamDeckProperties } from '../models/base'
-import type { HIDDevice } from '../hid-device'
-import type { Dimension, KeyIndex } from '../id'
-import type { FillImageOptions, FillPanelDimensionsOptions, FillPanelOptions } from '../types'
-import type { StreamdeckImageWriter } from './imageWriter/types'
-import type { StreamDeckButtonControlDefinition } from '../controlDefinition'
+import type { StreamDeckProperties } from '../models/base.js'
+import type { HIDDevice } from '../hid-device.js'
+import type { Dimension, KeyIndex } from '../id.js'
+import type { FillImageOptions, FillPanelDimensionsOptions, FillPanelOptions } from '../types.js'
+import type { StreamdeckImageWriter } from './imageWriter/types.js'
+import type { StreamDeckButtonControlDefinition } from '../controlDefinition.js'
 
 export interface InternalFillImageOptions extends FillImageOptions {
 	offset: number
@@ -45,7 +45,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		imageWriter: StreamdeckImageWriter,
 		imagePacker: ButtonLcdImagePacker,
 		device: HIDDevice,
-		deviceProperties: Readonly<StreamDeckProperties>
+		deviceProperties: Readonly<StreamDeckProperties>,
 	) {
 		this.#imageWriter = imageWriter
 		this.#imagePacker = imagePacker
@@ -63,7 +63,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	private getLcdButtonControls(): StreamDeckButtonControlDefinition[] {
 		return this.#deviceProperties.CONTROLS.filter(
 			(control): control is StreamDeckButtonControlDefinition =>
-				control.type === 'button' && control.feedbackType === 'lcd'
+				control.type === 'button' && control.feedbackType === 'lcd',
 		)
 	}
 
@@ -125,7 +125,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 								format: 'rgb',
 								offset: 0,
 								stride: this.#imagePacker.imageWidth * 3,
-							})
+							}),
 						)
 					}
 
@@ -142,7 +142,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
 		const control = this.#deviceProperties.CONTROLS.find(
 			(control): control is StreamDeckButtonControlDefinition =>
-				control.type === 'button' && control.index === keyIndex
+				control.type === 'button' && control.index === keyIndex,
 		)
 
 		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control?.feedbackType === 'rgb') {
@@ -164,7 +164,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 
 		const control = this.#deviceProperties.CONTROLS.find(
 			(control): control is StreamDeckButtonControlDefinition =>
-				control.type === 'button' && control.index === keyIndex
+				control.type === 'button' && control.index === keyIndex,
 		)
 
 		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control?.feedbackType === 'rgb') {
@@ -211,7 +211,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		const expectedByteCount = sourceFormat.length * panelDimensions.width * panelDimensions.height
 		if (imageBuffer.length !== expectedByteCount) {
 			throw new RangeError(
-				`Expected image buffer of length ${expectedByteCount}, got length ${imageBuffer.length}`
+				`Expected image buffer of length ${expectedByteCount}, got length ${imageBuffer.length}`,
 			)
 		}
 
@@ -233,7 +233,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 					format: sourceFormat,
 					offset: rowOffset + colOffset,
 					stride,
-				})
+				}),
 			)
 		}
 		await Promise.all(ps)
@@ -246,7 +246,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Buffer, sourceOptions: InternalFillImageOptions) {
 		const buttonControl = this.#deviceProperties.CONTROLS.find(
 			(control): control is StreamDeckButtonControlDefinition =>
-				control.type === 'button' && control.index === keyIndex
+				control.type === 'button' && control.index === keyIndex,
 		)
 		if (!buttonControl) throw new TypeError(`Expected a valid keyIndex`)
 		return this.fillImageRangeControl(buttonControl, imageBuffer, sourceOptions)
@@ -255,7 +255,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	private async fillImageRangeControl(
 		buttonControl: StreamDeckButtonControlDefinition,
 		imageBuffer: Buffer,
-		sourceOptions: InternalFillImageOptions
+		sourceOptions: InternalFillImageOptions,
 	) {
 		if (buttonControl.feedbackType !== 'lcd')
 			throw new TypeError(`keyIndex ${buttonControl.index} does not support lcd feedback`)

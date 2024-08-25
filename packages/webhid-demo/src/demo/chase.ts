@@ -1,5 +1,5 @@
 import { StreamDeck, StreamDeckButtonControlDefinition } from '@elgato-stream-deck/webhid'
-import { Demo } from './demo'
+import { Demo } from './demo.js'
 
 export class ChaseDemo implements Demo {
 	private pressed: number[] = []
@@ -14,7 +14,7 @@ export class ChaseDemo implements Demo {
 		const ps: Array<Promise<void>> = []
 
 		const controls = device.CONTROLS.filter(
-			(control): control is StreamDeckButtonControlDefinition => control.type === 'button'
+			(control): control is StreamDeckButtonControlDefinition => control.type === 'button',
 		).sort((a, b) => b.index - a.index)
 
 		if (ctx) {

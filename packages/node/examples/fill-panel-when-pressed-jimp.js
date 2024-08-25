@@ -1,6 +1,5 @@
 // @ts-check
 const path = require('path')
-// eslint-disable-next-line node/no-missing-require
 const Jimp = require('jimp')
 const { listStreamDecks, openStreamDeck } = require('../dist/index')
 
@@ -23,7 +22,7 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 	})
 
 	/** @type {import('@elgato-stream-deck/core').StreamDeckLcdStripControlDefinition} */
-	// @ts-ignore
+	// @ts-expect-error  to ignore the | undefined
 	const lcdStripControl = streamDeck.CONTROLS.find((control) => control.type === 'lcd-strip' && control.id === 0)
 
 	const buttonCount = streamDeck.CONTROLS.filter((control) => control.type === 'button').length
@@ -31,12 +30,12 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 	const bmpImgFieldLcd = lcdStripControl
 		? await Jimp.read(path.resolve(__dirname, 'fixtures/sunny_field.png')).then((img) => {
 				return img.resize(lcdStripControl.pixelSize.width, lcdStripControl.pixelSize.height)
-		  })
+			})
 		: undefined
 	const bmpImgMosaicLcd = lcdStripControl
 		? await Jimp.read(path.resolve(__dirname, '../../../fixtures/mosaic.png')).then((img) => {
 				return img.resize(lcdStripControl.pixelSize.width, lcdStripControl.pixelSize.height)
-		  })
+			})
 		: undefined
 
 	const imgField = bmpImgField.bitmap.data

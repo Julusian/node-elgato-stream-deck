@@ -1,9 +1,13 @@
-import { HIDDevice } from '../hid-device'
-import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
-import { StreamdeckImageWriter } from '../services/imageWriter/types'
-import { BMP_HEADER_LENGTH, FillImageTargetOptions, transformImageBuffer, writeBMPHeader } from '../util'
-import { ButtonLcdImagePacker, DefaultButtonsLcdService, InternalFillImageOptions } from '../services/buttonsLcdDisplay'
-import { PropertiesService } from '../services/propertiesService'
+import { HIDDevice } from '../hid-device.js'
+import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base.js'
+import { StreamdeckImageWriter } from '../services/imageWriter/types.js'
+import { BMP_HEADER_LENGTH, FillImageTargetOptions, transformImageBuffer, writeBMPHeader } from '../util.js'
+import {
+	ButtonLcdImagePacker,
+	DefaultButtonsLcdService,
+	InternalFillImageOptions,
+} from '../services/buttonsLcdDisplay.js'
+import { PropertiesService } from '../services/propertiesService.js'
 
 function extendDevicePropertiesForGen1(rawProps: StreamDeckGen1Properties): StreamDeckProperties {
 	return {
@@ -20,7 +24,7 @@ export function StreamDeckGen1Factory(
 	properties: StreamDeckGen1Properties,
 	imageWriter: StreamdeckImageWriter,
 	targetOptions: FillImageTargetOptions,
-	bmpImagePPM: number
+	bmpImagePPM: number,
 ): StreamDeckBase {
 	const fullProperties = extendDevicePropertiesForGen1(properties)
 
@@ -35,12 +39,12 @@ export function StreamDeckGen1Factory(
 				targetOptions,
 				bmpImagePPM,
 				properties.BUTTON_WIDTH_PX,
-				properties.BUTTON_HEIGHT_PX
+				properties.BUTTON_HEIGHT_PX,
 			),
 			device,
-			fullProperties
+			fullProperties,
 		),
-		null
+		null,
 	)
 }
 
@@ -72,14 +76,14 @@ class Gen1ButtonLcdImagePacker implements ButtonLcdImagePacker {
 			this.#targetOptions,
 			BMP_HEADER_LENGTH,
 			this.#imageWidth,
-			this.#imageHeight
+			this.#imageHeight,
 		)
 		writeBMPHeader(
 			byteBuffer,
 			this.#imageWidth,
 			this.#imageHeight,
 			byteBuffer.length - BMP_HEADER_LENGTH,
-			this.#bmpImagePPM
+			this.#bmpImagePPM,
 		)
 		return byteBuffer
 	}
@@ -120,7 +124,7 @@ class Gen1PropertiesService implements PropertiesService {
 		let val: Buffer
 		try {
 			val = await this.#device.getFeatureReport(4, 32)
-		} catch (e) {
+		} catch (_e) {
 			// In case some devices can't handle the different report length
 			val = await this.#device.getFeatureReport(4, 17)
 		}
@@ -132,7 +136,7 @@ class Gen1PropertiesService implements PropertiesService {
 		let val: Buffer
 		try {
 			val = await this.#device.getFeatureReport(3, 32)
-		} catch (e) {
+		} catch (_e) {
 			// In case some devices can't handle the different report length
 			val = await this.#device.getFeatureReport(3, 17)
 		}

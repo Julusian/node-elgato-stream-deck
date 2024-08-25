@@ -1,15 +1,15 @@
-import { HIDDevice } from '../hid-device'
-import { EncodeJPEGHelper, OpenStreamDeckOptions } from './base'
-import { DeviceModelId, Dimension } from '../id'
-import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
-import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
-import { StreamdeckNeoLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
-import { FillImageOptions, FillLcdImageOptions } from '../types'
-import { transformImageBuffer } from '../util'
-import { InternalFillImageOptions } from '../services/buttonsLcdDisplay'
-import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
-import { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition'
-import { LcdStripDisplayService } from '../services/lcdStripDisplay'
+import { HIDDevice } from '../hid-device.js'
+import { EncodeJPEGHelper, OpenStreamDeckOptions } from './base.js'
+import { DeviceModelId, Dimension } from '../id.js'
+import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2.js'
+import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter.js'
+import { StreamdeckNeoLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator.js'
+import { FillImageOptions, FillLcdImageOptions } from '../types.js'
+import { transformImageBuffer } from '../util.js'
+import { InternalFillImageOptions } from '../services/buttonsLcdDisplay.js'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
+import { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
+import { LcdStripDisplayService } from '../services/lcdStripDisplay.js'
 
 const neoControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2)
 neoControls.push(
@@ -43,7 +43,7 @@ neoControls.push(
 		index: 9,
 		hidIndex: 9,
 		feedbackType: 'rgb',
-	}
+	},
 )
 
 const neoProperties: StreamDeckGen2Properties = {
@@ -58,7 +58,7 @@ const neoProperties: StreamDeckGen2Properties = {
 	KEY_SPACING_VERTICAL: 30,
 }
 const lcdStripControls = neoProperties.CONTROLS.filter(
-	(control): control is StreamDeckLcdStripControlDefinition => control.type === 'lcd-strip'
+	(control): control is StreamDeckLcdStripControlDefinition => control.type === 'lcd-strip',
 )
 
 export function StreamDeckNeoFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckGen2 {
@@ -67,7 +67,7 @@ export function StreamDeckNeoFactory(device: HIDDevice, options: Required<OpenSt
 		options,
 		neoProperties,
 		new StreamDeckNeoLcdService(options.encodeJPEG, device, lcdStripControls),
-		null
+		null,
 	)
 }
 
@@ -81,7 +81,7 @@ class StreamDeckNeoLcdService implements LcdStripDisplayService {
 	constructor(
 		encodeJPEG: EncodeJPEGHelper,
 		device: HIDDevice,
-		lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>
+		lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>,
 	) {
 		this.#encodeJPEG = encodeJPEG
 		this.#device = device
@@ -93,7 +93,7 @@ class StreamDeckNeoLcdService implements LcdStripDisplayService {
 		_x: number,
 		_y: number,
 		_imageBuffer: Buffer,
-		_sourceOptions: FillLcdImageOptions
+		_sourceOptions: FillLcdImageOptions,
 	): Promise<void> {
 		throw new Error('Not supported for this model')
 	}
@@ -128,7 +128,7 @@ class StreamDeckNeoLcdService implements LcdStripDisplayService {
 	private async convertFillLcdBuffer(
 		sourceBuffer: Buffer,
 		size: Dimension,
-		sourceOptions: FillImageOptions
+		sourceOptions: FillImageOptions,
 	): Promise<Buffer> {
 		const sourceOptions2: InternalFillImageOptions = {
 			format: sourceOptions.format,
@@ -142,7 +142,7 @@ class StreamDeckNeoLcdService implements LcdStripDisplayService {
 			{ colorMode: 'rgba', xFlip: true, yFlip: true },
 			0,
 			size.width,
-			size.height
+			size.height,
 		)
 
 		return this.#encodeJPEG(byteBuffer, size.width, size.height)

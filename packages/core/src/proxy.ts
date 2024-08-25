@@ -1,6 +1,6 @@
-import type { DeviceModelId } from './id'
-import type { StreamDeck, StreamDeckEvents } from './types'
-import type { StreamDeckControlDefinition } from './controlDefinition'
+import type { DeviceModelId } from './id.js'
+import type { StreamDeck, StreamDeckEvents } from './types.js'
+import type { StreamDeckControlDefinition } from './controlDefinition.js'
 
 /**
  * A minimal proxy around a StreamDeck instance.

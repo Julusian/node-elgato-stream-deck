@@ -1,6 +1,6 @@
-import { LcdPosition } from '../types'
-import { StreamDeckLcdStripControlDefinition } from '../controlDefinition'
-import { SomeEmitEventFn } from '../models/plus'
+import { LcdPosition } from '../types.js'
+import { StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
+import { SomeEmitEventFn } from '../models/plus.js'
 
 export class LcdStripInputService {
 	readonly #lcdStripControls: Readonly<StreamDeckLcdStripControlDefinition[]>

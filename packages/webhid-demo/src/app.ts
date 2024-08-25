@@ -1,9 +1,9 @@
 import { requestStreamDecks, getStreamDecks, StreamDeckWeb, LcdPosition } from '@elgato-stream-deck/webhid'
-import { Demo } from './demo/demo'
-import { DomImageDemo } from './demo/dom'
-import { FillWhenPressedDemo } from './demo/fill-when-pressed'
-import { RapidFillDemo } from './demo/rapid-fill'
-import { ChaseDemo } from './demo/chase'
+import { Demo } from './demo/demo.js'
+import { DomImageDemo } from './demo/dom.js'
+import { FillWhenPressedDemo } from './demo/fill-when-pressed.js'
+import { RapidFillDemo } from './demo/rapid-fill.js'
+import { ChaseDemo } from './demo/chase.js'
 
 declare const LIB_VERSION: any
 if (LIB_VERSION) {
@@ -84,7 +84,7 @@ async function openDevice(device: StreamDeckWeb): Promise<void> {
 	})
 	device.on('lcdSwipe', (control, fromPosition: LcdPosition, toPosition: LcdPosition) => {
 		appendLog(
-			`LCD (${control.id}) swipe (${fromPosition.x},${fromPosition.y}) -> (${toPosition.x},${toPosition.y})`
+			`LCD (${control.id}) swipe (${fromPosition.x},${fromPosition.y}) -> (${toPosition.x},${toPosition.y})`,
 		)
 	})
 

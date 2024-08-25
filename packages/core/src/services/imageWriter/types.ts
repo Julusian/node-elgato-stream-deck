@@ -1,4 +1,4 @@
-import type { KeyIndex } from '../../id'
+import type { KeyIndex } from '../../id.js'
 
 export interface StreamdeckImageWriterProps {
 	keyIndex: KeyIndex
@@ -15,6 +15,6 @@ export interface StreamdeckImageHeaderGenerator<TProps = StreamdeckImageWriterPr
 		props: TProps,
 		partIndex: number,
 		isLast: boolean,
-		bodyLength: number
+		bodyLength: number,
 	): void
 }

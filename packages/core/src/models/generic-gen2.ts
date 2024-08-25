@@ -1,13 +1,17 @@
-import { HIDDevice } from '../hid-device'
-import { transformImageBuffer } from '../util'
-import { EncodeJPEGHelper, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
-import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
-import { StreamdeckGen2ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
-import { EncoderInputService } from '../services/encoderInput'
-import { ButtonLcdImagePacker, DefaultButtonsLcdService, InternalFillImageOptions } from '../services/buttonsLcdDisplay'
-import { LcdStripInputService } from '../services/lcdStripInput'
-import { LcdStripDisplayService } from '../services/lcdStripDisplay'
-import { PropertiesService } from '../services/propertiesService'
+import { HIDDevice } from '../hid-device.js'
+import { transformImageBuffer } from '../util.js'
+import { EncodeJPEGHelper, OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base.js'
+import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter.js'
+import { StreamdeckGen2ImageHeaderGenerator } from '../services/imageWriter/headerGenerator.js'
+import { EncoderInputService } from '../services/encoderInput.js'
+import {
+	ButtonLcdImagePacker,
+	DefaultButtonsLcdService,
+	InternalFillImageOptions,
+} from '../services/buttonsLcdDisplay.js'
+import { LcdStripInputService } from '../services/lcdStripInput.js'
+import { LcdStripDisplayService } from '../services/lcdStripDisplay.js'
+import { PropertiesService } from '../services/propertiesService.js'
 
 function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): StreamDeckProperties {
 	return {
@@ -32,7 +36,7 @@ export class StreamDeckGen2 extends StreamDeckBase {
 		properties: StreamDeckGen2Properties,
 		lcdStripDisplayService: LcdStripDisplayService | null,
 		lcdStripInputService: LcdStripInputService | null,
-		disableXYFlip?: boolean
+		disableXYFlip?: boolean,
 	) {
 		const fullProperties = extendDevicePropertiesForGen2(properties)
 
@@ -47,12 +51,12 @@ export class StreamDeckGen2 extends StreamDeckBase {
 					options.encodeJPEG,
 					!disableXYFlip,
 					properties.BUTTON_WIDTH_PX,
-					properties.BUTTON_HEIGHT_PX
+					properties.BUTTON_HEIGHT_PX,
 				),
 				device,
-				fullProperties
+				fullProperties,
 			),
-			lcdStripDisplayService
+			lcdStripDisplayService,
 		)
 
 		this.#lcdStripInputService = lcdStripInputService
@@ -103,7 +107,7 @@ class Gen2ButtonLcdImagePacker implements ButtonLcdImagePacker {
 			{ colorMode: 'rgba', xFlip: this.#xyFlip, yFlip: this.#xyFlip },
 			0,
 			this.#imageWidth,
-			this.#imageHeight
+			this.#imageHeight,
 		)
 
 		return this.#encodeJPEG(byteBuffer, this.#imageWidth, this.#imageHeight)

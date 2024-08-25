@@ -20,14 +20,14 @@ export async function encodeJPEG(buffer: Buffer, width: number, height: number):
 					if (b) {
 						resolve(b)
 					} else {
-						reject()
+						reject(new Error('No image generated'))
 					}
 				},
 				'image/jpeg',
-				0.9
+				0.9,
 			)
 		} else {
-			reject()
+			reject(new Error('Failed to get canvas context'))
 		}
 	})
 	return Buffer.from(await blob.arrayBuffer())

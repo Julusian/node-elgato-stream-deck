@@ -1,14 +1,5 @@
 import * as jpegJS from 'jpeg-js'
 
-let jpegTurbo: typeof import('@julusian/jpeg-turbo') | undefined
-try {
-	// eslint-disable-next-line node/no-extraneous-require
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-	jpegTurbo = require('@julusian/jpeg-turbo')
-} catch (e) {
-	// This is expected and can be ignored
-}
-
 export interface JPEGEncodeOptions {
 	quality: number
 	subsampling?: number
@@ -27,9 +18,11 @@ export async function encodeJPEG(
 	buffer: Buffer,
 	width: number,
 	height: number,
-	options: JPEGEncodeOptions | undefined
+	options: JPEGEncodeOptions | undefined,
 ): Promise<Buffer> {
 	try {
+		const jpegTurbo = await import('@julusian/jpeg-turbo')
+
 		// Try using jpeg-turbo if it is available
 		if (jpegTurbo && jpegTurbo.bufferSize && !!jpegTurbo.compressSync) {
 			const encodeOptions: import('@julusian/jpeg-turbo').EncodeOptions = {
@@ -44,9 +37,8 @@ export async function encodeJPEG(
 				return jpegTurbo.compress(buffer, tmpBuffer, encodeOptions)
 			}
 		}
-	} catch (e) {
+	} catch (_e) {
 		// TODO - log error
-		jpegTurbo = undefined
 	}
 
 	// If jpeg-turbo is unavailable or fails, then fallback to jpeg-js
@@ -56,7 +48,7 @@ export async function encodeJPEG(
 			height,
 			data: buffer,
 		},
-		options ? options.quality : DEFAULT_QUALITY
+		options ? options.quality : DEFAULT_QUALITY,
 	)
 	return jpegBuffer2.data
 }

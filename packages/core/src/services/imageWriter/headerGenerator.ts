@@ -1,4 +1,4 @@
-import type { StreamdeckImageHeaderGenerator, StreamdeckImageWriterProps } from './types'
+import type { StreamdeckImageHeaderGenerator, StreamdeckImageWriterProps } from './types.js'
 
 export class StreamdeckGen1ImageHeaderGenerator implements StreamdeckImageHeaderGenerator {
 	getFillImageCommandHeaderLength(): number {
@@ -10,7 +10,7 @@ export class StreamdeckGen1ImageHeaderGenerator implements StreamdeckImageHeader
 		props: StreamdeckImageWriterProps,
 		partIndex: number,
 		isLast: boolean,
-		_bodyLength: number
+		_bodyLength: number,
 	): void {
 		buffer.writeUInt8(0x02, 0)
 		buffer.writeUInt8(0x01, 1)
@@ -31,7 +31,7 @@ export class StreamdeckGen2ImageHeaderGenerator implements StreamdeckImageHeader
 		props: StreamdeckImageWriterProps,
 		partIndex: number,
 		isLast: boolean,
-		bodyLength: number
+		bodyLength: number,
 	): void {
 		buffer.writeUInt8(0x02, 0)
 		buffer.writeUInt8(0x07, 1)
@@ -60,7 +60,7 @@ export class StreamdeckPlusLcdImageHeaderGenerator
 		props: StreamdeckPlusHeaderProps,
 		partIndex: number,
 		isLast: boolean,
-		bodyLength: number
+		bodyLength: number,
 	): void {
 		buffer.writeUInt8(0x02, 0)
 		buffer.writeUInt8(0x0c, 1)
@@ -84,7 +84,7 @@ export class StreamdeckNeoLcdImageHeaderGenerator implements StreamdeckImageHead
 		_props: never,
 		partIndex: number,
 		isLast: boolean,
-		bodyLength: number
+		bodyLength: number,
 	): void {
 		buffer.writeUInt8(0x02, 0)
 		buffer.writeUInt8(0x0b, 1)

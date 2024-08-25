@@ -1,8 +1,8 @@
-import { HIDDevice } from '../hid-device'
-import { OpenStreamDeckOptions } from './base'
-import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
-import { DeviceModelId } from '../id'
-import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
+import { HIDDevice } from '../hid-device.js'
+import { OpenStreamDeckOptions } from './base.js'
+import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2.js'
+import { DeviceModelId } from '../id.js'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 
 const xlProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.XL,

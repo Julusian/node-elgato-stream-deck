@@ -1,10 +1,10 @@
-import { HIDDevice } from '../hid-device'
-import { OpenStreamDeckOptions, StreamDeckBase } from './base'
-import { StreamDeckGen1Factory, StreamDeckGen1Properties } from './generic-gen1'
-import { DeviceModelId } from '../id'
-import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
-import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
-import { StreamdeckGen1ImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
+import { HIDDevice } from '../hid-device.js'
+import { OpenStreamDeckOptions, StreamDeckBase } from './base.js'
+import { StreamDeckGen1Factory, StreamDeckGen1Properties } from './generic-gen1.js'
+import { DeviceModelId } from '../id.js'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
+import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter.js'
+import { StreamdeckGen1ImageHeaderGenerator } from '../services/imageWriter/headerGenerator.js'
 
 const miniProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.MINI,
@@ -26,6 +26,6 @@ export function StreamDeckMiniFactory(device: HIDDevice, options: Required<OpenS
 		miniProperties,
 		new StreamdeckDefaultImageWriter(new StreamdeckGen1ImageHeaderGenerator()),
 		{ colorMode: 'bgr', rotate: true, yFlip: true },
-		2835
+		2835,
 	)
 }

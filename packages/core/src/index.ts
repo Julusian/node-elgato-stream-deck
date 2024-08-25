@@ -1,22 +1,22 @@
-import { HIDDevice } from './hid-device'
-import { DeviceModelId } from './id'
-import { StreamDeck } from './types'
-import { OpenStreamDeckOptions } from './models/base'
-import { StreamDeckOriginalFactory } from './models/original'
-import { StreamDeckMiniFactory } from './models/mini'
-import { StreamDeckXLFactory } from './models/xl'
-import { StreamDeckOriginalV2Factory } from './models/originalv2'
-import { StreamDeckOriginalMK2Factory } from './models/original-mk2'
-import { StreamDeckPlusFactory } from './models/plus'
-import { StreamDeckPedalFactory } from './models/pedal'
-import { StreamDeckNeoFactory } from './models/neo'
+import { HIDDevice } from './hid-device.js'
+import { DeviceModelId } from './id.js'
+import { StreamDeck } from './types.js'
+import { OpenStreamDeckOptions } from './models/base.js'
+import { StreamDeckOriginalFactory } from './models/original.js'
+import { StreamDeckMiniFactory } from './models/mini.js'
+import { StreamDeckXLFactory } from './models/xl.js'
+import { StreamDeckOriginalV2Factory } from './models/originalv2.js'
+import { StreamDeckOriginalMK2Factory } from './models/original-mk2.js'
+import { StreamDeckPlusFactory } from './models/plus.js'
+import { StreamDeckPedalFactory } from './models/pedal.js'
+import { StreamDeckNeoFactory } from './models/neo.js'
 
-export * from './types'
-export * from './id'
-export * from './controlDefinition'
-export { HIDDevice, HIDDeviceInfo, HIDDeviceEvents } from './hid-device'
-export { OpenStreamDeckOptions } from './models/base'
-export { StreamDeckProxy } from './proxy'
+export * from './types.js'
+export * from './id.js'
+export * from './controlDefinition.js'
+export { HIDDevice, HIDDeviceInfo, HIDDeviceEvents } from './hid-device.js'
+export { OpenStreamDeckOptions } from './models/base.js'
+export { StreamDeckProxy } from './proxy.js'
 
 /** Elgato vendor id */
 export const VENDOR_ID = 0x0fd9
@@ -82,5 +82,5 @@ export const DEVICE_MODELS: DeviceModelSpec[] = Object.entries<Omit<DeviceModelS
 	([id, spec]) => ({
 		id: id as any as DeviceModelId,
 		...spec,
-	})
+	}),
 )

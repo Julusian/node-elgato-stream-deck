@@ -1,7 +1,7 @@
 // tslint:disable-next-line: no-submodule-imports
 import { mocked } from 'jest-mock'
 
-import { DummyHID } from '../__mocks__/hid'
+import { DummyHID } from '../__mocks__/hid.js'
 
 jest.mock('node-hid')
 import { devicesAsync, HIDAsync } from 'node-hid'
@@ -10,7 +10,7 @@ const hidOpenMock = jest.fn<Promise<HIDAsync>, [path: string]>()
 HIDAsync.open = hidOpenMock as any
 
 // Must be required after we register a mock for `node-hid`.
-import { getStreamDeckInfo, listStreamDecks, openStreamDeck } from '../'
+import { getStreamDeckInfo, listStreamDecks, openStreamDeck } from '../index.js'
 import { VENDOR_ID } from '@elgato-stream-deck/core'
 
 describe('StreamDeck Devices', () => {
@@ -156,7 +156,7 @@ describe('StreamDeck Devices', () => {
 			}
 		})
 		await expect(openStreamDeck('path-bad-product')).rejects.toThrow(
-			new Error(`Stream Deck is of unexpected type.`)
+			new Error(`Stream Deck is of unexpected type.`),
 		)
 		expect(hidOpenMock).toHaveBeenLastCalledWith('path-bad-product')
 	})

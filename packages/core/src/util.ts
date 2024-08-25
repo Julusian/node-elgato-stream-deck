@@ -1,4 +1,4 @@
-import type { InternalFillImageOptions } from './services/buttonsLcdDisplay'
+import type { InternalFillImageOptions } from './services/buttonsLcdDisplay.js'
 
 export interface FillImageTargetOptions {
 	colorMode: 'bgr' | 'rgba'
@@ -13,7 +13,7 @@ export function transformImageBuffer(
 	targetOptions: FillImageTargetOptions,
 	destPadding: number,
 	imageWidth: number,
-	imageHeight: number
+	imageHeight: number,
 ): Buffer {
 	const byteBuffer = Buffer.alloc(destPadding + imageWidth * imageHeight * targetOptions.colorMode.length)
 
@@ -64,7 +64,7 @@ export function writeBMPHeader(
 	imageWidth: number,
 	imageHeight: number,
 	imageBytes: number,
-	imagePPM: number
+	imagePPM: number,
 ): void {
 	// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
 

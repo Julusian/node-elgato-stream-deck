@@ -1,5 +1,5 @@
 import { StreamDeck } from '@elgato-stream-deck/webhid'
-import { Demo } from './demo'
+import { Demo } from './demo.js'
 
 export class FillWhenPressedDemo implements Demo {
 	private pressed: number[] = []

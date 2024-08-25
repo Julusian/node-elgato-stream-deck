@@ -1,4 +1,4 @@
-import { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from './controlDefinition'
+import { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from './controlDefinition.js'
 
 export function generateButtonsGrid(width: number, height: number, rtl = false): StreamDeckButtonControlDefinition[] {
 	const controls: StreamDeckButtonControlDefinition[] = []

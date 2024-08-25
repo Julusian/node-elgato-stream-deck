@@ -1,13 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/unbound-method */
 
-import { readFixtureJSON } from './helpers'
-import { DeviceModelId, DEVICE_MODELS, StreamDeck } from '../'
-import { OpenStreamDeckOptions } from '../models/base'
-import { DummyHID } from './hid'
-import { EncodeJPEGHelper } from '../models/base'
+import { readFixtureJSON } from './helpers.js'
+import { DeviceModelId, DEVICE_MODELS, StreamDeck } from '../index.js'
+import { OpenStreamDeckOptions, EncodeJPEGHelper } from '../models/base.js'
+import { DummyHID } from './hid.js'
 
 function openStreamDeck(path: string, deviceModel: DeviceModelId, userOptions?: OpenStreamDeckOptions): StreamDeck {
 	const encodeJpegMock: jest.MockedFunction<EncodeJPEGHelper> = jest.fn((_b: Buffer, _w: number, _h: number) => {
@@ -28,7 +24,7 @@ function openStreamDeck(path: string, deviceModel: DeviceModelId, userOptions?: 
 		device,
 		options || {
 			encodeJPEG: undefined,
-		}
+		},
 	)
 }
 
@@ -357,7 +353,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 			})
 			// console.log(JSON.stringify(bufferToIntArray(fillKeyBufferMock.mock.calls[0][1])))
 			expect(fillKeyBufferMock.mock.calls[0][1]).toEqual(
-				readFixtureJSON(`fillColor-buffer-${streamDeck.BUTTON_WIDTH_PX}.json`)
+				readFixtureJSON(`fillColor-buffer-${streamDeck.BUTTON_WIDTH_PX}.json`),
 			)
 		})
 	}

@@ -1,8 +1,8 @@
-import { HIDDevice } from '../hid-device'
-import { OpenStreamDeckOptions } from './base'
-import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
-import { DeviceModelId } from '../id'
-import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
+import { HIDDevice } from '../hid-device.js'
+import { OpenStreamDeckOptions } from './base.js'
+import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2.js'
+import { DeviceModelId } from '../id.js'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 
 const origV2Properties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.ORIGINALV2,
@@ -19,7 +19,7 @@ const origV2Properties: StreamDeckGen2Properties = {
 
 export function StreamDeckOriginalV2Factory(
 	device: HIDDevice,
-	options: Required<OpenStreamDeckOptions>
+	options: Required<OpenStreamDeckOptions>,
 ): StreamDeckGen2 {
 	return new StreamDeckGen2(device, options, origV2Properties, null, null)
 }

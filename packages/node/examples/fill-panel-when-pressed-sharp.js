@@ -22,7 +22,7 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 	})
 
 	/** @type {import('@elgato-stream-deck/core').StreamDeckLcdStripControlDefinition} */
-	// @ts-ignore
+	// @ts-expect-error case to ignore the | undefined
 	const lcdStripControl = streamDeck.CONTROLS.find((control) => control.type === 'lcd-strip' && control.id === 0)
 
 	const buttonCount = streamDeck.CONTROLS.filter((control) => control.type === 'button').length

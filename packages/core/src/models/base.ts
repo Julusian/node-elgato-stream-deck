@@ -1,18 +1,18 @@
 import { EventEmitter } from 'events'
 
-import { HIDDevice, HIDDeviceInfo } from '../hid-device'
-import { DeviceModelId, Dimension, KeyIndex } from '../id'
+import { HIDDevice, HIDDeviceInfo } from '../hid-device.js'
+import { DeviceModelId, Dimension, KeyIndex } from '../id.js'
 import type {
 	FillImageOptions,
 	FillPanelDimensionsOptions,
 	FillPanelOptions,
 	StreamDeck,
 	StreamDeckEvents,
-} from '../types'
-import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay'
-import type { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from '../controlDefinition'
-import type { LcdStripDisplayService } from '../services/lcdStripDisplay'
-import { PropertiesService } from '../services/propertiesService'
+} from '../types.js'
+import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay.js'
+import type { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from '../controlDefinition.js'
+import type { LcdStripDisplayService } from '../services/lcdStripDisplay.js'
+import { PropertiesService } from '../services/propertiesService.js'
 
 export type EncodeJPEGHelper = (buffer: Buffer, width: number, height: number) => Promise<Buffer>
 
@@ -85,7 +85,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		properties: StreamDeckProperties,
 		propertiesService: PropertiesService,
 		buttonsLcdService: ButtonsLcdDisplayService,
-		lcdStripDisplayService: LcdStripDisplayService | null
+		lcdStripDisplayService: LcdStripDisplayService | null,
 	) {
 		super()
 
@@ -96,7 +96,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		this.#lcdStripDisplayService = lcdStripDisplayService
 
 		const maxButtonIndex = properties.CONTROLS.filter(
-			(control): control is StreamDeckButtonControlDefinition => control.type === 'button'
+			(control): control is StreamDeckButtonControlDefinition => control.type === 'button',
 		).map((control) => control.index)
 		this.#keyState = new Array<boolean>(Math.max(-1, ...maxButtonIndex) + 1).fill(false)
 
@@ -128,11 +128,11 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 
 	protected checkValidKeyIndex(
 		keyIndex: KeyIndex,
-		feedbackType: StreamDeckButtonControlDefinition['feedbackType'] | null
+		feedbackType: StreamDeckButtonControlDefinition['feedbackType'] | null,
 	): void {
 		const buttonControl = this.deviceProperties.CONTROLS.find(
 			(control): control is StreamDeckButtonControlDefinition =>
-				control.type === 'button' && control.index === keyIndex
+				control.type === 'button' && control.index === keyIndex,
 		)
 
 		if (!buttonControl) {

@@ -1,5 +1,5 @@
-import { StreamdeckGen1ImageHeaderGenerator } from './headerGenerator'
-import { StreamdeckImageHeaderGenerator, StreamdeckImageWriter, StreamdeckImageWriterProps } from './types'
+import { StreamdeckGen1ImageHeaderGenerator } from './headerGenerator.js'
+import { StreamdeckImageHeaderGenerator, StreamdeckImageWriter, StreamdeckImageWriterProps } from './types.js'
 
 export class StreamdeckOriginalImageWriter implements StreamdeckImageWriter {
 	private readonly headerGenerator = new StreamdeckGen1ImageHeaderGenerator()
@@ -50,7 +50,7 @@ export class StreamdeckDefaultImageWriter<TProps = StreamdeckImageWriterProps>
 				props,
 				part,
 				remainingBytes <= MAX_PAYLOAD_SIZE,
-				byteCount
+				byteCount,
 			)
 
 			const byteOffset = byteBuffer.length - remainingBytes

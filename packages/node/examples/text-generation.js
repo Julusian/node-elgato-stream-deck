@@ -17,7 +17,7 @@ const { listStreamDecks, openStreamDeck } = require('../dist/index')
 
 		try {
 			const finalBuffer = await sharp(
-				path.resolve(__dirname, `fixtures/github_logo_${streamDeck.BUTTON_WIDTH_PX}.jpg`)
+				path.resolve(__dirname, `fixtures/github_logo_${streamDeck.BUTTON_WIDTH_PX}.jpg`),
 			)
 				.composite([
 					{
@@ -35,7 +35,7 @@ const { listStreamDecks, openStreamDeck } = require('../dist/index')
                             text-anchor="middle"
 							stroke="#666"
                             >FOO #${control.index}</text>
-                    </svg>`
+                    </svg>`,
 						),
 						top: 0,
 						left: 0,

@@ -14,7 +14,7 @@ const { listStreamDecks, openStreamDeck } = require('../dist/index')
 			streamDeck.fillKeyColor(control.index, 255, 255, 255).catch((e) => console.error('Fill failed:', e))
 		} else if (control.type === 'lcd-strip') {
 			const buffer = Buffer.alloc(control.pixelSize.width * control.pixelSize.height * 3).fill(
-				Buffer.from([255, 255, 255])
+				Buffer.from([255, 255, 255]),
 			)
 			streamDeck.fillLcd(control.id, buffer, { format: 'rgb' }).catch((e) => console.error('Fill lcd failed:', e))
 		}

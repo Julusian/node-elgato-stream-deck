@@ -1,9 +1,9 @@
-import { HIDDevice } from '../hid-device'
-import { OpenStreamDeckOptions, StreamDeckBase } from './base'
-import { StreamDeckGen1Factory, StreamDeckGen1Properties } from './generic-gen1'
-import { DeviceModelId } from '../id'
-import { StreamdeckOriginalImageWriter } from '../services/imageWriter/imageWriter'
-import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
+import { HIDDevice } from '../hid-device.js'
+import { OpenStreamDeckOptions, StreamDeckBase } from './base.js'
+import { StreamDeckGen1Factory, StreamDeckGen1Properties } from './generic-gen1.js'
+import { DeviceModelId } from '../id.js'
+import { StreamdeckOriginalImageWriter } from '../services/imageWriter/imageWriter.js'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 
 const originalProperties: StreamDeckGen1Properties = {
 	MODEL: DeviceModelId.ORIGINAL,
@@ -25,6 +25,6 @@ export function StreamDeckOriginalFactory(device: HIDDevice, options: Required<O
 		originalProperties,
 		new StreamdeckOriginalImageWriter(),
 		{ colorMode: 'bgr', xFlip: true },
-		3780
+		3780,
 	)
 }

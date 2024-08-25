@@ -26,7 +26,7 @@ listStreamDecks().then(async (devices) => {
 							await streamDeck.fillKeyColor(control.index, r, g, b)
 						} else if (control.type === 'lcd-strip') {
 							const lcdBuffer = Buffer.alloc(control.pixelSize.width * control.pixelSize.height * 4).fill(
-								Buffer.from([r, g, b, 255])
+								Buffer.from([r, g, b, 255]),
 							)
 							await streamDeck.fillLcd(control.id, lcdBuffer, { format: 'rgba' })
 						}

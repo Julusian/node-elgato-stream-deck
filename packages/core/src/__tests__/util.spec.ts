@@ -1,4 +1,4 @@
-import { transformImageBuffer } from '../util'
+import { transformImageBuffer } from '../util.js'
 
 function getSimpleBuffer(dim: number, components: 3 | 4): Buffer {
 	const buf = Buffer.alloc(dim * dim * components)
@@ -16,7 +16,7 @@ describe('imageToByteArray', () => {
 			{ colorMode: 'rgba' },
 			5,
 			2,
-			2
+			2,
 		)
 		expect(res).toMatchSnapshot()
 	})
@@ -28,7 +28,7 @@ describe('imageToByteArray', () => {
 			{ colorMode: 'bgr' },
 			4,
 			2,
-			2
+			2,
 		)
 		expect(res).toMatchSnapshot()
 	})
@@ -40,7 +40,7 @@ describe('imageToByteArray', () => {
 			{ colorMode: 'bgr' },
 			4,
 			2,
-			2
+			2,
 		)
 		expect(res).toMatchSnapshot()
 	})
@@ -52,7 +52,7 @@ describe('imageToByteArray', () => {
 			{ colorMode: 'rgba' },
 			4,
 			2,
-			2
+			2,
 		)
 		expect(res).toMatchSnapshot()
 	})
@@ -65,7 +65,7 @@ describe('imageToByteArray', () => {
 			{ colorMode: 'bgr', yFlip: true },
 			4,
 			3,
-			3
+			3,
 		)
 		expect(res).toMatchSnapshot()
 	})
@@ -78,7 +78,7 @@ describe('imageToByteArray', () => {
 			{ colorMode: 'bgr', xFlip: true },
 			4,
 			3,
-			3
+			3,
 		)
 		expect(res).toMatchSnapshot()
 	})

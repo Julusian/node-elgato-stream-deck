@@ -1,11 +1,11 @@
-import { HIDDevice } from '../hid-device'
-import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base'
-import { DeviceModelId, Dimension } from '../id'
-import { FillImageOptions, FillPanelDimensionsOptions, FillPanelOptions } from '../types'
-import { StreamDeckControlDefinition } from '../controlDefinition'
-import { freezeDefinitions } from '../controlsGenerator'
-import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay'
-import { PropertiesService } from '../services/propertiesService'
+import { HIDDevice } from '../hid-device.js'
+import { OpenStreamDeckOptions, StreamDeckBase, StreamDeckProperties } from './base.js'
+import { DeviceModelId, Dimension } from '../id.js'
+import { FillImageOptions, FillPanelDimensionsOptions, FillPanelOptions } from '../types.js'
+import { StreamDeckControlDefinition } from '../controlDefinition.js'
+import { freezeDefinitions } from '../controlsGenerator.js'
+import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay.js'
+import { PropertiesService } from '../services/propertiesService.js'
 
 const pedalControls: StreamDeckControlDefinition[] = [
 	{
@@ -104,6 +104,6 @@ export function StreamDeckPedalFactory(device: HIDDevice, options: Required<Open
 		pedalProperties,
 		new PedalPropertiesService(device),
 		new PedalLcdService(),
-		null
+		null,
 	)
 }

@@ -1,6 +1,6 @@
 import type { EventEmitter } from 'events'
-import type { StreamDeckEvents } from '..'
-import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../controlDefinition'
+import type { StreamDeckEvents } from '../types.js'
+import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../controlDefinition.js'
 
 export class EncoderInputService {
 	readonly #eventSource: EventEmitter<StreamDeckEvents>
@@ -10,7 +10,7 @@ export class EncoderInputService {
 	constructor(eventSource: EventEmitter<StreamDeckEvents>, allControls: Readonly<StreamDeckControlDefinition[]>) {
 		this.#eventSource = eventSource
 		this.#encoderControls = allControls.filter(
-			(control): control is StreamDeckEncoderControlDefinition => control.type === 'encoder'
+			(control): control is StreamDeckEncoderControlDefinition => control.type === 'encoder',
 		)
 		const maxIndex = Math.max(-1, ...this.#encoderControls.map((control) => control.index))
 		this.#encoderState = new Array<boolean>(maxIndex + 1).fill(false)

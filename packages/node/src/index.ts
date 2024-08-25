@@ -1,8 +1,8 @@
 import { DEVICE_MODELS, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from '@elgato-stream-deck/core'
 import * as HID from 'node-hid'
-import { NodeHIDDevice, StreamDeckDeviceInfo } from './hid-device'
-import { encodeJPEG, JPEGEncodeOptions } from './jpeg'
-import { StreamDeckNode } from './wrapper'
+import { NodeHIDDevice, StreamDeckDeviceInfo } from './hid-device.js'
+import { encodeJPEG, JPEGEncodeOptions } from './jpeg.js'
+import { StreamDeckNode } from './wrapper.js'
 
 export {
 	VENDOR_ID,
@@ -90,7 +90,7 @@ export async function openStreamDeck(devicePath: string, userOptions?: OpenStrea
 		const deviceInfo = await device.getDeviceInfo()
 
 		const model = DEVICE_MODELS.find(
-			(m) => deviceInfo.vendorId === VENDOR_ID && m.productIds.includes(deviceInfo.productId)
+			(m) => deviceInfo.vendorId === VENDOR_ID && m.productIds.includes(deviceInfo.productId),
 		)
 		if (!model) {
 			throw new Error('Stream Deck is of unexpected type.')

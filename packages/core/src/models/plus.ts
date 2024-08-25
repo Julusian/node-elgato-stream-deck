@@ -1,16 +1,16 @@
-import { transformImageBuffer } from '../util'
-import { FillImageOptions, FillLcdImageOptions, StreamDeckEvents } from '../types'
-import { HIDDevice } from '../hid-device'
-import { EncodeJPEGHelper, OpenStreamDeckOptions } from './base'
-import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2'
-import { DeviceModelId } from '../id'
-import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter'
-import { StreamdeckPlusLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator'
-import { InternalFillImageOptions } from '../services/buttonsLcdDisplay'
-import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
-import { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition'
-import { LcdStripInputService } from '../services/lcdStripInput'
-import { LcdStripDisplayService } from '../services/lcdStripDisplay'
+import { transformImageBuffer } from '../util.js'
+import { FillImageOptions, FillLcdImageOptions, StreamDeckEvents } from '../types.js'
+import { HIDDevice } from '../hid-device.js'
+import { EncodeJPEGHelper, OpenStreamDeckOptions } from './base.js'
+import { StreamDeckGen2, StreamDeckGen2Properties } from './generic-gen2.js'
+import { DeviceModelId } from '../id.js'
+import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter.js'
+import { StreamdeckPlusLcdImageHeaderGenerator } from '../services/imageWriter/headerGenerator.js'
+import { InternalFillImageOptions } from '../services/buttonsLcdDisplay.js'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
+import { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
+import { LcdStripInputService } from '../services/lcdStripInput.js'
+import { LcdStripDisplayService } from '../services/lcdStripDisplay.js'
 
 const plusControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2)
 plusControls.push(
@@ -56,7 +56,7 @@ plusControls.push(
 		column: 3,
 		index: 3,
 		hidIndex: 3,
-	}
+	},
 )
 
 const plusProperties: StreamDeckGen2Properties = {
@@ -71,7 +71,7 @@ const plusProperties: StreamDeckGen2Properties = {
 	KEY_SPACING_VERTICAL: 40,
 }
 const lcdStripControls = plusProperties.CONTROLS.filter(
-	(control): control is StreamDeckLcdStripControlDefinition => control.type === 'lcd-strip'
+	(control): control is StreamDeckLcdStripControlDefinition => control.type === 'lcd-strip',
 )
 
 class StreamDeckPlus extends StreamDeckGen2 {
@@ -82,7 +82,7 @@ class StreamDeckPlus extends StreamDeckGen2 {
 			plusProperties,
 			new StreamDeckPlusLcdService(options.encodeJPEG, device, lcdStripControls),
 			new LcdStripInputService(lcdStripControls, (key, ...args) => this.emit(key, ...args)),
-			true
+			true,
 		)
 	}
 }
@@ -102,7 +102,7 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 	constructor(
 		encodeJPEG: EncodeJPEGHelper,
 		device: HIDDevice,
-		lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>
+		lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>,
 	) {
 		this.#encodeJPEG = encodeJPEG
 		this.#device = device
@@ -138,7 +138,7 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		x: number,
 		y: number,
 		imageBuffer: Buffer,
-		sourceOptions: FillLcdImageOptions
+		sourceOptions: FillLcdImageOptions,
 	): Promise<void> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
 		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
@@ -164,7 +164,7 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		x: number,
 		y: number,
 		imageBuffer: Buffer,
-		sourceOptions: FillLcdImageOptions
+		sourceOptions: FillLcdImageOptions,
 	): Promise<void> {
 		// Basic bounds checking
 		const maxSize = lcdControl.pixelSize
@@ -200,7 +200,7 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 			{ colorMode: 'rgba' },
 			0,
 			sourceOptions.width,
-			sourceOptions.height
+			sourceOptions.height,
 		)
 
 		return this.#encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height)

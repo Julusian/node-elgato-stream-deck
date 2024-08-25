@@ -1,12 +1,12 @@
 import { EventEmitter } from 'events'
-import { DeviceModelId, Dimension, KeyIndex } from './id'
-import { HIDDeviceInfo } from './hid-device'
+import { DeviceModelId, Dimension, KeyIndex } from './id.js'
+import { HIDDeviceInfo } from './hid-device.js'
 import {
 	StreamDeckButtonControlDefinition,
 	StreamDeckControlDefinition,
 	StreamDeckEncoderControlDefinition,
 	StreamDeckLcdStripControlDefinition,
-} from './controlDefinition'
+} from './controlDefinition.js'
 
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
@@ -127,7 +127,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 		x: number,
 		y: number,
 		imageBuffer: Buffer,
-		sourceOptions: FillLcdImageOptions
+		sourceOptions: FillLcdImageOptions,
 	): Promise<void>
 
 	/**

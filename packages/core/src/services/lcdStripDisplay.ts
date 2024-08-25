@@ -1,4 +1,4 @@
-import type { FillImageOptions, FillLcdImageOptions } from '../types'
+import type { FillImageOptions, FillLcdImageOptions } from '../types.js'
 
 export interface LcdStripDisplayService {
 	/**
@@ -30,7 +30,7 @@ export interface LcdStripDisplayService {
 		x: number,
 		y: number,
 		imageBuffer: Buffer,
-		sourceOptions: FillLcdImageOptions
+		sourceOptions: FillLcdImageOptions,
 	): Promise<void>
 
 	/**

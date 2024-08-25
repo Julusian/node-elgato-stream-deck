@@ -1,6 +1,5 @@
 // @ts-check
 const path = require('path')
-// eslint-disable-next-line node/no-missing-require
 const Jimp = require('jimp')
 const { listStreamDecks, openStreamDeck } = require('../dist/index')
 
