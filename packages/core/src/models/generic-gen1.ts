@@ -105,7 +105,7 @@ class Gen1PropertiesService implements PropertiesService {
 		}
 
 		// prettier-ignore
-		const brightnessCommandBuffer = Buffer.from([
+		const brightnessCommandBuffer = new Uint8Array([
 			0x05,
 			0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
@@ -115,7 +115,7 @@ class Gen1PropertiesService implements PropertiesService {
 
 	public async resetToLogo(): Promise<void> {
 		// prettier-ignore
-		const resetCommandBuffer = Buffer.from([
+		const resetCommandBuffer = new Uint8Array([
 			0x0b,
 			0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00

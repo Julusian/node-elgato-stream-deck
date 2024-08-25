@@ -154,7 +154,7 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
 		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
 
-		const buffer = Buffer.alloc(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4)
+		const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4)
 
 		await this.fillControlRegion(lcdControl, 0, 0, buffer, {
 			format: 'rgba',

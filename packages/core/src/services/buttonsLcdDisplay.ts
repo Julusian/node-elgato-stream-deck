@@ -119,7 +119,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 					if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL) {
 						ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0))
 					} else {
-						const pixels = Buffer.alloc(this.imageRgbBytes, 0)
+						const pixels = new Uint8Array(this.imageRgbBytes)
 						ps.push(
 							this.fillImageRangeControl(control, pixels, {
 								format: 'rgb',
@@ -148,7 +148,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control?.feedbackType === 'rgb') {
 			await this.sendKeyRgb(keyIndex, 0, 0, 0)
 		} else {
-			const pixels = Buffer.alloc(this.imageRgbBytes, 0)
+			const pixels = new Uint8Array(this.imageRgbBytes)
 			await this.fillImageRange(keyIndex, pixels, {
 				format: 'rgb',
 				offset: 0,
@@ -170,9 +170,25 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control?.feedbackType === 'rgb') {
 			await this.sendKeyRgb(keyIndex, r, g, b)
 		} else {
-			const pixels = Buffer.alloc(this.imageRgbBytes, Buffer.from([r, g, b]))
+			// rgba is excessive here, but it makes the fill easier as it can be done in a 32bit uint
+			const pixels = new Uint8Array(this.imagePixelCount * 4)
+			const view = new DataView(pixels.buffer, pixels.byteOffset, pixels.byteLength)
+
+			// write first pixel
+			view.setUint8(0, r)
+			view.setUint8(1, g)
+			view.setUint8(2, b)
+			view.setUint8(3, 255)
+
+			// read computed pixel
+			const sample = view.getUint32(0)
+			// fill with computed pixel
+			for (let i = 1; i < this.imagePixelCount; i++) {
+				view.setUint32(i * 4, sample)
+			}
+
 			await this.fillImageRange(keyIndex, pixels, {
-				format: 'rgb',
+				format: 'rgba',
 				offset: 0,
 				stride: this.#imagePacker.imageWidth * 3,
 			})
@@ -240,7 +256,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	}
 
 	private async sendKeyRgb(keyIndex: number, red: number, green: number, blue: number): Promise<void> {
-		await this.#device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, red, green, blue]))
+		await this.#device.sendFeatureReport(new Uint8Array([0x03, 0x06, keyIndex, red, green, blue]))
 	}
 
 	private async fillImageRange(keyIndex: KeyIndex, imageBuffer: Uint8Array, sourceOptions: InternalFillImageOptions) {

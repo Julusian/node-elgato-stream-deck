@@ -60,9 +60,6 @@ module.exports = {
 		new CopyWebpackPlugin({
 			patterns: [{ from: path.join(__dirname, '/public'), to: path.join(__dirname, '/dist') }],
 		}),
-		new ProvidePlugin({
-			Buffer: ['buffer', 'Buffer'],
-		}),
 		new DefinePlugin({
 			LIB_VERSION: JSON.stringify(process.env.npm_package_version || ''),
 		}),
