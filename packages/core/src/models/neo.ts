@@ -1,9 +1,11 @@
-import { HIDDevice } from '../hid-device.js'
-import { OpenStreamDeckOptions, StreamDeckBase } from './base.js'
+import type { HIDDevice } from '../hid-device.js'
+import type { OpenStreamDeckOptions } from './base.js'
+import { StreamDeckBase } from './base.js'
 import { DeviceModelId } from '../id.js'
-import { createBaseGen2Properties, StreamDeckGen2Properties } from './generic-gen2.js'
+import type { StreamDeckGen2Properties } from './generic-gen2.js'
+import { createBaseGen2Properties } from './generic-gen2.js'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
-import { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
+import type { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
 import { StreamDeckNeoLcdService } from '../services/lcdStripDisplay/neo.js'
 
 const neoControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2)

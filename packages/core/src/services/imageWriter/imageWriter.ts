@@ -1,5 +1,5 @@
 import { StreamdeckGen1ImageHeaderGenerator } from './headerGenerator.js'
-import { StreamdeckImageHeaderGenerator, StreamdeckImageWriter, StreamdeckImageWriterProps } from './types.js'
+import type { StreamdeckImageHeaderGenerator, StreamdeckImageWriter, StreamdeckImageWriterProps } from './types.js'
 
 export class StreamdeckOriginalImageWriter implements StreamdeckImageWriter {
 	private readonly headerGenerator = new StreamdeckGen1ImageHeaderGenerator()

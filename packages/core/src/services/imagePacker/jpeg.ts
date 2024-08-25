@@ -1,6 +1,6 @@
-import { ButtonLcdImagePacker, InternalFillImageOptions } from './interface.js'
+import type { ButtonLcdImagePacker, InternalFillImageOptions } from './interface.js'
 import { transformImageBuffer } from '../../util.js'
-import { EncodeJPEGHelper } from '../../models/base.js'
+import type { EncodeJPEGHelper } from '../../models/base.js'
 
 export class JpegButtonLcdImagePacker implements ButtonLcdImagePacker {
 	readonly #encodeJPEG: EncodeJPEGHelper

@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 
 import { readFixtureJSON } from './helpers.js'
-import { DeviceModelId, DEVICE_MODELS, StreamDeck } from '../index.js'
-import { OpenStreamDeckOptions, EncodeJPEGHelper } from '../models/base.js'
+import type { StreamDeck } from '../index.js'
+import { DeviceModelId, DEVICE_MODELS } from '../index.js'
+import type { OpenStreamDeckOptions, EncodeJPEGHelper } from '../models/base.js'
 import { DummyHID } from './hid.js'
 
 function openStreamDeck(path: string, deviceModel: DeviceModelId, userOptions?: OpenStreamDeckOptions): StreamDeck {

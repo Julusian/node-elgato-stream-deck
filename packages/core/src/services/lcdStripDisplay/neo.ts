@@ -1,13 +1,13 @@
-import { StreamDeckLcdStripControlDefinition } from '../../controlDefinition.js'
-import { HIDDevice } from '../../hid-device.js'
-import { Dimension } from '../../id.js'
-import { InternalFillImageOptions } from '../imagePacker/interface.js'
+import type { StreamDeckLcdStripControlDefinition } from '../../controlDefinition.js'
+import type { HIDDevice } from '../../hid-device.js'
+import type { Dimension } from '../../id.js'
+import type { InternalFillImageOptions } from '../imagePacker/interface.js'
 import { StreamdeckNeoLcdImageHeaderGenerator } from '../imageWriter/headerGenerator.js'
 import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter.js'
-import { LcdStripDisplayService } from './interface.js'
-import { FillLcdImageOptions, FillImageOptions } from '../../types.js'
+import type { LcdStripDisplayService } from './interface.js'
+import type { FillLcdImageOptions, FillImageOptions } from '../../types.js'
 import { transformImageBuffer } from '../../util.js'
-import { EncodeJPEGHelper } from '../../models/base.js'
+import type { EncodeJPEGHelper } from '../../models/base.js'
 
 export class StreamDeckNeoLcdService implements LcdStripDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper

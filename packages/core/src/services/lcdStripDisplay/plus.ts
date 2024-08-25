@@ -1,12 +1,12 @@
-import { StreamDeckLcdStripControlDefinition } from '../../controlDefinition.js'
-import { HIDDevice } from '../../hid-device.js'
-import { InternalFillImageOptions } from '../imagePacker/interface.js'
+import type { StreamDeckLcdStripControlDefinition } from '../../controlDefinition.js'
+import type { HIDDevice } from '../../hid-device.js'
+import type { InternalFillImageOptions } from '../imagePacker/interface.js'
 import { StreamdeckPlusLcdImageHeaderGenerator } from '../imageWriter/headerGenerator.js'
 import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter.js'
-import { LcdStripDisplayService } from './interface.js'
-import { FillImageOptions, FillLcdImageOptions } from '../../types.js'
+import type { LcdStripDisplayService } from './interface.js'
+import type { FillImageOptions, FillLcdImageOptions } from '../../types.js'
 import { transformImageBuffer } from '../../util.js'
-import { EncodeJPEGHelper } from '../../models/base.js'
+import type { EncodeJPEGHelper } from '../../models/base.js'
 
 export class StreamDeckPlusLcdService implements LcdStripDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper

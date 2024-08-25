@@ -2,6 +2,8 @@
 
 import { mocked } from 'jest-mock'
 import { readFixtureJSON } from './helpers.js'
+import type * as TjpegJs from 'jpeg-js'
+import type * as Tjpeg from '../jpeg.js'
 
 const iconSize = 96
 
@@ -22,10 +24,10 @@ describe('jpeg-encoding', () => {
 
 		// Mock jpeg-js so we can see if it got used instead of jpeg-turbo
 		jest.doMock('jpeg-js')
-		const jpegJS: typeof import('jpeg-js') = require('jpeg-js')
+		const jpegJS: typeof TjpegJs = require('jpeg-js')
 		mocked(jpegJS.encode).mockImplementation((src) => ({ ...src, data: Buffer.alloc(100) }))
 
-		const { encodeJPEG } = require('../jpeg.js') as typeof import('../jpeg.js')
+		const { encodeJPEG } = require('../jpeg.js') as typeof Tjpeg
 
 		const encoded = await encodeJPEG(img, iconSize, iconSize, undefined)
 		expect(encoded).toBeTruthy()
@@ -39,11 +41,11 @@ describe('jpeg-encoding', () => {
 		const img = addAlphaChannel(readFixtureJSON('fillImage-sample-icon-96.json'))
 
 		// Ensure real jpeg-js is enabled
-		const jpegJS: typeof import('jpeg-js') = require('jpeg-js')
+		const jpegJS: typeof TjpegJs = require('jpeg-js')
 		mocked(jpegJS.encode).mockImplementation(jest.requireActual('jpeg-js').encode)
 
 		jest.doMock('@julusian/jpeg-turbo', undefined)
-		const { encodeJPEG } = require('../jpeg.js') as typeof import('../jpeg.js')
+		const { encodeJPEG } = require('../jpeg.js') as typeof Tjpeg
 
 		const encoded = await encodeJPEG(img, iconSize, iconSize, undefined)
 		expect(encoded).toBeTruthy()

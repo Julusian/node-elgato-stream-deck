@@ -8,6 +8,13 @@ const customConfig = [
 	...baseConfig,
 
 	{
+		files: ['**/*.ts', '**/*.tsx'],
+		rules: {
+			'@typescript-eslint/consistent-type-imports': 'error',
+		},
+	},
+
+	{
 		files: ['**/examples/*.js', '**/*.cjs'],
 		rules: {
 			'@typescript-eslint/no-require-imports': 'off',

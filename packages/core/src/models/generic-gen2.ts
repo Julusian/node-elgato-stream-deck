@@ -1,5 +1,5 @@
-import { HIDDevice } from '../hid-device.js'
-import { OpenStreamDeckOptions, StreamDeckProperties, StreamDeckServicesDefinition } from './base.js'
+import type { HIDDevice } from '../hid-device.js'
+import type { OpenStreamDeckOptions, StreamDeckProperties, StreamDeckServicesDefinition } from './base.js'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter.js'
 import { StreamdeckGen2ImageHeaderGenerator } from '../services/imageWriter/headerGenerator.js'
 import { EncoderInputService } from '../services/encoderInput.js'

@@ -1,5 +1,5 @@
-import { StreamDeck, StreamDeckButtonControlDefinition } from '@elgato-stream-deck/webhid'
-import { Demo } from './demo.js'
+import type { StreamDeck, StreamDeckButtonControlDefinition } from '@elgato-stream-deck/webhid'
+import type { Demo } from './demo.js'
 
 export class ChaseDemo implements Demo {
 	private pressed: number[] = []

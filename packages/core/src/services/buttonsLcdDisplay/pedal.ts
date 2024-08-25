@@ -1,4 +1,4 @@
-import { Dimension } from '../../id.js'
+import type { Dimension } from '../../id.js'
 import type { ButtonsLcdDisplayService } from './interface.js'
 import type { FillPanelDimensionsOptions, FillImageOptions, FillPanelOptions } from '../../types.js'
 

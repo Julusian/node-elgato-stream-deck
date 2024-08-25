@@ -1,4 +1,5 @@
 import * as jpegJS from 'jpeg-js'
+import type { EncodeOptions } from '@julusian/jpeg-turbo'
 
 export interface JPEGEncodeOptions {
 	quality: number
@@ -25,7 +26,7 @@ export async function encodeJPEG(
 
 		// Try using jpeg-turbo if it is available
 		if (jpegTurbo && jpegTurbo.bufferSize && !!jpegTurbo.compressSync) {
-			const encodeOptions: import('@julusian/jpeg-turbo').EncodeOptions = {
+			const encodeOptions: EncodeOptions = {
 				format: jpegTurbo.FORMAT_RGBA,
 				width,
 				height,

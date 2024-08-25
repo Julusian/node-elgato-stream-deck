@@ -1,7 +1,7 @@
-import * as EventEmitter from 'eventemitter3'
-import { DeviceModelId, Dimension, KeyIndex } from './id.js'
-import { HIDDeviceInfo } from './hid-device.js'
-import {
+import type * as EventEmitter from 'eventemitter3'
+import type { DeviceModelId, Dimension, KeyIndex } from './id.js'
+import type { HIDDeviceInfo } from './hid-device.js'
+import type {
 	StreamDeckButtonControlDefinition,
 	StreamDeckControlDefinition,
 	StreamDeckEncoderControlDefinition,

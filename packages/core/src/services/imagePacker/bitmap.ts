@@ -1,5 +1,6 @@
-import { ButtonLcdImagePacker, InternalFillImageOptions } from './interface.js'
-import { FillImageTargetOptions, transformImageBuffer, BMP_HEADER_LENGTH, writeBMPHeader } from '../../util.js'
+import type { ButtonLcdImagePacker, InternalFillImageOptions } from './interface.js'
+import type { FillImageTargetOptions } from '../../util.js'
+import { transformImageBuffer, BMP_HEADER_LENGTH, writeBMPHeader } from '../../util.js'
 
 export class BitmapButtonLcdImagePacker implements ButtonLcdImagePacker {
 	readonly #targetOptions: FillImageTargetOptions

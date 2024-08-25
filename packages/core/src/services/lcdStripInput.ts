@@ -1,4 +1,5 @@
-import { LcdPosition, type StreamDeckEvents } from '../types.js'
+import type { LcdPosition } from '../types.js'
+import { type StreamDeckEvents } from '../types.js'
 import type { StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
 import { uint8ArrayToDataView } from '../util.js'
 import type { CallbackHook } from './callback-hook.js'

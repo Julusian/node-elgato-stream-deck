@@ -1,6 +1,6 @@
 import * as EventEmitter from 'eventemitter3'
-import { HIDDevice, HIDDeviceInfo } from '../hid-device.js'
-import { DeviceModelId, Dimension, KeyIndex } from '../id.js'
+import type { HIDDevice, HIDDeviceInfo } from '../hid-device.js'
+import type { DeviceModelId, Dimension, KeyIndex } from '../id.js'
 import type {
 	FillImageOptions,
 	FillPanelDimensionsOptions,

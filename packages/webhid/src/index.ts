@@ -1,6 +1,7 @@
 /* eslint-disable n/no-unsupported-features/node-builtins */
 
-import { DEVICE_MODELS, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from '@elgato-stream-deck/core'
+import type { OpenStreamDeckOptions, StreamDeck } from '@elgato-stream-deck/core'
+import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'
 import { WebHIDDevice } from './hid-device.js'
 import { encodeJPEG } from './jpeg.js'
 import { StreamDeckWeb } from './wrapper.js'

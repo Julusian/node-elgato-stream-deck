@@ -1,4 +1,4 @@
-import { FillImageOptions } from '../../types.js'
+import type { FillImageOptions } from '../../types.js'
 
 export interface InternalFillImageOptions extends FillImageOptions {
 	offset: number
