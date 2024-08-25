@@ -35,11 +35,6 @@ export class DummyHID extends EventEmitter implements HIDAsync {
 		throw new Error('Method not implemented.')
 	}
 
-	public async generateDeviceInfo(): Promise<Device> {
-		// TODO - remove this!
-		throw new Error('Not implemented')
-	}
-
 	public getDeviceInfo = jest.fn(async (): Promise<Device> => {
 		throw new Error('Not implemented')
 	})
