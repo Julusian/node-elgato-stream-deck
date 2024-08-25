@@ -6,6 +6,9 @@ import type { FillImageTargetOptions } from '../util.js'
 import { Gen1PropertiesService } from '../services/properties/gen1.js'
 import { DefaultButtonsLcdService } from '../services/buttonsLcdDisplay/default.js'
 import { BitmapButtonLcdImagePacker } from '../services/imagePacker/bitmap.js'
+import { CallbackHook } from '../services/callback-hook.js'
+import type { StreamDeckEvents } from '../types.js'
+import { ButtonOnlyInputService } from '../services/input/gen1.js'
 
 function extendDevicePropertiesForGen1(rawProps: StreamDeckGen1Properties): StreamDeckProperties {
 	return {
@@ -26,9 +29,11 @@ export function StreamDeckGen1Factory(
 ): StreamDeckBase {
 	const fullProperties = extendDevicePropertiesForGen1(properties)
 
+	const events = new CallbackHook<StreamDeckEvents>()
+
 	return new StreamDeckBase(device, options, {
 		deviceProperties: fullProperties,
-		events: null,
+		events,
 		properties: new Gen1PropertiesService(device),
 		buttonsLcd: new DefaultButtonsLcdService(
 			imageWriter,
@@ -42,7 +47,6 @@ export function StreamDeckGen1Factory(
 			fullProperties,
 		),
 		lcdStripDisplay: null,
-		lcdStripInput: null,
-		encoderInput: null,
+		inputService: new ButtonOnlyInputService(fullProperties, events),
 	})
 }

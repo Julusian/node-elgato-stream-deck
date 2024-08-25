@@ -6,7 +6,6 @@ import { createBaseGen2Properties } from './generic-gen2.js'
 import { DeviceModelId } from '../id.js'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 import type { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
-import { LcdStripInputService } from '../services/lcdStripInput.js'
 import { StreamDeckPlusLcdService } from '../services/lcdStripDisplay/plus.js'
 
 const plusControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2)
@@ -74,7 +73,6 @@ const lcdStripControls = plusProperties.CONTROLS.filter(
 export function StreamDeckPlusFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
 	const services = createBaseGen2Properties(device, options, plusProperties, true)
 	services.lcdStripDisplay = new StreamDeckPlusLcdService(options.encodeJPEG, device, lcdStripControls)
-	services.lcdStripInput = new LcdStripInputService(lcdStripControls, services.events)
 
 	return new StreamDeckBase(device, options, services)
 }

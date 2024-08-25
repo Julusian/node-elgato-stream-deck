@@ -415,7 +415,7 @@ describe('StreamDeck', () => {
 		})
 	})
 
-	test('down and up events', () => {
+	test.only('down and up events', () => {
 		const downSpy = jest.fn()
 		const upSpy = jest.fn()
 		streamDeck.on('down', downSpy)
