@@ -59,7 +59,7 @@ export async function getStreamDeckInfo(path: string): Promise<StreamDeckDeviceI
 
 /**
  * Open a streamdeck
- * @param devicePath The path of the device to open. If not set, the first will be used
+ * @param devicePath The path of the device to open.
  * @param userOptions Options to customise the device behvaiour
  */
 export async function openStreamDeck(devicePath: string, userOptions?: OpenStreamDeckOptionsNode): Promise<StreamDeck> {
@@ -88,7 +88,7 @@ export async function openStreamDeck(devicePath: string, userOptions?: OpenStrea
 		const deviceInfo = await device.getDeviceInfo()
 
 		const model = DEVICE_MODELS.find(
-			(m) => m.productId === deviceInfo.productId && deviceInfo.vendorId === VENDOR_ID
+			(m) => m.productId === deviceInfo.productId && deviceInfo.vendorId === VENDOR_ID,
 		)
 		if (!model) {
 			throw new Error('Stream Deck is of unexpected type.')

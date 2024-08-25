@@ -86,10 +86,10 @@ export function getStreamDeckInfo(path: string): Promise<StreamDeckDeviceInfo | 
 
 /**
  * Open a streamdeck
- * @param devicePath The path of the device to open. If not set, the first will be used
+ * @param devicePath The path of the device to open.
  * @param userOptions Options to customise the device behvaiour
  */
-export function openStreamDeck(devicePath?: string, userOptions?: OpenStreamDeckOptionsNode): Promise<StreamDeck>
+export function openStreamDeck(devicePath: string, userOptions?: OpenStreamDeckOptionsNode): Promise<StreamDeck>
 ```
 
 The StreamDeck type can be found [here](/packages/core/src/models/types.ts#L15)
@@ -97,15 +97,16 @@ The StreamDeck type can be found [here](/packages/core/src/models/types.ts#L15)
 ## Example
 
 ```typescript
-import { openStreamDeck } from '@elgato-stream-deck/node'
+import { openStreamDeck, listStreamDecks } from '@elgato-stream-deck/node'
 
-// Automatically discovers connected Stream Decks, and attaches to the first one.
-// Throws if there are no connected stream decks.
-// You also have the option of providing the devicePath yourself as the first argument to the constructor.
+// List the connected streamdecks
+const devices = await listStreamDecks()
+if (devices.length === 0) throw new Error('No streamdecks connected!')
+
+// You must provide the devicePath yourself as the first argument to the constructor.
 // For example: const myStreamDeck = new StreamDeck('\\\\?\\hid#vid_05f3&pid_0405&mi_00#7&56cf813&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}')
 // On linux the equivalent would be: const myStreamDeck = new StreamDeck('0001:0021:00')
-// Available devices can be found with listStreamDecks()
-const myStreamDeck = await openStreamDeck() // Will throw an error if no Stream Decks are connected.
+const myStreamDeck = await openStreamDeck(devices[0].path)
 
 myStreamDeck.on('down', (keyIndex) => {
 	console.log('key %d down', keyIndex)
