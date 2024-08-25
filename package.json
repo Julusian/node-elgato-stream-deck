@@ -50,7 +50,7 @@
     "snyk-nodejs-lockfile-parser": "^1.57.0",
     "ts-jest": "^29.2.2",
     "ts-node": "^10.9.2",
-    "typescript": "~5.1.6",
+    "typescript": "~5.5.4",
     "typescript-eslint": "^8.2.0",
     "usb": "^2.13.0"
   },

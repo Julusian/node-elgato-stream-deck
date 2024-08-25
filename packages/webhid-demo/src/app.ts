@@ -1,6 +1,6 @@
 import { requestStreamDecks, getStreamDecks, StreamDeckWeb, LcdPosition } from '@elgato-stream-deck/webhid'
 import { Demo } from './demo/demo.js'
-import { DomImageDemo } from './demo/dom.js'
+import { DomImageDemo } from './demo/dom.ts'
 import { FillWhenPressedDemo } from './demo/fill-when-pressed.js'
 import { RapidFillDemo } from './demo/rapid-fill.js'
 import { ChaseDemo } from './demo/chase.js'

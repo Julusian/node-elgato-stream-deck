@@ -3,6 +3,7 @@
 	"include": ["src/**/*"],
 	"compilerOptions": {
 		"module": "commonjs",
+		"moduleResolution": "node",
 		"importHelpers": true,
 		"noEmitOnError": false,
 		"esModuleInterop": true,
