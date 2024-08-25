@@ -236,12 +236,6 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		return this.#lcdStripDisplayService.fillLcd(...args)
 	}
 
-	// public async fillEncoderLcd(
-	// 	...args: Parameters<StreamDeck['fillEncoderLcd']>
-	// ): ReturnType<StreamDeck['fillEncoderLcd']> {
-	// 	return this.device.fillEncoderLcd(...args)
-	// }
-
 	public async fillLcdRegion(
 		...args: Parameters<StreamDeck['fillLcdRegion']>
 	): ReturnType<StreamDeck['fillLcdRegion']> {

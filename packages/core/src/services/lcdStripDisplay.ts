@@ -13,14 +13,6 @@ export interface LcdStripDisplayService {
 		sourceOptions: FillImageOptions,
 	): Promise<void>
 
-	// /**
-	//  * Fills the lcd strip above an encoder
-	//  * @param {number} index The encoder to draw above
-	//  * @param {Buffer} imageBuffer The image to write
-	//  * @param {Object} sourceOptions Options to control the write
-	//  */
-	// fillEncoderLcd(index: EncoderIndex, imageBuffer: Uint8Array, sourceOptions: FillImageOptions): Promise<void>
-
 	/**
 	 * Fill a region of the lcd strip, ignoring the boundaries of the encoders
 	 * @param {number} lcdIndex The id of the lcd strip to draw to

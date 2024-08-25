@@ -114,19 +114,6 @@ class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		})
 	}
 
-	// public async fillEncoderLcd(index: EncoderIndex, buffer: Uint8Array, sourceOptions: FillImageOptions): Promise<void> {
-	// 	if (this.#encoderCount === 0) throw new Error(`There are no encoders`)
-
-	// 	const size = this.LCD_ENCODER_SIZE
-	// 	const x = index * size.width
-
-	// 	return this.fillLcdRegion(x, 0, buffer, {
-	// 		format: sourceOptions.format,
-	// 		width: size.width,
-	// 		height: size.height,
-	// 	})
-	// }
-
 	public async fillLcdRegion(
 		index: number,
 		x: number,

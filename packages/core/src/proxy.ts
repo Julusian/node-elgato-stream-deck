@@ -92,12 +92,6 @@ export class StreamDeckProxy implements StreamDeck {
 		return this.device.fillLcd(...args)
 	}
 
-	// public async fillEncoderLcd(
-	// 	...args: Parameters<StreamDeck['fillEncoderLcd']>
-	// ): ReturnType<StreamDeck['fillEncoderLcd']> {
-	// 	return this.device.fillEncoderLcd(...args)
-	// }
-
 	public async fillLcdRegion(
 		...args: Parameters<StreamDeck['fillLcdRegion']>
 	): ReturnType<StreamDeck['fillLcdRegion']> {
