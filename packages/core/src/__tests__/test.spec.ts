@@ -48,7 +48,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 	})
 
 	if (supportsRgbKeyFill) {
-		test('clearKey', async () => {
+		test('clearKey-rgb', async () => {
 			const hid = getDevice(streamDeck)
 			const mockedFn = (hid.sendFeatureReport = jest.fn(async () => Promise.resolve()))
 			await streamDeck.clearKey(2)
@@ -56,7 +56,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 			expect(mockedFn).toHaveBeenNthCalledWith(1, Buffer.from([3, 6, 2, 0, 0, 0]))
 		})
 
-		test('clearPanel', async () => {
+		test('clearPanel-rgb', async () => {
 			const hid = getDevice(streamDeck)
 			const mockedFn = (hid.sendFeatureReport = jest.fn(async () => Promise.resolve()))
 			await streamDeck.clearPanel()
@@ -68,7 +68,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 			}
 		})
 	} else {
-		test('clearKey', async () => {
+		test('clearKey=rgb', async () => {
 			const mockedFn = ((streamDeck as any).fillImageRange = jest.fn(async () => Promise.resolve()))
 			await streamDeck.clearKey(2)
 			expect(mockedFn).toHaveBeenCalledTimes(1)
@@ -335,7 +335,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 	})
 
 	if (supportsRgbKeyFill) {
-		test('fillKeyColor', async () => {
+		test('fillKeyColor-rgb', async () => {
 			const hid = getDevice(streamDeck)
 			const mockedFn = (hid.sendFeatureReport = jest.fn(async () => Promise.resolve()))
 
