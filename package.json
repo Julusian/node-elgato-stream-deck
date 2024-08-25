@@ -3,14 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "prepare": "run g:husky install",
+    "postinstall": "husky",
     "dev": "run build:root --watch",
     "dev:demo": "yarn workspace @elgato-stream-deck/webhid-demo start",
     "build": "run build:root && yarn workspace @elgato-stream-deck/webhid-demo build",
     "build:root": "(run g:rimraf packages/*/dist || true) && run g:tsc --build",
     "test": "run lint && run unit",
     "unit": "jest",
-    "lint:raw": "./node_modules/.bin/eslint --ext .ts --ext .js --ext .tsx --ext .jsx --ignore-pattern dist",
+    "lint:raw": "eslint",
     "lint": "run lint:raw packages",
     "lint-fix": "run lint --fix",
     "bump": "lerna version --exact --conventional-commits --no-push -m \"chore(release): publish %s\"",
@@ -19,9 +19,7 @@
     "validate:dependencies": "yarn npm audit && run license-validate",
     "license-validate": "node ./scripts/license-check.mjs",
     "g:tsc": "cd $INIT_CWD && tsc",
-    "g:rimraf": "cd $INIT_CWD && rimraf",
-    "g:husky": "./node_modules/.bin/husky",
-    "g:lint-staged": "./node_modules/.bin/lint-staged"
+    "g:rimraf": "cd $INIT_CWD && rimraf"
   },
   "lint-staged": {
     "*.{css,json,md,scss}": [
@@ -33,20 +31,24 @@
   },
   "devDependencies": {
     "@julusian/jpeg-turbo": "^2.1.0",
-    "@sofie-automation/code-standard-preset": "^2.5.2",
     "@tsconfig/node18": "^18.2.4",
     "@types/jest": "^29.5.12",
     "@types/node": "^18.19.39",
+    "eslint": "^9.9.1",
+    "husky": "^9.1.5",
     "jest": "^29.7.0",
     "jest-mock": "^29.7.0",
     "jimp": "^0.22.12",
     "lerna": "^8.1.6",
+    "lint-staged": "^15.2.9",
+    "prettier": "^3.3.3",
     "rimraf": "^5.0.9",
     "sharp": "^0.33.4",
     "snyk-nodejs-lockfile-parser": "^1.57.0",
     "ts-jest": "^29.2.2",
     "ts-node": "^10.9.2",
     "typescript": "~5.1.6",
+    "typescript-eslint": "^8.2.0",
     "usb": "^2.13.0"
   },
   "workspaces": [
