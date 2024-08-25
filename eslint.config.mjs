@@ -20,6 +20,13 @@ const customConfig = [
 			'n/no-extraneous-import': 'off',
 		},
 	},
+	{
+		files: ['packages/webhid-demo/src/**/*'],
+		rules: {
+			'@typescript-eslint/no-require-imports': 'off',
+			'n/no-missing-import': 'off',
+		},
+	},
 ]
 
 export default customConfig

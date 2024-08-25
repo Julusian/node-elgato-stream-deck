@@ -220,10 +220,11 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
 		await streamDeck.fillPanelBuffer(buffer)
 
-		expect(fillKeyBufferMock).toHaveBeenCalledTimes(streamDeck.NUM_KEYS)
+		expect(fillKeyBufferMock).toHaveBeenCalledTimes(buttonControls.length)
+		const columnCount = buttonControls.reduce((acc, c) => Math.max(acc, c.column), 0) + 1
 
-		const stride = streamDeck.KEY_COLUMNS * streamDeck.BUTTON_WIDTH_PX * 3
-		for (let i = 0; i < streamDeck.NUM_KEYS; i++) {
+		const stride = columnCount * streamDeck.BUTTON_WIDTH_PX * 3
+		for (let i = 0; i < buttonControls.length; i++) {
 			expect(fillKeyBufferMock).toHaveBeenCalledWith(i, expect.any(Buffer), {
 				format: 'rgb',
 				offset: expect.any(Number),

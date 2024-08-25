@@ -1,6 +1,6 @@
 const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const { ProvidePlugin, DefinePlugin } = require('webpack')
+const { DefinePlugin } = require('webpack')
 
 module.exports = {
 	// Where to fine the source code
