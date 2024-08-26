@@ -1,7 +1,7 @@
 import type { HIDDevice } from './hid-device.js'
-import { DeviceModelId } from './id.js'
+import { DeviceModelId, MODEL_NAMES } from './id.js'
 import type { StreamDeck } from './types.js'
-import type { OpenStreamDeckOptions } from './models/base.js'
+import type { OpenStreamDeckOptions, StreamDeckProperties } from './models/base.js'
 import { StreamDeckOriginalFactory } from './models/original.js'
 import { StreamDeckMiniFactory } from './models/mini.js'
 import { StreamDeckXLFactory } from './models/xl.js'
@@ -10,13 +10,17 @@ import { StreamDeckOriginalMK2Factory } from './models/original-mk2.js'
 import { StreamDeckPlusFactory } from './models/plus.js'
 import { StreamDeckPedalFactory } from './models/pedal.js'
 import { StreamDeckNeoFactory } from './models/neo.js'
+import { StreamDeckStudioFactory } from './models/studio.js'
+import type { PropertiesService } from './services/properties/interface.js'
 
 export * from './types.js'
 export * from './id.js'
 export * from './controlDefinition.js'
-export { HIDDevice, HIDDeviceInfo, HIDDeviceEvents } from './hid-device.js'
+export { HIDDevice, HIDDeviceInfo, ChildHIDDeviceInfo, HIDDeviceEvents } from './hid-device.js'
 export { OpenStreamDeckOptions } from './models/base.js'
 export { StreamDeckProxy } from './proxy.js'
+export { ChildHIDDevice } from './child-hid-device.js'
+export { parseDevice2Info } from './device2-info.js'
 
 /** Elgato vendor id */
 export const VENDOR_ID = 0x0fd9
@@ -30,57 +34,101 @@ export interface DeviceModelSpec {
 	id: DeviceModelId
 	type: DeviceModelType
 	productIds: number[]
-	factory: (device: HIDDevice, options: Required<OpenStreamDeckOptions>) => StreamDeck
+	productName: string
+
+	factory: (
+		device: HIDDevice,
+		options: Required<OpenStreamDeckOptions>,
+		propertiesService?: PropertiesService,
+	) => StreamDeck
+
+	/** If this can be a child device, the factory to create it */
+	device2Factory?: (
+		virtualDevice: HIDDevice,
+		parentDeviceProperties: StreamDeckProperties,
+		options: Required<OpenStreamDeckOptions>,
+		propertiesService?: PropertiesService,
+	) => StreamDeck
+
+	hasNativeTcp: boolean
 }
 
 /** List of all the known models, and the classes to use them */
-export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id'> } = {
+export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id' | 'productName'> } = {
 	[DeviceModelId.ORIGINAL]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0060],
 		factory: StreamDeckOriginalFactory,
+
+		hasNativeTcp: false,
 	},
 	[DeviceModelId.MINI]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0063, 0x0090],
 		factory: StreamDeckMiniFactory,
+
+		hasNativeTcp: false,
 	},
 	[DeviceModelId.XL]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x006c, 0x008f],
 		factory: StreamDeckXLFactory,
+
+		hasNativeTcp: false,
 	},
 	[DeviceModelId.ORIGINALV2]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x006d],
 		factory: StreamDeckOriginalV2Factory,
+
+		hasNativeTcp: false,
 	},
 	[DeviceModelId.ORIGINALMK2]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0080],
 		factory: StreamDeckOriginalMK2Factory,
+
+		hasNativeTcp: false,
 	},
 	[DeviceModelId.PLUS]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0084],
 		factory: StreamDeckPlusFactory,
+		// device2Factory: StreamDeckPlusDevice2Factory,
+
+		hasNativeTcp: false,
 	},
 	[DeviceModelId.PEDAL]: {
 		type: DeviceModelType.PEDAL,
 		productIds: [0x0086],
 		factory: StreamDeckPedalFactory,
+
+		hasNativeTcp: false,
 	},
 	[DeviceModelId.NEO]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x009a],
 		factory: StreamDeckNeoFactory,
+
+		hasNativeTcp: false,
+	},
+	[DeviceModelId.STUDIO]: {
+		type: DeviceModelType.STREAMDECK,
+		productIds: [0x00aa],
+		factory: StreamDeckStudioFactory,
+
+		hasNativeTcp: true,
 	},
 }
 
 /** @deprecated maybe? */
-export const DEVICE_MODELS: DeviceModelSpec[] = Object.entries<Omit<DeviceModelSpec, 'id'>>(DEVICE_MODELS2).map(
-	([id, spec]) => ({
-		id: id as any as DeviceModelId,
+export const DEVICE_MODELS: DeviceModelSpec[] = Object.entries<Omit<DeviceModelSpec, 'id' | 'productName'>>(
+	DEVICE_MODELS2,
+).map(([id, spec]) => {
+	const modelId = id as any as DeviceModelId
+	return {
+		id: modelId,
+		productName: MODEL_NAMES[modelId],
 		...spec,
-	}),
-)
+	}
+})

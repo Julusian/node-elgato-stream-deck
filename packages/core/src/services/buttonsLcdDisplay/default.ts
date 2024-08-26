@@ -13,19 +13,23 @@ import type { ButtonLcdImagePacker, InternalFillImageOptions } from '../imagePac
 export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	readonly #imageWriter: StreamdeckImageWriter
 	readonly #imagePacker: ButtonLcdImagePacker
-	readonly #device: HIDDevice
+	readonly #device: Pick<HIDDevice, 'sendReports' | 'sendFeatureReport'>
 	readonly #deviceProperties: Readonly<StreamDeckProperties>
+	readonly hidOffset: number
 
 	constructor(
 		imageWriter: StreamdeckImageWriter,
 		imagePacker: ButtonLcdImagePacker,
-		device: HIDDevice,
+		device: Pick<HIDDevice, 'sendReports' | 'sendFeatureReport'>,
 		deviceProperties: Readonly<StreamDeckProperties>,
+		hidOffset: number,
 	) {
 		this.#imageWriter = imageWriter
 		this.#imagePacker = imagePacker
 		this.#device = device
 		this.#deviceProperties = deviceProperties
+
+		this.hidOffset = hidOffset
 	}
 
 	private getLcdButtonControls(): StreamDeckButtonControlDefinitionLcdFeedback[] {
@@ -82,31 +86,43 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	public async clearPanel(): Promise<void> {
 		const ps: Promise<void>[] = []
 
-		for (const control of this.#deviceProperties.CONTROLS) {
-			if (control.type !== 'button') continue
+		if (this.#deviceProperties.FULLSCREEN_PANELS > 0) {
+			// TODO - should this be a separate property?
+			for (let screenIndex = 0; screenIndex < this.#deviceProperties.FULLSCREEN_PANELS; screenIndex++) {
+				const buffer = Buffer.alloc(1024)
+				buffer.writeUint8(0x03, 0)
+				buffer.writeUint8(0x05, 1)
+				buffer.writeUint8(screenIndex, 2) // TODO - index
+				ps.push(this.#device.sendReports([buffer]))
+			}
+			// TODO - clear rgb?
+		} else {
+			for (const control of this.#deviceProperties.CONTROLS) {
+				if (control.type !== 'button') continue
 
-			switch (control.feedbackType) {
-				case 'rgb':
-					ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0))
-					break
-				case 'lcd':
-					if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL) {
+				switch (control.feedbackType) {
+					case 'rgb':
 						ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0))
-					} else {
-						const pixels = new Uint8Array(control.pixelSize.width * control.pixelSize.height * 3)
-						ps.push(
-							this.fillImageRangeControl(control, pixels, {
-								format: 'rgb',
-								offset: 0,
-								stride: control.pixelSize.width * 3,
-							}),
-						)
-					}
+						break
+					case 'lcd':
+						if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL) {
+							ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0))
+						} else {
+							const pixels = new Uint8Array(control.pixelSize.width * control.pixelSize.height * 3)
+							ps.push(
+								this.fillImageRangeControl(control, pixels, {
+									format: 'rgb',
+									offset: 0,
+									stride: control.pixelSize.width * 3,
+								}),
+							)
+						}
 
-					break
-				case 'none':
-					// Do nothing
-					break
+						break
+					case 'none':
+						// Do nothing
+						break
+				}
 			}
 		}
 
@@ -247,7 +263,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	}
 
 	private async sendKeyRgb(keyIndex: number, red: number, green: number, blue: number): Promise<void> {
-		await this.#device.sendFeatureReport(new Uint8Array([0x03, 0x06, keyIndex, red, green, blue]))
+		await this.#device.sendFeatureReport(new Uint8Array([0x03, 0x06, this.hidOffset + keyIndex, red, green, blue]))
 	}
 
 	private async fillImageRangeControl(

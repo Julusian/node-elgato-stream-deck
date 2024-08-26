@@ -1,12 +1,13 @@
-import * as EventEmitter from 'eventemitter3'
+import { EventEmitter } from 'eventemitter3'
 import type { HIDDevice, HIDDeviceInfo } from '../hid-device.js'
-import type { DeviceModelId, Dimension, KeyIndex } from '../id.js'
+import type { DeviceModelId, Dimension, EncoderIndex, KeyIndex } from '../id.js'
 import type {
 	FillImageOptions,
 	FillPanelDimensionsOptions,
 	FillPanelOptions,
 	StreamDeck,
 	StreamDeckEvents,
+	StreamDeckTcpChildDeviceInfo,
 } from '../types.js'
 import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay/interface.js'
 import type { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from '../controlDefinition.js'
@@ -14,6 +15,8 @@ import type { LcdSegmentDisplayService } from '../services/lcdSegmentDisplay/int
 import type { PropertiesService } from '../services/properties/interface.js'
 import type { CallbackHook } from '../services/callback-hook.js'
 import type { StreamDeckInputService } from '../services/input/interface.js'
+import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'
+import { EncoderLedService } from '../services/encoderLed.js'
 
 export type EncodeJPEGHelper = (buffer: Uint8Array, width: number, height: number) => Promise<Uint8Array>
 
@@ -39,15 +42,23 @@ export type StreamDeckProperties = Readonly<{
 	 * @deprecated
 	 */
 	KEY_SPACING_VERTICAL: number
+	FULLSCREEN_PANELS: number
+
+	HAS_NFC_READER: boolean
+
+	/** Whether this device supports child devices */
+	SUPPORTS_CHILD_DEVICES: boolean
 }>
 
 export interface StreamDeckServicesDefinition {
 	deviceProperties: StreamDeckProperties
+	parentDeviceProperties: StreamDeckProperties | null
 	events: CallbackHook<StreamDeckEvents>
 	properties: PropertiesService
 	buttonsLcd: ButtonsLcdDisplayService
 	inputService: StreamDeckInputService
 	lcdSegmentDisplay: LcdSegmentDisplayService | null
+	encoderLed: EncoderLedService | null
 }
 
 export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
@@ -69,16 +80,27 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		return this.deviceProperties.PRODUCT_NAME
 	}
 
+	get HAS_NFC_READER(): boolean {
+		return this.deviceProperties.HAS_NFC_READER
+	}
+
 	protected readonly device: HIDDevice
 	protected readonly deviceProperties: Readonly<StreamDeckProperties>
+	readonly #options: Readonly<Required<OpenStreamDeckOptions>>
 	readonly #propertiesService: PropertiesService
 	readonly #buttonsLcdService: ButtonsLcdDisplayService
 	readonly #lcdSegmentDisplayService: LcdSegmentDisplayService | null
 	readonly #inputService: StreamDeckInputService
-	// private readonly options: Readonly<OpenStreamDeckOptions>
+	readonly #encoderLedService: EncoderLedService | null
 
-	constructor(device: HIDDevice, _options: OpenStreamDeckOptions, services: StreamDeckServicesDefinition) {
+	constructor(
+		device: HIDDevice,
+		options: Readonly<Required<OpenStreamDeckOptions>>,
+		services: StreamDeckServicesDefinition,
+	) {
 		super()
+
+		this.#options = options
 
 		this.device = device
 		this.deviceProperties = services.deviceProperties
@@ -86,6 +108,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		this.#buttonsLcdService = services.buttonsLcd
 		this.#lcdSegmentDisplayService = services.lcdSegmentDisplay
 		this.#inputService = services.inputService
+		this.#encoderLedService = services.encoderLed
 
 		// propogate events
 		services.events?.listen((key, ...args) => this.emit(key, ...args))
@@ -117,6 +140,25 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 
 	public calculateFillPanelDimensions(options?: FillPanelDimensionsOptions): Dimension | null {
 		return this.#buttonsLcdService.calculateFillPanelDimensions(options)
+	}
+
+	public async openChildDevice(): Promise<StreamDeck | null> {
+		if (!this.deviceProperties.SUPPORTS_CHILD_DEVICES) return null
+
+		const childDevice = await this.device.openChildDevice()
+		if (!childDevice) return null
+
+		const deviceInfo = await childDevice.getDeviceInfo()
+
+		console.log('info', deviceInfo)
+
+		const model = DEVICE_MODELS.find(
+			(m) => deviceInfo.vendorId === VENDOR_ID && m.productIds.includes(deviceInfo.productId),
+		)
+		if (!model || !model.device2Factory) throw new Error('Stream Deck is of unexpected type.')
+
+		// nocommit this needs to remember there is a child opened and reject subsequent calls. until the child is closed
+		return model.device2Factory(childDevice, this.deviceProperties, this.#options) // TODO - properties service?
 	}
 
 	public async close(): Promise<void> {
@@ -194,5 +236,40 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		if (!this.#lcdSegmentDisplayService) throw new Error('Not supported for this model')
 
 		return this.#lcdSegmentDisplayService.clearLcdSegment(...args)
+	}
+
+	public async setEncoderColor(
+		...args: Parameters<StreamDeck['setEncoderColor']>
+	): ReturnType<StreamDeck['setEncoderColor']> {
+		if (!this.#encoderLedService) throw new Error('Not supported for this model')
+
+		return this.#encoderLedService.setEncoderColor(...args)
+	}
+	public async setEncoderRingSingleColor(
+		...args: Parameters<StreamDeck['setEncoderRingSingleColor']>
+	): ReturnType<StreamDeck['setEncoderRingSingleColor']> {
+		if (!this.#encoderLedService) throw new Error('Not supported for this model')
+
+		return this.#encoderLedService.setEncoderRingSingleColor(...args)
+	}
+	public async setEncoderRingColors(
+		...args: Parameters<StreamDeck['setEncoderRingColors']>
+	): ReturnType<StreamDeck['setEncoderRingColors']> {
+		if (!this.#encoderLedService) throw new Error('Not supported for this model')
+
+		return this.#encoderLedService.setEncoderRingColors(...args)
+	}
+
+	public async getChildDeviceInfo(): Promise<StreamDeckTcpChildDeviceInfo | null> {
+		const info = await this.device.getChildDeviceInfo()
+		if (!info || info.vendorId !== VENDOR_ID) return null
+
+		const model = DEVICE_MODELS.find((m) => m.productIds.includes(info.productId))
+		if (!model) return null
+
+		return {
+			...info,
+			model: model.id,
+		}
 	}
 }

@@ -1,7 +1,9 @@
-import type * as EventEmitter from 'eventemitter3'
+import type { EventEmitter } from 'eventemitter3'
 import type { DeviceModelId } from './id.js'
 import type { StreamDeck, StreamDeckEvents } from './types.js'
 import type { StreamDeckControlDefinition } from './controlDefinition.js'
+
+export type StreamDeckProxyFactory = (device: StreamDeck) => StreamDeckProxy | null // nocommit - remove the null
 
 /**
  * A minimal proxy around a StreamDeck instance.
@@ -9,10 +11,12 @@ import type { StreamDeckControlDefinition } from './controlDefinition.js'
  */
 
 export class StreamDeckProxy implements StreamDeck {
-	protected device: StreamDeck
+	protected readonly device: StreamDeck
+	readonly #wrapChildDevice: StreamDeckProxyFactory
 
-	constructor(device: StreamDeck) {
+	constructor(device: StreamDeck, wrapChildDevice: StreamDeckProxyFactory) {
 		this.device = device
+		this.#wrapChildDevice = wrapChildDevice
 	}
 
 	public get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
@@ -30,11 +34,24 @@ export class StreamDeckProxy implements StreamDeck {
 	public get PRODUCT_NAME(): string {
 		return this.device.PRODUCT_NAME
 	}
+	public get HAS_NFC_READER(): boolean {
+		return this.device.HAS_NFC_READER
+	}
 
 	public calculateFillPanelDimensions(
 		...args: Parameters<StreamDeck['calculateFillPanelDimensions']>
 	): ReturnType<StreamDeck['calculateFillPanelDimensions']> {
 		return this.device.calculateFillPanelDimensions(...args)
+	}
+
+	public async openChildDevice(
+		...args: Parameters<StreamDeck['openChildDevice']>
+	): ReturnType<StreamDeck['openChildDevice']> {
+		const childDevice = await this.device.openChildDevice(...args)
+		if (!childDevice) return null
+
+		// The wrapper doesn't need to be reused, as open can only be called once
+		return this.#wrapChildDevice(childDevice)
 	}
 
 	public async close(): Promise<void> {
@@ -83,6 +100,24 @@ export class StreamDeckProxy implements StreamDeck {
 		return this.device.fillLcd(...args)
 	}
 
+	public async setEncoderColor(
+		...args: Parameters<StreamDeck['setEncoderColor']>
+	): ReturnType<StreamDeck['setEncoderColor']> {
+		return this.device.setEncoderColor(...args)
+	}
+
+	public async setEncoderRingSingleColor(
+		...args: Parameters<StreamDeck['setEncoderRingSingleColor']>
+	): ReturnType<StreamDeck['setEncoderRingSingleColor']> {
+		return this.device.setEncoderRingSingleColor(...args)
+	}
+
+	public async setEncoderRingColors(
+		...args: Parameters<StreamDeck['setEncoderRingColors']>
+	): ReturnType<StreamDeck['setEncoderRingColors']> {
+		return this.device.setEncoderRingColors(...args)
+	}
+
 	public async fillLcdRegion(
 		...args: Parameters<StreamDeck['fillLcdRegion']>
 	): ReturnType<StreamDeck['fillLcdRegion']> {
@@ -93,6 +128,12 @@ export class StreamDeckProxy implements StreamDeck {
 		...args: Parameters<StreamDeck['clearLcdSegment']>
 	): ReturnType<StreamDeck['clearLcdSegment']> {
 		return this.device.clearLcdSegment(...args)
+	}
+
+	public async getChildDeviceInfo(
+		...args: Parameters<StreamDeck['getChildDeviceInfo']>
+	): ReturnType<StreamDeck['getChildDeviceInfo']> {
+		return this.device.getChildDeviceInfo(...args)
 	}
 
 	/**

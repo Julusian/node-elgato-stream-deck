@@ -14,10 +14,15 @@ function extendDevicePropertiesForGen1(rawProps: StreamDeckGen1Properties): Stre
 	return {
 		...rawProps,
 		KEY_DATA_OFFSET: 0,
+		HAS_NFC_READER: false,
+		SUPPORTS_CHILD_DEVICES: false,
 	}
 }
 
-export type StreamDeckGen1Properties = Omit<StreamDeckProperties, 'KEY_DATA_OFFSET'>
+export type StreamDeckGen1Properties = Omit<
+	StreamDeckProperties,
+	'KEY_DATA_OFFSET' | 'HAS_NFC_READER' | 'SUPPORTS_CHILD_DEVICES'
+>
 
 export function StreamDeckGen1Factory(
 	device: HIDDevice,
@@ -33,6 +38,7 @@ export function StreamDeckGen1Factory(
 
 	return new StreamDeckBase(device, options, {
 		deviceProperties: fullProperties,
+		parentDeviceProperties: null,
 		events,
 		properties: new Gen1PropertiesService(device),
 		buttonsLcd: new DefaultButtonsLcdService(
@@ -40,8 +46,10 @@ export function StreamDeckGen1Factory(
 			new BitmapButtonLcdImagePacker(targetOptions, bmpImagePPM),
 			device,
 			fullProperties,
+			0,
 		),
 		lcdSegmentDisplay: null,
-		inputService: new ButtonOnlyInputService(fullProperties, events),
+		inputService: new ButtonOnlyInputService(fullProperties, events, 0),
+		encoderLed: null,
 	})
 }

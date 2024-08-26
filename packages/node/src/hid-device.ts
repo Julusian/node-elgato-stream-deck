@@ -1,5 +1,6 @@
 import type { DeviceModelId, HIDDevice, HIDDeviceEvents, HIDDeviceInfo } from '@elgato-stream-deck/core'
-import * as EventEmitter from 'eventemitter3'
+import { EventEmitter } from 'eventemitter3'
+import { ChildHIDDevice, ChildHIDDeviceInfo } from '@elgato-stream-deck/core'
 import type { HIDAsync, Device as NodeHIDDeviceInfo } from 'node-hid'
 
 /**
@@ -61,6 +62,33 @@ export class NodeHIDDevice extends EventEmitter<HIDDeviceEvents> implements HIDD
 			path: info.path,
 			productId: info.productId,
 			vendorId: info.vendorId,
+		}
+	}
+
+	public async openChildDevice(): Promise<HIDDevice | null> {
+		const childInfo = await this.getChildDeviceInfo()
+		if (!childInfo) return null
+
+		return new ChildHIDDevice(this, childInfo)
+	}
+
+	public async getChildDeviceInfo(): Promise<ChildHIDDeviceInfo | null> {
+		const b = Buffer.alloc(1024)
+		b.writeUint8(0x03, 0)
+		b.writeUint8(0x1c, 1)
+		this.device.write(b)
+		// const device2Info = await this.device.getFeatureReport(0x0b, 512)
+		// console.log('device2Info', device2Info)
+		// // return this.#deviceInfo
+		// // throw new Error('Method not implemented.')
+		// // nocommit do properly
+		// return parseDevice2Info(device2Info)
+		return {
+			productId: 0x0084,
+			vendorId: 0x0fd9,
+			serialNumber: 'abc',
+			tcpPort: 1234,
+			path: undefined,
 		}
 	}
 }

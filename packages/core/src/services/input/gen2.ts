@@ -13,9 +13,15 @@ export class Gen2InputService extends ButtonOnlyInputService {
 	readonly #encoderControls: Readonly<StreamDeckEncoderControlDefinition[]>
 	readonly #encoderState: boolean[]
 	readonly #lcdSegmentControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>
+	readonly #encoderOffset: number
 
-	constructor(deviceProperties: Readonly<StreamDeckProperties>, eventSource: CallbackHook<StreamDeckEvents>) {
-		super(deviceProperties, eventSource)
+	constructor(
+		deviceProperties: Readonly<StreamDeckProperties>,
+		eventSource: CallbackHook<StreamDeckEvents>,
+		buttonOffset: number,
+		encoderOffset: number,
+	) {
+		super(deviceProperties, eventSource, buttonOffset)
 
 		this.#eventSource = eventSource
 		this.#encoderControls = deviceProperties.CONTROLS.filter(
@@ -27,6 +33,8 @@ export class Gen2InputService extends ButtonOnlyInputService {
 		this.#lcdSegmentControls = deviceProperties.CONTROLS.filter(
 			(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
 		)
+
+		this.#encoderOffset = encoderOffset
 	}
 
 	handleInput(data: Uint8Array): void {
@@ -40,6 +48,9 @@ export class Gen2InputService extends ButtonOnlyInputService {
 				break
 			case 0x03: // Encoder
 				this.#handleEncoderInput(data)
+				break
+			case 0x04: // NFC
+				this.#handleNfcRead(data)
 				break
 		}
 	}
@@ -78,7 +89,7 @@ export class Gen2InputService extends ButtonOnlyInputService {
 		switch (data[3]) {
 			case 0x00: // press/release
 				for (const encoderControl of this.#encoderControls) {
-					const keyPressed = Boolean(data[4 + encoderControl.hidIndex])
+					const keyPressed = Boolean(data[4 + encoderControl.hidIndex + this.#encoderOffset])
 					const stateChanged = keyPressed !== this.#encoderState[encoderControl.index]
 					if (stateChanged) {
 						this.#encoderState[encoderControl.index] = keyPressed
@@ -93,12 +104,21 @@ export class Gen2InputService extends ButtonOnlyInputService {
 			case 0x01: // rotate
 				for (const encoderControl of this.#encoderControls) {
 					const intArray = new Int8Array(data.buffer, data.byteOffset, data.byteLength)
-					const value = intArray[4 + encoderControl.hidIndex]
+					const value = intArray[4 + encoderControl.hidIndex + this.#encoderOffset]
 					if (value !== 0) {
 						this.#eventSource.emit('rotate', encoderControl, value)
 					}
 				}
 				break
 		}
+	}
+
+	#handleNfcRead(data: Uint8Array): void {
+		if (!this.deviceProperties.HAS_NFC_READER) return
+
+		const length = data[1] + data[2] * 256
+		const id = new TextDecoder('ascii').decode(data.subarray(3, 3 + length))
+
+		this.#eventSource.emit('nfcRead', id)
 	}
 }

@@ -6,7 +6,7 @@ export class StreamDeckNode extends StreamDeckProxy {
 		device: StreamDeck,
 		private readonly resetToLogoOnClose: boolean,
 	) {
-		super(device)
+		super(device, (device) => new StreamDeckNode(device, this.resetToLogoOnClose))
 	}
 
 	public async close(): Promise<void> {

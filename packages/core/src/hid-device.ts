@@ -1,4 +1,4 @@
-import type * as EventEmitter from 'eventemitter3'
+import type { EventEmitter } from 'eventemitter3'
 
 export interface HIDDeviceEvents {
 	error: [data: any]
@@ -18,10 +18,19 @@ export interface HIDDevice extends EventEmitter<HIDDeviceEvents> {
 	sendReports(buffers: Uint8Array[]): Promise<void>
 
 	getDeviceInfo(): Promise<HIDDeviceInfo>
+
+	openChildDevice(): Promise<HIDDevice | null>
+
+	getChildDeviceInfo(): Promise<ChildHIDDeviceInfo | null>
 }
 
 export interface HIDDeviceInfo {
-	path: string | undefined
-	productId: number
-	vendorId: number
+	readonly path: string | undefined
+	readonly productId: number
+	readonly vendorId: number
+}
+
+export interface ChildHIDDeviceInfo extends HIDDeviceInfo {
+	readonly serialNumber: string
+	readonly tcpPort: number
 }

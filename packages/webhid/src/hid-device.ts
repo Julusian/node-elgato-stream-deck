@@ -1,5 +1,10 @@
-import type { HIDDevice as CoreHIDDevice, HIDDeviceEvents, HIDDeviceInfo } from '@elgato-stream-deck/core'
-import * as EventEmitter from 'eventemitter3'
+import type {
+	ChildHIDDeviceInfo,
+	HIDDevice as CoreHIDDevice,
+	HIDDeviceEvents,
+	HIDDeviceInfo,
+} from '@elgato-stream-deck/core'
+import { EventEmitter } from 'eventemitter3'
 import Queue from 'p-queue'
 
 /**
@@ -54,5 +59,15 @@ export class WebHIDDevice extends EventEmitter<HIDDeviceEvents> implements CoreH
 			productId: this.device.productId,
 			vendorId: this.device.vendorId,
 		}
+	}
+
+	public async openChildDevice(): Promise<CoreHIDDevice | null> {
+		// TODO - implement
+		throw new Error('Method not implemented.')
+	}
+
+	public async getChildDeviceInfo(): Promise<ChildHIDDeviceInfo | null> {
+		// TODO - implement
+		throw new Error('Method not implemented.')
 	}
 }
