@@ -467,7 +467,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@elgato-stream-deck/core@npm:6.2.2, @elgato-stream-deck/core@workspace:packages/core":
+"@elgato-stream-deck/core@npm:7.0.0-0, @elgato-stream-deck/core@workspace:packages/core":
   version: 0.0.0-use.local
   resolution: "@elgato-stream-deck/core@workspace:packages/core"
   dependencies:
@@ -480,7 +480,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@elgato-stream-deck/node@workspace:packages/node"
   dependencies:
-    "@elgato-stream-deck/core": "npm:6.2.2"
+    "@elgato-stream-deck/core": "npm:7.0.0-0"
     eventemitter3: "npm:^4.0.7"
     jpeg-js: "npm:^0.4.4"
     node-hid: "npm:^3.1.0"
@@ -494,7 +494,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@elgato-stream-deck/webhid-demo@workspace:packages/webhid-demo"
   dependencies:
-    "@elgato-stream-deck/webhid": "npm:6.2.2"
+    "@elgato-stream-deck/webhid": "npm:7.0.0-0"
     copy-webpack-plugin: "npm:^11.0.0"
     cross-env: "npm:^7.0.3"
     html-to-image: "npm:^1.11.11"
@@ -505,11 +505,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@elgato-stream-deck/webhid@npm:6.2.2, @elgato-stream-deck/webhid@workspace:packages/webhid":
+"@elgato-stream-deck/webhid@npm:7.0.0-0, @elgato-stream-deck/webhid@workspace:packages/webhid":
   version: 0.0.0-use.local
   resolution: "@elgato-stream-deck/webhid@workspace:packages/webhid"
   dependencies:
-    "@elgato-stream-deck/core": "npm:6.2.2"
+    "@elgato-stream-deck/core": "npm:7.0.0-0"
     "@types/w3c-web-hid": "npm:^1.0.6"
     eventemitter3: "npm:^4.0.7"
     p-queue: "npm:^6.6.2"

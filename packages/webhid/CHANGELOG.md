@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.0.0-0](https://github.com/julusian/node-elgato-stream-deck/compare/v6.2.2...v7.0.0-0) (2024-08-26)
+
+
+### Features
+
+* target nodejs 18 ([5fe6c09](https://github.com/julusian/node-elgato-stream-deck/commit/5fe6c092ba46e09a1814ff627ec2991359dadd6c))
+* rework how device functionality is exposed
+* rework events structure
+
+
+
+
 ## [6.2.2](https://github.com/julusian/node-elgato-stream-deck/compare/v6.2.1...v6.2.2) (2024-07-11)
 
 **Note:** Version bump only for package @elgato-stream-deck/webhid
