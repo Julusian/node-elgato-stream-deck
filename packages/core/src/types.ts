@@ -53,6 +53,11 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	/** The name of the product/model */
 	readonly PRODUCT_NAME: string
 
+	/**
+	 * Calculate the dimensions to use for `fillPanelBuffer`, to fill the whole button lcd panel with a single image.
+	 * @param options Options to control the write
+	 * @returns The dimensions to use for the image, or null if there is no panel
+	 */
 	calculateFillPanelDimensions(options?: FillPanelDimensionsOptions): Dimension | null
 
 	/**
