@@ -51,7 +51,7 @@
 		"node": ">=18.18"
 	},
 	"dependencies": {
-		"eventemitter3": "^4.0.7",
+		"eventemitter3": "^5.0.1",
 		"tslib": "^2.7.0"
 	}
 }

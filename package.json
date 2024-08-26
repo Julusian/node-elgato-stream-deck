@@ -34,7 +34,7 @@
     "@julusian/jpeg-turbo": "^2.1.0",
     "@tsconfig/node18": "^18.2.4",
     "@types/jest": "^29.5.12",
-    "@types/node": "^18.19.45",
+    "@types/node": "^18.19.46",
     "eslint": "^9.9.1",
     "eslint-plugin-n": "^17.10.2",
     "eslint-plugin-prettier": "^5.2.1",
