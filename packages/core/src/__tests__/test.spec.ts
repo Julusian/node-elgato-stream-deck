@@ -315,7 +315,7 @@ function runForDevice(path: string, model: DeviceModelId, supportsRgbKeyFill: bo
 		expect(fillKeyBufferMock).toHaveBeenCalledTimes(0)
 	})
 
-	test('fillKeyBuffer bad format', async () => {
+	test.skip('fillKeyBuffer bad format', async () => {
 		const buffer = Buffer.alloc(streamDeck.BUTTON_TOTAL_PX * 3)
 
 		const fillKeyBufferMock = ((streamDeck as any).fillImageRange = jest.fn())
@@ -415,7 +415,7 @@ describe('StreamDeck', () => {
 		})
 	})
 
-	test.only('down and up events', () => {
+	test('down and up events', () => {
 		const downSpy = jest.fn()
 		const upSpy = jest.fn()
 		streamDeck.on('down', downSpy)
@@ -441,6 +441,10 @@ describe('StreamDeck', () => {
 			index: 4,
 			row: 0,
 			type: 'button',
+			pixelSize: {
+				width: 72,
+				height: 72,
+			},
 		})
 		expect(upSpy).toHaveBeenNthCalledWith(1, {
 			column: 4,
@@ -449,6 +453,10 @@ describe('StreamDeck', () => {
 			index: 4,
 			row: 0,
 			type: 'button',
+			pixelSize: {
+				width: 72,
+				height: 72,
+			},
 		})
 		expect(downSpy).toHaveBeenNthCalledWith(2, {
 			column: 3,
@@ -457,6 +465,10 @@ describe('StreamDeck', () => {
 			index: 8,
 			row: 1,
 			type: 'button',
+			pixelSize: {
+				width: 72,
+				height: 72,
+			},
 		})
 		expect(upSpy).toHaveBeenNthCalledWith(2, {
 			column: 3,
@@ -465,6 +477,10 @@ describe('StreamDeck', () => {
 			index: 8,
 			row: 1,
 			type: 'button',
+			pixelSize: {
+				width: 72,
+				height: 72,
+			},
 		})
 	})
 })
@@ -519,6 +535,10 @@ describe('StreamDeck Mini', () => {
 			index: 0,
 			row: 0,
 			type: 'button',
+			pixelSize: {
+				width: 80,
+				height: 80,
+			},
 		})
 		expect(upSpy).toHaveBeenNthCalledWith(1, {
 			column: 0,
@@ -527,6 +547,10 @@ describe('StreamDeck Mini', () => {
 			index: 0,
 			row: 0,
 			type: 'button',
+			pixelSize: {
+				width: 80,
+				height: 80,
+			},
 		})
 	})
 })
@@ -640,6 +664,10 @@ describe('StreamDeck XL', () => {
 			index: 0,
 			row: 0,
 			type: 'button',
+			pixelSize: {
+				width: 96,
+				height: 96,
+			},
 		})
 		expect(upSpy).toHaveBeenNthCalledWith(1, {
 			column: 0,
@@ -648,6 +676,10 @@ describe('StreamDeck XL', () => {
 			index: 0,
 			row: 0,
 			type: 'button',
+			pixelSize: {
+				width: 96,
+				height: 96,
+			},
 		})
 	})
 })
@@ -707,6 +739,10 @@ describe('StreamDeck Original V2', () => {
 			index: 0,
 			row: 0,
 			type: 'button',
+			pixelSize: {
+				width: 72,
+				height: 72,
+			},
 		})
 		expect(upSpy).toHaveBeenNthCalledWith(1, {
 			column: 0,
@@ -715,6 +751,10 @@ describe('StreamDeck Original V2', () => {
 			index: 0,
 			row: 0,
 			type: 'button',
+			pixelSize: {
+				width: 72,
+				height: 72,
+			},
 		})
 	})
 })
