@@ -1,4 +1,4 @@
-import { StreamDeckTcpChildDeviceInfo } from './types'
+import type { StreamDeckTcpChildDeviceInfo } from './types.js'
 
 export function parseDevice2Info(device2Info: Buffer): Omit<StreamDeckTcpChildDeviceInfo, 'model'> | null {
 	if (device2Info.readUInt8(4) !== 0x02) {
@@ -15,7 +15,7 @@ export function parseDevice2Info(device2Info: Buffer): Omit<StreamDeckTcpChildDe
 	const serialNumber = device2Info.toString(
 		'ascii',
 		serialNumberStart,
-		firstNullInSerial > -1 ? serialNumberStart + firstNullInSerial : serialNumberEnd
+		firstNullInSerial > -1 ? serialNumberStart + firstNullInSerial : serialNumberEnd,
 	)
 
 	const tcpPort = device2Info.readUInt16LE(126)

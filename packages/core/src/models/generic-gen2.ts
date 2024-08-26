@@ -8,7 +8,7 @@ import type { StreamDeckEvents } from '../types.js'
 import { Gen2PropertiesService } from '../services/properties/gen2.js'
 import { JpegButtonLcdImagePacker } from '../services/imagePacker/jpeg.js'
 import { Gen2InputService } from '../services/input/gen2.js'
-import { PropertiesService } from '../services/properties/interface.js'
+import type { PropertiesService } from '../services/properties/interface.js'
 import { EncoderLedService } from '../services/encoderLed.js'
 
 function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): StreamDeckProperties {

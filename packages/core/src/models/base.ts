@@ -1,6 +1,6 @@
 import { EventEmitter } from 'eventemitter3'
 import type { HIDDevice, HIDDeviceInfo } from '../hid-device.js'
-import type { DeviceModelId, Dimension, EncoderIndex, KeyIndex } from '../id.js'
+import type { DeviceModelId, Dimension, KeyIndex } from '../id.js'
 import type {
 	FillImageOptions,
 	FillPanelDimensionsOptions,
@@ -15,8 +15,8 @@ import type { LcdSegmentDisplayService } from '../services/lcdSegmentDisplay/int
 import type { PropertiesService } from '../services/properties/interface.js'
 import type { CallbackHook } from '../services/callback-hook.js'
 import type { StreamDeckInputService } from '../services/input/interface.js'
-import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'
-import { EncoderLedService } from '../services/encoderLed.js'
+import { DEVICE_MODELS, VENDOR_ID } from '../index.js'
+import type { EncoderLedService } from '../services/encoderLed.js'
 
 export type EncodeJPEGHelper = (buffer: Uint8Array, width: number, height: number) => Promise<Uint8Array>
 

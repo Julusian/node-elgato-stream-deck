@@ -1,5 +1,5 @@
-import EventEmitter = require('events')
-import { ChildHIDDeviceInfo, HIDDevice, HIDDeviceEvents, HIDDeviceInfo } from './hid-device'
+import * as EventEmitter from 'events'
+import type { ChildHIDDeviceInfo, HIDDevice, HIDDeviceEvents, HIDDeviceInfo } from './hid-device.js'
 
 /**
  * In some backends, the child device works over the same stream as the primary, and uses offsets and things
@@ -19,7 +19,7 @@ export class ChildHIDDevice extends EventEmitter<HIDDeviceEvents> implements HID
 
 	#onInputReport = (data: Uint8Array) => this.emit('input', data)
 
-	close(): Promise<void> {
+	async close(): Promise<void> {
 		// TODO - make sure this is called correctly
 		this.#parentDevice.off('input', this.#onInputReport)
 		throw new Error('Method not implemented.')

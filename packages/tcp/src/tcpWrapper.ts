@@ -1,8 +1,9 @@
-import * as EventEmitter from 'events'
-import { StreamDeckProxy, StreamDeck } from '@elgato-stream-deck/core'
-import { SocketWrapper } from './socketWrapper'
-import { StreamDeckTcp, StreamDeckTcpEvents } from './types'
-import { TcpHidDevice } from './hid-device'
+import { EventEmitter } from 'eventemitter3'
+import type { StreamDeck } from '@elgato-stream-deck/core'
+import { StreamDeckProxy } from '@elgato-stream-deck/core'
+import type { SocketWrapper } from './socketWrapper.js'
+import type { StreamDeckTcp, StreamDeckTcpEvents } from './types.js'
+import type { TcpHidDevice } from './hid-device.js'
 
 export class StreamDeckTcpWrapper extends StreamDeckProxy implements StreamDeckTcp {
 	readonly #socket: SocketWrapper

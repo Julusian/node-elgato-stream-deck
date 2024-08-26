@@ -1,10 +1,10 @@
-import { HIDDevice } from '../hid-device'
-import { OpenStreamDeckOptions, StreamDeckBase } from './base'
-import { createBaseGen2Properties, StreamDeckGen2Properties } from './generic-gen2'
-import { DeviceModelId, MODEL_NAMES } from '../id'
-import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator'
-import { StreamDeckControlDefinition } from '../controlDefinition'
-import { PropertiesService } from '../services/properties/interface'
+import type { HIDDevice } from '../hid-device.js'
+import { StreamDeckBase, type OpenStreamDeckOptions } from './base.js'
+import { createBaseGen2Properties, type StreamDeckGen2Properties } from './generic-gen2.js'
+import { DeviceModelId, MODEL_NAMES } from '../id.js'
+import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
+import type { StreamDeckControlDefinition } from '../controlDefinition.js'
+import type { PropertiesService } from '../services/properties/interface.js'
 
 const studioControls: StreamDeckControlDefinition[] = [
 	{

@@ -1,6 +1,6 @@
-import type { EncoderIndex } from '../id'
-import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../controlDefinition'
-import { HIDDevice } from '..'
+import type { EncoderIndex } from '../id.js'
+import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../controlDefinition.js'
+import type { HIDDevice } from '../hid-device.js'
 
 export class EncoderLedService {
 	readonly #device: HIDDevice

@@ -1,7 +1,9 @@
-import { Bonjour, Browser, Service as BonjourService } from '@julusian/bonjour-service'
-import EventEmitter = require('events')
-import { DEFAULT_MDNS_QUERY_INTERVAL } from './constants'
-import { DEVICE_MODELS, DeviceModelId, DeviceModelType, VENDOR_ID } from '@elgato-stream-deck/core'
+import type { Browser, Service as BonjourService } from '@julusian/bonjour-service'
+import { Bonjour } from '@julusian/bonjour-service'
+import * as EventEmitter from 'events'
+import { DEFAULT_MDNS_QUERY_INTERVAL } from './constants.js'
+import type { DeviceModelId, DeviceModelType } from '@elgato-stream-deck/core'
+import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'
 
 export interface StreamDeckTcpDiscoveryServiceOptions {
 	/**

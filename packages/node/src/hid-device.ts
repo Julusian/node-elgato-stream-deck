@@ -1,6 +1,12 @@
-import type { DeviceModelId, HIDDevice, HIDDeviceEvents, HIDDeviceInfo } from '@elgato-stream-deck/core'
+import type {
+	DeviceModelId,
+	HIDDevice,
+	HIDDeviceEvents,
+	HIDDeviceInfo,
+	ChildHIDDeviceInfo,
+} from '@elgato-stream-deck/core'
 import { EventEmitter } from 'eventemitter3'
-import { ChildHIDDevice, ChildHIDDeviceInfo } from '@elgato-stream-deck/core'
+import { ChildHIDDevice } from '@elgato-stream-deck/core'
 import type { HIDAsync, Device as NodeHIDDeviceInfo } from 'node-hid'
 
 /**
@@ -73,10 +79,10 @@ export class NodeHIDDevice extends EventEmitter<HIDDeviceEvents> implements HIDD
 	}
 
 	public async getChildDeviceInfo(): Promise<ChildHIDDeviceInfo | null> {
-		const b = Buffer.alloc(1024)
-		b.writeUint8(0x03, 0)
-		b.writeUint8(0x1c, 1)
-		this.device.write(b)
+		// const b = Buffer.alloc(1024)
+		// b.writeUint8(0x03, 0)
+		// b.writeUint8(0x1c, 1)
+		// await this.device.write(b)
 		// const device2Info = await this.device.getFeatureReport(0x0b, 512)
 		// console.log('device2Info', device2Info)
 		// // return this.#deviceInfo

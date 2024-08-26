@@ -15,8 +15,8 @@ export {
 	OpenStreamDeckOptions,
 } from '@elgato-stream-deck/core'
 
-export * from './types'
-export * from './connectionManager'
-export * from './discoveryService'
+export * from './types.js'
+export * from './connectionManager.js'
+export * from './discoveryService.js'
 
 export { JPEGEncodeOptions }

@@ -118,7 +118,6 @@ function generateEncoderColor(value, max) {
 	console.log('serial number', await streamDeck.getSerialNumber())
 
 	/** @type {import('@elgato-stream-deck/core').StreamDeckEncoderControlDefinition[]} */
-	// @ts-ignore
 	const encoders = streamDeck.CONTROLS.filter((control) => control.type === 'encoder')
 
 	const encoderValues = encoders.map((encoder) => Math.round(encoder.ledRingSteps / 2))
@@ -126,7 +125,7 @@ function generateEncoderColor(value, max) {
 		streamDeck
 			.setEncoderRingColors(
 				control.index,
-				generateEncoderColor(encoderValues[control.index], control.ledRingSteps)
+				generateEncoderColor(encoderValues[control.index], control.ledRingSteps),
 			)
 			.catch((e) => console.error('Fill failed:', e))
 	}
@@ -174,12 +173,12 @@ function generateEncoderColor(value, max) {
 
 		encoderValues[control.index] = Math.min(
 			control.ledRingSteps,
-			Math.max(0, encoderValues[control.index] + amount)
+			Math.max(0, encoderValues[control.index] + amount),
 		)
 		streamDeck
 			.setEncoderRingColors(
 				control.index,
-				generateEncoderColor(encoderValues[control.index], control.ledRingSteps)
+				generateEncoderColor(encoderValues[control.index], control.ledRingSteps),
 			)
 			.catch((e) => console.error('Fill failed:', e))
 	})

@@ -88,7 +88,6 @@ connectionManager.on('connected', async (streamDeck) => {
 		.catch((e) => console.log('child info failed', e))
 
 	/** @type {import('@elgato-stream-deck/core').StreamDeckEncoderControlDefinition[]} */
-	// @ts-ignore
 	const encoders = streamDeck.CONTROLS.filter((control) => control.type === 'encoder')
 
 	const encoderValues = encoders.map((encoder) => Math.round(encoder.ledRingSteps / 2))
@@ -98,7 +97,7 @@ connectionManager.on('connected', async (streamDeck) => {
 			streamDeck
 				.setEncoderRingColors(
 					control.index,
-					generateEncoderColor(encoderValues[control.index], control.ledRingSteps)
+					generateEncoderColor(encoderValues[control.index], control.ledRingSteps),
 				)
 				.catch((e) => console.error('Fill failed:', e))
 		}
@@ -143,14 +142,14 @@ connectionManager.on('connected', async (streamDeck) => {
 
 		encoderValues[control.index] = Math.min(
 			control.ledRingSteps,
-			Math.max(0, encoderValues[control.index] + amount)
+			Math.max(0, encoderValues[control.index] + amount),
 		)
 
 		if (control.ledRingSteps > 0) {
 			streamDeck
 				.setEncoderRingColors(
 					control.index,
-					generateEncoderColor(encoderValues[control.index], control.ledRingSteps)
+					generateEncoderColor(encoderValues[control.index], control.ledRingSteps),
 				)
 				.catch((e) => console.error('Fill failed:', e))
 		}

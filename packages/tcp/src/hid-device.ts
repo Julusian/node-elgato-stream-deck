@@ -1,13 +1,13 @@
 import * as EventEmitter from 'events'
-import {
+import type {
 	HIDDeviceInfo,
 	HIDDevice,
 	HIDDeviceEvents,
 	ChildHIDDeviceInfo,
 	StreamDeckTcpChildDeviceInfo,
-	parseDevice2Info,
 } from '@elgato-stream-deck/core'
-import { SocketWrapper } from './socketWrapper'
+import { parseDevice2Info } from '@elgato-stream-deck/core'
+import type { SocketWrapper } from './socketWrapper.js'
 
 class QueuedCommand {
 	public readonly promise: Promise<Buffer>
@@ -79,13 +79,13 @@ export class TcpHidDevice extends EventEmitter<HIDDeviceEvents> implements HIDDe
 			}
 		})
 		this.#socket.on('error', (message, err) =>
-			this.emit('error', `Socket error: ${message} (${err?.message ?? err})`)
+			this.emit('error', `Socket error: ${message} (${err?.message ?? err})`),
 		)
 		this.#socket.on('disconnected', () => {
 			for (const command of this.#pendingSingletonCommands.values()) {
 				try {
 					command.reject(new Error('Disconnected'))
-				} catch (e) {
+				} catch (_e) {
 					// Ignore
 				}
 			}
