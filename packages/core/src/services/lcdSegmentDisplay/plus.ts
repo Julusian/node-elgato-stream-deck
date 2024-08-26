@@ -1,24 +1,24 @@
-import type { StreamDeckLcdStripControlDefinition } from '../../controlDefinition.js'
+import type { StreamDeckLcdSegmentControlDefinition } from '../../controlDefinition.js'
 import type { HIDDevice } from '../../hid-device.js'
 import type { InternalFillImageOptions } from '../imagePacker/interface.js'
 import { StreamdeckPlusLcdImageHeaderGenerator } from '../imageWriter/headerGenerator.js'
 import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter.js'
-import type { LcdStripDisplayService } from './interface.js'
+import type { LcdSegmentDisplayService } from './interface.js'
 import type { FillImageOptions, FillLcdImageOptions } from '../../types.js'
 import { transformImageBuffer } from '../../util.js'
 import type { EncodeJPEGHelper } from '../../models/base.js'
 
-export class StreamDeckPlusLcdService implements LcdStripDisplayService {
+export class StreamDeckPlusLcdService implements LcdSegmentDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper
 	readonly #device: HIDDevice
-	readonly #lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>
+	readonly #lcdControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>
 
 	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter(new StreamdeckPlusLcdImageHeaderGenerator())
 
 	constructor(
 		encodeJPEG: EncodeJPEGHelper,
 		device: HIDDevice,
-		lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>,
+		lcdControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>,
 	) {
 		this.#encodeJPEG = encodeJPEG
 		this.#device = device
@@ -31,7 +31,7 @@ export class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		sourceOptions: FillImageOptions,
 	): Promise<void> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
-		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
+		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
 		return this.fillControlRegion(lcdControl, 0, 0, buffer, {
 			format: sourceOptions.format,
@@ -48,14 +48,14 @@ export class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		sourceOptions: FillLcdImageOptions,
 	): Promise<void> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
-		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
+		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
 		return this.fillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions)
 	}
 
-	public async clearLcdStrip(index: number): Promise<void> {
+	public async clearLcdSegment(index: number): Promise<void> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
-		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
+		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
 		const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4)
 
@@ -66,17 +66,17 @@ export class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		})
 	}
 
-	public async clearAllLcdStrips(): Promise<void> {
+	public async clearAllLcdSegments(): Promise<void> {
 		const ps: Array<Promise<void>> = []
 		for (const control of this.#lcdControls) {
-			ps.push(this.clearLcdStrip(control.id))
+			ps.push(this.clearLcdSegment(control.id))
 		}
 
 		await Promise.all(ps)
 	}
 
 	private async fillControlRegion(
-		lcdControl: StreamDeckLcdStripControlDefinition,
+		lcdControl: StreamDeckLcdSegmentControlDefinition,
 		x: number,
 		y: number,
 		imageBuffer: Uint8Array | Uint8ClampedArray,
@@ -85,10 +85,10 @@ export class StreamDeckPlusLcdService implements LcdStripDisplayService {
 		// Basic bounds checking
 		const maxSize = lcdControl.pixelSize
 		if (x < 0 || x + sourceOptions.width > maxSize.width) {
-			throw new TypeError(`Image will not fit within the lcd strip`)
+			throw new TypeError(`Image will not fit within the lcd segment`)
 		}
 		if (y < 0 || y + sourceOptions.height > maxSize.height) {
-			throw new TypeError(`Image will not fit within the lcd strip`)
+			throw new TypeError(`Image will not fit within the lcd segment`)
 		}
 
 		const imageSize = sourceOptions.width * sourceOptions.height * sourceOptions.format.length

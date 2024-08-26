@@ -1,7 +1,7 @@
 import type { Dimension } from './id.js'
 
 export interface StreamDeckControlDefinitionBase {
-	type: 'button' | 'encoder' | 'lcd-strip'
+	type: 'button' | 'encoder' | 'lcd-segment'
 
 	row: number
 	column: number
@@ -40,16 +40,17 @@ export interface StreamDeckEncoderControlDefinition extends StreamDeckControlDef
 	hidIndex: number
 }
 
-export interface StreamDeckLcdStripControlDefinition extends StreamDeckControlDefinitionBase {
-	type: 'lcd-strip'
-	id: 0 // Future: Maybe there will be more than one LCD strip
+export interface StreamDeckLcdSegmentControlDefinition extends StreamDeckControlDefinitionBase {
+	type: 'lcd-segment'
+	id: 0 // Future: Maybe there will be more than one LCD segment
 
 	columnSpan: number
+	rowSpan: number
 
 	pixelSize: Dimension
 
 	/**
-	 * Whether the LCD strip supports drawing regions
+	 * Whether the LCD segment supports drawing regions
 	 */
 	drawRegions: boolean
 }
@@ -57,4 +58,4 @@ export interface StreamDeckLcdStripControlDefinition extends StreamDeckControlDe
 export type StreamDeckControlDefinition =
 	| StreamDeckButtonControlDefinition
 	| StreamDeckEncoderControlDefinition
-	| StreamDeckLcdStripControlDefinition
+	| StreamDeckLcdSegmentControlDefinition

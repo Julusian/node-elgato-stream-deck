@@ -21,20 +21,20 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 		return img.resize(panelDimensions.width, panelDimensions.height)
 	})
 
-	/** @type {import('@elgato-stream-deck/core').StreamDeckLcdStripControlDefinition} */
+	/** @type {import('@elgato-stream-deck/core').StreamDeckLcdSegmentControlDefinition} */
 	// @ts-expect-error  to ignore the | undefined
-	const lcdStripControl = streamDeck.CONTROLS.find((control) => control.type === 'lcd-strip' && control.id === 0)
+	const lcdSegmentControl = streamDeck.CONTROLS.find((control) => control.type === 'lcd-segment' && control.id === 0)
 
 	const buttonCount = streamDeck.CONTROLS.filter((control) => control.type === 'button').length
 
-	const bmpImgFieldLcd = lcdStripControl
+	const bmpImgFieldLcd = lcdSegmentControl
 		? await Jimp.read(path.resolve(__dirname, 'fixtures/sunny_field.png')).then((img) => {
-				return img.resize(lcdStripControl.pixelSize.width, lcdStripControl.pixelSize.height)
+				return img.resize(lcdSegmentControl.pixelSize.width, lcdSegmentControl.pixelSize.height)
 			})
 		: undefined
-	const bmpImgMosaicLcd = lcdStripControl
+	const bmpImgMosaicLcd = lcdSegmentControl
 		? await Jimp.read(path.resolve(__dirname, '../../../fixtures/mosaic.png')).then((img) => {
-				return img.resize(lcdStripControl.pixelSize.width, lcdStripControl.pixelSize.height)
+				return img.resize(lcdSegmentControl.pixelSize.width, lcdSegmentControl.pixelSize.height)
 			})
 		: undefined
 
@@ -70,7 +70,7 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 		streamDeck.fillPanelBuffer(image, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e))
 		if (imageLcd) {
 			streamDeck
-				.fillLcd(lcdStripControl.id, imageLcd, { format: 'rgba' })
+				.fillLcd(lcdSegmentControl.id, imageLcd, { format: 'rgba' })
 				.catch((e) => console.error('Fill lcd failed:', e))
 		}
 

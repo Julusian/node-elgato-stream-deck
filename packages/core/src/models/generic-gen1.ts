@@ -41,7 +41,7 @@ export function StreamDeckGen1Factory(
 			device,
 			fullProperties,
 		),
-		lcdStripDisplay: null,
+		lcdSegmentDisplay: null,
 		inputService: new ButtonOnlyInputService(fullProperties, events),
 	})
 }

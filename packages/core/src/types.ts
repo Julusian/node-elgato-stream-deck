@@ -5,7 +5,7 @@ import type {
 	StreamDeckButtonControlDefinition,
 	StreamDeckControlDefinition,
 	StreamDeckEncoderControlDefinition,
-	StreamDeckLcdStripControlDefinition,
+	StreamDeckLcdSegmentControlDefinition,
 } from './controlDefinition.js'
 
 export interface FillImageOptions {
@@ -32,9 +32,9 @@ export type StreamDeckEvents = {
 	up: [control: StreamDeckButtonControlDefinition | StreamDeckEncoderControlDefinition]
 	error: [err: unknown]
 	rotate: [control: StreamDeckEncoderControlDefinition, amount: number]
-	lcdShortPress: [control: StreamDeckLcdStripControlDefinition, position: LcdPosition]
-	lcdLongPress: [control: StreamDeckLcdStripControlDefinition, position: LcdPosition]
-	lcdSwipe: [control: StreamDeckLcdStripControlDefinition, from: LcdPosition, to: LcdPosition]
+	lcdShortPress: [control: StreamDeckLcdSegmentControlDefinition, position: LcdPosition]
+	lcdLongPress: [control: StreamDeckLcdSegmentControlDefinition, position: LcdPosition]
+	lcdSwipe: [control: StreamDeckLcdSegmentControlDefinition, from: LcdPosition, to: LcdPosition]
 }
 
 export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
@@ -97,8 +97,8 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	fillPanelBuffer(imageBuffer: Uint8Array | Uint8ClampedArray, options?: FillPanelOptions): Promise<void>
 
 	/**
-	 * Fill the whole lcd strip
-	 * @param {number} lcdIndex The id of the lcd strip to draw to
+	 * Fill the whole lcd segment
+	 * @param {number} lcdIndex The id of the lcd segment to draw to
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
 	 */
@@ -109,8 +109,8 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	): Promise<void>
 
 	/**
-	 * Fill a region of the lcd strip, ignoring the boundaries of the encoders
-	 * @param {number} lcdIndex The id of the lcd strip to draw to
+	 * Fill a region of the lcd segment, ignoring the boundaries of the encoders
+	 * @param {number} lcdIndex The id of the lcd segment to draw to
 	 * @param {number} x The x position to draw to
 	 * @param {number} y The y position to draw to
 	 * @param {Buffer} imageBuffer The image to write
@@ -125,10 +125,10 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	): Promise<void>
 
 	/**
-	 * Clear the lcd strip to black
-	 * @param {number} lcdIndex The id of the lcd strip to clear
+	 * Clear the lcd segment to black
+	 * @param {number} lcdIndex The id of the lcd segment to clear
 	 */
-	clearLcdStrip(lcdIndex: number): Promise<void>
+	clearLcdSegment(lcdIndex: number): Promise<void>
 
 	/**
 	 * Clears the given key.

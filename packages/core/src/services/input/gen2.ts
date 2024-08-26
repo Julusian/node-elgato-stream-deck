@@ -3,7 +3,7 @@ import type { LcdPosition, StreamDeckEvents } from '../../types.js'
 import type { CallbackHook } from '../callback-hook.js'
 import type {
 	StreamDeckEncoderControlDefinition,
-	StreamDeckLcdStripControlDefinition,
+	StreamDeckLcdSegmentControlDefinition,
 } from '../../controlDefinition.js'
 import { ButtonOnlyInputService } from './gen1.js'
 import { uint8ArrayToDataView } from '../../util.js'
@@ -12,7 +12,7 @@ export class Gen2InputService extends ButtonOnlyInputService {
 	readonly #eventSource: CallbackHook<StreamDeckEvents>
 	readonly #encoderControls: Readonly<StreamDeckEncoderControlDefinition[]>
 	readonly #encoderState: boolean[]
-	readonly #lcdStripControls: Readonly<StreamDeckLcdStripControlDefinition[]>
+	readonly #lcdSegmentControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>
 
 	constructor(deviceProperties: Readonly<StreamDeckProperties>, eventSource: CallbackHook<StreamDeckEvents>) {
 		super(deviceProperties, eventSource)
@@ -24,8 +24,8 @@ export class Gen2InputService extends ButtonOnlyInputService {
 		const maxIndex = Math.max(-1, ...this.#encoderControls.map((control) => control.index))
 		this.#encoderState = new Array<boolean>(maxIndex + 1).fill(false)
 
-		this.#lcdStripControls = deviceProperties.CONTROLS.filter(
-			(control): control is StreamDeckLcdStripControlDefinition => control.type === 'lcd-strip',
+		this.#lcdSegmentControls = deviceProperties.CONTROLS.filter(
+			(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
 		)
 	}
 
@@ -36,7 +36,7 @@ export class Gen2InputService extends ButtonOnlyInputService {
 				super.handleInput(data)
 				break
 			case 0x02: // LCD
-				this.#handleLcdStripInput(data)
+				this.#handleLcdSegmentInput(data)
 				break
 			case 0x03: // Encoder
 				this.#handleEncoderInput(data)
@@ -44,10 +44,10 @@ export class Gen2InputService extends ButtonOnlyInputService {
 		}
 	}
 
-	#handleLcdStripInput(data: Uint8Array): void {
+	#handleLcdSegmentInput(data: Uint8Array): void {
 		// Future: This will need to handle selecting the correct control
-		const lcdStripControl = this.#lcdStripControls.find((control) => control.id === 0)
-		if (!lcdStripControl) return
+		const lcdSegmentControl = this.#lcdSegmentControls.find((control) => control.id === 0)
+		if (!lcdSegmentControl) return
 
 		const bufferView = uint8ArrayToDataView(data)
 		const position: LcdPosition = {
@@ -57,10 +57,10 @@ export class Gen2InputService extends ButtonOnlyInputService {
 
 		switch (data[3]) {
 			case 1: // short press
-				this.#eventSource.emit('lcdShortPress', lcdStripControl, position)
+				this.#eventSource.emit('lcdShortPress', lcdSegmentControl, position)
 				break
 			case 2: // long press
-				this.#eventSource.emit('lcdLongPress', lcdStripControl, position)
+				this.#eventSource.emit('lcdLongPress', lcdSegmentControl, position)
 				break
 			case 3: {
 				// swipe
@@ -68,7 +68,7 @@ export class Gen2InputService extends ButtonOnlyInputService {
 					x: bufferView.getUint16(9, true),
 					y: bufferView.getUint16(11, true),
 				}
-				this.#eventSource.emit('lcdSwipe', lcdStripControl, position, positionTo)
+				this.#eventSource.emit('lcdSwipe', lcdSegmentControl, position, positionTo)
 				break
 			}
 		}

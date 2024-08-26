@@ -39,7 +39,7 @@ export function createBaseGen2Properties(
 			device,
 			fullProperties,
 		),
-		lcdStripDisplay: null,
+		lcdSegmentDisplay: null,
 		inputService: new Gen2InputService(fullProperties, events),
 	}
 }

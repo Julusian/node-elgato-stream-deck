@@ -18,7 +18,7 @@ export {
 	StreamDeckButtonControlDefinitionRgbFeedback,
 	StreamDeckButtonControlDefinitionLcdFeedback,
 	StreamDeckEncoderControlDefinition,
-	StreamDeckLcdStripControlDefinition,
+	StreamDeckLcdSegmentControlDefinition,
 	StreamDeckControlDefinition,
 	OpenStreamDeckOptions,
 } from '@elgato-stream-deck/core'

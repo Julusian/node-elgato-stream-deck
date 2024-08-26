@@ -5,16 +5,17 @@ import type { StreamDeckGen2Properties } from './generic-gen2.js'
 import { createBaseGen2Properties } from './generic-gen2.js'
 import { DeviceModelId } from '../id.js'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
-import type { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
-import { StreamDeckPlusLcdService } from '../services/lcdStripDisplay/plus.js'
+import type { StreamDeckControlDefinition, StreamDeckLcdSegmentControlDefinition } from '../controlDefinition.js'
+import { StreamDeckPlusLcdService } from '../services/lcdSegmentDisplay/plus.js'
 
 const plusControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2, { width: 120, height: 120 })
 plusControls.push(
 	{
-		type: 'lcd-strip',
+		type: 'lcd-segment',
 		row: 2,
 		column: 0,
 		columnSpan: 4,
+		rowSpan: 1,
 
 		id: 0,
 
@@ -64,13 +65,13 @@ const plusProperties: StreamDeckGen2Properties = {
 	KEY_SPACING_HORIZONTAL: 99,
 	KEY_SPACING_VERTICAL: 40,
 }
-const lcdStripControls = plusProperties.CONTROLS.filter(
-	(control): control is StreamDeckLcdStripControlDefinition => control.type === 'lcd-strip',
+const lcdSegmentControls = plusProperties.CONTROLS.filter(
+	(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
 )
 
 export function StreamDeckPlusFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
 	const services = createBaseGen2Properties(device, options, plusProperties, true)
-	services.lcdStripDisplay = new StreamDeckPlusLcdService(options.encodeJPEG, device, lcdStripControls)
+	services.lcdSegmentDisplay = new StreamDeckPlusLcdService(options.encodeJPEG, device, lcdSegmentControls)
 
 	return new StreamDeckBase(device, options, services)
 }

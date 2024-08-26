@@ -24,7 +24,7 @@ listStreamDecks().then(async (devices) => {
 					for (const control of streamDeck.CONTROLS) {
 						if (control.type === 'button' && control.feedbackType !== 'none') {
 							await streamDeck.fillKeyColor(control.index, r, g, b)
-						} else if (control.type === 'lcd-strip') {
+						} else if (control.type === 'lcd-segment') {
 							const lcdBuffer = Buffer.alloc(control.pixelSize.width * control.pixelSize.height * 4).fill(
 								Buffer.from([r, g, b, 255]),
 							)

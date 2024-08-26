@@ -1,9 +1,9 @@
 import type { FillImageOptions, FillLcdImageOptions } from '../../types.js'
 
-export interface LcdStripDisplayService {
+export interface LcdSegmentDisplayService {
 	/**
-	 * Fill the whole lcd strip
-	 * @param {number} lcdIndex The id of the lcd strip to draw to
+	 * Fill the whole lcd segment
+	 * @param {number} lcdIndex The id of the lcd segment to draw to
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
 	 */
@@ -14,8 +14,8 @@ export interface LcdStripDisplayService {
 	): Promise<void>
 
 	/**
-	 * Fill a region of the lcd strip, ignoring the boundaries of the encoders
-	 * @param {number} lcdIndex The id of the lcd strip to draw to
+	 * Fill a region of the lcd segment, ignoring the boundaries of the encoders
+	 * @param {number} lcdIndex The id of the lcd segment to draw to
 	 * @param {number} x The x position to draw to
 	 * @param {number} y The y position to draw to
 	 * @param {Buffer} imageBuffer The image to write
@@ -30,13 +30,13 @@ export interface LcdStripDisplayService {
 	): Promise<void>
 
 	/**
-	 * Clear the lcd strip to black
-	 * @param {number} lcdIndex The id of the lcd strip to clear
+	 * Clear the lcd segment to black
+	 * @param {number} lcdIndex The id of the lcd segment to clear
 	 */
-	clearLcdStrip(lcdIndex: number): Promise<void>
+	clearLcdSegment(lcdIndex: number): Promise<void>
 
 	/**
-	 * Clear all lcd strips to black
+	 * Clear all lcd segment to black
 	 */
-	clearAllLcdStrips(): Promise<void>
+	clearAllLcdSegments(): Promise<void>
 }

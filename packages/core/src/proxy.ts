@@ -89,10 +89,10 @@ export class StreamDeckProxy implements StreamDeck {
 		return this.device.fillLcdRegion(...args)
 	}
 
-	public async clearLcdStrip(
-		...args: Parameters<StreamDeck['clearLcdStrip']>
-	): ReturnType<StreamDeck['clearLcdStrip']> {
-		return this.device.clearLcdStrip(...args)
+	public async clearLcdSegment(
+		...args: Parameters<StreamDeck['clearLcdSegment']>
+	): ReturnType<StreamDeck['clearLcdSegment']> {
+		return this.device.clearLcdSegment(...args)
 	}
 
 	/**

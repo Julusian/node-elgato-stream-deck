@@ -5,8 +5,8 @@ import { DeviceModelId } from '../id.js'
 import type { StreamDeckGen2Properties } from './generic-gen2.js'
 import { createBaseGen2Properties } from './generic-gen2.js'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
-import type { StreamDeckControlDefinition, StreamDeckLcdStripControlDefinition } from '../controlDefinition.js'
-import { StreamDeckNeoLcdService } from '../services/lcdStripDisplay/neo.js'
+import type { StreamDeckControlDefinition, StreamDeckLcdSegmentControlDefinition } from '../controlDefinition.js'
+import { StreamDeckNeoLcdService } from '../services/lcdSegmentDisplay/neo.js'
 
 const neoControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2, { width: 96, height: 96 })
 neoControls.push(
@@ -19,10 +19,11 @@ neoControls.push(
 		feedbackType: 'rgb',
 	},
 	{
-		type: 'lcd-strip',
+		type: 'lcd-segment',
 		row: 2,
 		column: 1,
 		columnSpan: 2,
+		rowSpan: 1,
 
 		id: 0,
 
@@ -52,13 +53,13 @@ const neoProperties: StreamDeckGen2Properties = {
 	KEY_SPACING_HORIZONTAL: 30,
 	KEY_SPACING_VERTICAL: 30,
 }
-const lcdStripControls = neoProperties.CONTROLS.filter(
-	(control): control is StreamDeckLcdStripControlDefinition => control.type === 'lcd-strip',
+const lcdSegmentControls = neoProperties.CONTROLS.filter(
+	(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
 )
 
 export function StreamDeckNeoFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
 	const services = createBaseGen2Properties(device, options, neoProperties)
-	services.lcdStripDisplay = new StreamDeckNeoLcdService(options.encodeJPEG, device, lcdStripControls)
+	services.lcdSegmentDisplay = new StreamDeckNeoLcdService(options.encodeJPEG, device, lcdSegmentControls)
 
 	return new StreamDeckBase(device, options, services)
 }

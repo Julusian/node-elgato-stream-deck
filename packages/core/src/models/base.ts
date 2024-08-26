@@ -10,7 +10,7 @@ import type {
 } from '../types.js'
 import type { ButtonsLcdDisplayService } from '../services/buttonsLcdDisplay/interface.js'
 import type { StreamDeckButtonControlDefinition, StreamDeckControlDefinition } from '../controlDefinition.js'
-import type { LcdStripDisplayService } from '../services/lcdStripDisplay/interface.js'
+import type { LcdSegmentDisplayService } from '../services/lcdSegmentDisplay/interface.js'
 import type { PropertiesService } from '../services/properties/interface.js'
 import type { CallbackHook } from '../services/callback-hook.js'
 import type { StreamDeckInputService } from '../services/input/interface.js'
@@ -47,7 +47,7 @@ export interface StreamDeckServicesDefinition {
 	properties: PropertiesService
 	buttonsLcd: ButtonsLcdDisplayService
 	inputService: StreamDeckInputService
-	lcdStripDisplay: LcdStripDisplayService | null
+	lcdSegmentDisplay: LcdSegmentDisplayService | null
 }
 
 export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
@@ -73,7 +73,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	protected readonly deviceProperties: Readonly<StreamDeckProperties>
 	readonly #propertiesService: PropertiesService
 	readonly #buttonsLcdService: ButtonsLcdDisplayService
-	readonly #lcdStripDisplayService: LcdStripDisplayService | null
+	readonly #lcdSegmentDisplayService: LcdSegmentDisplayService | null
 	readonly #inputService: StreamDeckInputService
 	// private readonly options: Readonly<OpenStreamDeckOptions>
 
@@ -84,7 +84,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		this.deviceProperties = services.deviceProperties
 		this.#propertiesService = services.properties
 		this.#buttonsLcdService = services.buttonsLcd
-		this.#lcdStripDisplayService = services.lcdStripDisplay
+		this.#lcdSegmentDisplayService = services.lcdSegmentDisplay
 		this.#inputService = services.inputService
 
 		// propogate events
@@ -169,30 +169,30 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 
 		ps.push(this.#buttonsLcdService.clearPanel())
 
-		if (this.#lcdStripDisplayService) ps.push(this.#lcdStripDisplayService.clearAllLcdStrips())
+		if (this.#lcdSegmentDisplayService) ps.push(this.#lcdSegmentDisplayService.clearAllLcdSegments())
 
 		await Promise.all(ps)
 	}
 
 	public async fillLcd(...args: Parameters<StreamDeck['fillLcd']>): ReturnType<StreamDeck['fillLcd']> {
-		if (!this.#lcdStripDisplayService) throw new Error('Not supported for this model')
+		if (!this.#lcdSegmentDisplayService) throw new Error('Not supported for this model')
 
-		return this.#lcdStripDisplayService.fillLcd(...args)
+		return this.#lcdSegmentDisplayService.fillLcd(...args)
 	}
 
 	public async fillLcdRegion(
 		...args: Parameters<StreamDeck['fillLcdRegion']>
 	): ReturnType<StreamDeck['fillLcdRegion']> {
-		if (!this.#lcdStripDisplayService) throw new Error('Not supported for this model')
+		if (!this.#lcdSegmentDisplayService) throw new Error('Not supported for this model')
 
-		return this.#lcdStripDisplayService.fillLcdRegion(...args)
+		return this.#lcdSegmentDisplayService.fillLcdRegion(...args)
 	}
 
-	public async clearLcdStrip(
-		...args: Parameters<StreamDeck['clearLcdStrip']>
-	): ReturnType<StreamDeck['clearLcdStrip']> {
-		if (!this.#lcdStripDisplayService) throw new Error('Not supported for this model')
+	public async clearLcdSegment(
+		...args: Parameters<StreamDeck['clearLcdSegment']>
+	): ReturnType<StreamDeck['clearLcdSegment']> {
+		if (!this.#lcdSegmentDisplayService) throw new Error('Not supported for this model')
 
-		return this.#lcdStripDisplayService.clearLcdStrip(...args)
+		return this.#lcdSegmentDisplayService.clearLcdSegment(...args)
 	}
 }

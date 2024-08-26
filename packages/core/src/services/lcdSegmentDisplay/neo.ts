@@ -1,25 +1,25 @@
-import type { StreamDeckLcdStripControlDefinition } from '../../controlDefinition.js'
+import type { StreamDeckLcdSegmentControlDefinition } from '../../controlDefinition.js'
 import type { HIDDevice } from '../../hid-device.js'
 import type { Dimension } from '../../id.js'
 import type { InternalFillImageOptions } from '../imagePacker/interface.js'
 import { StreamdeckNeoLcdImageHeaderGenerator } from '../imageWriter/headerGenerator.js'
 import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter.js'
-import type { LcdStripDisplayService } from './interface.js'
+import type { LcdSegmentDisplayService } from './interface.js'
 import type { FillLcdImageOptions, FillImageOptions } from '../../types.js'
 import { transformImageBuffer } from '../../util.js'
 import type { EncodeJPEGHelper } from '../../models/base.js'
 
-export class StreamDeckNeoLcdService implements LcdStripDisplayService {
+export class StreamDeckNeoLcdService implements LcdSegmentDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper
 	readonly #device: HIDDevice
-	readonly #lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>
+	readonly #lcdControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>
 
 	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter<null>(new StreamdeckNeoLcdImageHeaderGenerator())
 
 	constructor(
 		encodeJPEG: EncodeJPEGHelper,
 		device: HIDDevice,
-		lcdControls: Readonly<StreamDeckLcdStripControlDefinition[]>,
+		lcdControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>,
 	) {
 		this.#encodeJPEG = encodeJPEG
 		this.#device = device
@@ -38,7 +38,7 @@ export class StreamDeckNeoLcdService implements LcdStripDisplayService {
 
 	public async fillLcd(index: number, imageBuffer: Uint8Array, sourceOptions: FillImageOptions): Promise<void> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
-		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
+		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
 		const imageSize = lcdControl.pixelSize.width * lcdControl.pixelSize.height * sourceOptions.format.length
 		if (imageBuffer.length !== imageSize) {
@@ -52,9 +52,9 @@ export class StreamDeckNeoLcdService implements LcdStripDisplayService {
 		await this.#device.sendReports(packets)
 	}
 
-	public async clearLcdStrip(index: number): Promise<void> {
+	public async clearLcdSegment(index: number): Promise<void> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
-		if (!lcdControl) throw new Error(`Invalid lcd strip index ${index}`)
+		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
 		const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4)
 
@@ -63,10 +63,10 @@ export class StreamDeckNeoLcdService implements LcdStripDisplayService {
 		})
 	}
 
-	public async clearAllLcdStrips(): Promise<void> {
+	public async clearAllLcdSegments(): Promise<void> {
 		const ps: Array<Promise<void>> = []
 		for (const control of this.#lcdControls) {
-			ps.push(this.clearLcdStrip(control.id))
+			ps.push(this.clearLcdSegment(control.id))
 		}
 
 		await Promise.all(ps)

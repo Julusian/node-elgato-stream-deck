@@ -12,7 +12,7 @@ const { listStreamDecks, openStreamDeck } = require('../dist/index')
 	for (const control of streamDeck.CONTROLS) {
 		if (control.type === 'button' && control.feedbackType !== 'none') {
 			streamDeck.fillKeyColor(control.index, 255, 255, 255).catch((e) => console.error('Fill failed:', e))
-		} else if (control.type === 'lcd-strip') {
+		} else if (control.type === 'lcd-segment') {
 			const buffer = Buffer.alloc(control.pixelSize.width * control.pixelSize.height * 3).fill(
 				Buffer.from([255, 255, 255]),
 			)
