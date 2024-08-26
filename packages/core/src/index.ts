@@ -16,9 +16,10 @@ import type { PropertiesService } from './services/properties/interface.js'
 export * from './types.js'
 export * from './id.js'
 export * from './controlDefinition.js'
-export { HIDDevice, HIDDeviceInfo, HIDDeviceEvents, ChildHIDDeviceInfo } from './hid-device.js'
-export { OpenStreamDeckOptions } from './models/base.js'
+export type { HIDDevice, HIDDeviceInfo, HIDDeviceEvents, ChildHIDDeviceInfo } from './hid-device.js'
+export type { OpenStreamDeckOptions } from './models/base.js'
 export { StreamDeckProxy } from './proxy.js'
+export type { PropertiesService } from './services/properties/interface.js'
 
 /** Elgato vendor id */
 export const VENDOR_ID = 0x0fd9

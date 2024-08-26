@@ -2,12 +2,11 @@ import * as EventEmitter from 'events'
 import type { OpenStreamDeckOptionsTcp, StreamDeckTcp } from './types.js'
 import { DEFAULT_TCP_PORT } from './constants.js'
 import { SocketWrapper } from './socketWrapper.js'
-import { type JPEGEncodeOptions, encodeJPEG } from '@elgato-stream-deck/node-lib/dist/jpeg.js'
-import type { HIDDevice, OpenStreamDeckOptions, ChildHIDDeviceInfo } from '@elgato-stream-deck/core'
+import { type JPEGEncodeOptions, encodeJPEG } from '@elgato-stream-deck/node-lib'
+import type { HIDDevice, OpenStreamDeckOptions, ChildHIDDeviceInfo, PropertiesService } from '@elgato-stream-deck/core'
 import { DEVICE_MODELS } from '@elgato-stream-deck/core'
 import { StreamDeckTcpWrapper } from './tcpWrapper.js'
 import { TcpHidDevice } from './hid-device.js'
-import type { PropertiesService } from '@elgato-stream-deck/core/dist/services/properties/interface.js'
 
 export interface StreamDeckTcpConnectionManagerEvents {
 	connected: [streamdeck: StreamDeckTcp]

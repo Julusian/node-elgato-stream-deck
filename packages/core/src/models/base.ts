@@ -85,7 +85,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 
 	protected readonly device: HIDDevice
 	protected readonly deviceProperties: Readonly<StreamDeckProperties>
-	readonly #options: Readonly<Required<OpenStreamDeckOptions>>
+	// readonly #options: Readonly<Required<OpenStreamDeckOptions>>
 	readonly #propertiesService: PropertiesService
 	readonly #buttonsLcdService: ButtonsLcdDisplayService
 	readonly #lcdSegmentDisplayService: LcdSegmentDisplayService | null
@@ -94,15 +94,14 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 
 	constructor(
 		device: HIDDevice,
-		options: Readonly<Required<OpenStreamDeckOptions>>,
+		_options: Readonly<Required<OpenStreamDeckOptions>>,
 		services: StreamDeckServicesDefinition,
 	) {
 		super()
 
-		this.#options = options
-
 		this.device = device
 		this.deviceProperties = services.deviceProperties
+		// this.#options = options
 		this.#propertiesService = services.properties
 		this.#buttonsLcdService = services.buttonsLcd
 		this.#lcdSegmentDisplayService = services.lcdSegmentDisplay

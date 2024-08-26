@@ -1,4 +1,4 @@
-import { JPEGEncodeOptions } from '@elgato-stream-deck/node-lib/dist/jpeg'
+import type { JPEGEncodeOptions } from '@elgato-stream-deck/node-lib'
 
 export {
 	VENDOR_ID,

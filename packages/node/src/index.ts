@@ -3,7 +3,7 @@ import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'
 import * as HID from 'node-hid'
 import { NodeHIDDevice, StreamDeckDeviceInfo } from './hid-device.js'
 import { StreamDeckNode } from './wrapper.js'
-import { encodeJPEG, JPEGEncodeOptions } from '@elgato-stream-deck/node-lib/dist/jpeg.js'
+import { encodeJPEG, JPEGEncodeOptions } from '@elgato-stream-deck/node-lib'
 
 export {
 	VENDOR_ID,
