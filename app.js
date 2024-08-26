@@ -1,2283 +1,10 @@
 /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
-
-/***/ 28:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-exports.byteLength = byteLength
-exports.toByteArray = toByteArray
-exports.fromByteArray = fromByteArray
-
-var lookup = []
-var revLookup = []
-var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
-
-var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-for (var i = 0, len = code.length; i < len; ++i) {
-  lookup[i] = code[i]
-  revLookup[code.charCodeAt(i)] = i
-}
-
-// Support decoding URL-safe base64 strings, as Node.js does.
-// See: https://en.wikipedia.org/wiki/Base64#URL_applications
-revLookup['-'.charCodeAt(0)] = 62
-revLookup['_'.charCodeAt(0)] = 63
-
-function getLens (b64) {
-  var len = b64.length
-
-  if (len % 4 > 0) {
-    throw new Error('Invalid string. Length must be a multiple of 4')
-  }
-
-  // Trim off extra bytes after placeholder bytes are found
-  // See: https://github.com/beatgammit/base64-js/issues/42
-  var validLen = b64.indexOf('=')
-  if (validLen === -1) validLen = len
-
-  var placeHoldersLen = validLen === len
-    ? 0
-    : 4 - (validLen % 4)
-
-  return [validLen, placeHoldersLen]
-}
-
-// base64 is 4/3 + up to two characters of the original data
-function byteLength (b64) {
-  var lens = getLens(b64)
-  var validLen = lens[0]
-  var placeHoldersLen = lens[1]
-  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
-}
-
-function _byteLength (b64, validLen, placeHoldersLen) {
-  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
-}
-
-function toByteArray (b64) {
-  var tmp
-  var lens = getLens(b64)
-  var validLen = lens[0]
-  var placeHoldersLen = lens[1]
-
-  var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen))
-
-  var curByte = 0
-
-  // if there are placeholders, only get up to the last complete 4 chars
-  var len = placeHoldersLen > 0
-    ? validLen - 4
-    : validLen
-
-  var i
-  for (i = 0; i < len; i += 4) {
-    tmp =
-      (revLookup[b64.charCodeAt(i)] << 18) |
-      (revLookup[b64.charCodeAt(i + 1)] << 12) |
-      (revLookup[b64.charCodeAt(i + 2)] << 6) |
-      revLookup[b64.charCodeAt(i + 3)]
-    arr[curByte++] = (tmp >> 16) & 0xFF
-    arr[curByte++] = (tmp >> 8) & 0xFF
-    arr[curByte++] = tmp & 0xFF
-  }
-
-  if (placeHoldersLen === 2) {
-    tmp =
-      (revLookup[b64.charCodeAt(i)] << 2) |
-      (revLookup[b64.charCodeAt(i + 1)] >> 4)
-    arr[curByte++] = tmp & 0xFF
-  }
-
-  if (placeHoldersLen === 1) {
-    tmp =
-      (revLookup[b64.charCodeAt(i)] << 10) |
-      (revLookup[b64.charCodeAt(i + 1)] << 4) |
-      (revLookup[b64.charCodeAt(i + 2)] >> 2)
-    arr[curByte++] = (tmp >> 8) & 0xFF
-    arr[curByte++] = tmp & 0xFF
-  }
-
-  return arr
-}
-
-function tripletToBase64 (num) {
-  return lookup[num >> 18 & 0x3F] +
-    lookup[num >> 12 & 0x3F] +
-    lookup[num >> 6 & 0x3F] +
-    lookup[num & 0x3F]
-}
-
-function encodeChunk (uint8, start, end) {
-  var tmp
-  var output = []
-  for (var i = start; i < end; i += 3) {
-    tmp =
-      ((uint8[i] << 16) & 0xFF0000) +
-      ((uint8[i + 1] << 8) & 0xFF00) +
-      (uint8[i + 2] & 0xFF)
-    output.push(tripletToBase64(tmp))
-  }
-  return output.join('')
-}
-
-function fromByteArray (uint8) {
-  var tmp
-  var len = uint8.length
-  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
-  var parts = []
-  var maxChunkLength = 16383 // must be multiple of 3
-
-  // go through the array every three bytes, we'll deal with trailing stuff later
-  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
-  }
-
-  // pad the end with zeros, but make sure to not forget the extra bytes
-  if (extraBytes === 1) {
-    tmp = uint8[len - 1]
-    parts.push(
-      lookup[tmp >> 2] +
-      lookup[(tmp << 4) & 0x3F] +
-      '=='
-    )
-  } else if (extraBytes === 2) {
-    tmp = (uint8[len - 2] << 8) + uint8[len - 1]
-    parts.push(
-      lookup[tmp >> 10] +
-      lookup[(tmp >> 4) & 0x3F] +
-      lookup[(tmp << 2) & 0x3F] +
-      '='
-    )
-  }
-
-  return parts.join('')
-}
-
-
-/***/ }),
-
-/***/ 429:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-var __webpack_unused_export__;
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
-/* eslint-disable no-proto */
-
-
-
-const base64 = __webpack_require__(28)
-const ieee754 = __webpack_require__(801)
-const customInspectSymbol =
-  (typeof Symbol === 'function' && typeof Symbol['for'] === 'function') // eslint-disable-line dot-notation
-    ? Symbol['for']('nodejs.util.inspect.custom') // eslint-disable-line dot-notation
-    : null
-
-exports.hp = Buffer
-__webpack_unused_export__ = SlowBuffer
-exports.IS = 50
-
-const K_MAX_LENGTH = 0x7fffffff
-__webpack_unused_export__ = K_MAX_LENGTH
-
-/**
- * If `Buffer.TYPED_ARRAY_SUPPORT`:
- *   === true    Use Uint8Array implementation (fastest)
- *   === false   Print warning and recommend using `buffer` v4.x which has an Object
- *               implementation (most compatible, even IE6)
- *
- * Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
- * Opera 11.6+, iOS 4.2+.
- *
- * We report that the browser does not support typed arrays if the are not subclassable
- * using __proto__. Firefox 4-29 lacks support for adding new properties to `Uint8Array`
- * (See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438). IE 10 lacks support
- * for __proto__ and has a buggy typed array implementation.
- */
-Buffer.TYPED_ARRAY_SUPPORT = typedArraySupport()
-
-if (!Buffer.TYPED_ARRAY_SUPPORT && typeof console !== 'undefined' &&
-    typeof console.error === 'function') {
-  console.error(
-    'This browser lacks typed array (Uint8Array) support which is required by ' +
-    '`buffer` v5.x. Use `buffer` v4.x if you require old browser support.'
-  )
-}
-
-function typedArraySupport () {
-  // Can typed array instances can be augmented?
-  try {
-    const arr = new Uint8Array(1)
-    const proto = { foo: function () { return 42 } }
-    Object.setPrototypeOf(proto, Uint8Array.prototype)
-    Object.setPrototypeOf(arr, proto)
-    return arr.foo() === 42
-  } catch (e) {
-    return false
-  }
-}
-
-Object.defineProperty(Buffer.prototype, 'parent', {
-  enumerable: true,
-  get: function () {
-    if (!Buffer.isBuffer(this)) return undefined
-    return this.buffer
-  }
-})
-
-Object.defineProperty(Buffer.prototype, 'offset', {
-  enumerable: true,
-  get: function () {
-    if (!Buffer.isBuffer(this)) return undefined
-    return this.byteOffset
-  }
-})
-
-function createBuffer (length) {
-  if (length > K_MAX_LENGTH) {
-    throw new RangeError('The value "' + length + '" is invalid for option "size"')
-  }
-  // Return an augmented `Uint8Array` instance
-  const buf = new Uint8Array(length)
-  Object.setPrototypeOf(buf, Buffer.prototype)
-  return buf
-}
-
-/**
- * The Buffer constructor returns instances of `Uint8Array` that have their
- * prototype changed to `Buffer.prototype`. Furthermore, `Buffer` is a subclass of
- * `Uint8Array`, so the returned instances will have all the node `Buffer` methods
- * and the `Uint8Array` methods. Square bracket notation works as expected -- it
- * returns a single octet.
- *
- * The `Uint8Array` prototype remains unmodified.
- */
-
-function Buffer (arg, encodingOrOffset, length) {
-  // Common case.
-  if (typeof arg === 'number') {
-    if (typeof encodingOrOffset === 'string') {
-      throw new TypeError(
-        'The "string" argument must be of type string. Received type number'
-      )
-    }
-    return allocUnsafe(arg)
-  }
-  return from(arg, encodingOrOffset, length)
-}
-
-Buffer.poolSize = 8192 // not used by this implementation
-
-function from (value, encodingOrOffset, length) {
-  if (typeof value === 'string') {
-    return fromString(value, encodingOrOffset)
-  }
-
-  if (ArrayBuffer.isView(value)) {
-    return fromArrayView(value)
-  }
-
-  if (value == null) {
-    throw new TypeError(
-      'The first argument must be one of type string, Buffer, ArrayBuffer, Array, ' +
-      'or Array-like Object. Received type ' + (typeof value)
-    )
-  }
-
-  if (isInstance(value, ArrayBuffer) ||
-      (value && isInstance(value.buffer, ArrayBuffer))) {
-    return fromArrayBuffer(value, encodingOrOffset, length)
-  }
-
-  if (typeof SharedArrayBuffer !== 'undefined' &&
-      (isInstance(value, SharedArrayBuffer) ||
-      (value && isInstance(value.buffer, SharedArrayBuffer)))) {
-    return fromArrayBuffer(value, encodingOrOffset, length)
-  }
-
-  if (typeof value === 'number') {
-    throw new TypeError(
-      'The "value" argument must not be of type number. Received type number'
-    )
-  }
-
-  const valueOf = value.valueOf && value.valueOf()
-  if (valueOf != null && valueOf !== value) {
-    return Buffer.from(valueOf, encodingOrOffset, length)
-  }
-
-  const b = fromObject(value)
-  if (b) return b
-
-  if (typeof Symbol !== 'undefined' && Symbol.toPrimitive != null &&
-      typeof value[Symbol.toPrimitive] === 'function') {
-    return Buffer.from(value[Symbol.toPrimitive]('string'), encodingOrOffset, length)
-  }
-
-  throw new TypeError(
-    'The first argument must be one of type string, Buffer, ArrayBuffer, Array, ' +
-    'or Array-like Object. Received type ' + (typeof value)
-  )
-}
-
-/**
- * Functionally equivalent to Buffer(arg, encoding) but throws a TypeError
- * if value is a number.
- * Buffer.from(str[, encoding])
- * Buffer.from(array)
- * Buffer.from(buffer)
- * Buffer.from(arrayBuffer[, byteOffset[, length]])
- **/
-Buffer.from = function (value, encodingOrOffset, length) {
-  return from(value, encodingOrOffset, length)
-}
-
-// Note: Change prototype *after* Buffer.from is defined to workaround Chrome bug:
-// https://github.com/feross/buffer/pull/148
-Object.setPrototypeOf(Buffer.prototype, Uint8Array.prototype)
-Object.setPrototypeOf(Buffer, Uint8Array)
-
-function assertSize (size) {
-  if (typeof size !== 'number') {
-    throw new TypeError('"size" argument must be of type number')
-  } else if (size < 0) {
-    throw new RangeError('The value "' + size + '" is invalid for option "size"')
-  }
-}
-
-function alloc (size, fill, encoding) {
-  assertSize(size)
-  if (size <= 0) {
-    return createBuffer(size)
-  }
-  if (fill !== undefined) {
-    // Only pay attention to encoding if it's a string. This
-    // prevents accidentally sending in a number that would
-    // be interpreted as a start offset.
-    return typeof encoding === 'string'
-      ? createBuffer(size).fill(fill, encoding)
-      : createBuffer(size).fill(fill)
-  }
-  return createBuffer(size)
-}
-
-/**
- * Creates a new filled Buffer instance.
- * alloc(size[, fill[, encoding]])
- **/
-Buffer.alloc = function (size, fill, encoding) {
-  return alloc(size, fill, encoding)
-}
-
-function allocUnsafe (size) {
-  assertSize(size)
-  return createBuffer(size < 0 ? 0 : checked(size) | 0)
-}
-
-/**
- * Equivalent to Buffer(num), by default creates a non-zero-filled Buffer instance.
- * */
-Buffer.allocUnsafe = function (size) {
-  return allocUnsafe(size)
-}
-/**
- * Equivalent to SlowBuffer(num), by default creates a non-zero-filled Buffer instance.
- */
-Buffer.allocUnsafeSlow = function (size) {
-  return allocUnsafe(size)
-}
-
-function fromString (string, encoding) {
-  if (typeof encoding !== 'string' || encoding === '') {
-    encoding = 'utf8'
-  }
-
-  if (!Buffer.isEncoding(encoding)) {
-    throw new TypeError('Unknown encoding: ' + encoding)
-  }
-
-  const length = byteLength(string, encoding) | 0
-  let buf = createBuffer(length)
-
-  const actual = buf.write(string, encoding)
-
-  if (actual !== length) {
-    // Writing a hex string, for example, that contains invalid characters will
-    // cause everything after the first invalid character to be ignored. (e.g.
-    // 'abxxcd' will be treated as 'ab')
-    buf = buf.slice(0, actual)
-  }
-
-  return buf
-}
-
-function fromArrayLike (array) {
-  const length = array.length < 0 ? 0 : checked(array.length) | 0
-  const buf = createBuffer(length)
-  for (let i = 0; i < length; i += 1) {
-    buf[i] = array[i] & 255
-  }
-  return buf
-}
-
-function fromArrayView (arrayView) {
-  if (isInstance(arrayView, Uint8Array)) {
-    const copy = new Uint8Array(arrayView)
-    return fromArrayBuffer(copy.buffer, copy.byteOffset, copy.byteLength)
-  }
-  return fromArrayLike(arrayView)
-}
-
-function fromArrayBuffer (array, byteOffset, length) {
-  if (byteOffset < 0 || array.byteLength < byteOffset) {
-    throw new RangeError('"offset" is outside of buffer bounds')
-  }
-
-  if (array.byteLength < byteOffset + (length || 0)) {
-    throw new RangeError('"length" is outside of buffer bounds')
-  }
-
-  let buf
-  if (byteOffset === undefined && length === undefined) {
-    buf = new Uint8Array(array)
-  } else if (length === undefined) {
-    buf = new Uint8Array(array, byteOffset)
-  } else {
-    buf = new Uint8Array(array, byteOffset, length)
-  }
-
-  // Return an augmented `Uint8Array` instance
-  Object.setPrototypeOf(buf, Buffer.prototype)
-
-  return buf
-}
-
-function fromObject (obj) {
-  if (Buffer.isBuffer(obj)) {
-    const len = checked(obj.length) | 0
-    const buf = createBuffer(len)
-
-    if (buf.length === 0) {
-      return buf
-    }
-
-    obj.copy(buf, 0, 0, len)
-    return buf
-  }
-
-  if (obj.length !== undefined) {
-    if (typeof obj.length !== 'number' || numberIsNaN(obj.length)) {
-      return createBuffer(0)
-    }
-    return fromArrayLike(obj)
-  }
-
-  if (obj.type === 'Buffer' && Array.isArray(obj.data)) {
-    return fromArrayLike(obj.data)
-  }
-}
-
-function checked (length) {
-  // Note: cannot use `length < K_MAX_LENGTH` here because that fails when
-  // length is NaN (which is otherwise coerced to zero.)
-  if (length >= K_MAX_LENGTH) {
-    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
-                         'size: 0x' + K_MAX_LENGTH.toString(16) + ' bytes')
-  }
-  return length | 0
-}
-
-function SlowBuffer (length) {
-  if (+length != length) { // eslint-disable-line eqeqeq
-    length = 0
-  }
-  return Buffer.alloc(+length)
-}
-
-Buffer.isBuffer = function isBuffer (b) {
-  return b != null && b._isBuffer === true &&
-    b !== Buffer.prototype // so Buffer.isBuffer(Buffer.prototype) will be false
-}
-
-Buffer.compare = function compare (a, b) {
-  if (isInstance(a, Uint8Array)) a = Buffer.from(a, a.offset, a.byteLength)
-  if (isInstance(b, Uint8Array)) b = Buffer.from(b, b.offset, b.byteLength)
-  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b)) {
-    throw new TypeError(
-      'The "buf1", "buf2" arguments must be one of type Buffer or Uint8Array'
-    )
-  }
-
-  if (a === b) return 0
-
-  let x = a.length
-  let y = b.length
-
-  for (let i = 0, len = Math.min(x, y); i < len; ++i) {
-    if (a[i] !== b[i]) {
-      x = a[i]
-      y = b[i]
-      break
-    }
-  }
-
-  if (x < y) return -1
-  if (y < x) return 1
-  return 0
-}
-
-Buffer.isEncoding = function isEncoding (encoding) {
-  switch (String(encoding).toLowerCase()) {
-    case 'hex':
-    case 'utf8':
-    case 'utf-8':
-    case 'ascii':
-    case 'latin1':
-    case 'binary':
-    case 'base64':
-    case 'ucs2':
-    case 'ucs-2':
-    case 'utf16le':
-    case 'utf-16le':
-      return true
-    default:
-      return false
-  }
-}
-
-Buffer.concat = function concat (list, length) {
-  if (!Array.isArray(list)) {
-    throw new TypeError('"list" argument must be an Array of Buffers')
-  }
-
-  if (list.length === 0) {
-    return Buffer.alloc(0)
-  }
-
-  let i
-  if (length === undefined) {
-    length = 0
-    for (i = 0; i < list.length; ++i) {
-      length += list[i].length
-    }
-  }
-
-  const buffer = Buffer.allocUnsafe(length)
-  let pos = 0
-  for (i = 0; i < list.length; ++i) {
-    let buf = list[i]
-    if (isInstance(buf, Uint8Array)) {
-      if (pos + buf.length > buffer.length) {
-        if (!Buffer.isBuffer(buf)) buf = Buffer.from(buf)
-        buf.copy(buffer, pos)
-      } else {
-        Uint8Array.prototype.set.call(
-          buffer,
-          buf,
-          pos
-        )
-      }
-    } else if (!Buffer.isBuffer(buf)) {
-      throw new TypeError('"list" argument must be an Array of Buffers')
-    } else {
-      buf.copy(buffer, pos)
-    }
-    pos += buf.length
-  }
-  return buffer
-}
-
-function byteLength (string, encoding) {
-  if (Buffer.isBuffer(string)) {
-    return string.length
-  }
-  if (ArrayBuffer.isView(string) || isInstance(string, ArrayBuffer)) {
-    return string.byteLength
-  }
-  if (typeof string !== 'string') {
-    throw new TypeError(
-      'The "string" argument must be one of type string, Buffer, or ArrayBuffer. ' +
-      'Received type ' + typeof string
-    )
-  }
-
-  const len = string.length
-  const mustMatch = (arguments.length > 2 && arguments[2] === true)
-  if (!mustMatch && len === 0) return 0
-
-  // Use a for loop to avoid recursion
-  let loweredCase = false
-  for (;;) {
-    switch (encoding) {
-      case 'ascii':
-      case 'latin1':
-      case 'binary':
-        return len
-      case 'utf8':
-      case 'utf-8':
-        return utf8ToBytes(string).length
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return len * 2
-      case 'hex':
-        return len >>> 1
-      case 'base64':
-        return base64ToBytes(string).length
-      default:
-        if (loweredCase) {
-          return mustMatch ? -1 : utf8ToBytes(string).length // assume utf8
-        }
-        encoding = ('' + encoding).toLowerCase()
-        loweredCase = true
-    }
-  }
-}
-Buffer.byteLength = byteLength
-
-function slowToString (encoding, start, end) {
-  let loweredCase = false
-
-  // No need to verify that "this.length <= MAX_UINT32" since it's a read-only
-  // property of a typed array.
-
-  // This behaves neither like String nor Uint8Array in that we set start/end
-  // to their upper/lower bounds if the value passed is out of range.
-  // undefined is handled specially as per ECMA-262 6th Edition,
-  // Section 13.3.3.7 Runtime Semantics: KeyedBindingInitialization.
-  if (start === undefined || start < 0) {
-    start = 0
-  }
-  // Return early if start > this.length. Done here to prevent potential uint32
-  // coercion fail below.
-  if (start > this.length) {
-    return ''
-  }
-
-  if (end === undefined || end > this.length) {
-    end = this.length
-  }
-
-  if (end <= 0) {
-    return ''
-  }
-
-  // Force coercion to uint32. This will also coerce falsey/NaN values to 0.
-  end >>>= 0
-  start >>>= 0
-
-  if (end <= start) {
-    return ''
-  }
-
-  if (!encoding) encoding = 'utf8'
-
-  while (true) {
-    switch (encoding) {
-      case 'hex':
-        return hexSlice(this, start, end)
-
-      case 'utf8':
-      case 'utf-8':
-        return utf8Slice(this, start, end)
-
-      case 'ascii':
-        return asciiSlice(this, start, end)
-
-      case 'latin1':
-      case 'binary':
-        return latin1Slice(this, start, end)
-
-      case 'base64':
-        return base64Slice(this, start, end)
-
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return utf16leSlice(this, start, end)
-
-      default:
-        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
-        encoding = (encoding + '').toLowerCase()
-        loweredCase = true
-    }
-  }
-}
-
-// This property is used by `Buffer.isBuffer` (and the `is-buffer` npm package)
-// to detect a Buffer instance. It's not possible to use `instanceof Buffer`
-// reliably in a browserify context because there could be multiple different
-// copies of the 'buffer' package in use. This method works even for Buffer
-// instances that were created from another copy of the `buffer` package.
-// See: https://github.com/feross/buffer/issues/154
-Buffer.prototype._isBuffer = true
-
-function swap (b, n, m) {
-  const i = b[n]
-  b[n] = b[m]
-  b[m] = i
-}
-
-Buffer.prototype.swap16 = function swap16 () {
-  const len = this.length
-  if (len % 2 !== 0) {
-    throw new RangeError('Buffer size must be a multiple of 16-bits')
-  }
-  for (let i = 0; i < len; i += 2) {
-    swap(this, i, i + 1)
-  }
-  return this
-}
-
-Buffer.prototype.swap32 = function swap32 () {
-  const len = this.length
-  if (len % 4 !== 0) {
-    throw new RangeError('Buffer size must be a multiple of 32-bits')
-  }
-  for (let i = 0; i < len; i += 4) {
-    swap(this, i, i + 3)
-    swap(this, i + 1, i + 2)
-  }
-  return this
-}
-
-Buffer.prototype.swap64 = function swap64 () {
-  const len = this.length
-  if (len % 8 !== 0) {
-    throw new RangeError('Buffer size must be a multiple of 64-bits')
-  }
-  for (let i = 0; i < len; i += 8) {
-    swap(this, i, i + 7)
-    swap(this, i + 1, i + 6)
-    swap(this, i + 2, i + 5)
-    swap(this, i + 3, i + 4)
-  }
-  return this
-}
-
-Buffer.prototype.toString = function toString () {
-  const length = this.length
-  if (length === 0) return ''
-  if (arguments.length === 0) return utf8Slice(this, 0, length)
-  return slowToString.apply(this, arguments)
-}
-
-Buffer.prototype.toLocaleString = Buffer.prototype.toString
-
-Buffer.prototype.equals = function equals (b) {
-  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
-  if (this === b) return true
-  return Buffer.compare(this, b) === 0
-}
-
-Buffer.prototype.inspect = function inspect () {
-  let str = ''
-  const max = exports.IS
-  str = this.toString('hex', 0, max).replace(/(.{2})/g, '$1 ').trim()
-  if (this.length > max) str += ' ... '
-  return '<Buffer ' + str + '>'
-}
-if (customInspectSymbol) {
-  Buffer.prototype[customInspectSymbol] = Buffer.prototype.inspect
-}
-
-Buffer.prototype.compare = function compare (target, start, end, thisStart, thisEnd) {
-  if (isInstance(target, Uint8Array)) {
-    target = Buffer.from(target, target.offset, target.byteLength)
-  }
-  if (!Buffer.isBuffer(target)) {
-    throw new TypeError(
-      'The "target" argument must be one of type Buffer or Uint8Array. ' +
-      'Received type ' + (typeof target)
-    )
-  }
-
-  if (start === undefined) {
-    start = 0
-  }
-  if (end === undefined) {
-    end = target ? target.length : 0
-  }
-  if (thisStart === undefined) {
-    thisStart = 0
-  }
-  if (thisEnd === undefined) {
-    thisEnd = this.length
-  }
-
-  if (start < 0 || end > target.length || thisStart < 0 || thisEnd > this.length) {
-    throw new RangeError('out of range index')
-  }
-
-  if (thisStart >= thisEnd && start >= end) {
-    return 0
-  }
-  if (thisStart >= thisEnd) {
-    return -1
-  }
-  if (start >= end) {
-    return 1
-  }
-
-  start >>>= 0
-  end >>>= 0
-  thisStart >>>= 0
-  thisEnd >>>= 0
-
-  if (this === target) return 0
-
-  let x = thisEnd - thisStart
-  let y = end - start
-  const len = Math.min(x, y)
-
-  const thisCopy = this.slice(thisStart, thisEnd)
-  const targetCopy = target.slice(start, end)
-
-  for (let i = 0; i < len; ++i) {
-    if (thisCopy[i] !== targetCopy[i]) {
-      x = thisCopy[i]
-      y = targetCopy[i]
-      break
-    }
-  }
-
-  if (x < y) return -1
-  if (y < x) return 1
-  return 0
-}
-
-// Finds either the first index of `val` in `buffer` at offset >= `byteOffset`,
-// OR the last index of `val` in `buffer` at offset <= `byteOffset`.
-//
-// Arguments:
-// - buffer - a Buffer to search
-// - val - a string, Buffer, or number
-// - byteOffset - an index into `buffer`; will be clamped to an int32
-// - encoding - an optional encoding, relevant is val is a string
-// - dir - true for indexOf, false for lastIndexOf
-function bidirectionalIndexOf (buffer, val, byteOffset, encoding, dir) {
-  // Empty buffer means no match
-  if (buffer.length === 0) return -1
-
-  // Normalize byteOffset
-  if (typeof byteOffset === 'string') {
-    encoding = byteOffset
-    byteOffset = 0
-  } else if (byteOffset > 0x7fffffff) {
-    byteOffset = 0x7fffffff
-  } else if (byteOffset < -0x80000000) {
-    byteOffset = -0x80000000
-  }
-  byteOffset = +byteOffset // Coerce to Number.
-  if (numberIsNaN(byteOffset)) {
-    // byteOffset: it it's undefined, null, NaN, "foo", etc, search whole buffer
-    byteOffset = dir ? 0 : (buffer.length - 1)
-  }
-
-  // Normalize byteOffset: negative offsets start from the end of the buffer
-  if (byteOffset < 0) byteOffset = buffer.length + byteOffset
-  if (byteOffset >= buffer.length) {
-    if (dir) return -1
-    else byteOffset = buffer.length - 1
-  } else if (byteOffset < 0) {
-    if (dir) byteOffset = 0
-    else return -1
-  }
-
-  // Normalize val
-  if (typeof val === 'string') {
-    val = Buffer.from(val, encoding)
-  }
-
-  // Finally, search either indexOf (if dir is true) or lastIndexOf
-  if (Buffer.isBuffer(val)) {
-    // Special case: looking for empty string/buffer always fails
-    if (val.length === 0) {
-      return -1
-    }
-    return arrayIndexOf(buffer, val, byteOffset, encoding, dir)
-  } else if (typeof val === 'number') {
-    val = val & 0xFF // Search for a byte value [0-255]
-    if (typeof Uint8Array.prototype.indexOf === 'function') {
-      if (dir) {
-        return Uint8Array.prototype.indexOf.call(buffer, val, byteOffset)
-      } else {
-        return Uint8Array.prototype.lastIndexOf.call(buffer, val, byteOffset)
-      }
-    }
-    return arrayIndexOf(buffer, [val], byteOffset, encoding, dir)
-  }
-
-  throw new TypeError('val must be string, number or Buffer')
-}
-
-function arrayIndexOf (arr, val, byteOffset, encoding, dir) {
-  let indexSize = 1
-  let arrLength = arr.length
-  let valLength = val.length
-
-  if (encoding !== undefined) {
-    encoding = String(encoding).toLowerCase()
-    if (encoding === 'ucs2' || encoding === 'ucs-2' ||
-        encoding === 'utf16le' || encoding === 'utf-16le') {
-      if (arr.length < 2 || val.length < 2) {
-        return -1
-      }
-      indexSize = 2
-      arrLength /= 2
-      valLength /= 2
-      byteOffset /= 2
-    }
-  }
-
-  function read (buf, i) {
-    if (indexSize === 1) {
-      return buf[i]
-    } else {
-      return buf.readUInt16BE(i * indexSize)
-    }
-  }
-
-  let i
-  if (dir) {
-    let foundIndex = -1
-    for (i = byteOffset; i < arrLength; i++) {
-      if (read(arr, i) === read(val, foundIndex === -1 ? 0 : i - foundIndex)) {
-        if (foundIndex === -1) foundIndex = i
-        if (i - foundIndex + 1 === valLength) return foundIndex * indexSize
-      } else {
-        if (foundIndex !== -1) i -= i - foundIndex
-        foundIndex = -1
-      }
-    }
-  } else {
-    if (byteOffset + valLength > arrLength) byteOffset = arrLength - valLength
-    for (i = byteOffset; i >= 0; i--) {
-      let found = true
-      for (let j = 0; j < valLength; j++) {
-        if (read(arr, i + j) !== read(val, j)) {
-          found = false
-          break
-        }
-      }
-      if (found) return i
-    }
-  }
-
-  return -1
-}
-
-Buffer.prototype.includes = function includes (val, byteOffset, encoding) {
-  return this.indexOf(val, byteOffset, encoding) !== -1
-}
-
-Buffer.prototype.indexOf = function indexOf (val, byteOffset, encoding) {
-  return bidirectionalIndexOf(this, val, byteOffset, encoding, true)
-}
-
-Buffer.prototype.lastIndexOf = function lastIndexOf (val, byteOffset, encoding) {
-  return bidirectionalIndexOf(this, val, byteOffset, encoding, false)
-}
-
-function hexWrite (buf, string, offset, length) {
-  offset = Number(offset) || 0
-  const remaining = buf.length - offset
-  if (!length) {
-    length = remaining
-  } else {
-    length = Number(length)
-    if (length > remaining) {
-      length = remaining
-    }
-  }
-
-  const strLen = string.length
-
-  if (length > strLen / 2) {
-    length = strLen / 2
-  }
-  let i
-  for (i = 0; i < length; ++i) {
-    const parsed = parseInt(string.substr(i * 2, 2), 16)
-    if (numberIsNaN(parsed)) return i
-    buf[offset + i] = parsed
-  }
-  return i
-}
-
-function utf8Write (buf, string, offset, length) {
-  return blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length)
-}
-
-function asciiWrite (buf, string, offset, length) {
-  return blitBuffer(asciiToBytes(string), buf, offset, length)
-}
-
-function base64Write (buf, string, offset, length) {
-  return blitBuffer(base64ToBytes(string), buf, offset, length)
-}
-
-function ucs2Write (buf, string, offset, length) {
-  return blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length)
-}
-
-Buffer.prototype.write = function write (string, offset, length, encoding) {
-  // Buffer#write(string)
-  if (offset === undefined) {
-    encoding = 'utf8'
-    length = this.length
-    offset = 0
-  // Buffer#write(string, encoding)
-  } else if (length === undefined && typeof offset === 'string') {
-    encoding = offset
-    length = this.length
-    offset = 0
-  // Buffer#write(string, offset[, length][, encoding])
-  } else if (isFinite(offset)) {
-    offset = offset >>> 0
-    if (isFinite(length)) {
-      length = length >>> 0
-      if (encoding === undefined) encoding = 'utf8'
-    } else {
-      encoding = length
-      length = undefined
-    }
-  } else {
-    throw new Error(
-      'Buffer.write(string, encoding, offset[, length]) is no longer supported'
-    )
-  }
-
-  const remaining = this.length - offset
-  if (length === undefined || length > remaining) length = remaining
-
-  if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
-    throw new RangeError('Attempt to write outside buffer bounds')
-  }
-
-  if (!encoding) encoding = 'utf8'
-
-  let loweredCase = false
-  for (;;) {
-    switch (encoding) {
-      case 'hex':
-        return hexWrite(this, string, offset, length)
-
-      case 'utf8':
-      case 'utf-8':
-        return utf8Write(this, string, offset, length)
-
-      case 'ascii':
-      case 'latin1':
-      case 'binary':
-        return asciiWrite(this, string, offset, length)
-
-      case 'base64':
-        // Warning: maxLength not taken into account in base64Write
-        return base64Write(this, string, offset, length)
-
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return ucs2Write(this, string, offset, length)
-
-      default:
-        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
-        encoding = ('' + encoding).toLowerCase()
-        loweredCase = true
-    }
-  }
-}
-
-Buffer.prototype.toJSON = function toJSON () {
-  return {
-    type: 'Buffer',
-    data: Array.prototype.slice.call(this._arr || this, 0)
-  }
-}
-
-function base64Slice (buf, start, end) {
-  if (start === 0 && end === buf.length) {
-    return base64.fromByteArray(buf)
-  } else {
-    return base64.fromByteArray(buf.slice(start, end))
-  }
-}
-
-function utf8Slice (buf, start, end) {
-  end = Math.min(buf.length, end)
-  const res = []
-
-  let i = start
-  while (i < end) {
-    const firstByte = buf[i]
-    let codePoint = null
-    let bytesPerSequence = (firstByte > 0xEF)
-      ? 4
-      : (firstByte > 0xDF)
-          ? 3
-          : (firstByte > 0xBF)
-              ? 2
-              : 1
-
-    if (i + bytesPerSequence <= end) {
-      let secondByte, thirdByte, fourthByte, tempCodePoint
-
-      switch (bytesPerSequence) {
-        case 1:
-          if (firstByte < 0x80) {
-            codePoint = firstByte
-          }
-          break
-        case 2:
-          secondByte = buf[i + 1]
-          if ((secondByte & 0xC0) === 0x80) {
-            tempCodePoint = (firstByte & 0x1F) << 0x6 | (secondByte & 0x3F)
-            if (tempCodePoint > 0x7F) {
-              codePoint = tempCodePoint
-            }
-          }
-          break
-        case 3:
-          secondByte = buf[i + 1]
-          thirdByte = buf[i + 2]
-          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80) {
-            tempCodePoint = (firstByte & 0xF) << 0xC | (secondByte & 0x3F) << 0x6 | (thirdByte & 0x3F)
-            if (tempCodePoint > 0x7FF && (tempCodePoint < 0xD800 || tempCodePoint > 0xDFFF)) {
-              codePoint = tempCodePoint
-            }
-          }
-          break
-        case 4:
-          secondByte = buf[i + 1]
-          thirdByte = buf[i + 2]
-          fourthByte = buf[i + 3]
-          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80 && (fourthByte & 0xC0) === 0x80) {
-            tempCodePoint = (firstByte & 0xF) << 0x12 | (secondByte & 0x3F) << 0xC | (thirdByte & 0x3F) << 0x6 | (fourthByte & 0x3F)
-            if (tempCodePoint > 0xFFFF && tempCodePoint < 0x110000) {
-              codePoint = tempCodePoint
-            }
-          }
-      }
-    }
-
-    if (codePoint === null) {
-      // we did not generate a valid codePoint so insert a
-      // replacement char (U+FFFD) and advance only 1 byte
-      codePoint = 0xFFFD
-      bytesPerSequence = 1
-    } else if (codePoint > 0xFFFF) {
-      // encode to utf16 (surrogate pair dance)
-      codePoint -= 0x10000
-      res.push(codePoint >>> 10 & 0x3FF | 0xD800)
-      codePoint = 0xDC00 | codePoint & 0x3FF
-    }
-
-    res.push(codePoint)
-    i += bytesPerSequence
-  }
-
-  return decodeCodePointsArray(res)
-}
-
-// Based on http://stackoverflow.com/a/22747272/680742, the browser with
-// the lowest limit is Chrome, with 0x10000 args.
-// We go 1 magnitude less, for safety
-const MAX_ARGUMENTS_LENGTH = 0x1000
-
-function decodeCodePointsArray (codePoints) {
-  const len = codePoints.length
-  if (len <= MAX_ARGUMENTS_LENGTH) {
-    return String.fromCharCode.apply(String, codePoints) // avoid extra slice()
-  }
-
-  // Decode in chunks to avoid "call stack size exceeded".
-  let res = ''
-  let i = 0
-  while (i < len) {
-    res += String.fromCharCode.apply(
-      String,
-      codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH)
-    )
-  }
-  return res
-}
-
-function asciiSlice (buf, start, end) {
-  let ret = ''
-  end = Math.min(buf.length, end)
-
-  for (let i = start; i < end; ++i) {
-    ret += String.fromCharCode(buf[i] & 0x7F)
-  }
-  return ret
-}
-
-function latin1Slice (buf, start, end) {
-  let ret = ''
-  end = Math.min(buf.length, end)
-
-  for (let i = start; i < end; ++i) {
-    ret += String.fromCharCode(buf[i])
-  }
-  return ret
-}
-
-function hexSlice (buf, start, end) {
-  const len = buf.length
-
-  if (!start || start < 0) start = 0
-  if (!end || end < 0 || end > len) end = len
-
-  let out = ''
-  for (let i = start; i < end; ++i) {
-    out += hexSliceLookupTable[buf[i]]
-  }
-  return out
-}
-
-function utf16leSlice (buf, start, end) {
-  const bytes = buf.slice(start, end)
-  let res = ''
-  // If bytes.length is odd, the last 8 bits must be ignored (same as node.js)
-  for (let i = 0; i < bytes.length - 1; i += 2) {
-    res += String.fromCharCode(bytes[i] + (bytes[i + 1] * 256))
-  }
-  return res
-}
-
-Buffer.prototype.slice = function slice (start, end) {
-  const len = this.length
-  start = ~~start
-  end = end === undefined ? len : ~~end
-
-  if (start < 0) {
-    start += len
-    if (start < 0) start = 0
-  } else if (start > len) {
-    start = len
-  }
-
-  if (end < 0) {
-    end += len
-    if (end < 0) end = 0
-  } else if (end > len) {
-    end = len
-  }
-
-  if (end < start) end = start
-
-  const newBuf = this.subarray(start, end)
-  // Return an augmented `Uint8Array` instance
-  Object.setPrototypeOf(newBuf, Buffer.prototype)
-
-  return newBuf
-}
-
-/*
- * Need to make sure that buffer isn't trying to write out of bounds.
- */
-function checkOffset (offset, ext, length) {
-  if ((offset % 1) !== 0 || offset < 0) throw new RangeError('offset is not uint')
-  if (offset + ext > length) throw new RangeError('Trying to access beyond buffer length')
-}
-
-Buffer.prototype.readUintLE =
-Buffer.prototype.readUIntLE = function readUIntLE (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert) checkOffset(offset, byteLength, this.length)
-
-  let val = this[offset]
-  let mul = 1
-  let i = 0
-  while (++i < byteLength && (mul *= 0x100)) {
-    val += this[offset + i] * mul
-  }
-
-  return val
-}
-
-Buffer.prototype.readUintBE =
-Buffer.prototype.readUIntBE = function readUIntBE (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert) {
-    checkOffset(offset, byteLength, this.length)
-  }
-
-  let val = this[offset + --byteLength]
-  let mul = 1
-  while (byteLength > 0 && (mul *= 0x100)) {
-    val += this[offset + --byteLength] * mul
-  }
-
-  return val
-}
-
-Buffer.prototype.readUint8 =
-Buffer.prototype.readUInt8 = function readUInt8 (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 1, this.length)
-  return this[offset]
-}
-
-Buffer.prototype.readUint16LE =
-Buffer.prototype.readUInt16LE = function readUInt16LE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 2, this.length)
-  return this[offset] | (this[offset + 1] << 8)
-}
-
-Buffer.prototype.readUint16BE =
-Buffer.prototype.readUInt16BE = function readUInt16BE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 2, this.length)
-  return (this[offset] << 8) | this[offset + 1]
-}
-
-Buffer.prototype.readUint32LE =
-Buffer.prototype.readUInt32LE = function readUInt32LE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 4, this.length)
-
-  return ((this[offset]) |
-      (this[offset + 1] << 8) |
-      (this[offset + 2] << 16)) +
-      (this[offset + 3] * 0x1000000)
-}
-
-Buffer.prototype.readUint32BE =
-Buffer.prototype.readUInt32BE = function readUInt32BE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 4, this.length)
-
-  return (this[offset] * 0x1000000) +
-    ((this[offset + 1] << 16) |
-    (this[offset + 2] << 8) |
-    this[offset + 3])
-}
-
-Buffer.prototype.readBigUInt64LE = defineBigIntMethod(function readBigUInt64LE (offset) {
-  offset = offset >>> 0
-  validateNumber(offset, 'offset')
-  const first = this[offset]
-  const last = this[offset + 7]
-  if (first === undefined || last === undefined) {
-    boundsError(offset, this.length - 8)
-  }
-
-  const lo = first +
-    this[++offset] * 2 ** 8 +
-    this[++offset] * 2 ** 16 +
-    this[++offset] * 2 ** 24
-
-  const hi = this[++offset] +
-    this[++offset] * 2 ** 8 +
-    this[++offset] * 2 ** 16 +
-    last * 2 ** 24
-
-  return BigInt(lo) + (BigInt(hi) << BigInt(32))
-})
-
-Buffer.prototype.readBigUInt64BE = defineBigIntMethod(function readBigUInt64BE (offset) {
-  offset = offset >>> 0
-  validateNumber(offset, 'offset')
-  const first = this[offset]
-  const last = this[offset + 7]
-  if (first === undefined || last === undefined) {
-    boundsError(offset, this.length - 8)
-  }
-
-  const hi = first * 2 ** 24 +
-    this[++offset] * 2 ** 16 +
-    this[++offset] * 2 ** 8 +
-    this[++offset]
-
-  const lo = this[++offset] * 2 ** 24 +
-    this[++offset] * 2 ** 16 +
-    this[++offset] * 2 ** 8 +
-    last
-
-  return (BigInt(hi) << BigInt(32)) + BigInt(lo)
-})
-
-Buffer.prototype.readIntLE = function readIntLE (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert) checkOffset(offset, byteLength, this.length)
-
-  let val = this[offset]
-  let mul = 1
-  let i = 0
-  while (++i < byteLength && (mul *= 0x100)) {
-    val += this[offset + i] * mul
-  }
-  mul *= 0x80
-
-  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
-
-  return val
-}
-
-Buffer.prototype.readIntBE = function readIntBE (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert) checkOffset(offset, byteLength, this.length)
-
-  let i = byteLength
-  let mul = 1
-  let val = this[offset + --i]
-  while (i > 0 && (mul *= 0x100)) {
-    val += this[offset + --i] * mul
-  }
-  mul *= 0x80
-
-  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
-
-  return val
-}
-
-Buffer.prototype.readInt8 = function readInt8 (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 1, this.length)
-  if (!(this[offset] & 0x80)) return (this[offset])
-  return ((0xff - this[offset] + 1) * -1)
-}
-
-Buffer.prototype.readInt16LE = function readInt16LE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 2, this.length)
-  const val = this[offset] | (this[offset + 1] << 8)
-  return (val & 0x8000) ? val | 0xFFFF0000 : val
-}
-
-Buffer.prototype.readInt16BE = function readInt16BE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 2, this.length)
-  const val = this[offset + 1] | (this[offset] << 8)
-  return (val & 0x8000) ? val | 0xFFFF0000 : val
-}
-
-Buffer.prototype.readInt32LE = function readInt32LE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 4, this.length)
-
-  return (this[offset]) |
-    (this[offset + 1] << 8) |
-    (this[offset + 2] << 16) |
-    (this[offset + 3] << 24)
-}
-
-Buffer.prototype.readInt32BE = function readInt32BE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 4, this.length)
-
-  return (this[offset] << 24) |
-    (this[offset + 1] << 16) |
-    (this[offset + 2] << 8) |
-    (this[offset + 3])
-}
-
-Buffer.prototype.readBigInt64LE = defineBigIntMethod(function readBigInt64LE (offset) {
-  offset = offset >>> 0
-  validateNumber(offset, 'offset')
-  const first = this[offset]
-  const last = this[offset + 7]
-  if (first === undefined || last === undefined) {
-    boundsError(offset, this.length - 8)
-  }
-
-  const val = this[offset + 4] +
-    this[offset + 5] * 2 ** 8 +
-    this[offset + 6] * 2 ** 16 +
-    (last << 24) // Overflow
-
-  return (BigInt(val) << BigInt(32)) +
-    BigInt(first +
-    this[++offset] * 2 ** 8 +
-    this[++offset] * 2 ** 16 +
-    this[++offset] * 2 ** 24)
-})
-
-Buffer.prototype.readBigInt64BE = defineBigIntMethod(function readBigInt64BE (offset) {
-  offset = offset >>> 0
-  validateNumber(offset, 'offset')
-  const first = this[offset]
-  const last = this[offset + 7]
-  if (first === undefined || last === undefined) {
-    boundsError(offset, this.length - 8)
-  }
-
-  const val = (first << 24) + // Overflow
-    this[++offset] * 2 ** 16 +
-    this[++offset] * 2 ** 8 +
-    this[++offset]
-
-  return (BigInt(val) << BigInt(32)) +
-    BigInt(this[++offset] * 2 ** 24 +
-    this[++offset] * 2 ** 16 +
-    this[++offset] * 2 ** 8 +
-    last)
-})
-
-Buffer.prototype.readFloatLE = function readFloatLE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 4, this.length)
-  return ieee754.read(this, offset, true, 23, 4)
-}
-
-Buffer.prototype.readFloatBE = function readFloatBE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 4, this.length)
-  return ieee754.read(this, offset, false, 23, 4)
-}
-
-Buffer.prototype.readDoubleLE = function readDoubleLE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 8, this.length)
-  return ieee754.read(this, offset, true, 52, 8)
-}
-
-Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 8, this.length)
-  return ieee754.read(this, offset, false, 52, 8)
-}
-
-function checkInt (buf, value, offset, ext, max, min) {
-  if (!Buffer.isBuffer(buf)) throw new TypeError('"buffer" argument must be a Buffer instance')
-  if (value > max || value < min) throw new RangeError('"value" argument is out of bounds')
-  if (offset + ext > buf.length) throw new RangeError('Index out of range')
-}
-
-Buffer.prototype.writeUintLE =
-Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert) {
-    const maxBytes = Math.pow(2, 8 * byteLength) - 1
-    checkInt(this, value, offset, byteLength, maxBytes, 0)
-  }
-
-  let mul = 1
-  let i = 0
-  this[offset] = value & 0xFF
-  while (++i < byteLength && (mul *= 0x100)) {
-    this[offset + i] = (value / mul) & 0xFF
-  }
-
-  return offset + byteLength
-}
-
-Buffer.prototype.writeUintBE =
-Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert) {
-    const maxBytes = Math.pow(2, 8 * byteLength) - 1
-    checkInt(this, value, offset, byteLength, maxBytes, 0)
-  }
-
-  let i = byteLength - 1
-  let mul = 1
-  this[offset + i] = value & 0xFF
-  while (--i >= 0 && (mul *= 0x100)) {
-    this[offset + i] = (value / mul) & 0xFF
-  }
-
-  return offset + byteLength
-}
-
-Buffer.prototype.writeUint8 =
-Buffer.prototype.writeUInt8 = function writeUInt8 (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 1, 0xff, 0)
-  this[offset] = (value & 0xff)
-  return offset + 1
-}
-
-Buffer.prototype.writeUint16LE =
-Buffer.prototype.writeUInt16LE = function writeUInt16LE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
-  this[offset] = (value & 0xff)
-  this[offset + 1] = (value >>> 8)
-  return offset + 2
-}
-
-Buffer.prototype.writeUint16BE =
-Buffer.prototype.writeUInt16BE = function writeUInt16BE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
-  this[offset] = (value >>> 8)
-  this[offset + 1] = (value & 0xff)
-  return offset + 2
-}
-
-Buffer.prototype.writeUint32LE =
-Buffer.prototype.writeUInt32LE = function writeUInt32LE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
-  this[offset + 3] = (value >>> 24)
-  this[offset + 2] = (value >>> 16)
-  this[offset + 1] = (value >>> 8)
-  this[offset] = (value & 0xff)
-  return offset + 4
-}
-
-Buffer.prototype.writeUint32BE =
-Buffer.prototype.writeUInt32BE = function writeUInt32BE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
-  this[offset] = (value >>> 24)
-  this[offset + 1] = (value >>> 16)
-  this[offset + 2] = (value >>> 8)
-  this[offset + 3] = (value & 0xff)
-  return offset + 4
-}
-
-function wrtBigUInt64LE (buf, value, offset, min, max) {
-  checkIntBI(value, min, max, buf, offset, 7)
-
-  let lo = Number(value & BigInt(0xffffffff))
-  buf[offset++] = lo
-  lo = lo >> 8
-  buf[offset++] = lo
-  lo = lo >> 8
-  buf[offset++] = lo
-  lo = lo >> 8
-  buf[offset++] = lo
-  let hi = Number(value >> BigInt(32) & BigInt(0xffffffff))
-  buf[offset++] = hi
-  hi = hi >> 8
-  buf[offset++] = hi
-  hi = hi >> 8
-  buf[offset++] = hi
-  hi = hi >> 8
-  buf[offset++] = hi
-  return offset
-}
-
-function wrtBigUInt64BE (buf, value, offset, min, max) {
-  checkIntBI(value, min, max, buf, offset, 7)
-
-  let lo = Number(value & BigInt(0xffffffff))
-  buf[offset + 7] = lo
-  lo = lo >> 8
-  buf[offset + 6] = lo
-  lo = lo >> 8
-  buf[offset + 5] = lo
-  lo = lo >> 8
-  buf[offset + 4] = lo
-  let hi = Number(value >> BigInt(32) & BigInt(0xffffffff))
-  buf[offset + 3] = hi
-  hi = hi >> 8
-  buf[offset + 2] = hi
-  hi = hi >> 8
-  buf[offset + 1] = hi
-  hi = hi >> 8
-  buf[offset] = hi
-  return offset + 8
-}
-
-Buffer.prototype.writeBigUInt64LE = defineBigIntMethod(function writeBigUInt64LE (value, offset = 0) {
-  return wrtBigUInt64LE(this, value, offset, BigInt(0), BigInt('0xffffffffffffffff'))
-})
-
-Buffer.prototype.writeBigUInt64BE = defineBigIntMethod(function writeBigUInt64BE (value, offset = 0) {
-  return wrtBigUInt64BE(this, value, offset, BigInt(0), BigInt('0xffffffffffffffff'))
-})
-
-Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) {
-    const limit = Math.pow(2, (8 * byteLength) - 1)
-
-    checkInt(this, value, offset, byteLength, limit - 1, -limit)
-  }
-
-  let i = 0
-  let mul = 1
-  let sub = 0
-  this[offset] = value & 0xFF
-  while (++i < byteLength && (mul *= 0x100)) {
-    if (value < 0 && sub === 0 && this[offset + i - 1] !== 0) {
-      sub = 1
-    }
-    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
-  }
-
-  return offset + byteLength
-}
-
-Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) {
-    const limit = Math.pow(2, (8 * byteLength) - 1)
-
-    checkInt(this, value, offset, byteLength, limit - 1, -limit)
-  }
-
-  let i = byteLength - 1
-  let mul = 1
-  let sub = 0
-  this[offset + i] = value & 0xFF
-  while (--i >= 0 && (mul *= 0x100)) {
-    if (value < 0 && sub === 0 && this[offset + i + 1] !== 0) {
-      sub = 1
-    }
-    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
-  }
-
-  return offset + byteLength
-}
-
-Buffer.prototype.writeInt8 = function writeInt8 (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 1, 0x7f, -0x80)
-  if (value < 0) value = 0xff + value + 1
-  this[offset] = (value & 0xff)
-  return offset + 1
-}
-
-Buffer.prototype.writeInt16LE = function writeInt16LE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
-  this[offset] = (value & 0xff)
-  this[offset + 1] = (value >>> 8)
-  return offset + 2
-}
-
-Buffer.prototype.writeInt16BE = function writeInt16BE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
-  this[offset] = (value >>> 8)
-  this[offset + 1] = (value & 0xff)
-  return offset + 2
-}
-
-Buffer.prototype.writeInt32LE = function writeInt32LE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
-  this[offset] = (value & 0xff)
-  this[offset + 1] = (value >>> 8)
-  this[offset + 2] = (value >>> 16)
-  this[offset + 3] = (value >>> 24)
-  return offset + 4
-}
-
-Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
-  if (value < 0) value = 0xffffffff + value + 1
-  this[offset] = (value >>> 24)
-  this[offset + 1] = (value >>> 16)
-  this[offset + 2] = (value >>> 8)
-  this[offset + 3] = (value & 0xff)
-  return offset + 4
-}
-
-Buffer.prototype.writeBigInt64LE = defineBigIntMethod(function writeBigInt64LE (value, offset = 0) {
-  return wrtBigUInt64LE(this, value, offset, -BigInt('0x8000000000000000'), BigInt('0x7fffffffffffffff'))
-})
-
-Buffer.prototype.writeBigInt64BE = defineBigIntMethod(function writeBigInt64BE (value, offset = 0) {
-  return wrtBigUInt64BE(this, value, offset, -BigInt('0x8000000000000000'), BigInt('0x7fffffffffffffff'))
-})
-
-function checkIEEE754 (buf, value, offset, ext, max, min) {
-  if (offset + ext > buf.length) throw new RangeError('Index out of range')
-  if (offset < 0) throw new RangeError('Index out of range')
-}
-
-function writeFloat (buf, value, offset, littleEndian, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) {
-    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
-  }
-  ieee754.write(buf, value, offset, littleEndian, 23, 4)
-  return offset + 4
-}
-
-Buffer.prototype.writeFloatLE = function writeFloatLE (value, offset, noAssert) {
-  return writeFloat(this, value, offset, true, noAssert)
-}
-
-Buffer.prototype.writeFloatBE = function writeFloatBE (value, offset, noAssert) {
-  return writeFloat(this, value, offset, false, noAssert)
-}
-
-function writeDouble (buf, value, offset, littleEndian, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) {
-    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
-  }
-  ieee754.write(buf, value, offset, littleEndian, 52, 8)
-  return offset + 8
-}
-
-Buffer.prototype.writeDoubleLE = function writeDoubleLE (value, offset, noAssert) {
-  return writeDouble(this, value, offset, true, noAssert)
-}
-
-Buffer.prototype.writeDoubleBE = function writeDoubleBE (value, offset, noAssert) {
-  return writeDouble(this, value, offset, false, noAssert)
-}
-
-// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
-Buffer.prototype.copy = function copy (target, targetStart, start, end) {
-  if (!Buffer.isBuffer(target)) throw new TypeError('argument should be a Buffer')
-  if (!start) start = 0
-  if (!end && end !== 0) end = this.length
-  if (targetStart >= target.length) targetStart = target.length
-  if (!targetStart) targetStart = 0
-  if (end > 0 && end < start) end = start
-
-  // Copy 0 bytes; we're done
-  if (end === start) return 0
-  if (target.length === 0 || this.length === 0) return 0
-
-  // Fatal error conditions
-  if (targetStart < 0) {
-    throw new RangeError('targetStart out of bounds')
-  }
-  if (start < 0 || start >= this.length) throw new RangeError('Index out of range')
-  if (end < 0) throw new RangeError('sourceEnd out of bounds')
-
-  // Are we oob?
-  if (end > this.length) end = this.length
-  if (target.length - targetStart < end - start) {
-    end = target.length - targetStart + start
-  }
-
-  const len = end - start
-
-  if (this === target && typeof Uint8Array.prototype.copyWithin === 'function') {
-    // Use built-in when available, missing from IE11
-    this.copyWithin(targetStart, start, end)
-  } else {
-    Uint8Array.prototype.set.call(
-      target,
-      this.subarray(start, end),
-      targetStart
-    )
-  }
-
-  return len
-}
-
-// Usage:
-//    buffer.fill(number[, offset[, end]])
-//    buffer.fill(buffer[, offset[, end]])
-//    buffer.fill(string[, offset[, end]][, encoding])
-Buffer.prototype.fill = function fill (val, start, end, encoding) {
-  // Handle string cases:
-  if (typeof val === 'string') {
-    if (typeof start === 'string') {
-      encoding = start
-      start = 0
-      end = this.length
-    } else if (typeof end === 'string') {
-      encoding = end
-      end = this.length
-    }
-    if (encoding !== undefined && typeof encoding !== 'string') {
-      throw new TypeError('encoding must be a string')
-    }
-    if (typeof encoding === 'string' && !Buffer.isEncoding(encoding)) {
-      throw new TypeError('Unknown encoding: ' + encoding)
-    }
-    if (val.length === 1) {
-      const code = val.charCodeAt(0)
-      if ((encoding === 'utf8' && code < 128) ||
-          encoding === 'latin1') {
-        // Fast path: If `val` fits into a single byte, use that numeric value.
-        val = code
-      }
-    }
-  } else if (typeof val === 'number') {
-    val = val & 255
-  } else if (typeof val === 'boolean') {
-    val = Number(val)
-  }
-
-  // Invalid ranges are not set to a default, so can range check early.
-  if (start < 0 || this.length < start || this.length < end) {
-    throw new RangeError('Out of range index')
-  }
-
-  if (end <= start) {
-    return this
-  }
-
-  start = start >>> 0
-  end = end === undefined ? this.length : end >>> 0
-
-  if (!val) val = 0
-
-  let i
-  if (typeof val === 'number') {
-    for (i = start; i < end; ++i) {
-      this[i] = val
-    }
-  } else {
-    const bytes = Buffer.isBuffer(val)
-      ? val
-      : Buffer.from(val, encoding)
-    const len = bytes.length
-    if (len === 0) {
-      throw new TypeError('The value "' + val +
-        '" is invalid for argument "value"')
-    }
-    for (i = 0; i < end - start; ++i) {
-      this[i + start] = bytes[i % len]
-    }
-  }
-
-  return this
-}
-
-// CUSTOM ERRORS
-// =============
-
-// Simplified versions from Node, changed for Buffer-only usage
-const errors = {}
-function E (sym, getMessage, Base) {
-  errors[sym] = class NodeError extends Base {
-    constructor () {
-      super()
-
-      Object.defineProperty(this, 'message', {
-        value: getMessage.apply(this, arguments),
-        writable: true,
-        configurable: true
-      })
-
-      // Add the error code to the name to include it in the stack trace.
-      this.name = `${this.name} [${sym}]`
-      // Access the stack to generate the error message including the error code
-      // from the name.
-      this.stack // eslint-disable-line no-unused-expressions
-      // Reset the name to the actual name.
-      delete this.name
-    }
-
-    get code () {
-      return sym
-    }
-
-    set code (value) {
-      Object.defineProperty(this, 'code', {
-        configurable: true,
-        enumerable: true,
-        value,
-        writable: true
-      })
-    }
-
-    toString () {
-      return `${this.name} [${sym}]: ${this.message}`
-    }
-  }
-}
-
-E('ERR_BUFFER_OUT_OF_BOUNDS',
-  function (name) {
-    if (name) {
-      return `${name} is outside of buffer bounds`
-    }
-
-    return 'Attempt to access memory outside buffer bounds'
-  }, RangeError)
-E('ERR_INVALID_ARG_TYPE',
-  function (name, actual) {
-    return `The "${name}" argument must be of type number. Received type ${typeof actual}`
-  }, TypeError)
-E('ERR_OUT_OF_RANGE',
-  function (str, range, input) {
-    let msg = `The value of "${str}" is out of range.`
-    let received = input
-    if (Number.isInteger(input) && Math.abs(input) > 2 ** 32) {
-      received = addNumericalSeparator(String(input))
-    } else if (typeof input === 'bigint') {
-      received = String(input)
-      if (input > BigInt(2) ** BigInt(32) || input < -(BigInt(2) ** BigInt(32))) {
-        received = addNumericalSeparator(received)
-      }
-      received += 'n'
-    }
-    msg += ` It must be ${range}. Received ${received}`
-    return msg
-  }, RangeError)
-
-function addNumericalSeparator (val) {
-  let res = ''
-  let i = val.length
-  const start = val[0] === '-' ? 1 : 0
-  for (; i >= start + 4; i -= 3) {
-    res = `_${val.slice(i - 3, i)}${res}`
-  }
-  return `${val.slice(0, i)}${res}`
-}
-
-// CHECK FUNCTIONS
-// ===============
-
-function checkBounds (buf, offset, byteLength) {
-  validateNumber(offset, 'offset')
-  if (buf[offset] === undefined || buf[offset + byteLength] === undefined) {
-    boundsError(offset, buf.length - (byteLength + 1))
-  }
-}
-
-function checkIntBI (value, min, max, buf, offset, byteLength) {
-  if (value > max || value < min) {
-    const n = typeof min === 'bigint' ? 'n' : ''
-    let range
-    if (byteLength > 3) {
-      if (min === 0 || min === BigInt(0)) {
-        range = `>= 0${n} and < 2${n} ** ${(byteLength + 1) * 8}${n}`
-      } else {
-        range = `>= -(2${n} ** ${(byteLength + 1) * 8 - 1}${n}) and < 2 ** ` +
-                `${(byteLength + 1) * 8 - 1}${n}`
-      }
-    } else {
-      range = `>= ${min}${n} and <= ${max}${n}`
-    }
-    throw new errors.ERR_OUT_OF_RANGE('value', range, value)
-  }
-  checkBounds(buf, offset, byteLength)
-}
-
-function validateNumber (value, name) {
-  if (typeof value !== 'number') {
-    throw new errors.ERR_INVALID_ARG_TYPE(name, 'number', value)
-  }
-}
-
-function boundsError (value, length, type) {
-  if (Math.floor(value) !== value) {
-    validateNumber(value, type)
-    throw new errors.ERR_OUT_OF_RANGE(type || 'offset', 'an integer', value)
-  }
-
-  if (length < 0) {
-    throw new errors.ERR_BUFFER_OUT_OF_BOUNDS()
-  }
-
-  throw new errors.ERR_OUT_OF_RANGE(type || 'offset',
-                                    `>= ${type ? 1 : 0} and <= ${length}`,
-                                    value)
-}
-
-// HELPER FUNCTIONS
-// ================
-
-const INVALID_BASE64_RE = /[^+/0-9A-Za-z-_]/g
-
-function base64clean (str) {
-  // Node takes equal signs as end of the Base64 encoding
-  str = str.split('=')[0]
-  // Node strips out invalid characters like \n and \t from the string, base64-js does not
-  str = str.trim().replace(INVALID_BASE64_RE, '')
-  // Node converts strings with length < 2 to ''
-  if (str.length < 2) return ''
-  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
-  while (str.length % 4 !== 0) {
-    str = str + '='
-  }
-  return str
-}
-
-function utf8ToBytes (string, units) {
-  units = units || Infinity
-  let codePoint
-  const length = string.length
-  let leadSurrogate = null
-  const bytes = []
-
-  for (let i = 0; i < length; ++i) {
-    codePoint = string.charCodeAt(i)
-
-    // is surrogate component
-    if (codePoint > 0xD7FF && codePoint < 0xE000) {
-      // last char was a lead
-      if (!leadSurrogate) {
-        // no lead yet
-        if (codePoint > 0xDBFF) {
-          // unexpected trail
-          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
-          continue
-        } else if (i + 1 === length) {
-          // unpaired lead
-          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
-          continue
-        }
-
-        // valid lead
-        leadSurrogate = codePoint
-
-        continue
-      }
-
-      // 2 leads in a row
-      if (codePoint < 0xDC00) {
-        if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
-        leadSurrogate = codePoint
-        continue
-      }
-
-      // valid surrogate pair
-      codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000
-    } else if (leadSurrogate) {
-      // valid bmp char, but last char was a lead
-      if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
-    }
-
-    leadSurrogate = null
-
-    // encode utf8
-    if (codePoint < 0x80) {
-      if ((units -= 1) < 0) break
-      bytes.push(codePoint)
-    } else if (codePoint < 0x800) {
-      if ((units -= 2) < 0) break
-      bytes.push(
-        codePoint >> 0x6 | 0xC0,
-        codePoint & 0x3F | 0x80
-      )
-    } else if (codePoint < 0x10000) {
-      if ((units -= 3) < 0) break
-      bytes.push(
-        codePoint >> 0xC | 0xE0,
-        codePoint >> 0x6 & 0x3F | 0x80,
-        codePoint & 0x3F | 0x80
-      )
-    } else if (codePoint < 0x110000) {
-      if ((units -= 4) < 0) break
-      bytes.push(
-        codePoint >> 0x12 | 0xF0,
-        codePoint >> 0xC & 0x3F | 0x80,
-        codePoint >> 0x6 & 0x3F | 0x80,
-        codePoint & 0x3F | 0x80
-      )
-    } else {
-      throw new Error('Invalid code point')
-    }
-  }
-
-  return bytes
-}
-
-function asciiToBytes (str) {
-  const byteArray = []
-  for (let i = 0; i < str.length; ++i) {
-    // Node's code seems to be doing this and not & 0x7F..
-    byteArray.push(str.charCodeAt(i) & 0xFF)
-  }
-  return byteArray
-}
-
-function utf16leToBytes (str, units) {
-  let c, hi, lo
-  const byteArray = []
-  for (let i = 0; i < str.length; ++i) {
-    if ((units -= 2) < 0) break
-
-    c = str.charCodeAt(i)
-    hi = c >> 8
-    lo = c % 256
-    byteArray.push(lo)
-    byteArray.push(hi)
-  }
-
-  return byteArray
-}
-
-function base64ToBytes (str) {
-  return base64.toByteArray(base64clean(str))
-}
-
-function blitBuffer (src, dst, offset, length) {
-  let i
-  for (i = 0; i < length; ++i) {
-    if ((i + offset >= dst.length) || (i >= src.length)) break
-    dst[i + offset] = src[i]
-  }
-  return i
-}
-
-// ArrayBuffer or Uint8Array objects from other contexts (i.e. iframes) do not pass
-// the `instanceof` check but they should be treated as of that type.
-// See: https://github.com/feross/buffer/issues/166
-function isInstance (obj, type) {
-  return obj instanceof type ||
-    (obj != null && obj.constructor != null && obj.constructor.name != null &&
-      obj.constructor.name === type.name)
-}
-function numberIsNaN (obj) {
-  // For IE11 support
-  return obj !== obj // eslint-disable-line no-self-compare
-}
-
-// Create lookup table for `toString('hex')`
-// See: https://github.com/feross/buffer/issues/219
-const hexSliceLookupTable = (function () {
-  const alphabet = '0123456789abcdef'
-  const table = new Array(256)
-  for (let i = 0; i < 16; ++i) {
-    const i16 = i * 16
-    for (let j = 0; j < 16; ++j) {
-      table[i16 + j] = alphabet[i] + alphabet[j]
-    }
-  }
-  return table
-})()
-
-// Return not function with Error if BigInt not supported
-function defineBigIntMethod (fn) {
-  return typeof BigInt === 'undefined' ? BufferBigIntNotDefined : fn
-}
-
-function BufferBigIntNotDefined () {
-  throw new Error('BigInt not supported')
-}
-
-
-/***/ }),
 
 /***/ 646:
 /***/ ((module) => {
 
-"use strict";
 
 
 var has = Object.prototype.hasOwnProperty
@@ -2618,515 +345,9 @@ if (true) {
 
 /***/ }),
 
-/***/ 621:
-/***/ ((module) => {
-
-"use strict";
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-
-var R = typeof Reflect === 'object' ? Reflect : null
-var ReflectApply = R && typeof R.apply === 'function'
-  ? R.apply
-  : function ReflectApply(target, receiver, args) {
-    return Function.prototype.apply.call(target, receiver, args);
-  }
-
-var ReflectOwnKeys
-if (R && typeof R.ownKeys === 'function') {
-  ReflectOwnKeys = R.ownKeys
-} else if (Object.getOwnPropertySymbols) {
-  ReflectOwnKeys = function ReflectOwnKeys(target) {
-    return Object.getOwnPropertyNames(target)
-      .concat(Object.getOwnPropertySymbols(target));
-  };
-} else {
-  ReflectOwnKeys = function ReflectOwnKeys(target) {
-    return Object.getOwnPropertyNames(target);
-  };
-}
-
-function ProcessEmitWarning(warning) {
-  if (console && console.warn) console.warn(warning);
-}
-
-var NumberIsNaN = Number.isNaN || function NumberIsNaN(value) {
-  return value !== value;
-}
-
-function EventEmitter() {
-  EventEmitter.init.call(this);
-}
-module.exports = EventEmitter;
-module.exports.once = once;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._eventsCount = 0;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-var defaultMaxListeners = 10;
-
-function checkListener(listener) {
-  if (typeof listener !== 'function') {
-    throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
-  }
-}
-
-Object.defineProperty(EventEmitter, 'defaultMaxListeners', {
-  enumerable: true,
-  get: function() {
-    return defaultMaxListeners;
-  },
-  set: function(arg) {
-    if (typeof arg !== 'number' || arg < 0 || NumberIsNaN(arg)) {
-      throw new RangeError('The value of "defaultMaxListeners" is out of range. It must be a non-negative number. Received ' + arg + '.');
-    }
-    defaultMaxListeners = arg;
-  }
-});
-
-EventEmitter.init = function() {
-
-  if (this._events === undefined ||
-      this._events === Object.getPrototypeOf(this)._events) {
-    this._events = Object.create(null);
-    this._eventsCount = 0;
-  }
-
-  this._maxListeners = this._maxListeners || undefined;
-};
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function setMaxListeners(n) {
-  if (typeof n !== 'number' || n < 0 || NumberIsNaN(n)) {
-    throw new RangeError('The value of "n" is out of range. It must be a non-negative number. Received ' + n + '.');
-  }
-  this._maxListeners = n;
-  return this;
-};
-
-function _getMaxListeners(that) {
-  if (that._maxListeners === undefined)
-    return EventEmitter.defaultMaxListeners;
-  return that._maxListeners;
-}
-
-EventEmitter.prototype.getMaxListeners = function getMaxListeners() {
-  return _getMaxListeners(this);
-};
-
-EventEmitter.prototype.emit = function emit(type) {
-  var args = [];
-  for (var i = 1; i < arguments.length; i++) args.push(arguments[i]);
-  var doError = (type === 'error');
-
-  var events = this._events;
-  if (events !== undefined)
-    doError = (doError && events.error === undefined);
-  else if (!doError)
-    return false;
-
-  // If there is no 'error' event listener then throw.
-  if (doError) {
-    var er;
-    if (args.length > 0)
-      er = args[0];
-    if (er instanceof Error) {
-      // Note: The comments on the `throw` lines are intentional, they show
-      // up in Node's output if this results in an unhandled exception.
-      throw er; // Unhandled 'error' event
-    }
-    // At least give some kind of context to the user
-    var err = new Error('Unhandled error.' + (er ? ' (' + er.message + ')' : ''));
-    err.context = er;
-    throw err; // Unhandled 'error' event
-  }
-
-  var handler = events[type];
-
-  if (handler === undefined)
-    return false;
-
-  if (typeof handler === 'function') {
-    ReflectApply(handler, this, args);
-  } else {
-    var len = handler.length;
-    var listeners = arrayClone(handler, len);
-    for (var i = 0; i < len; ++i)
-      ReflectApply(listeners[i], this, args);
-  }
-
-  return true;
-};
-
-function _addListener(target, type, listener, prepend) {
-  var m;
-  var events;
-  var existing;
-
-  checkListener(listener);
-
-  events = target._events;
-  if (events === undefined) {
-    events = target._events = Object.create(null);
-    target._eventsCount = 0;
-  } else {
-    // To avoid recursion in the case that type === "newListener"! Before
-    // adding it to the listeners, first emit "newListener".
-    if (events.newListener !== undefined) {
-      target.emit('newListener', type,
-                  listener.listener ? listener.listener : listener);
-
-      // Re-assign `events` because a newListener handler could have caused the
-      // this._events to be assigned to a new object
-      events = target._events;
-    }
-    existing = events[type];
-  }
-
-  if (existing === undefined) {
-    // Optimize the case of one listener. Don't need the extra array object.
-    existing = events[type] = listener;
-    ++target._eventsCount;
-  } else {
-    if (typeof existing === 'function') {
-      // Adding the second element, need to change to array.
-      existing = events[type] =
-        prepend ? [listener, existing] : [existing, listener];
-      // If we've already got an array, just append.
-    } else if (prepend) {
-      existing.unshift(listener);
-    } else {
-      existing.push(listener);
-    }
-
-    // Check for listener leak
-    m = _getMaxListeners(target);
-    if (m > 0 && existing.length > m && !existing.warned) {
-      existing.warned = true;
-      // No error code for this since it is a Warning
-      // eslint-disable-next-line no-restricted-syntax
-      var w = new Error('Possible EventEmitter memory leak detected. ' +
-                          existing.length + ' ' + String(type) + ' listeners ' +
-                          'added. Use emitter.setMaxListeners() to ' +
-                          'increase limit');
-      w.name = 'MaxListenersExceededWarning';
-      w.emitter = target;
-      w.type = type;
-      w.count = existing.length;
-      ProcessEmitWarning(w);
-    }
-  }
-
-  return target;
-}
-
-EventEmitter.prototype.addListener = function addListener(type, listener) {
-  return _addListener(this, type, listener, false);
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.prependListener =
-    function prependListener(type, listener) {
-      return _addListener(this, type, listener, true);
-    };
-
-function onceWrapper() {
-  if (!this.fired) {
-    this.target.removeListener(this.type, this.wrapFn);
-    this.fired = true;
-    if (arguments.length === 0)
-      return this.listener.call(this.target);
-    return this.listener.apply(this.target, arguments);
-  }
-}
-
-function _onceWrap(target, type, listener) {
-  var state = { fired: false, wrapFn: undefined, target: target, type: type, listener: listener };
-  var wrapped = onceWrapper.bind(state);
-  wrapped.listener = listener;
-  state.wrapFn = wrapped;
-  return wrapped;
-}
-
-EventEmitter.prototype.once = function once(type, listener) {
-  checkListener(listener);
-  this.on(type, _onceWrap(this, type, listener));
-  return this;
-};
-
-EventEmitter.prototype.prependOnceListener =
-    function prependOnceListener(type, listener) {
-      checkListener(listener);
-      this.prependListener(type, _onceWrap(this, type, listener));
-      return this;
-    };
-
-// Emits a 'removeListener' event if and only if the listener was removed.
-EventEmitter.prototype.removeListener =
-    function removeListener(type, listener) {
-      var list, events, position, i, originalListener;
-
-      checkListener(listener);
-
-      events = this._events;
-      if (events === undefined)
-        return this;
-
-      list = events[type];
-      if (list === undefined)
-        return this;
-
-      if (list === listener || list.listener === listener) {
-        if (--this._eventsCount === 0)
-          this._events = Object.create(null);
-        else {
-          delete events[type];
-          if (events.removeListener)
-            this.emit('removeListener', type, list.listener || listener);
-        }
-      } else if (typeof list !== 'function') {
-        position = -1;
-
-        for (i = list.length - 1; i >= 0; i--) {
-          if (list[i] === listener || list[i].listener === listener) {
-            originalListener = list[i].listener;
-            position = i;
-            break;
-          }
-        }
-
-        if (position < 0)
-          return this;
-
-        if (position === 0)
-          list.shift();
-        else {
-          spliceOne(list, position);
-        }
-
-        if (list.length === 1)
-          events[type] = list[0];
-
-        if (events.removeListener !== undefined)
-          this.emit('removeListener', type, originalListener || listener);
-      }
-
-      return this;
-    };
-
-EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
-
-EventEmitter.prototype.removeAllListeners =
-    function removeAllListeners(type) {
-      var listeners, events, i;
-
-      events = this._events;
-      if (events === undefined)
-        return this;
-
-      // not listening for removeListener, no need to emit
-      if (events.removeListener === undefined) {
-        if (arguments.length === 0) {
-          this._events = Object.create(null);
-          this._eventsCount = 0;
-        } else if (events[type] !== undefined) {
-          if (--this._eventsCount === 0)
-            this._events = Object.create(null);
-          else
-            delete events[type];
-        }
-        return this;
-      }
-
-      // emit removeListener for all listeners on all events
-      if (arguments.length === 0) {
-        var keys = Object.keys(events);
-        var key;
-        for (i = 0; i < keys.length; ++i) {
-          key = keys[i];
-          if (key === 'removeListener') continue;
-          this.removeAllListeners(key);
-        }
-        this.removeAllListeners('removeListener');
-        this._events = Object.create(null);
-        this._eventsCount = 0;
-        return this;
-      }
-
-      listeners = events[type];
-
-      if (typeof listeners === 'function') {
-        this.removeListener(type, listeners);
-      } else if (listeners !== undefined) {
-        // LIFO order
-        for (i = listeners.length - 1; i >= 0; i--) {
-          this.removeListener(type, listeners[i]);
-        }
-      }
-
-      return this;
-    };
-
-function _listeners(target, type, unwrap) {
-  var events = target._events;
-
-  if (events === undefined)
-    return [];
-
-  var evlistener = events[type];
-  if (evlistener === undefined)
-    return [];
-
-  if (typeof evlistener === 'function')
-    return unwrap ? [evlistener.listener || evlistener] : [evlistener];
-
-  return unwrap ?
-    unwrapListeners(evlistener) : arrayClone(evlistener, evlistener.length);
-}
-
-EventEmitter.prototype.listeners = function listeners(type) {
-  return _listeners(this, type, true);
-};
-
-EventEmitter.prototype.rawListeners = function rawListeners(type) {
-  return _listeners(this, type, false);
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  if (typeof emitter.listenerCount === 'function') {
-    return emitter.listenerCount(type);
-  } else {
-    return listenerCount.call(emitter, type);
-  }
-};
-
-EventEmitter.prototype.listenerCount = listenerCount;
-function listenerCount(type) {
-  var events = this._events;
-
-  if (events !== undefined) {
-    var evlistener = events[type];
-
-    if (typeof evlistener === 'function') {
-      return 1;
-    } else if (evlistener !== undefined) {
-      return evlistener.length;
-    }
-  }
-
-  return 0;
-}
-
-EventEmitter.prototype.eventNames = function eventNames() {
-  return this._eventsCount > 0 ? ReflectOwnKeys(this._events) : [];
-};
-
-function arrayClone(arr, n) {
-  var copy = new Array(n);
-  for (var i = 0; i < n; ++i)
-    copy[i] = arr[i];
-  return copy;
-}
-
-function spliceOne(list, index) {
-  for (; index + 1 < list.length; index++)
-    list[index] = list[index + 1];
-  list.pop();
-}
-
-function unwrapListeners(arr) {
-  var ret = new Array(arr.length);
-  for (var i = 0; i < ret.length; ++i) {
-    ret[i] = arr[i].listener || arr[i];
-  }
-  return ret;
-}
-
-function once(emitter, name) {
-  return new Promise(function (resolve, reject) {
-    function errorListener(err) {
-      emitter.removeListener(name, resolver);
-      reject(err);
-    }
-
-    function resolver() {
-      if (typeof emitter.removeListener === 'function') {
-        emitter.removeListener('error', errorListener);
-      }
-      resolve([].slice.call(arguments));
-    };
-
-    eventTargetAgnosticAddListener(emitter, name, resolver, { once: true });
-    if (name !== 'error') {
-      addErrorHandlerIfEventEmitter(emitter, errorListener, { once: true });
-    }
-  });
-}
-
-function addErrorHandlerIfEventEmitter(emitter, handler, flags) {
-  if (typeof emitter.on === 'function') {
-    eventTargetAgnosticAddListener(emitter, 'error', handler, flags);
-  }
-}
-
-function eventTargetAgnosticAddListener(emitter, name, listener, flags) {
-  if (typeof emitter.on === 'function') {
-    if (flags.once) {
-      emitter.once(name, listener);
-    } else {
-      emitter.on(name, listener);
-    }
-  } else if (typeof emitter.addEventListener === 'function') {
-    // EventTarget does not have `error` event semantics like Node
-    // EventEmitters, we do not listen for `error` events here.
-    emitter.addEventListener(name, function wrapListener(arg) {
-      // IE does not have builtin `{ once: true }` support so we
-      // have to do it manually.
-      if (flags.once) {
-        emitter.removeEventListener(name, wrapListener);
-      }
-      listener(arg);
-    });
-  } else {
-    throw new TypeError('The "emitter" argument must be of type EventEmitter. Received type ' + typeof emitter);
-  }
-}
-
-
-/***/ }),
-
 /***/ 559:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
@@ -4045,102 +1266,9 @@ async function getFontEmbedCSS(node, options = {}) {
 
 /***/ }),
 
-/***/ 801:
-/***/ ((__unused_webpack_module, exports) => {
-
-/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
-exports.read = function (buffer, offset, isLE, mLen, nBytes) {
-  var e, m
-  var eLen = (nBytes * 8) - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var nBits = -7
-  var i = isLE ? (nBytes - 1) : 0
-  var d = isLE ? -1 : 1
-  var s = buffer[offset + i]
-
-  i += d
-
-  e = s & ((1 << (-nBits)) - 1)
-  s >>= (-nBits)
-  nBits += eLen
-  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}
-
-  m = e & ((1 << (-nBits)) - 1)
-  e >>= (-nBits)
-  nBits += mLen
-  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}
-
-  if (e === 0) {
-    e = 1 - eBias
-  } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity)
-  } else {
-    m = m + Math.pow(2, mLen)
-    e = e - eBias
-  }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
-}
-
-exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c
-  var eLen = (nBytes * 8) - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
-  var i = isLE ? 0 : (nBytes - 1)
-  var d = isLE ? 1 : -1
-  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
-
-  value = Math.abs(value)
-
-  if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0
-    e = eMax
-  } else {
-    e = Math.floor(Math.log(value) / Math.LN2)
-    if (value * (c = Math.pow(2, -e)) < 1) {
-      e--
-      c *= 2
-    }
-    if (e + eBias >= 1) {
-      value += rt / c
-    } else {
-      value += rt * Math.pow(2, 1 - eBias)
-    }
-    if (value * c >= 2) {
-      e++
-      c /= 2
-    }
-
-    if (e + eBias >= eMax) {
-      m = 0
-      e = eMax
-    } else if (e + eBias >= 1) {
-      m = ((value * c) - 1) * Math.pow(2, mLen)
-      e = e + eBias
-    } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
-      e = 0
-    }
-  }
-
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
-
-  e = (e << mLen) | m
-  eLen += mLen
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
-
-  buffer[offset + i - d] |= s * 128
-}
-
-
-/***/ }),
-
 /***/ 651:
 /***/ ((module) => {
 
-"use strict";
 
 module.exports = (promise, onFinally) => {
 	onFinally = onFinally || (() => {});
@@ -4163,7 +1291,6 @@ module.exports = (promise, onFinally) => {
 /***/ 968:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const EventEmitter = __webpack_require__(646);
@@ -4450,7 +1577,6 @@ exports["default"] = PQueue;
 /***/ 152:
 /***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 // Port of lower_bound from https://en.cppreference.com/w/cpp/algorithm/lower_bound
@@ -4479,7 +1605,6 @@ exports["default"] = lowerBound;
 /***/ 856:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const lower_bound_1 = __webpack_require__(152);
@@ -4519,7 +1644,6 @@ exports["default"] = PriorityQueue;
 /***/ 455:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-"use strict";
 
 
 const pFinally = __webpack_require__(651);
@@ -4582,25 +1706,23 @@ module.exports.TimeoutError = TimeoutError;
 /***/ }),
 
 /***/ 889:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
-/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChaseDemo = void 0;
 class ChaseDemo {
-    constructor() {
-        this.pressed = [];
-        this.counter = 0;
-    }
-    async drawButtons(device, canvas, c) {
-        // We probably should reuse this instead of creating it each time.
-        const ctx = canvas.getContext('2d');
+    pressed = [];
+    counter = 0;
+    interval;
+    running;
+    async drawButtons(device, controls, c) {
         const ps = [];
-        for (let i = 0; i < device.NUM_KEYS; i++) {
+        for (const { control, canvas } of controls) {
+            // We probably should reuse this instead of creating it each time.
+            const ctx = canvas.getContext('2d');
             if (ctx) {
-                const n = c + i;
+                const n = c + control.index;
                 ctx.save();
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 // Start with a font that's 80% as high as the button. maxWidth
@@ -4612,7 +1734,7 @@ class ChaseDemo {
                 ctx.fillStyle = 'white';
                 ctx.fillText(n.toString(), 8, canvas.height * 0.9, canvas.width * 0.8);
                 const id = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                ps.push(device.fillKeyBuffer(i, Buffer.from(id.data), { format: 'rgba' }));
+                ps.push(device.fillKeyBuffer(control.index, id.data, { format: 'rgba' }));
                 ctx.restore();
             }
         }
@@ -4621,14 +1743,18 @@ class ChaseDemo {
     async start(device) {
         await device.clearPanel();
         this.counter = 0;
-        const canvas = document.createElement('canvas');
-        canvas.width = device.ICON_SIZE;
-        canvas.height = device.ICON_SIZE;
-        await this.drawButtons(device, canvas, this.counter);
+        const controls = device.CONTROLS.filter((control) => control.type === 'button' && control.feedbackType === 'lcd').sort((a, b) => b.index - a.index);
+        const controlsAndCanvases = controls.map((control) => {
+            const canvas = document.createElement('canvas');
+            canvas.width = control.pixelSize.width;
+            canvas.height = control.pixelSize.height;
+            return { control, canvas };
+        });
+        await this.drawButtons(device, controlsAndCanvases, this.counter);
         if (!this.interval) {
             const doThing = async () => {
                 if (!this.running) {
-                    this.running = this.drawButtons(device, canvas, ++this.counter);
+                    this.running = this.drawButtons(device, controlsAndCanvases, ++this.counter);
                     await this.running;
                     this.running = undefined;
                 }
@@ -4668,7 +1794,6 @@ exports.ChaseDemo = ChaseDemo;
 /***/ 35:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DomImageDemo = void 0;
@@ -4688,9 +1813,9 @@ function getRandomColor() {
  * It would be better to render natively on a canvas.
  */
 class DomImageDemo {
-    constructor() {
-        this.run = false;
-    }
+    element;
+    run = false;
+    running;
     async start(device) {
         this.element = document.querySelector('#image-source') || undefined;
         if (this.element) {
@@ -4740,14 +1865,11 @@ exports.DomImageDemo = DomImageDemo;
 /***/ 964:
 /***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.FillWhenPressedDemo = void 0;
 class FillWhenPressedDemo {
-    constructor() {
-        this.pressed = [];
-    }
+    pressed = [];
     async start(device) {
         await device.clearPanel();
     }
@@ -4776,7 +1898,6 @@ exports.FillWhenPressedDemo = FillWhenPressedDemo;
 /***/ 215:
 /***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RapidFillDemo = void 0;
@@ -4786,6 +1907,8 @@ function getRandomIntInclusive(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 class RapidFillDemo {
+    interval;
+    running;
     async start(device) {
         if (!this.interval) {
             const doThing = async () => {
@@ -4795,8 +1918,10 @@ class RapidFillDemo {
                     const b = getRandomIntInclusive(0, 255);
                     console.log('Filling with rgb(%d, %d, %d)', r, g, b);
                     const ps = [];
-                    for (let i = 0; i < device.NUM_KEYS; i++) {
-                        ps.push(device.fillKeyColor(i, r, g, b));
+                    for (const control of device.CONTROLS) {
+                        if (control.type === 'button') {
+                            ps.push(device.fillKeyColor(control.index, r, g, b));
+                        }
                     }
                     this.running = Promise.all(ps);
                     await this.running;
@@ -4828,10 +1953,57 @@ exports.RapidFillDemo = RapidFillDemo;
 
 /***/ }),
 
+/***/ 173:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+//# sourceMappingURL=controlDefinition.js.map
+
+/***/ }),
+
+/***/ 794:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.generateButtonsGrid = generateButtonsGrid;
+exports.freezeDefinitions = freezeDefinitions;
+function generateButtonsGrid(width, height, pixelSize, rtl = false) {
+    const controls = [];
+    for (let row = 0; row < height; row++) {
+        for (let column = 0; column < width; column++) {
+            const index = row * width + column;
+            const hidIndex = rtl ? flipKeyIndex(width, index) : index;
+            controls.push({
+                type: 'button',
+                row,
+                column,
+                index,
+                hidIndex,
+                feedbackType: 'lcd',
+                pixelSize,
+            });
+        }
+    }
+    return controls;
+}
+function flipKeyIndex(columns, keyIndex) {
+    // Horizontal flip
+    const half = (columns - 1) / 2;
+    const diff = ((keyIndex % columns) - half) * -half;
+    return keyIndex + diff;
+}
+function freezeDefinitions(controls) {
+    return Object.freeze(controls.map((control) => Object.freeze(control)));
+}
+//# sourceMappingURL=controlsGenerator.js.map
+
+/***/ }),
+
 /***/ 444:
 /***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DeviceModelId = void 0;
@@ -4841,9 +2013,7 @@ var DeviceModelId;
     DeviceModelId["ORIGINALV2"] = "originalv2";
     DeviceModelId["ORIGINALMK2"] = "original-mk2";
     DeviceModelId["MINI"] = "mini";
-    DeviceModelId["MINIV2"] = "miniv2";
     DeviceModelId["XL"] = "xl";
-    DeviceModelId["XLV2"] = "xlv2";
     DeviceModelId["PEDAL"] = "pedal";
     DeviceModelId["PLUS"] = "plus";
     DeviceModelId["NEO"] = "neo";
@@ -4852,158 +2022,27 @@ var DeviceModelId;
 
 /***/ }),
 
-/***/ 598:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamdeckNeoLcdImageHeaderGenerator = exports.StreamdeckPlusLcdImageHeaderGenerator = exports.StreamdeckGen2ImageHeaderGenerator = exports.StreamdeckGen1ImageHeaderGenerator = void 0;
-class StreamdeckGen1ImageHeaderGenerator {
-    getFillImageCommandHeaderLength() {
-        return 16;
-    }
-    writeFillImageCommandHeader(buffer, props, partIndex, isLast, _bodyLength) {
-        buffer.writeUInt8(0x02, 0);
-        buffer.writeUInt8(0x01, 1);
-        buffer.writeUInt16LE(partIndex, 2);
-        // 3 = 0x00
-        buffer.writeUInt8(isLast ? 1 : 0, 4);
-        buffer.writeUInt8(props.keyIndex + 1, 5);
-    }
-}
-exports.StreamdeckGen1ImageHeaderGenerator = StreamdeckGen1ImageHeaderGenerator;
-class StreamdeckGen2ImageHeaderGenerator {
-    getFillImageCommandHeaderLength() {
-        return 8;
-    }
-    writeFillImageCommandHeader(buffer, props, partIndex, isLast, bodyLength) {
-        buffer.writeUInt8(0x02, 0);
-        buffer.writeUInt8(0x07, 1);
-        buffer.writeUInt8(props.keyIndex, 2);
-        buffer.writeUInt8(isLast ? 1 : 0, 3);
-        buffer.writeUInt16LE(bodyLength, 4);
-        buffer.writeUInt16LE(partIndex++, 6);
-    }
-}
-exports.StreamdeckGen2ImageHeaderGenerator = StreamdeckGen2ImageHeaderGenerator;
-class StreamdeckPlusLcdImageHeaderGenerator {
-    getFillImageCommandHeaderLength() {
-        return 16;
-    }
-    writeFillImageCommandHeader(buffer, props, partIndex, isLast, bodyLength) {
-        buffer.writeUInt8(0x02, 0);
-        buffer.writeUInt8(0x0c, 1);
-        buffer.writeUInt16LE(props.x, 2);
-        buffer.writeUInt16LE(props.y, 4);
-        buffer.writeUInt16LE(props.width, 6);
-        buffer.writeUInt16LE(props.height, 8);
-        buffer.writeUInt8(isLast ? 1 : 0, 10); // Is last
-        buffer.writeUInt16LE(partIndex, 11);
-        buffer.writeUInt16LE(bodyLength, 13);
-    }
-}
-exports.StreamdeckPlusLcdImageHeaderGenerator = StreamdeckPlusLcdImageHeaderGenerator;
-class StreamdeckNeoLcdImageHeaderGenerator {
-    getFillImageCommandHeaderLength() {
-        return 8;
-    }
-    writeFillImageCommandHeader(buffer, _props, partIndex, isLast, bodyLength) {
-        buffer.writeUInt8(0x02, 0);
-        buffer.writeUInt8(0x0b, 1);
-        buffer.writeUInt8(0, 2);
-        buffer.writeUInt8(isLast ? 1 : 0, 3);
-        buffer.writeUInt16LE(bodyLength, 4);
-        buffer.writeUInt16LE(partIndex++, 6);
-    }
-}
-exports.StreamdeckNeoLcdImageHeaderGenerator = StreamdeckNeoLcdImageHeaderGenerator;
-//# sourceMappingURL=headerGenerator.js.map
-
-/***/ }),
-
-/***/ 222:
+/***/ 601:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
-/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamdeckDefaultImageWriter = exports.StreamdeckOriginalImageWriter = void 0;
-const headerGenerator_1 = __webpack_require__(598);
-class StreamdeckOriginalImageWriter {
-    constructor() {
-        this.headerGenerator = new headerGenerator_1.StreamdeckGen1ImageHeaderGenerator();
-    }
-    generateFillImageWrites(props, byteBuffer) {
-        const MAX_PACKET_SIZE = 8191;
-        const PACKET_HEADER_LENGTH = this.headerGenerator.getFillImageCommandHeaderLength();
-        // The original uses larger packets, and splits the payload equally across 2
-        const packet1Bytes = byteBuffer.length / 2;
-        const packet1 = Buffer.alloc(MAX_PACKET_SIZE);
-        this.headerGenerator.writeFillImageCommandHeader(packet1, props, 0x01, false, packet1Bytes);
-        byteBuffer.copy(packet1, PACKET_HEADER_LENGTH, 0, packet1Bytes);
-        const packet2 = Buffer.alloc(MAX_PACKET_SIZE);
-        this.headerGenerator.writeFillImageCommandHeader(packet2, props, 0x02, true, packet1Bytes);
-        byteBuffer.copy(packet2, PACKET_HEADER_LENGTH, packet1Bytes);
-        return [packet1, packet2];
-    }
-}
-exports.StreamdeckOriginalImageWriter = StreamdeckOriginalImageWriter;
-class StreamdeckDefaultImageWriter {
-    constructor(headerGenerator) {
-        this.headerGenerator = headerGenerator;
-    }
-    generateFillImageWrites(props, byteBuffer) {
-        const MAX_PACKET_SIZE = 1024;
-        const PACKET_HEADER_LENGTH = this.headerGenerator.getFillImageCommandHeaderLength();
-        const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH;
-        const result = [];
-        let remainingBytes = byteBuffer.length;
-        for (let part = 0; remainingBytes > 0; part++) {
-            const packet = Buffer.alloc(MAX_PACKET_SIZE);
-            const byteCount = Math.min(remainingBytes, MAX_PAYLOAD_SIZE);
-            this.headerGenerator.writeFillImageCommandHeader(packet, props, part, remainingBytes <= MAX_PAYLOAD_SIZE, byteCount);
-            const byteOffset = byteBuffer.length - remainingBytes;
-            remainingBytes -= byteCount;
-            byteBuffer.copy(packet, PACKET_HEADER_LENGTH, byteOffset, byteOffset + byteCount);
-            result.push(packet);
-        }
-        return result;
-    }
-}
-exports.StreamdeckDefaultImageWriter = StreamdeckDefaultImageWriter;
-//# sourceMappingURL=imageWriter.js.map
-
-/***/ }),
-
-/***/ 601:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DEVICE_MODELS = exports.DEVICE_MODELS2 = exports.DeviceModelType = exports.VENDOR_ID = exports.StreamDeckProxy = void 0;
-const id_1 = __webpack_require__(444);
-const models_1 = __webpack_require__(612);
-__exportStar(__webpack_require__(64), exports);
-__exportStar(__webpack_require__(444), exports);
-var proxy_1 = __webpack_require__(481);
-Object.defineProperty(exports, "StreamDeckProxy", ({ enumerable: true, get: function () { return proxy_1.StreamDeckProxy; } }));
+const tslib_1 = __webpack_require__(823);
+const id_js_1 = __webpack_require__(444);
+const original_js_1 = __webpack_require__(745);
+const mini_js_1 = __webpack_require__(321);
+const xl_js_1 = __webpack_require__(766);
+const originalv2_js_1 = __webpack_require__(150);
+const original_mk2_js_1 = __webpack_require__(158);
+const plus_js_1 = __webpack_require__(562);
+const pedal_js_1 = __webpack_require__(756);
+const neo_js_1 = __webpack_require__(350);
+tslib_1.__exportStar(__webpack_require__(64), exports);
+tslib_1.__exportStar(__webpack_require__(444), exports);
+tslib_1.__exportStar(__webpack_require__(173), exports);
+var proxy_js_1 = __webpack_require__(481);
+Object.defineProperty(exports, "StreamDeckProxy", ({ enumerable: true, get: function () { return proxy_js_1.StreamDeckProxy; } }));
 /** Elgato vendor id */
 exports.VENDOR_ID = 0x0fd9;
 var DeviceModelType;
@@ -5013,55 +2052,45 @@ var DeviceModelType;
 })(DeviceModelType || (exports.DeviceModelType = DeviceModelType = {}));
 /** List of all the known models, and the classes to use them */
 exports.DEVICE_MODELS2 = {
-    [id_1.DeviceModelId.ORIGINAL]: {
+    [id_js_1.DeviceModelId.ORIGINAL]: {
         type: DeviceModelType.STREAMDECK,
-        productId: 0x0060,
-        class: models_1.StreamDeckOriginal,
+        productIds: [0x0060],
+        factory: original_js_1.StreamDeckOriginalFactory,
     },
-    [id_1.DeviceModelId.MINI]: {
+    [id_js_1.DeviceModelId.MINI]: {
         type: DeviceModelType.STREAMDECK,
-        productId: 0x0063,
-        class: models_1.StreamDeckMini,
+        productIds: [0x0063, 0x0090],
+        factory: mini_js_1.StreamDeckMiniFactory,
     },
-    [id_1.DeviceModelId.XL]: {
+    [id_js_1.DeviceModelId.XL]: {
         type: DeviceModelType.STREAMDECK,
-        productId: 0x006c,
-        class: models_1.StreamDeckXL,
+        productIds: [0x006c, 0x008f],
+        factory: xl_js_1.StreamDeckXLFactory,
     },
-    [id_1.DeviceModelId.ORIGINALV2]: {
+    [id_js_1.DeviceModelId.ORIGINALV2]: {
         type: DeviceModelType.STREAMDECK,
-        productId: 0x006d,
-        class: models_1.StreamDeckOriginalV2,
+        productIds: [0x006d],
+        factory: originalv2_js_1.StreamDeckOriginalV2Factory,
     },
-    [id_1.DeviceModelId.ORIGINALMK2]: {
+    [id_js_1.DeviceModelId.ORIGINALMK2]: {
         type: DeviceModelType.STREAMDECK,
-        productId: 0x0080,
-        class: models_1.StreamDeckOriginalMK2,
+        productIds: [0x0080],
+        factory: original_mk2_js_1.StreamDeckOriginalMK2Factory,
     },
-    [id_1.DeviceModelId.PLUS]: {
+    [id_js_1.DeviceModelId.PLUS]: {
         type: DeviceModelType.STREAMDECK,
-        productId: 0x0084,
-        class: models_1.StreamDeckPlus,
+        productIds: [0x0084],
+        factory: plus_js_1.StreamDeckPlusFactory,
     },
-    [id_1.DeviceModelId.PEDAL]: {
+    [id_js_1.DeviceModelId.PEDAL]: {
         type: DeviceModelType.PEDAL,
-        productId: 0x0086,
-        class: models_1.StreamDeckPedal,
+        productIds: [0x0086],
+        factory: pedal_js_1.StreamDeckPedalFactory,
     },
-    [id_1.DeviceModelId.XLV2]: {
+    [id_js_1.DeviceModelId.NEO]: {
         type: DeviceModelType.STREAMDECK,
-        productId: 0x008f,
-        class: models_1.StreamDeckXLV2,
-    },
-    [id_1.DeviceModelId.MINIV2]: {
-        type: DeviceModelType.STREAMDECK,
-        productId: 0x0090,
-        class: models_1.StreamDeckMiniV2,
-    },
-    [id_1.DeviceModelId.NEO]: {
-        type: DeviceModelType.STREAMDECK,
-        productId: 0x009a,
-        class: models_1.StreamDeckNeo,
+        productIds: [0x009a],
+        factory: neo_js_1.StreamDeckNeoFactory,
     },
 };
 /** @deprecated maybe? */
@@ -5073,238 +2102,62 @@ exports.DEVICE_MODELS = Object.entries(exports.DEVICE_MODELS2).map(([id, spec]) 
 
 /***/ }),
 
-/***/ 165:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckGen1Base = void 0;
-const base_1 = __webpack_require__(67);
-const imageWriter_1 = __webpack_require__(222);
-const headerGenerator_1 = __webpack_require__(598);
-/**
- * Base class for generation 1 hardware (before the xl)
- */
-class StreamDeckGen1Base extends base_1.StreamDeckBase {
-    constructor(device, options, properties, imageWriter) {
-        super(device, options, properties, imageWriter ?? new imageWriter_1.StreamdeckDefaultImageWriter(new headerGenerator_1.StreamdeckGen1ImageHeaderGenerator()));
-    }
-    /**
-     * Sets the brightness of the keys on the Stream Deck
-     *
-     * @param {number} percentage The percentage brightness
-     */
-    async setBrightness(percentage) {
-        if (percentage < 0 || percentage > 100) {
-            throw new RangeError('Expected brightness percentage to be between 0 and 100');
-        }
-        // prettier-ignore
-        const brightnessCommandBuffer = Buffer.from([
-            0x05,
-            0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        ]);
-        await this.device.sendFeatureReport(brightnessCommandBuffer);
-    }
-    async resetToLogo() {
-        // prettier-ignore
-        const resetCommandBuffer = Buffer.from([
-            0x0b,
-            0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        ]);
-        await this.device.sendFeatureReport(resetCommandBuffer);
-    }
-    async getFirmwareVersion() {
-        let val;
-        try {
-            val = await this.device.getFeatureReport(4, 32);
-        }
-        catch (e) {
-            // In case some devices can't handle the different report length
-            val = await this.device.getFeatureReport(4, 17);
-        }
-        const end = val.indexOf(0, 5);
-        return val.toString('ascii', 5, end === -1 ? undefined : end);
-    }
-    async getSerialNumber() {
-        let val;
-        try {
-            val = await this.device.getFeatureReport(3, 32);
-        }
-        catch (e) {
-            // In case some devices can't handle the different report length
-            val = await this.device.getFeatureReport(3, 17);
-        }
-        return val.toString('ascii', 5, 17);
-    }
-}
-exports.StreamDeckGen1Base = StreamDeckGen1Base;
-//# sourceMappingURL=base-gen1.js.map
-
-/***/ }),
-
-/***/ 748:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckGen2Base = void 0;
-const util_1 = __webpack_require__(369);
-const base_1 = __webpack_require__(67);
-const imageWriter_1 = __webpack_require__(222);
-const headerGenerator_1 = __webpack_require__(598);
-/**
- * Base class for generation 2 hardware (starting with the xl)
- */
-class StreamDeckGen2Base extends base_1.StreamDeckBase {
-    constructor(device, options, properties, disableXYFlip) {
-        super(device, options, properties, new imageWriter_1.StreamdeckDefaultImageWriter(new headerGenerator_1.StreamdeckGen2ImageHeaderGenerator()));
-        this.encodeJPEG = options.encodeJPEG;
-        this.xyFlip = !disableXYFlip;
-    }
-    /**
-     * Sets the brightness of the keys on the Stream Deck
-     *
-     * @param {number} percentage The percentage brightness
-     */
-    async setBrightness(percentage) {
-        if (percentage < 0 || percentage > 100) {
-            throw new RangeError('Expected brightness percentage to be between 0 and 100');
-        }
-        // prettier-ignore
-        const brightnessCommandBuffer = Buffer.from([
-            0x03,
-            0x08, percentage, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        ]);
-        await this.device.sendFeatureReport(brightnessCommandBuffer);
-    }
-    async resetToLogo() {
-        // prettier-ignore
-        const resetCommandBuffer = Buffer.from([
-            0x03,
-            0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        ]);
-        await this.device.sendFeatureReport(resetCommandBuffer);
-    }
-    async getFirmwareVersion() {
-        const val = await this.device.getFeatureReport(5, 32);
-        const end = val.readUInt8(1) + 2;
-        return val.toString('ascii', 6, end);
-    }
-    async getSerialNumber() {
-        const val = await this.device.getFeatureReport(6, 32);
-        const end = val.readUInt8(1) + 2;
-        return val.toString('ascii', 2, end);
-    }
-    async convertFillImage(sourceBuffer, sourceOptions) {
-        const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions, { colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip }, 0, this.ICON_SIZE);
-        return this.encodeJPEG(byteBuffer, this.ICON_SIZE, this.ICON_SIZE);
-    }
-}
-exports.StreamDeckGen2Base = StreamDeckGen2Base;
-//# sourceMappingURL=base-gen2.js.map
-
-/***/ }),
-
 /***/ 67:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
-/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckBase = exports.StreamDeckInputBase = void 0;
+exports.StreamDeckBase = void 0;
 const EventEmitter = __webpack_require__(646);
-class StreamDeckInputBase extends EventEmitter {
-    get NUM_KEYS() {
-        return this.KEY_COLUMNS * this.KEY_ROWS;
+class StreamDeckBase extends EventEmitter {
+    get CONTROLS() {
+        return this.deviceProperties.CONTROLS;
     }
-    get KEY_COLUMNS() {
-        return this.deviceProperties.COLUMNS;
-    }
-    get KEY_ROWS() {
-        return this.deviceProperties.ROWS;
-    }
-    get NUM_TOUCH_KEYS() {
-        return this.deviceProperties.TOUCH_BUTTONS;
-    }
-    get NUM_ENCODERS() {
-        // Overridden by models which support this
-        return 0;
-    }
-    get LCD_STRIP_SIZE() {
-        // Overridden by models which support this
-        return undefined;
-    }
-    get LCD_ENCODER_SIZE() {
-        // Overridden by models which support this
-        return undefined;
-    }
-    get ICON_SIZE() {
-        return this.deviceProperties.ICON_SIZE;
-    }
-    get ICON_BYTES() {
-        return this.ICON_PIXELS * 3;
-    }
-    get ICON_PIXELS() {
-        return this.ICON_SIZE * this.ICON_SIZE;
-    }
-    get KEY_SPACING_HORIZONTAL() {
-        return this.deviceProperties.KEY_SPACING_HORIZONTAL;
-    }
-    get KEY_SPACING_VERTICAL() {
-        return this.deviceProperties.KEY_SPACING_VERTICAL;
-    }
+    // get KEY_SPACING_HORIZONTAL(): number {
+    // 	return this.deviceProperties.KEY_SPACING_HORIZONTAL
+    // }
+    // get KEY_SPACING_VERTICAL(): number {
+    // 	return this.deviceProperties.KEY_SPACING_VERTICAL
+    // }
     get MODEL() {
         return this.deviceProperties.MODEL;
     }
     get PRODUCT_NAME() {
         return this.deviceProperties.PRODUCT_NAME;
     }
-    constructor(device, _options, properties) {
+    device;
+    deviceProperties;
+    #propertiesService;
+    #buttonsLcdService;
+    #lcdStripDisplayService;
+    #inputService;
+    // private readonly options: Readonly<OpenStreamDeckOptions>
+    constructor(device, _options, services) {
         super();
-        this.deviceProperties = properties;
         this.device = device;
-        this.keyState = new Array(this.NUM_KEYS + this.NUM_TOUCH_KEYS).fill(false);
-        this.device.on('input', (data) => this.handleInputBuffer(data));
+        this.deviceProperties = services.deviceProperties;
+        this.#propertiesService = services.properties;
+        this.#buttonsLcdService = services.buttonsLcd;
+        this.#lcdStripDisplayService = services.lcdStripDisplay;
+        this.#inputService = services.inputService;
+        // propogate events
+        services.events?.listen((key, ...args) => this.emit(key, ...args));
+        this.device.on('input', (data) => this.#inputService.handleInput(data));
         this.device.on('error', (err) => {
             this.emit('error', err);
         });
     }
-    handleInputBuffer(data) {
-        const totalKeyCount = this.NUM_KEYS + this.NUM_TOUCH_KEYS;
-        const keyData = data.subarray(this.deviceProperties.KEY_DATA_OFFSET || 0);
-        for (let i = 0; i < totalKeyCount; i++) {
-            const keyPressed = Boolean(keyData[i]);
-            const keyIndex = this.transformKeyIndex(i);
-            const stateChanged = keyPressed !== this.keyState[keyIndex];
-            if (stateChanged) {
-                this.keyState[keyIndex] = keyPressed;
-                if (keyPressed) {
-                    this.emit('down', keyIndex);
-                }
-                else {
-                    this.emit('up', keyIndex);
-                }
-            }
+    checkValidKeyIndex(keyIndex, feedbackType) {
+        const buttonControl = this.deviceProperties.CONTROLS.find((control) => control.type === 'button' && control.index === keyIndex);
+        if (!buttonControl) {
+            throw new TypeError(`Expected a valid keyIndex`);
+        }
+        if (feedbackType && buttonControl.feedbackType !== feedbackType) {
+            throw new TypeError(`Expected a keyIndex with expected feedbackType`);
         }
     }
-    checkValidKeyIndex(keyIndex, includeTouchKeys) {
-        const totalKeys = this.NUM_KEYS + (includeTouchKeys ? this.NUM_TOUCH_KEYS : 0);
-        if (keyIndex < 0 || keyIndex >= totalKeys) {
-            throw new TypeError(`Expected a valid keyIndex 0 - ${totalKeys - 1}`);
-        }
+    calculateFillPanelDimensions(options) {
+        return this.#buttonsLcdService.calculateFillPanelDimensions(options);
     }
     async close() {
         return this.device.close();
@@ -5312,148 +2165,54 @@ class StreamDeckInputBase extends EventEmitter {
     async getHidDeviceInfo() {
         return this.device.getDeviceInfo();
     }
-    transformKeyIndex(keyIndex) {
-        return keyIndex;
+    async setBrightness(percentage) {
+        return this.#propertiesService.setBrightness(percentage);
     }
-    async fillLcd(_imageBuffer, _sourceOptions) {
-        throw new Error('Not supported for this model');
+    async resetToLogo() {
+        return this.#propertiesService.resetToLogo();
     }
-    async fillEncoderLcd(_index, _buffer, _sourceOptions) {
-        throw new Error('Not supported for this model');
+    async getFirmwareVersion() {
+        return this.#propertiesService.getFirmwareVersion();
     }
-    async fillLcdRegion(_x, _y, _imageBuffer, _sourceOptions) {
-        throw new Error('Not supported for this model');
-    }
-}
-exports.StreamDeckInputBase = StreamDeckInputBase;
-class StreamDeckBase extends StreamDeckInputBase {
-    constructor(device, options, properties, imageWriter) {
-        super(device, options, properties);
-        this.imageWriter = imageWriter;
+    async getSerialNumber() {
+        return this.#propertiesService.getSerialNumber();
     }
     async fillKeyColor(keyIndex, r, g, b) {
-        this.checkValidKeyIndex(keyIndex, true);
-        this.checkRGBValue(r);
-        this.checkRGBValue(g);
-        this.checkRGBValue(b);
-        if (keyIndex >= this.NUM_KEYS) {
-            await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, r, g, b]));
-        }
-        else {
-            const pixels = Buffer.alloc(this.ICON_BYTES, Buffer.from([r, g, b]));
-            const keyIndex2 = this.transformKeyIndex(keyIndex);
-            await this.fillImageRange(keyIndex2, pixels, {
-                format: 'rgb',
-                offset: 0,
-                stride: this.ICON_SIZE * 3,
-            });
-        }
+        this.checkValidKeyIndex(keyIndex, null);
+        await this.#buttonsLcdService.fillKeyColor(keyIndex, r, g, b);
     }
     async fillKeyBuffer(keyIndex, imageBuffer, options) {
-        this.checkValidKeyIndex(keyIndex);
-        const sourceFormat = options?.format ?? 'rgb';
-        this.checkSourceFormat(sourceFormat);
-        const imageSize = this.ICON_PIXELS * sourceFormat.length;
-        if (imageBuffer.length !== imageSize) {
-            throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
-        }
-        const keyIndex2 = this.transformKeyIndex(keyIndex);
-        await this.fillImageRange(keyIndex2, imageBuffer, {
-            format: sourceFormat,
-            offset: 0,
-            stride: this.ICON_SIZE * sourceFormat.length,
-        });
+        this.checkValidKeyIndex(keyIndex, 'lcd');
+        await this.#buttonsLcdService.fillKeyBuffer(keyIndex, imageBuffer, options);
     }
     async fillPanelBuffer(imageBuffer, options) {
-        const sourceFormat = options?.format ?? 'rgb';
-        this.checkSourceFormat(sourceFormat);
-        const imageSize = this.ICON_PIXELS * sourceFormat.length * this.NUM_KEYS;
-        if (imageBuffer.length !== imageSize) {
-            throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
-        }
-        const iconSize = this.ICON_SIZE * sourceFormat.length;
-        const stride = iconSize * this.KEY_COLUMNS;
-        const ps = [];
-        for (let row = 0; row < this.KEY_ROWS; row++) {
-            const rowOffset = stride * row * this.ICON_SIZE;
-            for (let column = 0; column < this.KEY_COLUMNS; column++) {
-                let index = row * this.KEY_COLUMNS;
-                if (this.deviceProperties.KEY_DIRECTION === 'ltr') {
-                    index += column;
-                }
-                else {
-                    index += this.KEY_COLUMNS - column - 1;
-                }
-                const colOffset = column * iconSize;
-                ps.push(this.fillImageRange(index, imageBuffer, {
-                    format: sourceFormat,
-                    offset: rowOffset + colOffset,
-                    stride,
-                }));
-            }
-        }
-        await Promise.all(ps);
+        await this.#buttonsLcdService.fillPanelBuffer(imageBuffer, options);
     }
     async clearKey(keyIndex) {
-        this.checkValidKeyIndex(keyIndex, true);
-        if (keyIndex >= this.NUM_KEYS) {
-            await this.device.sendFeatureReport(Buffer.from([0x03, 0x06, keyIndex, 0, 0, 0]));
-        }
-        else {
-            const pixels = Buffer.alloc(this.ICON_BYTES, 0);
-            const keyIndex2 = this.transformKeyIndex(keyIndex);
-            await this.fillImageRange(keyIndex2, pixels, {
-                format: 'rgb',
-                offset: 0,
-                stride: this.ICON_SIZE * 3,
-            });
-        }
+        this.checkValidKeyIndex(keyIndex, null);
+        await this.#buttonsLcdService.clearKey(keyIndex);
     }
     async clearPanel() {
-        const pixels = Buffer.alloc(this.ICON_BYTES, 0);
         const ps = [];
-        for (let keyIndex = 0; keyIndex < this.NUM_KEYS; keyIndex++) {
-            ps.push(this.fillImageRange(keyIndex, pixels, {
-                format: 'rgb',
-                offset: 0,
-                stride: this.ICON_SIZE * 3,
-            }));
-        }
-        for (let buttonIndex = 0; buttonIndex < this.NUM_TOUCH_KEYS; buttonIndex++) {
-            ps.push(this.clearKey(buttonIndex + this.NUM_KEYS));
-        }
-        const lcdSize = this.LCD_STRIP_SIZE;
-        if (lcdSize) {
-            const buffer = Buffer.alloc(lcdSize.width * lcdSize.height * 4);
-            ps.push(this.fillLcd(buffer, {
-                format: 'rgba',
-            }));
-        }
+        ps.push(this.#buttonsLcdService.clearPanel());
+        if (this.#lcdStripDisplayService)
+            ps.push(this.#lcdStripDisplayService.clearAllLcdStrips());
         await Promise.all(ps);
     }
-    async fillImageRange(keyIndex, imageBuffer, sourceOptions) {
-        this.checkValidKeyIndex(keyIndex);
-        const byteBuffer = await this.convertFillImage(imageBuffer, sourceOptions);
-        const packets = this.imageWriter.generateFillImageWrites({ keyIndex }, byteBuffer);
-        await this.device.sendReports(packets);
+    async fillLcd(...args) {
+        if (!this.#lcdStripDisplayService)
+            throw new Error('Not supported for this model');
+        return this.#lcdStripDisplayService.fillLcd(...args);
     }
-    checkRGBValue(value) {
-        if (value < 0 || value > 255) {
-            throw new TypeError('Expected a valid color RGB value 0 - 255');
-        }
+    async fillLcdRegion(...args) {
+        if (!this.#lcdStripDisplayService)
+            throw new Error('Not supported for this model');
+        return this.#lcdStripDisplayService.fillLcdRegion(...args);
     }
-    checkSourceFormat(format) {
-        switch (format) {
-            case 'rgb':
-            case 'rgba':
-            case 'bgr':
-            case 'bgra':
-                break;
-            default: {
-                const fmt = format;
-                throw new TypeError(`Expected a known color format not "${fmt}"`);
-            }
-        }
+    async clearLcdStrip(...args) {
+        if (!this.#lcdStripDisplayService)
+            throw new Error('Not supported for this model');
+        return this.#lcdStripDisplayService.clearLcdStrip(...args);
     }
 }
 exports.StreamDeckBase = StreamDeckBase;
@@ -5461,180 +2220,153 @@ exports.StreamDeckBase = StreamDeckBase;
 
 /***/ }),
 
-/***/ 612:
+/***/ 367:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckNeo = exports.StreamDeckPlus = exports.StreamDeckPedal = exports.StreamDeckOriginalMK2 = exports.StreamDeckOriginalV2 = exports.StreamDeckXLV2 = exports.StreamDeckXL = exports.StreamDeckMiniV2 = exports.StreamDeckMini = exports.StreamDeckOriginal = void 0;
-var original_1 = __webpack_require__(745);
-Object.defineProperty(exports, "StreamDeckOriginal", ({ enumerable: true, get: function () { return original_1.StreamDeckOriginal; } }));
-var mini_1 = __webpack_require__(321);
-Object.defineProperty(exports, "StreamDeckMini", ({ enumerable: true, get: function () { return mini_1.StreamDeckMini; } }));
-var miniv2_1 = __webpack_require__(681);
-Object.defineProperty(exports, "StreamDeckMiniV2", ({ enumerable: true, get: function () { return miniv2_1.StreamDeckMiniV2; } }));
-var xl_1 = __webpack_require__(766);
-Object.defineProperty(exports, "StreamDeckXL", ({ enumerable: true, get: function () { return xl_1.StreamDeckXL; } }));
-var xlv2_1 = __webpack_require__(786);
-Object.defineProperty(exports, "StreamDeckXLV2", ({ enumerable: true, get: function () { return xlv2_1.StreamDeckXLV2; } }));
-var originalv2_1 = __webpack_require__(769);
-Object.defineProperty(exports, "StreamDeckOriginalV2", ({ enumerable: true, get: function () { return originalv2_1.StreamDeckOriginalV2; } }));
-var original_mk2_1 = __webpack_require__(158);
-Object.defineProperty(exports, "StreamDeckOriginalMK2", ({ enumerable: true, get: function () { return original_mk2_1.StreamDeckOriginalMK2; } }));
-var pedal_1 = __webpack_require__(756);
-Object.defineProperty(exports, "StreamDeckPedal", ({ enumerable: true, get: function () { return pedal_1.StreamDeckPedal; } }));
-var plus_1 = __webpack_require__(562);
-Object.defineProperty(exports, "StreamDeckPlus", ({ enumerable: true, get: function () { return plus_1.StreamDeckPlus; } }));
-var neo_1 = __webpack_require__(350);
-Object.defineProperty(exports, "StreamDeckNeo", ({ enumerable: true, get: function () { return neo_1.StreamDeckNeo; } }));
-//# sourceMappingURL=index.js.map
+exports.StreamDeckGen1Factory = StreamDeckGen1Factory;
+const base_js_1 = __webpack_require__(67);
+const gen1_js_1 = __webpack_require__(993);
+const default_js_1 = __webpack_require__(826);
+const bitmap_js_1 = __webpack_require__(483);
+const callback_hook_js_1 = __webpack_require__(659);
+const gen1_js_2 = __webpack_require__(632);
+function extendDevicePropertiesForGen1(rawProps) {
+    return {
+        ...rawProps,
+        KEY_DATA_OFFSET: 0,
+    };
+}
+function StreamDeckGen1Factory(device, options, properties, imageWriter, targetOptions, bmpImagePPM) {
+    const fullProperties = extendDevicePropertiesForGen1(properties);
+    const events = new callback_hook_js_1.CallbackHook();
+    return new base_js_1.StreamDeckBase(device, options, {
+        deviceProperties: fullProperties,
+        events,
+        properties: new gen1_js_1.Gen1PropertiesService(device),
+        buttonsLcd: new default_js_1.DefaultButtonsLcdService(imageWriter, new bitmap_js_1.BitmapButtonLcdImagePacker(targetOptions, bmpImagePPM), device, fullProperties),
+        lcdStripDisplay: null,
+        inputService: new gen1_js_2.ButtonOnlyInputService(fullProperties, events),
+    });
+}
+//# sourceMappingURL=generic-gen1.js.map
+
+/***/ }),
+
+/***/ 442:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createBaseGen2Properties = createBaseGen2Properties;
+const imageWriter_js_1 = __webpack_require__(845);
+const headerGenerator_js_1 = __webpack_require__(117);
+const default_js_1 = __webpack_require__(826);
+const callback_hook_js_1 = __webpack_require__(659);
+const gen2_js_1 = __webpack_require__(352);
+const jpeg_js_1 = __webpack_require__(582);
+const gen2_js_2 = __webpack_require__(769);
+function extendDevicePropertiesForGen2(rawProps) {
+    return {
+        ...rawProps,
+        KEY_DATA_OFFSET: 3,
+        SUPPORTS_RGB_KEY_FILL: true,
+    };
+}
+function createBaseGen2Properties(device, options, properties, disableXYFlip) {
+    const fullProperties = extendDevicePropertiesForGen2(properties);
+    const events = new callback_hook_js_1.CallbackHook();
+    return {
+        deviceProperties: fullProperties,
+        events,
+        properties: new gen2_js_1.Gen2PropertiesService(device),
+        buttonsLcd: new default_js_1.DefaultButtonsLcdService(new imageWriter_js_1.StreamdeckDefaultImageWriter(new headerGenerator_js_1.StreamdeckGen2ImageHeaderGenerator()), new jpeg_js_1.JpegButtonLcdImagePacker(options.encodeJPEG, !disableXYFlip), device, fullProperties),
+        lcdStripDisplay: null,
+        inputService: new gen2_js_2.Gen2InputService(fullProperties, events),
+    };
+}
+//# sourceMappingURL=generic-gen2.js.map
 
 /***/ }),
 
 /***/ 321:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckMini = void 0;
-const util_1 = __webpack_require__(369);
-const base_gen1_1 = __webpack_require__(165);
-const id_1 = __webpack_require__(444);
+exports.StreamDeckMiniFactory = StreamDeckMiniFactory;
+const generic_gen1_js_1 = __webpack_require__(367);
+const id_js_1 = __webpack_require__(444);
+const controlsGenerator_js_1 = __webpack_require__(794);
+const imageWriter_js_1 = __webpack_require__(845);
+const headerGenerator_js_1 = __webpack_require__(117);
 const miniProperties = {
-    MODEL: id_1.DeviceModelId.MINI,
-    PRODUCT_NAME: 'Streamdeck Mini',
-    COLUMNS: 3,
-    ROWS: 2,
-    TOUCH_BUTTONS: 0,
-    ICON_SIZE: 80,
-    KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 0,
+    MODEL: id_js_1.DeviceModelId.MINI,
+    PRODUCT_NAME: 'Stream Deck Mini',
+    SUPPORTS_RGB_KEY_FILL: false, // TODO - verify this
+    CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(3, 2, { width: 80, height: 80 })),
     KEY_SPACING_HORIZONTAL: 28,
     KEY_SPACING_VERTICAL: 28,
 };
-class StreamDeckMini extends base_gen1_1.StreamDeckGen1Base {
-    constructor(device, options) {
-        super(device, options, miniProperties);
-    }
-    async convertFillImage(sourceBuffer, sourceOptions) {
-        const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions, { colorMode: 'bgr', rotate: true, yFlip: true }, util_1.BMP_HEADER_LENGTH, this.ICON_SIZE);
-        (0, util_1.writeBMPHeader)(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 2835);
-        return Promise.resolve(byteBuffer);
-    }
-    getFillImagePacketLength() {
-        return 1024;
-    }
+function StreamDeckMiniFactory(device, options) {
+    return (0, generic_gen1_js_1.StreamDeckGen1Factory)(device, options, miniProperties, new imageWriter_js_1.StreamdeckDefaultImageWriter(new headerGenerator_js_1.StreamdeckGen1ImageHeaderGenerator()), { colorMode: 'bgr', rotate: true, yFlip: true }, 2835);
 }
-exports.StreamDeckMini = StreamDeckMini;
 //# sourceMappingURL=mini.js.map
 
 /***/ }),
 
-/***/ 681:
+/***/ 350:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckMiniV2 = void 0;
-const util_1 = __webpack_require__(369);
-const base_gen1_1 = __webpack_require__(165);
-const id_1 = __webpack_require__(444);
-const miniV2Properties = {
-    MODEL: id_1.DeviceModelId.MINIV2,
-    PRODUCT_NAME: 'Streamdeck Mini',
-    COLUMNS: 3,
-    ROWS: 2,
-    TOUCH_BUTTONS: 0,
-    ICON_SIZE: 80,
-    KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 0,
-    KEY_SPACING_HORIZONTAL: 28,
-    KEY_SPACING_VERTICAL: 28,
-};
-class StreamDeckMiniV2 extends base_gen1_1.StreamDeckGen1Base {
-    constructor(device, options) {
-        super(device, options, miniV2Properties);
-    }
-    async convertFillImage(sourceBuffer, sourceOptions) {
-        const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions, { colorMode: 'bgr', rotate: true, yFlip: true }, util_1.BMP_HEADER_LENGTH, this.ICON_SIZE);
-        (0, util_1.writeBMPHeader)(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 2835);
-        return Promise.resolve(byteBuffer);
-    }
-}
-exports.StreamDeckMiniV2 = StreamDeckMiniV2;
-//# sourceMappingURL=miniv2.js.map
-
-/***/ }),
-
-/***/ 350:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _StreamDeckNeo_lcdImageWriter;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckNeo = void 0;
-const id_1 = __webpack_require__(444);
-const base_gen2_1 = __webpack_require__(748);
-const imageWriter_1 = __webpack_require__(222);
-const headerGenerator_1 = __webpack_require__(598);
-const util_1 = __webpack_require__(369);
+exports.StreamDeckNeoFactory = StreamDeckNeoFactory;
+const base_js_1 = __webpack_require__(67);
+const id_js_1 = __webpack_require__(444);
+const generic_gen2_js_1 = __webpack_require__(442);
+const controlsGenerator_js_1 = __webpack_require__(794);
+const neo_js_1 = __webpack_require__(60);
+const neoControls = (0, controlsGenerator_js_1.generateButtonsGrid)(4, 2, { width: 96, height: 96 });
+neoControls.push({
+    type: 'button',
+    row: 2,
+    column: 0,
+    index: 8,
+    hidIndex: 8,
+    feedbackType: 'rgb',
+}, {
+    type: 'lcd-strip',
+    row: 2,
+    column: 1,
+    columnSpan: 2,
+    id: 0,
+    pixelSize: {
+        width: 248,
+        height: 58,
+    },
+    drawRegions: false,
+}, {
+    type: 'button',
+    row: 2,
+    column: 3,
+    index: 9,
+    hidIndex: 9,
+    feedbackType: 'rgb',
+});
 const neoProperties = {
-    MODEL: id_1.DeviceModelId.NEO,
-    PRODUCT_NAME: 'Streamdeck Neo',
-    COLUMNS: 4,
-    ROWS: 2,
-    TOUCH_BUTTONS: 2,
-    ICON_SIZE: 96,
-    KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 3,
+    MODEL: id_js_1.DeviceModelId.NEO,
+    PRODUCT_NAME: 'Stream Deck Neo',
+    CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)(neoControls),
     KEY_SPACING_HORIZONTAL: 30,
     KEY_SPACING_VERTICAL: 30,
 };
-class StreamDeckNeo extends base_gen2_1.StreamDeckGen2Base {
-    constructor(device, options) {
-        super(device, options, neoProperties);
-        _StreamDeckNeo_lcdImageWriter.set(this, new imageWriter_1.StreamdeckDefaultImageWriter(new headerGenerator_1.StreamdeckNeoLcdImageHeaderGenerator()));
-    }
-    get LCD_STRIP_SIZE() {
-        return {
-            width: 248,
-            height: 58,
-        };
-    }
-    async fillLcd(imageBuffer, sourceOptions) {
-        const size = this.LCD_STRIP_SIZE;
-        if (!size)
-            throw new Error(`There is no lcd to fill`);
-        const imageSize = size.width * size.height * sourceOptions.format.length;
-        if (imageBuffer.length !== imageSize) {
-            throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
-        }
-        // A lot of this drawing code is heavily based on the normal button
-        const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, size, sourceOptions);
-        const packets = __classPrivateFieldGet(this, _StreamDeckNeo_lcdImageWriter, "f").generateFillImageWrites(null, byteBuffer);
-        await this.device.sendReports(packets);
-    }
-    async convertFillLcdBuffer(sourceBuffer, size, sourceOptions) {
-        const sourceOptions2 = {
-            format: sourceOptions.format,
-            offset: 0,
-            stride: size.width * sourceOptions.format.length,
-        };
-        const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions2, { colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip }, 0, size.width, size.height);
-        return this.encodeJPEG(byteBuffer, size.width, size.height);
-    }
+const lcdStripControls = neoProperties.CONTROLS.filter((control) => control.type === 'lcd-strip');
+function StreamDeckNeoFactory(device, options) {
+    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, neoProperties);
+    services.lcdStripDisplay = new neo_js_1.StreamDeckNeoLcdService(options.encodeJPEG, device, lcdStripControls);
+    return new base_js_1.StreamDeckBase(device, options, services);
 }
-exports.StreamDeckNeo = StreamDeckNeo;
-_StreamDeckNeo_lcdImageWriter = new WeakMap();
 //# sourceMappingURL=neo.js.map
 
 /***/ }),
@@ -5642,30 +2374,24 @@ _StreamDeckNeo_lcdImageWriter = new WeakMap();
 /***/ 158:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckOriginalMK2 = void 0;
-const base_gen2_1 = __webpack_require__(748);
-const id_1 = __webpack_require__(444);
+exports.StreamDeckOriginalMK2Factory = StreamDeckOriginalMK2Factory;
+const base_js_1 = __webpack_require__(67);
+const generic_gen2_js_1 = __webpack_require__(442);
+const id_js_1 = __webpack_require__(444);
+const controlsGenerator_js_1 = __webpack_require__(794);
 const origMK2Properties = {
-    MODEL: id_1.DeviceModelId.ORIGINALMK2,
-    PRODUCT_NAME: 'Streamdeck MK2',
-    COLUMNS: 5,
-    ROWS: 3,
-    TOUCH_BUTTONS: 0,
-    ICON_SIZE: 72,
-    KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 3,
+    MODEL: id_js_1.DeviceModelId.ORIGINALMK2,
+    PRODUCT_NAME: 'Stream Deck MK2',
+    CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(5, 3, { width: 72, height: 72 })),
     KEY_SPACING_HORIZONTAL: 25,
     KEY_SPACING_VERTICAL: 25,
 };
-class StreamDeckOriginalMK2 extends base_gen2_1.StreamDeckGen2Base {
-    constructor(device, options) {
-        super(device, options, origMK2Properties);
-    }
+function StreamDeckOriginalMK2Factory(device, options) {
+    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, origMK2Properties);
+    return new base_js_1.StreamDeckBase(device, options, services);
 }
-exports.StreamDeckOriginalMK2 = StreamDeckOriginalMK2;
 //# sourceMappingURL=original-mk2.js.map
 
 /***/ }),
@@ -5673,80 +2399,50 @@ exports.StreamDeckOriginalMK2 = StreamDeckOriginalMK2;
 /***/ 745:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckOriginal = void 0;
-const util_1 = __webpack_require__(369);
-const base_gen1_1 = __webpack_require__(165);
-const id_1 = __webpack_require__(444);
-const imageWriter_1 = __webpack_require__(222);
+exports.StreamDeckOriginalFactory = StreamDeckOriginalFactory;
+const generic_gen1_js_1 = __webpack_require__(367);
+const id_js_1 = __webpack_require__(444);
+const imageWriter_js_1 = __webpack_require__(845);
+const controlsGenerator_js_1 = __webpack_require__(794);
 const originalProperties = {
-    MODEL: id_1.DeviceModelId.ORIGINAL,
-    PRODUCT_NAME: 'Streamdeck',
-    COLUMNS: 5,
-    ROWS: 3,
-    TOUCH_BUTTONS: 0,
-    ICON_SIZE: 72,
-    KEY_DIRECTION: 'rtl',
-    KEY_DATA_OFFSET: 0,
+    MODEL: id_js_1.DeviceModelId.ORIGINAL,
+    PRODUCT_NAME: 'Stream Deck',
+    SUPPORTS_RGB_KEY_FILL: false,
+    CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(5, 3, { width: 72, height: 72 }, true)),
     KEY_SPACING_HORIZONTAL: 25,
     KEY_SPACING_VERTICAL: 25,
 };
-class StreamDeckOriginal extends base_gen1_1.StreamDeckGen1Base {
-    constructor(device, options) {
-        super(device, options, originalProperties, new imageWriter_1.StreamdeckOriginalImageWriter());
-        this.useOriginalKeyOrder = !!options.useOriginalKeyOrder;
-    }
-    transformKeyIndex(keyIndex) {
-        if (!this.useOriginalKeyOrder) {
-            // Horizontal flip
-            const half = (this.KEY_COLUMNS - 1) / 2;
-            const diff = ((keyIndex % this.KEY_COLUMNS) - half) * -half;
-            return keyIndex + diff;
-        }
-        else {
-            return keyIndex;
-        }
-    }
-    async convertFillImage(sourceBuffer, sourceOptions) {
-        const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions, { colorMode: 'bgr', xFlip: true }, util_1.BMP_HEADER_LENGTH, this.ICON_SIZE);
-        (0, util_1.writeBMPHeader)(byteBuffer, this.ICON_SIZE, this.ICON_BYTES, 3780);
-        return Promise.resolve(byteBuffer);
-    }
+function StreamDeckOriginalFactory(device, options) {
+    return (0, generic_gen1_js_1.StreamDeckGen1Factory)(device, options, originalProperties, new imageWriter_js_1.StreamdeckOriginalImageWriter(), { colorMode: 'bgr', xFlip: true }, 3780);
 }
-exports.StreamDeckOriginal = StreamDeckOriginal;
 //# sourceMappingURL=original.js.map
 
 /***/ }),
 
-/***/ 769:
+/***/ 150:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckOriginalV2 = void 0;
-const base_gen2_1 = __webpack_require__(748);
-const id_1 = __webpack_require__(444);
+exports.StreamDeckOriginalV2Factory = StreamDeckOriginalV2Factory;
+const base_js_1 = __webpack_require__(67);
+const generic_gen2_js_1 = __webpack_require__(442);
+const id_js_1 = __webpack_require__(444);
+const controlsGenerator_js_1 = __webpack_require__(794);
 const origV2Properties = {
-    MODEL: id_1.DeviceModelId.ORIGINALV2,
-    PRODUCT_NAME: 'Streamdeck',
-    COLUMNS: 5,
-    ROWS: 3,
-    TOUCH_BUTTONS: 0,
-    ICON_SIZE: 72,
-    KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 3,
+    MODEL: id_js_1.DeviceModelId.ORIGINALV2,
+    PRODUCT_NAME: 'Stream Deck',
+    // SUPPORTS_RGB_KEY_FILL: false, // TODO - verify SUPPORTS_RGB_KEY_FILL
+    CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(5, 3, { width: 72, height: 72 })),
     KEY_SPACING_HORIZONTAL: 25,
     KEY_SPACING_VERTICAL: 25,
 };
-class StreamDeckOriginalV2 extends base_gen2_1.StreamDeckGen2Base {
-    constructor(device, options) {
-        super(device, options, origV2Properties);
-    }
+function StreamDeckOriginalV2Factory(device, options) {
+    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, origV2Properties);
+    return new base_js_1.StreamDeckBase(device, options, services);
 }
-exports.StreamDeckOriginalV2 = StreamDeckOriginalV2;
 //# sourceMappingURL=originalv2.js.map
 
 /***/ }),
@@ -5754,250 +2450,127 @@ exports.StreamDeckOriginalV2 = StreamDeckOriginalV2;
 /***/ 756:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckPedal = void 0;
-const base_1 = __webpack_require__(67);
-const id_1 = __webpack_require__(444);
+exports.StreamDeckPedalFactory = StreamDeckPedalFactory;
+const base_js_1 = __webpack_require__(67);
+const id_js_1 = __webpack_require__(444);
+const controlsGenerator_js_1 = __webpack_require__(794);
+const pedal_js_1 = __webpack_require__(874);
+const pedal_js_2 = __webpack_require__(183);
+const callback_hook_js_1 = __webpack_require__(659);
+const gen1_js_1 = __webpack_require__(632);
+const pedalControls = [
+    {
+        type: 'button',
+        row: 0,
+        column: 0,
+        index: 0,
+        hidIndex: 0,
+        feedbackType: 'none',
+    },
+    {
+        type: 'button',
+        row: 0,
+        column: 1,
+        index: 1,
+        hidIndex: 1,
+        feedbackType: 'none',
+    },
+    {
+        type: 'button',
+        row: 0,
+        column: 2,
+        index: 2,
+        hidIndex: 2,
+        feedbackType: 'none',
+    },
+];
 const pedalProperties = {
-    MODEL: id_1.DeviceModelId.PEDAL,
-    PRODUCT_NAME: 'Streamdeck Pedal',
-    COLUMNS: 3,
-    ROWS: 1,
-    TOUCH_BUTTONS: 0,
-    ICON_SIZE: 0,
-    KEY_DIRECTION: 'ltr',
+    MODEL: id_js_1.DeviceModelId.PEDAL,
+    PRODUCT_NAME: 'Stream Deck Pedal',
     KEY_DATA_OFFSET: 3,
+    SUPPORTS_RGB_KEY_FILL: false,
+    CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)(pedalControls),
     KEY_SPACING_HORIZONTAL: 0,
     KEY_SPACING_VERTICAL: 0,
 };
-class StreamDeckPedal extends base_1.StreamDeckInputBase {
-    constructor(device, options) {
-        super(device, options, pedalProperties);
-    }
-    /**
-     * Sets the brightness of the keys on the Stream Deck
-     *
-     * @param {number} percentage The percentage brightness
-     */
-    async setBrightness(_percentage) {
-        // Not supported
-    }
-    async resetToLogo() {
-        // Not supported
-    }
-    async getFirmwareVersion() {
-        const val = await this.device.getFeatureReport(5, 32);
-        const end = val.indexOf(0, 6);
-        return val.toString('ascii', 6, end === -1 ? undefined : end);
-    }
-    async getSerialNumber() {
-        const val = await this.device.getFeatureReport(6, 32);
-        return val.toString('ascii', 2, 14);
-    }
-    async fillKeyColor(_keyIndex, _r, _g, _b) {
-        // Not supported
-    }
-    async fillKeyBuffer(_keyIndex, _imageBuffer, _options) {
-        // Not supported
-    }
-    async fillPanelBuffer(_imageBuffer, _options) {
-        // Not supported
-    }
-    async clearKey(_keyIndex) {
-        // Not supported
-    }
-    async clearPanel() {
-        // Not supported
-    }
+function StreamDeckPedalFactory(device, options) {
+    const events = new callback_hook_js_1.CallbackHook();
+    return new base_js_1.StreamDeckBase(device, options, {
+        deviceProperties: pedalProperties,
+        events,
+        properties: new pedal_js_1.PedalPropertiesService(device),
+        buttonsLcd: new pedal_js_2.PedalLcdService(),
+        lcdStripDisplay: null,
+        inputService: new gen1_js_1.ButtonOnlyInputService(pedalProperties, events),
+    });
 }
-exports.StreamDeckPedal = StreamDeckPedal;
 //# sourceMappingURL=pedal.js.map
 
 /***/ }),
 
 /***/ 562:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
-/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _StreamDeckPlus_lcdImageWriter, _StreamDeckPlus_encoderState;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckPlus = void 0;
-const util_1 = __webpack_require__(369);
-const base_gen2_1 = __webpack_require__(748);
-const id_1 = __webpack_require__(444);
-const imageWriter_1 = __webpack_require__(222);
-const headerGenerator_1 = __webpack_require__(598);
+exports.StreamDeckPlusFactory = StreamDeckPlusFactory;
+const base_js_1 = __webpack_require__(67);
+const generic_gen2_js_1 = __webpack_require__(442);
+const id_js_1 = __webpack_require__(444);
+const controlsGenerator_js_1 = __webpack_require__(794);
+const plus_js_1 = __webpack_require__(88);
+const plusControls = (0, controlsGenerator_js_1.generateButtonsGrid)(4, 2, { width: 120, height: 120 });
+plusControls.push({
+    type: 'lcd-strip',
+    row: 2,
+    column: 0,
+    columnSpan: 4,
+    id: 0,
+    pixelSize: Object.freeze({
+        width: 800,
+        height: 100,
+    }),
+    drawRegions: true,
+}, {
+    type: 'encoder',
+    row: 3,
+    column: 0,
+    index: 0,
+    hidIndex: 0,
+}, {
+    type: 'encoder',
+    row: 3,
+    column: 1,
+    index: 1,
+    hidIndex: 1,
+}, {
+    type: 'encoder',
+    row: 3,
+    column: 2,
+    index: 2,
+    hidIndex: 2,
+}, {
+    type: 'encoder',
+    row: 3,
+    column: 3,
+    index: 3,
+    hidIndex: 3,
+});
 const plusProperties = {
-    MODEL: id_1.DeviceModelId.PLUS,
-    PRODUCT_NAME: 'Streamdeck +',
-    COLUMNS: 4,
-    ROWS: 2,
-    TOUCH_BUTTONS: 0,
-    ICON_SIZE: 120,
-    KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 3,
+    MODEL: id_js_1.DeviceModelId.PLUS,
+    PRODUCT_NAME: 'Stream Deck +',
+    CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)(plusControls),
     KEY_SPACING_HORIZONTAL: 99,
     KEY_SPACING_VERTICAL: 40,
 };
-class StreamDeckPlus extends base_gen2_1.StreamDeckGen2Base {
-    constructor(device, options) {
-        super(device, options, plusProperties, true);
-        _StreamDeckPlus_lcdImageWriter.set(this, new imageWriter_1.StreamdeckDefaultImageWriter(new headerGenerator_1.StreamdeckPlusLcdImageHeaderGenerator()));
-        _StreamDeckPlus_encoderState.set(this, void 0);
-        __classPrivateFieldSet(this, _StreamDeckPlus_encoderState, new Array(4).fill(false), "f");
-    }
-    get NUM_ENCODERS() {
-        return 4;
-    }
-    get LCD_STRIP_SIZE() {
-        const size = this.LCD_ENCODER_SIZE;
-        size.width *= this.NUM_ENCODERS;
-        return size;
-    }
-    get LCD_ENCODER_SIZE() {
-        return { width: 200, height: 100 };
-    }
-    calculateEncoderForX(x) {
-        const encoderWidth = this.LCD_ENCODER_SIZE.width;
-        return Math.floor(x / encoderWidth);
-    }
-    handleInputBuffer(data) {
-        const inputType = data[0];
-        switch (inputType) {
-            case 0x00: // Button
-                super.handleInputBuffer(data);
-                break;
-            case 0x02: // LCD
-                this.handleLcdInput(data);
-                break;
-            case 0x03: // Encoder
-                this.handleEncoderInput(data);
-                break;
-        }
-    }
-    handleLcdInput(data) {
-        const buffer = Buffer.from(data);
-        const position = {
-            x: buffer.readUint16LE(5),
-            y: buffer.readUint16LE(7),
-        };
-        const index = this.calculateEncoderForX(position.x);
-        switch (data[3]) {
-            case 0x01: // short press
-                this.emit('lcdShortPress', index, position);
-                break;
-            case 0x02: // long press
-                this.emit('lcdLongPress', index, position);
-                break;
-            case 0x03: {
-                // swipe
-                const position2 = {
-                    x: buffer.readUint16LE(9),
-                    y: buffer.readUint16LE(11),
-                };
-                const index2 = this.calculateEncoderForX(position2.x);
-                this.emit('lcdSwipe', index, index2, position, position2);
-                break;
-            }
-        }
-    }
-    handleEncoderInput(data) {
-        switch (data[3]) {
-            case 0x00: // press/release
-                for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
-                    const keyPressed = Boolean(data[4 + keyIndex]);
-                    const stateChanged = keyPressed !== __classPrivateFieldGet(this, _StreamDeckPlus_encoderState, "f")[keyIndex];
-                    if (stateChanged) {
-                        __classPrivateFieldGet(this, _StreamDeckPlus_encoderState, "f")[keyIndex] = keyPressed;
-                        if (keyPressed) {
-                            this.emit('encoderDown', keyIndex);
-                        }
-                        else {
-                            this.emit('encoderUp', keyIndex);
-                        }
-                    }
-                }
-                break;
-            case 0x01: // rotate
-                for (let keyIndex = 0; keyIndex < this.NUM_ENCODERS; keyIndex++) {
-                    const intArray = new Int8Array(data.buffer, data.byteOffset, data.byteLength);
-                    const value = intArray[4 + keyIndex];
-                    if (value > 0) {
-                        this.emit('rotateRight', keyIndex, value);
-                    }
-                    else if (value < 0) {
-                        this.emit('rotateLeft', keyIndex, -value);
-                    }
-                }
-                break;
-        }
-    }
-    async fillLcd(buffer, sourceOptions) {
-        const size = this.LCD_STRIP_SIZE;
-        if (!size)
-            throw new Error(`There is no lcd to fill`);
-        return this.fillLcdRegion(0, 0, buffer, {
-            format: sourceOptions.format,
-            width: size.width,
-            height: size.height,
-        });
-    }
-    async fillEncoderLcd(index, buffer, sourceOptions) {
-        if (this.NUM_ENCODERS === 0)
-            throw new Error(`There are no encoders`);
-        const size = this.LCD_ENCODER_SIZE;
-        const x = index * size.width;
-        return this.fillLcdRegion(x, 0, buffer, {
-            format: sourceOptions.format,
-            width: size.width,
-            height: size.height,
-        });
-    }
-    async fillLcdRegion(x, y, imageBuffer, sourceOptions) {
-        // Basic bounds checking
-        const maxSize = this.LCD_STRIP_SIZE;
-        if (x < 0 || x + sourceOptions.width > maxSize.width) {
-            throw new TypeError(`Image will not fit within the lcd strip`);
-        }
-        if (y < 0 || y + sourceOptions.height > maxSize.height) {
-            throw new TypeError(`Image will not fit within the lcd strip`);
-        }
-        const imageSize = sourceOptions.width * sourceOptions.height * sourceOptions.format.length;
-        if (imageBuffer.length !== imageSize) {
-            throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
-        }
-        // A lot of this drawing code is heavily based on the normal button
-        const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions);
-        const packets = __classPrivateFieldGet(this, _StreamDeckPlus_lcdImageWriter, "f").generateFillImageWrites({ ...sourceOptions, x, y }, byteBuffer);
-        await this.device.sendReports(packets);
-    }
-    async convertFillLcdBuffer(sourceBuffer, sourceOptions) {
-        const sourceOptions2 = {
-            format: sourceOptions.format,
-            offset: 0,
-            stride: sourceOptions.width * sourceOptions.format.length,
-        };
-        const byteBuffer = (0, util_1.transformImageBuffer)(sourceBuffer, sourceOptions2, { colorMode: 'rgba', xFlip: this.xyFlip, yFlip: this.xyFlip }, 0, sourceOptions.width, sourceOptions.height);
-        return this.encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height);
-    }
+const lcdStripControls = plusProperties.CONTROLS.filter((control) => control.type === 'lcd-strip');
+function StreamDeckPlusFactory(device, options) {
+    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, plusProperties, true);
+    services.lcdStripDisplay = new plus_js_1.StreamDeckPlusLcdService(options.encodeJPEG, device, lcdStripControls);
+    return new base_js_1.StreamDeckBase(device, options, services);
 }
-exports.StreamDeckPlus = StreamDeckPlus;
-_StreamDeckPlus_lcdImageWriter = new WeakMap(), _StreamDeckPlus_encoderState = new WeakMap();
 //# sourceMappingURL=plus.js.map
 
 /***/ }),
@@ -6005,69 +2578,31 @@ _StreamDeckPlus_lcdImageWriter = new WeakMap(), _StreamDeckPlus_encoderState = n
 /***/ 766:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckXL = void 0;
-const base_gen2_1 = __webpack_require__(748);
-const id_1 = __webpack_require__(444);
+exports.StreamDeckXLFactory = StreamDeckXLFactory;
+const base_js_1 = __webpack_require__(67);
+const generic_gen2_js_1 = __webpack_require__(442);
+const id_js_1 = __webpack_require__(444);
+const controlsGenerator_js_1 = __webpack_require__(794);
 const xlProperties = {
-    MODEL: id_1.DeviceModelId.XL,
-    PRODUCT_NAME: 'Streamdeck XL',
-    COLUMNS: 8,
-    ROWS: 4,
-    TOUCH_BUTTONS: 0,
-    ICON_SIZE: 96,
-    KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 3,
+    MODEL: id_js_1.DeviceModelId.XL,
+    PRODUCT_NAME: 'Stream Deck XL',
+    CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(8, 4, { width: 96, height: 96 })),
     KEY_SPACING_HORIZONTAL: 32,
     KEY_SPACING_VERTICAL: 39,
 };
-class StreamDeckXL extends base_gen2_1.StreamDeckGen2Base {
-    constructor(device, options) {
-        super(device, options, xlProperties);
-    }
+function StreamDeckXLFactory(device, options) {
+    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, xlProperties);
+    return new base_js_1.StreamDeckBase(device, options, services);
 }
-exports.StreamDeckXL = StreamDeckXL;
 //# sourceMappingURL=xl.js.map
-
-/***/ }),
-
-/***/ 786:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckXLV2 = void 0;
-const base_gen2_1 = __webpack_require__(748);
-const id_1 = __webpack_require__(444);
-const xlProperties = {
-    MODEL: id_1.DeviceModelId.XLV2,
-    PRODUCT_NAME: 'Streamdeck XL',
-    COLUMNS: 8,
-    ROWS: 4,
-    TOUCH_BUTTONS: 0,
-    ICON_SIZE: 96,
-    KEY_DIRECTION: 'ltr',
-    KEY_DATA_OFFSET: 3,
-    KEY_SPACING_HORIZONTAL: 32,
-    KEY_SPACING_VERTICAL: 39,
-};
-class StreamDeckXLV2 extends base_gen2_1.StreamDeckGen2Base {
-    constructor(device, options) {
-        super(device, options, xlProperties);
-    }
-}
-exports.StreamDeckXLV2 = StreamDeckXLV2;
-//# sourceMappingURL=xlv2.js.map
 
 /***/ }),
 
 /***/ 481:
 /***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckProxy = void 0;
@@ -6076,80 +2611,54 @@ exports.StreamDeckProxy = void 0;
  * This is intended to be used by libraries wrapping this that want to add more methods to the StreamDeck
  */
 class StreamDeckProxy {
+    device;
     constructor(device) {
         this.device = device;
     }
-    get NUM_KEYS() {
-        return this.device.NUM_KEYS;
+    get CONTROLS() {
+        return this.device.CONTROLS;
     }
-    get KEY_COLUMNS() {
-        return this.device.KEY_COLUMNS;
-    }
-    get KEY_ROWS() {
-        return this.device.KEY_ROWS;
-    }
-    get NUM_TOUCH_KEYS() {
-        return this.device.NUM_TOUCH_KEYS;
-    }
-    get NUM_ENCODERS() {
-        return this.device.NUM_ENCODERS;
-    }
-    get LCD_STRIP_SIZE() {
-        return this.device.LCD_STRIP_SIZE;
-    }
-    get LCD_ENCODER_SIZE() {
-        return this.device.LCD_ENCODER_SIZE;
-    }
-    get ICON_SIZE() {
-        return this.device.ICON_SIZE;
-    }
-    get ICON_BYTES() {
-        return this.device.ICON_BYTES;
-    }
-    get ICON_PIXELS() {
-        return this.device.ICON_PIXELS;
-    }
-    get KEY_SPACING_VERTICAL() {
-        return this.device.KEY_SPACING_VERTICAL;
-    }
-    get KEY_SPACING_HORIZONTAL() {
-        return this.device.KEY_SPACING_HORIZONTAL;
-    }
+    // public get KEY_SPACING_VERTICAL(): number {
+    // 	return this.device.KEY_SPACING_VERTICAL
+    // }
+    // public get KEY_SPACING_HORIZONTAL(): number {
+    // 	return this.device.KEY_SPACING_HORIZONTAL
+    // }
     get MODEL() {
         return this.device.MODEL;
     }
     get PRODUCT_NAME() {
         return this.device.PRODUCT_NAME;
     }
-    checkValidKeyIndex(keyIndex, includeTouchKeys) {
-        this.device.checkValidKeyIndex(keyIndex, includeTouchKeys);
+    calculateFillPanelDimensions(...args) {
+        return this.device.calculateFillPanelDimensions(...args);
     }
     async close() {
         return this.device.close();
     }
-    async getHidDeviceInfo() {
-        return this.device.getHidDeviceInfo();
+    async getHidDeviceInfo(...args) {
+        return this.device.getHidDeviceInfo(...args);
     }
-    async fillKeyColor(keyIndex, r, g, b) {
-        return this.device.fillKeyColor(keyIndex, r, g, b);
+    async fillKeyColor(...args) {
+        return this.device.fillKeyColor(...args);
     }
-    async fillKeyBuffer(keyIndex, imageBuffer, options) {
-        return this.device.fillKeyBuffer(keyIndex, imageBuffer, options);
+    async fillKeyBuffer(...args) {
+        return this.device.fillKeyBuffer(...args);
     }
-    async fillPanelBuffer(imageBuffer, options) {
-        return this.device.fillPanelBuffer(imageBuffer, options);
+    async fillPanelBuffer(...args) {
+        return this.device.fillPanelBuffer(...args);
     }
-    async clearKey(keyIndex) {
-        return this.device.clearKey(keyIndex);
+    async clearKey(...args) {
+        return this.device.clearKey(...args);
     }
-    async clearPanel() {
-        return this.device.clearPanel();
+    async clearPanel(...args) {
+        return this.device.clearPanel(...args);
     }
-    async setBrightness(percentage) {
-        return this.device.setBrightness(percentage);
+    async setBrightness(...args) {
+        return this.device.setBrightness(...args);
     }
-    async resetToLogo() {
-        return this.device.resetToLogo();
+    async resetToLogo(...args) {
+        return this.device.resetToLogo(...args);
     }
     async getFirmwareVersion() {
         return this.device.getFirmwareVersion();
@@ -6157,14 +2666,14 @@ class StreamDeckProxy {
     async getSerialNumber() {
         return this.device.getSerialNumber();
     }
-    async fillLcd(imageBuffer, sourceOptions) {
-        return this.device.fillLcd(imageBuffer, sourceOptions);
+    async fillLcd(...args) {
+        return this.device.fillLcd(...args);
     }
-    async fillEncoderLcd(index, imageBuffer, sourceOptions) {
-        return this.device.fillEncoderLcd(index, imageBuffer, sourceOptions);
+    async fillLcdRegion(...args) {
+        return this.device.fillLcdRegion(...args);
     }
-    async fillLcdRegion(x, y, imageBuffer, sourceOptions) {
-        return this.device.fillLcdRegion(x, y, imageBuffer, sourceOptions);
+    async clearLcdStrip(...args) {
+        return this.device.clearLcdStrip(...args);
     }
     /**
      * EventEmitter
@@ -6220,10 +2729,889 @@ exports.StreamDeckProxy = StreamDeckProxy;
 
 /***/ }),
 
+/***/ 826:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DefaultButtonsLcdService = void 0;
+class DefaultButtonsLcdService {
+    #imageWriter;
+    #imagePacker;
+    #device;
+    #deviceProperties;
+    constructor(imageWriter, imagePacker, device, deviceProperties) {
+        this.#imageWriter = imageWriter;
+        this.#imagePacker = imagePacker;
+        this.#device = device;
+        this.#deviceProperties = deviceProperties;
+    }
+    getLcdButtonControls() {
+        return this.#deviceProperties.CONTROLS.filter((control) => control.type === 'button' && control.feedbackType === 'lcd');
+    }
+    calculateLcdGridSpan(buttonsLcd) {
+        if (buttonsLcd.length === 0)
+            return null;
+        const allRowValues = buttonsLcd.map((button) => button.row);
+        const allColumnValues = buttonsLcd.map((button) => button.column);
+        return {
+            minRow: Math.min(...allRowValues),
+            maxRow: Math.max(...allRowValues),
+            minCol: Math.min(...allColumnValues),
+            maxCol: Math.max(...allColumnValues),
+        };
+    }
+    calculateDimensionsFromGridSpan(gridSpan, buttonPixelSize, withPadding) {
+        if (withPadding) {
+            // TODO: Implement padding
+            throw new Error('Not implemented');
+        }
+        else {
+            const rowCount = gridSpan.maxRow - gridSpan.minRow + 1;
+            const columnCount = gridSpan.maxCol - gridSpan.minCol + 1;
+            // TODO: Consider that different rows/columns could have different dimensions
+            return {
+                width: columnCount * buttonPixelSize.width,
+                height: rowCount * buttonPixelSize.height,
+            };
+        }
+    }
+    calculateFillPanelDimensions(options) {
+        const buttonLcdControls = this.getLcdButtonControls();
+        const gridSpan = this.calculateLcdGridSpan(buttonLcdControls);
+        if (!gridSpan || buttonLcdControls.length === 0)
+            return null;
+        return this.calculateDimensionsFromGridSpan(gridSpan, buttonLcdControls[0].pixelSize, options?.withPadding);
+    }
+    async clearPanel() {
+        const ps = [];
+        for (const control of this.#deviceProperties.CONTROLS) {
+            if (control.type !== 'button')
+                continue;
+            switch (control.feedbackType) {
+                case 'rgb':
+                    ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0));
+                    break;
+                case 'lcd':
+                    if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL) {
+                        ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0));
+                    }
+                    else {
+                        const pixels = new Uint8Array(control.pixelSize.width * control.pixelSize.height * 3);
+                        ps.push(this.fillImageRangeControl(control, pixels, {
+                            format: 'rgb',
+                            offset: 0,
+                            stride: control.pixelSize.width * 3,
+                        }));
+                    }
+                    break;
+                case 'none':
+                    // Do nothing
+                    break;
+            }
+        }
+        await Promise.all(ps);
+    }
+    async clearKey(keyIndex) {
+        const control = this.#deviceProperties.CONTROLS.find((control) => control.type === 'button' && control.index === keyIndex);
+        if (!control || control.feedbackType === 'none')
+            throw new TypeError(`Expected a valid keyIndex`);
+        if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control.feedbackType === 'rgb') {
+            await this.sendKeyRgb(keyIndex, 0, 0, 0);
+        }
+        else {
+            const pixels = new Uint8Array(control.pixelSize.width * control.pixelSize.height * 3);
+            await this.fillImageRangeControl(control, pixels, {
+                format: 'rgb',
+                offset: 0,
+                stride: control.pixelSize.width * 3,
+            });
+        }
+    }
+    async fillKeyColor(keyIndex, r, g, b) {
+        this.checkRGBValue(r);
+        this.checkRGBValue(g);
+        this.checkRGBValue(b);
+        const control = this.#deviceProperties.CONTROLS.find((control) => control.type === 'button' && control.index === keyIndex);
+        if (!control || control.feedbackType === 'none')
+            throw new TypeError(`Expected a valid keyIndex`);
+        if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control.feedbackType === 'rgb') {
+            await this.sendKeyRgb(keyIndex, r, g, b);
+        }
+        else {
+            // rgba is excessive here, but it makes the fill easier as it can be done in a 32bit uint
+            const pixelCount = control.pixelSize.width * control.pixelSize.height;
+            const pixels = new Uint8Array(pixelCount * 4);
+            const view = new DataView(pixels.buffer, pixels.byteOffset, pixels.byteLength);
+            // write first pixel
+            view.setUint8(0, r);
+            view.setUint8(1, g);
+            view.setUint8(2, b);
+            view.setUint8(3, 255);
+            // read computed pixel
+            const sample = view.getUint32(0);
+            // fill with computed pixel
+            for (let i = 1; i < pixelCount; i++) {
+                view.setUint32(i * 4, sample);
+            }
+            await this.fillImageRangeControl(control, pixels, {
+                format: 'rgba',
+                offset: 0,
+                stride: control.pixelSize.width * 3,
+            });
+        }
+    }
+    async fillKeyBuffer(keyIndex, imageBuffer, options) {
+        const sourceFormat = options?.format ?? 'rgb';
+        this.checkSourceFormat(sourceFormat);
+        const control = this.#deviceProperties.CONTROLS.find((control) => control.type === 'button' && control.index === keyIndex);
+        if (!control || control.feedbackType === 'none')
+            throw new TypeError(`Expected a valid keyIndex`);
+        if (control.feedbackType !== 'lcd')
+            throw new TypeError(`keyIndex ${control.index} does not support lcd feedback`);
+        const imageSize = control.pixelSize.width * control.pixelSize.height * sourceFormat.length;
+        if (imageBuffer.length !== imageSize) {
+            throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
+        }
+        await this.fillImageRangeControl(control, imageBuffer, {
+            format: sourceFormat,
+            offset: 0,
+            stride: control.pixelSize.width * sourceFormat.length,
+        });
+    }
+    async fillPanelBuffer(imageBuffer, options) {
+        const sourceFormat = options?.format ?? 'rgb';
+        this.checkSourceFormat(sourceFormat);
+        const buttonLcdControls = this.getLcdButtonControls();
+        const panelGridSpan = this.calculateLcdGridSpan(buttonLcdControls);
+        if (!panelGridSpan || buttonLcdControls.length === 0) {
+            throw new Error(`Panel does not support being filled`);
+        }
+        const panelDimensions = this.calculateDimensionsFromGridSpan(panelGridSpan, buttonLcdControls[0].pixelSize, options?.withPadding);
+        const expectedByteCount = sourceFormat.length * panelDimensions.width * panelDimensions.height;
+        if (imageBuffer.length !== expectedByteCount) {
+            throw new RangeError(`Expected image buffer of length ${expectedByteCount}, got length ${imageBuffer.length}`);
+        }
+        const stride = panelDimensions.width * sourceFormat.length;
+        const ps = [];
+        for (const control of buttonLcdControls) {
+            const controlRow = control.row - panelGridSpan.minRow;
+            const controlCol = control.column - panelGridSpan.minCol;
+            // TODO: Consider that different rows/columns could have different dimensions
+            const iconSize = control.pixelSize.width * sourceFormat.length;
+            const rowOffset = stride * controlRow * control.pixelSize.height;
+            const colOffset = controlCol * iconSize;
+            // TODO: Implement padding
+            ps.push(this.fillImageRangeControl(control, imageBuffer, {
+                format: sourceFormat,
+                offset: rowOffset + colOffset,
+                stride,
+            }));
+        }
+        await Promise.all(ps);
+    }
+    async sendKeyRgb(keyIndex, red, green, blue) {
+        await this.#device.sendFeatureReport(new Uint8Array([0x03, 0x06, keyIndex, red, green, blue]));
+    }
+    async fillImageRangeControl(buttonControl, imageBuffer, sourceOptions) {
+        if (buttonControl.feedbackType !== 'lcd')
+            throw new TypeError(`keyIndex ${buttonControl.index} does not support lcd feedback`);
+        const byteBuffer = await this.#imagePacker.convertPixelBuffer(imageBuffer, sourceOptions, buttonControl.pixelSize);
+        const packets = this.#imageWriter.generateFillImageWrites({ keyIndex: buttonControl.hidIndex }, byteBuffer);
+        await this.#device.sendReports(packets);
+    }
+    checkRGBValue(value) {
+        if (value < 0 || value > 255) {
+            throw new TypeError('Expected a valid color RGB value 0 - 255');
+        }
+    }
+    checkSourceFormat(format) {
+        switch (format) {
+            case 'rgb':
+            case 'rgba':
+            case 'bgr':
+            case 'bgra':
+                break;
+            default: {
+                const fmt = format;
+                throw new TypeError(`Expected a known color format not "${fmt}"`);
+            }
+        }
+    }
+}
+exports.DefaultButtonsLcdService = DefaultButtonsLcdService;
+//# sourceMappingURL=default.js.map
+
+/***/ }),
+
+/***/ 183:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PedalLcdService = void 0;
+class PedalLcdService {
+    calculateFillPanelDimensions(_options) {
+        // Not supported
+        return null;
+    }
+    async clearKey(_keyIndex) {
+        // Not supported
+    }
+    async clearPanel() {
+        // Not supported
+    }
+    async fillKeyColor(_keyIndex, _r, _g, _b) {
+        // Not supported
+    }
+    async fillKeyBuffer(_keyIndex, _imageBuffer, _options) {
+        // Not supported
+    }
+    async fillPanelBuffer(_imageBuffer, _options) {
+        // Not supported
+    }
+}
+exports.PedalLcdService = PedalLcdService;
+//# sourceMappingURL=pedal.js.map
+
+/***/ }),
+
+/***/ 659:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CallbackHook = void 0;
+/**
+ * A simple helper that allows for the delayed registering of a listener, to avoid dependency cycles
+ */
+class CallbackHook {
+    #listener = null;
+    emit(key, ...args) {
+        if (!this.#listener)
+            throw new Error('No listener setup');
+        this.#listener(key, ...args);
+    }
+    listen(fn) {
+        this.#listener = fn;
+    }
+}
+exports.CallbackHook = CallbackHook;
+//# sourceMappingURL=callback-hook.js.map
+
+/***/ }),
+
+/***/ 483:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BitmapButtonLcdImagePacker = void 0;
+const util_js_1 = __webpack_require__(369);
+class BitmapButtonLcdImagePacker {
+    #targetOptions;
+    #bmpImagePPM;
+    constructor(targetOptions, bmpImagePPM) {
+        this.#targetOptions = targetOptions;
+        this.#bmpImagePPM = bmpImagePPM;
+    }
+    async convertPixelBuffer(sourceBuffer, sourceOptions, targetSize) {
+        const byteBuffer = (0, util_js_1.transformImageBuffer)(sourceBuffer, sourceOptions, this.#targetOptions, util_js_1.BMP_HEADER_LENGTH, targetSize.width, targetSize.height);
+        (0, util_js_1.writeBMPHeader)(byteBuffer, targetSize.width, targetSize.height, byteBuffer.length - util_js_1.BMP_HEADER_LENGTH, this.#bmpImagePPM);
+        return byteBuffer;
+    }
+}
+exports.BitmapButtonLcdImagePacker = BitmapButtonLcdImagePacker;
+//# sourceMappingURL=bitmap.js.map
+
+/***/ }),
+
+/***/ 582:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.JpegButtonLcdImagePacker = void 0;
+const util_js_1 = __webpack_require__(369);
+class JpegButtonLcdImagePacker {
+    #encodeJPEG;
+    #xyFlip;
+    constructor(encodeJPEG, xyFlip) {
+        this.#encodeJPEG = encodeJPEG;
+        this.#xyFlip = xyFlip;
+    }
+    async convertPixelBuffer(sourceBuffer, sourceOptions, targetSize) {
+        const byteBuffer = (0, util_js_1.transformImageBuffer)(sourceBuffer, sourceOptions, { colorMode: 'rgba', xFlip: this.#xyFlip, yFlip: this.#xyFlip }, 0, targetSize.width, targetSize.height);
+        return this.#encodeJPEG(byteBuffer, targetSize.width, targetSize.height);
+    }
+}
+exports.JpegButtonLcdImagePacker = JpegButtonLcdImagePacker;
+//# sourceMappingURL=jpeg.js.map
+
+/***/ }),
+
+/***/ 117:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamdeckNeoLcdImageHeaderGenerator = exports.StreamdeckPlusLcdImageHeaderGenerator = exports.StreamdeckGen2ImageHeaderGenerator = exports.StreamdeckGen1ImageHeaderGenerator = void 0;
+const util_js_1 = __webpack_require__(369);
+class StreamdeckGen1ImageHeaderGenerator {
+    getFillImageCommandHeaderLength() {
+        return 16;
+    }
+    writeFillImageCommandHeader(buffer, props, partIndex, isLast, _bodyLength) {
+        const bufferView = (0, util_js_1.uint8ArrayToDataView)(buffer);
+        bufferView.setUint8(0, 0x02);
+        bufferView.setUint8(1, 0x01);
+        bufferView.setUint16(2, partIndex, true);
+        bufferView.setUint8(4, isLast ? 1 : 0);
+        bufferView.setUint8(5, props.keyIndex + 1);
+    }
+}
+exports.StreamdeckGen1ImageHeaderGenerator = StreamdeckGen1ImageHeaderGenerator;
+class StreamdeckGen2ImageHeaderGenerator {
+    getFillImageCommandHeaderLength() {
+        return 8;
+    }
+    writeFillImageCommandHeader(buffer, props, partIndex, isLast, bodyLength) {
+        const bufferView = (0, util_js_1.uint8ArrayToDataView)(buffer);
+        bufferView.setUint8(0, 0x02);
+        bufferView.setUint8(1, 0x07);
+        bufferView.setUint8(2, props.keyIndex);
+        bufferView.setUint8(3, isLast ? 1 : 0);
+        bufferView.setUint16(4, bodyLength, true);
+        bufferView.setUint16(6, partIndex++, true);
+    }
+}
+exports.StreamdeckGen2ImageHeaderGenerator = StreamdeckGen2ImageHeaderGenerator;
+class StreamdeckPlusLcdImageHeaderGenerator {
+    getFillImageCommandHeaderLength() {
+        return 16;
+    }
+    writeFillImageCommandHeader(buffer, props, partIndex, isLast, bodyLength) {
+        const bufferView = (0, util_js_1.uint8ArrayToDataView)(buffer);
+        bufferView.setUint8(0, 0x02);
+        bufferView.setUint8(1, 0x0c);
+        bufferView.setUint16(2, props.x, true);
+        bufferView.setUint16(4, props.y, true);
+        bufferView.setUint16(6, props.width, true);
+        bufferView.setUint16(8, props.height, true);
+        bufferView.setUint8(10, isLast ? 1 : 0);
+        bufferView.setUint16(11, partIndex, true);
+        bufferView.setUint16(13, bodyLength, true);
+    }
+}
+exports.StreamdeckPlusLcdImageHeaderGenerator = StreamdeckPlusLcdImageHeaderGenerator;
+class StreamdeckNeoLcdImageHeaderGenerator {
+    getFillImageCommandHeaderLength() {
+        return 8;
+    }
+    writeFillImageCommandHeader(buffer, _props, partIndex, isLast, bodyLength) {
+        const bufferView = (0, util_js_1.uint8ArrayToDataView)(buffer);
+        bufferView.setUint8(0, 0x02);
+        bufferView.setUint8(1, 0x0b);
+        bufferView.setUint8(2, 0);
+        bufferView.setUint8(3, isLast ? 1 : 0);
+        bufferView.setUint16(4, bodyLength, true);
+        bufferView.setUint16(6, partIndex, true);
+    }
+}
+exports.StreamdeckNeoLcdImageHeaderGenerator = StreamdeckNeoLcdImageHeaderGenerator;
+//# sourceMappingURL=headerGenerator.js.map
+
+/***/ }),
+
+/***/ 845:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamdeckDefaultImageWriter = exports.StreamdeckOriginalImageWriter = void 0;
+const headerGenerator_js_1 = __webpack_require__(117);
+class StreamdeckOriginalImageWriter {
+    headerGenerator = new headerGenerator_js_1.StreamdeckGen1ImageHeaderGenerator();
+    generateFillImageWrites(props, byteBuffer) {
+        const MAX_PACKET_SIZE = 8191;
+        const PACKET_HEADER_LENGTH = this.headerGenerator.getFillImageCommandHeaderLength();
+        // The original uses larger packets, and splits the payload equally across 2
+        const packet1Bytes = byteBuffer.length / 2;
+        const packet1 = new Uint8Array(MAX_PACKET_SIZE);
+        this.headerGenerator.writeFillImageCommandHeader(packet1, props, 0x01, false, packet1Bytes);
+        packet1.set(byteBuffer.subarray(0, packet1Bytes), PACKET_HEADER_LENGTH);
+        const packet2 = new Uint8Array(MAX_PACKET_SIZE);
+        this.headerGenerator.writeFillImageCommandHeader(packet2, props, 0x02, true, packet1Bytes);
+        packet2.set(byteBuffer.subarray(packet1Bytes), PACKET_HEADER_LENGTH);
+        return [packet1, packet2];
+    }
+}
+exports.StreamdeckOriginalImageWriter = StreamdeckOriginalImageWriter;
+class StreamdeckDefaultImageWriter {
+    headerGenerator;
+    constructor(headerGenerator) {
+        this.headerGenerator = headerGenerator;
+    }
+    generateFillImageWrites(props, byteBuffer) {
+        const MAX_PACKET_SIZE = 1024;
+        const PACKET_HEADER_LENGTH = this.headerGenerator.getFillImageCommandHeaderLength();
+        const MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - PACKET_HEADER_LENGTH;
+        const result = [];
+        let remainingBytes = byteBuffer.length;
+        for (let part = 0; remainingBytes > 0; part++) {
+            const packet = new Uint8Array(MAX_PACKET_SIZE);
+            const byteCount = Math.min(remainingBytes, MAX_PAYLOAD_SIZE);
+            this.headerGenerator.writeFillImageCommandHeader(packet, props, part, remainingBytes <= MAX_PAYLOAD_SIZE, byteCount);
+            const byteOffset = byteBuffer.length - remainingBytes;
+            remainingBytes -= byteCount;
+            packet.set(byteBuffer.subarray(byteOffset, byteOffset + byteCount), PACKET_HEADER_LENGTH);
+            result.push(packet);
+        }
+        return result;
+    }
+}
+exports.StreamdeckDefaultImageWriter = StreamdeckDefaultImageWriter;
+//# sourceMappingURL=imageWriter.js.map
+
+/***/ }),
+
+/***/ 632:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ButtonOnlyInputService = void 0;
+class ButtonOnlyInputService {
+    #deviceProperties;
+    #keyState;
+    #eventSource;
+    constructor(deviceProperties, eventSource) {
+        this.#deviceProperties = deviceProperties;
+        this.#eventSource = eventSource;
+        const maxButtonIndex = this.#deviceProperties.CONTROLS.filter((control) => control.type === 'button').map((control) => control.index);
+        this.#keyState = new Array(Math.max(-1, ...maxButtonIndex) + 1).fill(false);
+    }
+    handleInput(data) {
+        const dataOffset = this.#deviceProperties.KEY_DATA_OFFSET || 0;
+        for (const control of this.#deviceProperties.CONTROLS) {
+            if (control.type !== 'button')
+                continue;
+            const keyPressed = Boolean(data[dataOffset + control.hidIndex]);
+            const stateChanged = keyPressed !== this.#keyState[control.index];
+            if (stateChanged) {
+                this.#keyState[control.index] = keyPressed;
+                if (keyPressed) {
+                    this.#eventSource.emit('down', control);
+                }
+                else {
+                    this.#eventSource.emit('up', control);
+                }
+            }
+        }
+    }
+}
+exports.ButtonOnlyInputService = ButtonOnlyInputService;
+//# sourceMappingURL=gen1.js.map
+
+/***/ }),
+
+/***/ 769:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Gen2InputService = void 0;
+const gen1_js_1 = __webpack_require__(632);
+const util_js_1 = __webpack_require__(369);
+class Gen2InputService extends gen1_js_1.ButtonOnlyInputService {
+    #eventSource;
+    #encoderControls;
+    #encoderState;
+    #lcdStripControls;
+    constructor(deviceProperties, eventSource) {
+        super(deviceProperties, eventSource);
+        this.#eventSource = eventSource;
+        this.#encoderControls = deviceProperties.CONTROLS.filter((control) => control.type === 'encoder');
+        const maxIndex = Math.max(-1, ...this.#encoderControls.map((control) => control.index));
+        this.#encoderState = new Array(maxIndex + 1).fill(false);
+        this.#lcdStripControls = deviceProperties.CONTROLS.filter((control) => control.type === 'lcd-strip');
+    }
+    handleInput(data) {
+        const inputType = data[0];
+        switch (inputType) {
+            case 0x00: // Button
+                super.handleInput(data);
+                break;
+            case 0x02: // LCD
+                this.#handleLcdStripInput(data);
+                break;
+            case 0x03: // Encoder
+                this.#handleEncoderInput(data);
+                break;
+        }
+    }
+    #handleLcdStripInput(data) {
+        // Future: This will need to handle selecting the correct control
+        const lcdStripControl = this.#lcdStripControls.find((control) => control.id === 0);
+        if (!lcdStripControl)
+            return;
+        const bufferView = (0, util_js_1.uint8ArrayToDataView)(data);
+        const position = {
+            x: bufferView.getUint16(5, true),
+            y: bufferView.getUint16(7, true),
+        };
+        switch (data[3]) {
+            case 1: // short press
+                this.#eventSource.emit('lcdShortPress', lcdStripControl, position);
+                break;
+            case 2: // long press
+                this.#eventSource.emit('lcdLongPress', lcdStripControl, position);
+                break;
+            case 3: {
+                // swipe
+                const positionTo = {
+                    x: bufferView.getUint16(9, true),
+                    y: bufferView.getUint16(11, true),
+                };
+                this.#eventSource.emit('lcdSwipe', lcdStripControl, position, positionTo);
+                break;
+            }
+        }
+    }
+    #handleEncoderInput(data) {
+        switch (data[3]) {
+            case 0x00: // press/release
+                for (const encoderControl of this.#encoderControls) {
+                    const keyPressed = Boolean(data[4 + encoderControl.hidIndex]);
+                    const stateChanged = keyPressed !== this.#encoderState[encoderControl.index];
+                    if (stateChanged) {
+                        this.#encoderState[encoderControl.index] = keyPressed;
+                        if (keyPressed) {
+                            this.#eventSource.emit('down', encoderControl);
+                        }
+                        else {
+                            this.#eventSource.emit('up', encoderControl);
+                        }
+                    }
+                }
+                break;
+            case 0x01: // rotate
+                for (const encoderControl of this.#encoderControls) {
+                    const intArray = new Int8Array(data.buffer, data.byteOffset, data.byteLength);
+                    const value = intArray[4 + encoderControl.hidIndex];
+                    if (value !== 0) {
+                        this.#eventSource.emit('rotate', encoderControl, value);
+                    }
+                }
+                break;
+        }
+    }
+}
+exports.Gen2InputService = Gen2InputService;
+//# sourceMappingURL=gen2.js.map
+
+/***/ }),
+
+/***/ 60:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamDeckNeoLcdService = void 0;
+const headerGenerator_js_1 = __webpack_require__(117);
+const imageWriter_js_1 = __webpack_require__(845);
+const util_js_1 = __webpack_require__(369);
+class StreamDeckNeoLcdService {
+    #encodeJPEG;
+    #device;
+    #lcdControls;
+    #lcdImageWriter = new imageWriter_js_1.StreamdeckDefaultImageWriter(new headerGenerator_js_1.StreamdeckNeoLcdImageHeaderGenerator());
+    constructor(encodeJPEG, device, lcdControls) {
+        this.#encodeJPEG = encodeJPEG;
+        this.#device = device;
+        this.#lcdControls = lcdControls;
+    }
+    async fillLcdRegion(_index, _x, _y, _imageBuffer, _sourceOptions) {
+        throw new Error('Not supported for this model');
+    }
+    async fillLcd(index, imageBuffer, sourceOptions) {
+        const lcdControl = this.#lcdControls.find((control) => control.id === index);
+        if (!lcdControl)
+            throw new Error(`Invalid lcd strip index ${index}`);
+        const imageSize = lcdControl.pixelSize.width * lcdControl.pixelSize.height * sourceOptions.format.length;
+        if (imageBuffer.length !== imageSize) {
+            throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
+        }
+        // A lot of this drawing code is heavily based on the normal button
+        const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, lcdControl.pixelSize, sourceOptions);
+        const packets = this.#lcdImageWriter.generateFillImageWrites(null, byteBuffer);
+        await this.#device.sendReports(packets);
+    }
+    async clearLcdStrip(index) {
+        const lcdControl = this.#lcdControls.find((control) => control.id === index);
+        if (!lcdControl)
+            throw new Error(`Invalid lcd strip index ${index}`);
+        const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4);
+        await this.fillLcd(index, buffer, {
+            format: 'rgba',
+        });
+    }
+    async clearAllLcdStrips() {
+        const ps = [];
+        for (const control of this.#lcdControls) {
+            ps.push(this.clearLcdStrip(control.id));
+        }
+        await Promise.all(ps);
+    }
+    async convertFillLcdBuffer(sourceBuffer, size, sourceOptions) {
+        const sourceOptions2 = {
+            format: sourceOptions.format,
+            offset: 0,
+            stride: size.width * sourceOptions.format.length,
+        };
+        const byteBuffer = (0, util_js_1.transformImageBuffer)(sourceBuffer, sourceOptions2, { colorMode: 'rgba', xFlip: true, yFlip: true }, 0, size.width, size.height);
+        return this.#encodeJPEG(byteBuffer, size.width, size.height);
+    }
+}
+exports.StreamDeckNeoLcdService = StreamDeckNeoLcdService;
+//# sourceMappingURL=neo.js.map
+
+/***/ }),
+
+/***/ 88:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamDeckPlusLcdService = void 0;
+const headerGenerator_js_1 = __webpack_require__(117);
+const imageWriter_js_1 = __webpack_require__(845);
+const util_js_1 = __webpack_require__(369);
+class StreamDeckPlusLcdService {
+    #encodeJPEG;
+    #device;
+    #lcdControls;
+    #lcdImageWriter = new imageWriter_js_1.StreamdeckDefaultImageWriter(new headerGenerator_js_1.StreamdeckPlusLcdImageHeaderGenerator());
+    constructor(encodeJPEG, device, lcdControls) {
+        this.#encodeJPEG = encodeJPEG;
+        this.#device = device;
+        this.#lcdControls = lcdControls;
+    }
+    async fillLcd(index, buffer, sourceOptions) {
+        const lcdControl = this.#lcdControls.find((control) => control.id === index);
+        if (!lcdControl)
+            throw new Error(`Invalid lcd strip index ${index}`);
+        return this.fillControlRegion(lcdControl, 0, 0, buffer, {
+            format: sourceOptions.format,
+            width: lcdControl.pixelSize.width,
+            height: lcdControl.pixelSize.height,
+        });
+    }
+    async fillLcdRegion(index, x, y, imageBuffer, sourceOptions) {
+        const lcdControl = this.#lcdControls.find((control) => control.id === index);
+        if (!lcdControl)
+            throw new Error(`Invalid lcd strip index ${index}`);
+        return this.fillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions);
+    }
+    async clearLcdStrip(index) {
+        const lcdControl = this.#lcdControls.find((control) => control.id === index);
+        if (!lcdControl)
+            throw new Error(`Invalid lcd strip index ${index}`);
+        const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4);
+        await this.fillControlRegion(lcdControl, 0, 0, buffer, {
+            format: 'rgba',
+            width: lcdControl.pixelSize.width,
+            height: lcdControl.pixelSize.height,
+        });
+    }
+    async clearAllLcdStrips() {
+        const ps = [];
+        for (const control of this.#lcdControls) {
+            ps.push(this.clearLcdStrip(control.id));
+        }
+        await Promise.all(ps);
+    }
+    async fillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions) {
+        // Basic bounds checking
+        const maxSize = lcdControl.pixelSize;
+        if (x < 0 || x + sourceOptions.width > maxSize.width) {
+            throw new TypeError(`Image will not fit within the lcd strip`);
+        }
+        if (y < 0 || y + sourceOptions.height > maxSize.height) {
+            throw new TypeError(`Image will not fit within the lcd strip`);
+        }
+        const imageSize = sourceOptions.width * sourceOptions.height * sourceOptions.format.length;
+        if (imageBuffer.length !== imageSize) {
+            throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
+        }
+        // A lot of this drawing code is heavily based on the normal button
+        const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions);
+        const packets = this.#lcdImageWriter.generateFillImageWrites({ ...sourceOptions, x, y }, byteBuffer);
+        await this.#device.sendReports(packets);
+    }
+    async convertFillLcdBuffer(sourceBuffer, sourceOptions) {
+        const sourceOptions2 = {
+            format: sourceOptions.format,
+            offset: 0,
+            stride: sourceOptions.width * sourceOptions.format.length,
+        };
+        const byteBuffer = (0, util_js_1.transformImageBuffer)(sourceBuffer, sourceOptions2, { colorMode: 'rgba' }, 0, sourceOptions.width, sourceOptions.height);
+        return this.#encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height);
+    }
+}
+exports.StreamDeckPlusLcdService = StreamDeckPlusLcdService;
+//# sourceMappingURL=plus.js.map
+
+/***/ }),
+
+/***/ 993:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Gen1PropertiesService = void 0;
+class Gen1PropertiesService {
+    #device;
+    constructor(device) {
+        this.#device = device;
+    }
+    async setBrightness(percentage) {
+        if (percentage < 0 || percentage > 100) {
+            throw new RangeError('Expected brightness percentage to be between 0 and 100');
+        }
+        // prettier-ignore
+        const brightnessCommandBuffer = new Uint8Array([
+            0x05,
+            0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        ]);
+        await this.#device.sendFeatureReport(brightnessCommandBuffer);
+    }
+    async resetToLogo() {
+        // prettier-ignore
+        const resetCommandBuffer = new Uint8Array([
+            0x0b,
+            0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        ]);
+        await this.#device.sendFeatureReport(resetCommandBuffer);
+    }
+    async getFirmwareVersion() {
+        let val;
+        try {
+            val = await this.#device.getFeatureReport(4, 32);
+        }
+        catch (_e) {
+            // In case some devices can't handle the different report length
+            val = await this.#device.getFeatureReport(4, 17);
+        }
+        const end = val.indexOf(0, 5);
+        return new TextDecoder('ascii').decode(val.subarray(5, end === -1 ? undefined : end));
+    }
+    async getSerialNumber() {
+        let val;
+        try {
+            val = await this.#device.getFeatureReport(3, 32);
+        }
+        catch (_e) {
+            // In case some devices can't handle the different report length
+            val = await this.#device.getFeatureReport(3, 17);
+        }
+        return new TextDecoder('ascii').decode(val.subarray(5, 17));
+    }
+}
+exports.Gen1PropertiesService = Gen1PropertiesService;
+//# sourceMappingURL=gen1.js.map
+
+/***/ }),
+
+/***/ 352:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Gen2PropertiesService = void 0;
+class Gen2PropertiesService {
+    #device;
+    constructor(device) {
+        this.#device = device;
+    }
+    async setBrightness(percentage) {
+        if (percentage < 0 || percentage > 100) {
+            throw new RangeError('Expected brightness percentage to be between 0 and 100');
+        }
+        // prettier-ignore
+        const brightnessCommandBuffer = new Uint8Array([
+            0x03,
+            0x08, percentage, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        ]);
+        await this.#device.sendFeatureReport(brightnessCommandBuffer);
+    }
+    async resetToLogo() {
+        // prettier-ignore
+        const resetCommandBuffer = new Uint8Array([
+            0x03,
+            0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        ]);
+        await this.#device.sendFeatureReport(resetCommandBuffer);
+    }
+    async getFirmwareVersion() {
+        const val = await this.#device.getFeatureReport(5, 32);
+        const end = val[1] + 2;
+        return new TextDecoder('ascii').decode(val.subarray(6, end));
+    }
+    async getSerialNumber() {
+        const val = await this.#device.getFeatureReport(6, 32);
+        const end = val[1] + 2;
+        return new TextDecoder('ascii').decode(val.subarray(2, end));
+    }
+}
+exports.Gen2PropertiesService = Gen2PropertiesService;
+//# sourceMappingURL=gen2.js.map
+
+/***/ }),
+
+/***/ 874:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PedalPropertiesService = void 0;
+class PedalPropertiesService {
+    #device;
+    constructor(device) {
+        this.#device = device;
+    }
+    async setBrightness(_percentage) {
+        // Not supported
+    }
+    async resetToLogo() {
+        // Not supported
+    }
+    async getFirmwareVersion() {
+        const val = await this.#device.getFeatureReport(5, 32);
+        const end = val.indexOf(0, 6);
+        return new TextDecoder('ascii').decode(val.subarray(6, end === -1 ? undefined : end));
+    }
+    async getSerialNumber() {
+        const val = await this.#device.getFeatureReport(6, 32);
+        return new TextDecoder('ascii').decode(val.subarray(2, 14));
+    }
+}
+exports.PedalPropertiesService = PedalPropertiesService;
+//# sourceMappingURL=pedal.js.map
+
+/***/ }),
+
 /***/ 64:
 /***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 //# sourceMappingURL=types.js.map
@@ -6231,17 +3619,18 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 /***/ }),
 
 /***/ 369:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
-/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.writeBMPHeader = exports.BMP_HEADER_LENGTH = exports.transformImageBuffer = void 0;
+exports.BMP_HEADER_LENGTH = void 0;
+exports.transformImageBuffer = transformImageBuffer;
+exports.writeBMPHeader = writeBMPHeader;
+exports.uint8ArrayToDataView = uint8ArrayToDataView;
 function transformImageBuffer(imageBuffer, sourceOptions, targetOptions, destPadding, imageWidth, imageHeight) {
-    if (!imageHeight)
-        imageHeight = imageWidth;
-    const byteBuffer = Buffer.alloc(destPadding + imageWidth * imageHeight * targetOptions.colorMode.length);
+    const imageBufferView = uint8ArrayToDataView(imageBuffer);
+    const byteBuffer = new Uint8Array(destPadding + imageWidth * imageHeight * targetOptions.colorMode.length);
+    const byteBufferView = uint8ArrayToDataView(byteBuffer);
     const flipColours = sourceOptions.format.substring(0, 3) !== targetOptions.colorMode.substring(0, 3);
     for (let y = 0; y < imageHeight; y++) {
         const rowOffset = destPadding + imageWidth * targetOptions.colorMode.length * y;
@@ -6256,80 +3645,82 @@ function transformImageBuffer(imageBuffer, sourceOptions, targetOptions, destPad
                 y2 = tmpX;
             }
             const srcOffset = y2 * sourceOptions.stride + sourceOptions.offset + x2 * sourceOptions.format.length;
-            const red = imageBuffer.readUInt8(srcOffset);
-            const green = imageBuffer.readUInt8(srcOffset + 1);
-            const blue = imageBuffer.readUInt8(srcOffset + 2);
+            const red = imageBufferView.getUint8(srcOffset);
+            const green = imageBufferView.getUint8(srcOffset + 1);
+            const blue = imageBufferView.getUint8(srcOffset + 2);
             const targetOffset = rowOffset + x * targetOptions.colorMode.length;
             if (flipColours) {
-                byteBuffer.writeUInt8(blue, targetOffset);
-                byteBuffer.writeUInt8(green, targetOffset + 1);
-                byteBuffer.writeUInt8(red, targetOffset + 2);
+                byteBufferView.setUint8(targetOffset, blue);
+                byteBufferView.setUint8(targetOffset + 1, green);
+                byteBufferView.setUint8(targetOffset + 2, red);
             }
             else {
-                byteBuffer.writeUInt8(red, targetOffset);
-                byteBuffer.writeUInt8(green, targetOffset + 1);
-                byteBuffer.writeUInt8(blue, targetOffset + 2);
+                byteBufferView.setUint8(targetOffset, red);
+                byteBufferView.setUint8(targetOffset + 1, green);
+                byteBufferView.setUint8(targetOffset + 2, blue);
             }
             if (targetOptions.colorMode.length === 4) {
-                byteBuffer.writeUInt8(255, targetOffset + 3);
+                byteBufferView.setUint8(targetOffset + 3, 255);
             }
         }
     }
     return byteBuffer;
 }
-exports.transformImageBuffer = transformImageBuffer;
 exports.BMP_HEADER_LENGTH = 54;
-function writeBMPHeader(buf, iconSize, iconBytes, imagePPM) {
+function writeBMPHeader(buf, imageWidth, imageHeight, imageBytes, imagePPM) {
+    const bufView = uint8ArrayToDataView(buf);
     // Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
     // Bitmap file header
-    buf.write('BM');
-    buf.writeUInt32LE(iconBytes + 54, 2);
-    buf.writeInt16LE(0, 6);
-    buf.writeInt16LE(0, 8);
-    buf.writeUInt32LE(54, 10); // Full header size
+    bufView.setUint8(0, 0x42); // B
+    bufView.setUint8(1, 0x4d); // M
+    bufView.setUint32(2, imageBytes + 54, true);
+    bufView.setInt16(6, 0, true);
+    bufView.setInt16(8, 0, true);
+    bufView.setUint32(10, 54, true); // Full header size
     // DIB header (BITMAPINFOHEADER)
-    buf.writeUInt32LE(40, 14); // DIB header size
-    buf.writeInt32LE(iconSize, 18);
-    buf.writeInt32LE(iconSize, 22);
-    buf.writeInt16LE(1, 26); // Color planes
-    buf.writeInt16LE(24, 28); // Bit depth
-    buf.writeInt32LE(0, 30); // Compression
-    buf.writeInt32LE(iconBytes, 34); // Image size
-    buf.writeInt32LE(imagePPM, 38); // Horizontal resolution ppm
-    buf.writeInt32LE(imagePPM, 42); // Vertical resolution ppm
-    buf.writeInt32LE(0, 46); // Colour pallette size
-    buf.writeInt32LE(0, 50); // 'Important' Colour count
+    bufView.setUint32(14, 40, true); // DIB header size
+    bufView.setInt32(18, imageWidth, true);
+    bufView.setInt32(22, imageHeight, true);
+    bufView.setInt16(26, 1, true); // Color planes
+    bufView.setInt16(28, 24, true); // Bit depth
+    bufView.setInt32(30, 0, true); // Compression
+    bufView.setInt32(34, imageBytes, true); // Image size
+    bufView.setInt32(38, imagePPM, true); // Horizontal resolution ppm
+    bufView.setInt32(42, imagePPM, true); // Vertical resolution ppm
+    bufView.setInt32(46, 0, true); // Colour pallette size
+    bufView.setInt32(50, 0, true); // 'Important' Colour count
 }
-exports.writeBMPHeader = writeBMPHeader;
+function uint8ArrayToDataView(buffer) {
+    return new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+}
 //# sourceMappingURL=util.js.map
 
 /***/ }),
 
-/***/ 351:
+/***/ 863:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
-/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.WebHIDDevice = void 0;
-const events_1 = __webpack_require__(621);
+const EventEmitter = __webpack_require__(646);
 const p_queue_1 = __webpack_require__(968);
 /**
  * The wrapped browser HIDDevice.
  * This translates it into the common format expected by @elgato-stream-deck/core
  */
-class WebHIDDevice extends events_1.EventEmitter {
+class WebHIDDevice extends EventEmitter {
+    device;
+    reportQueue = new p_queue_1.default({ concurrency: 1 });
     constructor(device) {
         super();
-        this.reportQueue = new p_queue_1.default({ concurrency: 1 });
         this.device = device;
         // this.device.on('data', data => this.emit('data', data))
         // this.device.on('error', error => this.emit('error', error))
         this.device.addEventListener('inputreport', (event) => {
             // Button press
             if (event.reportId === 0x01) {
-                const data = new Uint8Array(event.data.buffer);
+                const data = new Uint8Array(event.data.buffer, event.data.byteOffset, event.data.byteLength);
                 this.emit('input', data);
             }
         });
@@ -6341,16 +3732,16 @@ class WebHIDDevice extends events_1.EventEmitter {
         return this.device.forget();
     }
     async sendFeatureReport(data) {
-        return this.device.sendFeatureReport(data[0], new Uint8Array(data.subarray(1)));
+        return this.device.sendFeatureReport(data[0], data.subarray(1));
     }
     async getFeatureReport(reportId, _reportLength) {
         const view = await this.device.receiveFeatureReport(reportId);
-        return Buffer.from(view.buffer);
+        return new Uint8Array(view.buffer, view.byteOffset, view.byteLength);
     }
     async sendReports(buffers) {
         return this.reportQueue.add(async () => {
             for (const data of buffers) {
-                await this.device.sendReport(data[0], new Uint8Array(data.subarray(1)));
+                await this.device.sendReport(data[0], data.subarray(1));
             }
         });
     }
@@ -6363,25 +3754,29 @@ class WebHIDDevice extends events_1.EventEmitter {
     }
 }
 exports.WebHIDDevice = WebHIDDevice;
-//# sourceMappingURL=device.js.map
+//# sourceMappingURL=hid-device.js.map
 
 /***/ }),
 
 /***/ 253:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
+/* eslint-disable n/no-unsupported-features/node-builtins */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.openDevice = exports.getStreamDecks = exports.requestStreamDecks = exports.StreamDeckWeb = exports.DeviceModelId = void 0;
+exports.StreamDeckWeb = exports.DeviceModelId = exports.VENDOR_ID = void 0;
+exports.requestStreamDecks = requestStreamDecks;
+exports.getStreamDecks = getStreamDecks;
+exports.openDevice = openDevice;
 const core_1 = __webpack_require__(601);
-const device_1 = __webpack_require__(351);
-const jpeg_1 = __webpack_require__(443);
-const wrapper_1 = __webpack_require__(26);
+const hid_device_js_1 = __webpack_require__(863);
+const jpeg_js_1 = __webpack_require__(443);
+const wrapper_js_1 = __webpack_require__(26);
 var core_2 = __webpack_require__(601);
+Object.defineProperty(exports, "VENDOR_ID", ({ enumerable: true, get: function () { return core_2.VENDOR_ID; } }));
 Object.defineProperty(exports, "DeviceModelId", ({ enumerable: true, get: function () { return core_2.DeviceModelId; } }));
-var wrapper_2 = __webpack_require__(26);
-Object.defineProperty(exports, "StreamDeckWeb", ({ enumerable: true, get: function () { return wrapper_2.StreamDeckWeb; } }));
+var wrapper_js_2 = __webpack_require__(26);
+Object.defineProperty(exports, "StreamDeckWeb", ({ enumerable: true, get: function () { return wrapper_js_2.StreamDeckWeb; } }));
 /**
  * Request the user to select some streamdecks to open
  * @param userOptions Options to customise the device behvaiour
@@ -6397,7 +3792,6 @@ async function requestStreamDecks(options) {
     });
     return Promise.all(browserDevices.map(async (dev) => openDevice(dev, options)));
 }
-exports.requestStreamDecks = requestStreamDecks;
 /**
  * Reopen previously selected streamdecks.
  * The browser remembers what the user previously allowed your site to access, and this will open those without the request dialog
@@ -6406,50 +3800,44 @@ exports.requestStreamDecks = requestStreamDecks;
 async function getStreamDecks(options) {
     const browserDevices = await navigator.hid.getDevices();
     const validDevices = browserDevices.filter((d) => d.vendorId === core_1.VENDOR_ID);
-    const resultDevices = await Promise.all(validDevices.map(async (dev) => openDevice(dev, options).catch((_) => null)) // Ignore failures
-    );
+    const resultDevices = await Promise.all(validDevices.map(async (dev) => openDevice(dev, options).catch((_) => null)));
     return resultDevices.filter((v) => !!v);
 }
-exports.getStreamDecks = getStreamDecks;
 /**
  * Open a StreamDeck from a manually selected HIDDevice handle
  * @param browserDevice The unopened browser HIDDevice
  * @param userOptions Options to customise the device behvaiour
  */
 async function openDevice(browserDevice, userOptions) {
-    const model = core_1.DEVICE_MODELS.find((m) => m.productId === browserDevice.productId);
+    const model = core_1.DEVICE_MODELS.find((m) => browserDevice.vendorId === core_1.VENDOR_ID && m.productIds.includes(browserDevice.productId));
     if (!model) {
         throw new Error('Stream Deck is of unexpected type.');
     }
     await browserDevice.open();
     try {
         const options = {
-            useOriginalKeyOrder: false,
-            encodeJPEG: jpeg_1.encodeJPEG,
+            encodeJPEG: jpeg_js_1.encodeJPEG,
             ...userOptions,
         };
-        const browserHid = new device_1.WebHIDDevice(browserDevice);
-        const device = new model.class(browserHid, options || {});
-        return new wrapper_1.StreamDeckWeb(device, browserHid);
+        const browserHid = new hid_device_js_1.WebHIDDevice(browserDevice);
+        const device = model.factory(browserHid, options || {});
+        return new wrapper_js_1.StreamDeckWeb(device, browserHid);
     }
     catch (e) {
         await browserDevice.close().catch(() => null); // Suppress error
         throw e;
     }
 }
-exports.openDevice = openDevice;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
 
 /***/ 443:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
-/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.encodeJPEG = void 0;
+exports.encodeJPEG = encodeJPEG;
 /**
  * The default JPEG encoder.
  * Utilises a hidden canvas to convert a byte array buffer into a jpeg
@@ -6472,17 +3860,16 @@ async function encodeJPEG(buffer, width, height) {
                     resolve(b);
                 }
                 else {
-                    reject();
+                    reject(new Error('No image generated'));
                 }
             }, 'image/jpeg', 0.9);
         }
         else {
-            reject();
+            reject(new Error('Failed to get canvas context'));
         }
     });
-    return Buffer.from(await blob.arrayBuffer());
+    return new Uint8Array(await blob.arrayBuffer());
 }
-exports.encodeJPEG = encodeJPEG;
 //# sourceMappingURL=jpeg.js.map
 
 /***/ }),
@@ -6490,8 +3877,6 @@ exports.encodeJPEG = encodeJPEG;
 /***/ 26:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
-/* provided dependency */ var Buffer = __webpack_require__(429)["hp"];
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckWeb = void 0;
@@ -6501,6 +3886,7 @@ const core_1 = __webpack_require__(601);
  * This is an extended variant of the class, to provide some more web friendly helpers, such as accepting a canvas
  */
 class StreamDeckWeb extends core_1.StreamDeckProxy {
+    hid;
     constructor(device, hid) {
         super(device);
         this.hid = hid;
@@ -6512,25 +3898,451 @@ class StreamDeckWeb extends core_1.StreamDeckProxy {
         await this.hid.forget();
     }
     async fillKeyCanvas(keyIndex, canvas) {
-        this.checkValidKeyIndex(keyIndex);
+        // this.checkValidKeyIndex(keyIndex)
         const ctx = canvas.getContext('2d');
-        if (!ctx) {
+        if (!ctx)
             throw new Error('Failed to get canvas context');
-        }
-        const data = ctx.getImageData(0, 0, this.ICON_SIZE, this.ICON_SIZE);
-        return this.device.fillKeyBuffer(keyIndex, Buffer.from(data.data), { format: 'rgba' });
+        const control = this.CONTROLS.find((control) => control.type === 'button' && control.index === keyIndex);
+        if (!control || control.feedbackType === 'none')
+            throw new TypeError(`Expected a valid keyIndex`);
+        if (control.feedbackType !== 'lcd')
+            throw new TypeError(`keyIndex ${control.index} does not support lcd feedback`);
+        const data = ctx.getImageData(0, 0, control.pixelSize.width, control.pixelSize.height);
+        return this.device.fillKeyBuffer(keyIndex, data.data, { format: 'rgba' });
     }
     async fillPanelCanvas(canvas) {
         const ctx = canvas.getContext('2d');
-        if (!ctx) {
+        if (!ctx)
             throw new Error('Failed to get canvas context');
-        }
-        const data = ctx.getImageData(0, 0, this.ICON_SIZE * this.KEY_COLUMNS, this.ICON_SIZE * this.KEY_ROWS);
-        return this.device.fillPanelBuffer(Buffer.from(data.data), { format: 'rgba' });
+        const dimensions = this.device.calculateFillPanelDimensions();
+        if (!dimensions)
+            throw new Error('Panel does not support filling');
+        const data = ctx.getImageData(0, 0, dimensions.width, dimensions.height);
+        return this.device.fillPanelBuffer(data.data, { format: 'rgba' });
     }
 }
 exports.StreamDeckWeb = StreamDeckWeb;
 //# sourceMappingURL=wrapper.js.map
+
+/***/ }),
+
+/***/ 823:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __addDisposableResource: () => (/* binding */ __addDisposableResource),
+/* harmony export */   __assign: () => (/* binding */ __assign),
+/* harmony export */   __asyncDelegator: () => (/* binding */ __asyncDelegator),
+/* harmony export */   __asyncGenerator: () => (/* binding */ __asyncGenerator),
+/* harmony export */   __asyncValues: () => (/* binding */ __asyncValues),
+/* harmony export */   __await: () => (/* binding */ __await),
+/* harmony export */   __awaiter: () => (/* binding */ __awaiter),
+/* harmony export */   __classPrivateFieldGet: () => (/* binding */ __classPrivateFieldGet),
+/* harmony export */   __classPrivateFieldIn: () => (/* binding */ __classPrivateFieldIn),
+/* harmony export */   __classPrivateFieldSet: () => (/* binding */ __classPrivateFieldSet),
+/* harmony export */   __createBinding: () => (/* binding */ __createBinding),
+/* harmony export */   __decorate: () => (/* binding */ __decorate),
+/* harmony export */   __disposeResources: () => (/* binding */ __disposeResources),
+/* harmony export */   __esDecorate: () => (/* binding */ __esDecorate),
+/* harmony export */   __exportStar: () => (/* binding */ __exportStar),
+/* harmony export */   __extends: () => (/* binding */ __extends),
+/* harmony export */   __generator: () => (/* binding */ __generator),
+/* harmony export */   __importDefault: () => (/* binding */ __importDefault),
+/* harmony export */   __importStar: () => (/* binding */ __importStar),
+/* harmony export */   __makeTemplateObject: () => (/* binding */ __makeTemplateObject),
+/* harmony export */   __metadata: () => (/* binding */ __metadata),
+/* harmony export */   __param: () => (/* binding */ __param),
+/* harmony export */   __propKey: () => (/* binding */ __propKey),
+/* harmony export */   __read: () => (/* binding */ __read),
+/* harmony export */   __rest: () => (/* binding */ __rest),
+/* harmony export */   __runInitializers: () => (/* binding */ __runInitializers),
+/* harmony export */   __setFunctionName: () => (/* binding */ __setFunctionName),
+/* harmony export */   __spread: () => (/* binding */ __spread),
+/* harmony export */   __spreadArray: () => (/* binding */ __spreadArray),
+/* harmony export */   __spreadArrays: () => (/* binding */ __spreadArrays),
+/* harmony export */   __values: () => (/* binding */ __values),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise, SuppressedError, Symbol, Iterator */
+
+var extendStatics = function(d, b) {
+  extendStatics = Object.setPrototypeOf ||
+      ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+      function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+  return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+  if (typeof b !== "function" && b !== null)
+      throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+  extendStatics(d, b);
+  function __() { this.constructor = d; }
+  d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+var __assign = function() {
+  __assign = Object.assign || function __assign(t) {
+      for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+      }
+      return t;
+  }
+  return __assign.apply(this, arguments);
+}
+
+function __rest(s, e) {
+  var t = {};
+  for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+      t[p] = s[p];
+  if (s != null && typeof Object.getOwnPropertySymbols === "function")
+      for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+          if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+              t[p[i]] = s[p[i]];
+      }
+  return t;
+}
+
+function __decorate(decorators, target, key, desc) {
+  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+
+function __param(paramIndex, decorator) {
+  return function (target, key) { decorator(target, key, paramIndex); }
+}
+
+function __esDecorate(ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
+  function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
+  var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
+  var target = !descriptorIn && ctor ? contextIn["static"] ? ctor : ctor.prototype : null;
+  var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});
+  var _, done = false;
+  for (var i = decorators.length - 1; i >= 0; i--) {
+      var context = {};
+      for (var p in contextIn) context[p] = p === "access" ? {} : contextIn[p];
+      for (var p in contextIn.access) context.access[p] = contextIn.access[p];
+      context.addInitializer = function (f) { if (done) throw new TypeError("Cannot add initializers after decoration has completed"); extraInitializers.push(accept(f || null)); };
+      var result = (0, decorators[i])(kind === "accessor" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);
+      if (kind === "accessor") {
+          if (result === void 0) continue;
+          if (result === null || typeof result !== "object") throw new TypeError("Object expected");
+          if (_ = accept(result.get)) descriptor.get = _;
+          if (_ = accept(result.set)) descriptor.set = _;
+          if (_ = accept(result.init)) initializers.unshift(_);
+      }
+      else if (_ = accept(result)) {
+          if (kind === "field") initializers.unshift(_);
+          else descriptor[key] = _;
+      }
+  }
+  if (target) Object.defineProperty(target, contextIn.name, descriptor);
+  done = true;
+};
+
+function __runInitializers(thisArg, initializers, value) {
+  var useValue = arguments.length > 2;
+  for (var i = 0; i < initializers.length; i++) {
+      value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
+  }
+  return useValue ? value : void 0;
+};
+
+function __propKey(x) {
+  return typeof x === "symbol" ? x : "".concat(x);
+};
+
+function __setFunctionName(f, name, prefix) {
+  if (typeof name === "symbol") name = name.description ? "[".concat(name.description, "]") : "";
+  return Object.defineProperty(f, "name", { configurable: true, value: prefix ? "".concat(prefix, " ", name) : name });
+};
+
+function __metadata(metadataKey, metadataValue) {
+  if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
+}
+
+function __awaiter(thisArg, _arguments, P, generator) {
+  function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+  return new (P || (P = Promise))(function (resolve, reject) {
+      function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+      function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+      function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+}
+
+function __generator(thisArg, body) {
+  var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+  return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+  function verb(n) { return function (v) { return step([n, v]); }; }
+  function step(op) {
+      if (f) throw new TypeError("Generator is already executing.");
+      while (g && (g = 0, op[0] && (_ = 0)), _) try {
+          if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+          if (y = 0, t) op = [op[0] & 2, t.value];
+          switch (op[0]) {
+              case 0: case 1: t = op; break;
+              case 4: _.label++; return { value: op[1], done: false };
+              case 5: _.label++; y = op[1]; op = [0]; continue;
+              case 7: op = _.ops.pop(); _.trys.pop(); continue;
+              default:
+                  if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                  if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                  if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                  if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                  if (t[2]) _.ops.pop();
+                  _.trys.pop(); continue;
+          }
+          op = body.call(thisArg, _);
+      } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+      if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+  }
+}
+
+var __createBinding = Object.create ? (function(o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  var desc = Object.getOwnPropertyDescriptor(m, k);
+  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+  }
+  Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+function __exportStar(m, o) {
+  for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(o, p)) __createBinding(o, m, p);
+}
+
+function __values(o) {
+  var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+  if (m) return m.call(o);
+  if (o && typeof o.length === "number") return {
+      next: function () {
+          if (o && i >= o.length) o = void 0;
+          return { value: o && o[i++], done: !o };
+      }
+  };
+  throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+}
+
+function __read(o, n) {
+  var m = typeof Symbol === "function" && o[Symbol.iterator];
+  if (!m) return o;
+  var i = m.call(o), r, ar = [], e;
+  try {
+      while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+  }
+  catch (error) { e = { error: error }; }
+  finally {
+      try {
+          if (r && !r.done && (m = i["return"])) m.call(i);
+      }
+      finally { if (e) throw e.error; }
+  }
+  return ar;
+}
+
+/** @deprecated */
+function __spread() {
+  for (var ar = [], i = 0; i < arguments.length; i++)
+      ar = ar.concat(__read(arguments[i]));
+  return ar;
+}
+
+/** @deprecated */
+function __spreadArrays() {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+  for (var r = Array(s), k = 0, i = 0; i < il; i++)
+      for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+          r[k] = a[j];
+  return r;
+}
+
+function __spreadArray(to, from, pack) {
+  if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+      if (ar || !(i in from)) {
+          if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+          ar[i] = from[i];
+      }
+  }
+  return to.concat(ar || Array.prototype.slice.call(from));
+}
+
+function __await(v) {
+  return this instanceof __await ? (this.v = v, this) : new __await(v);
+}
+
+function __asyncGenerator(thisArg, _arguments, generator) {
+  if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+  var g = generator.apply(thisArg, _arguments || []), i, q = [];
+  return i = Object.create((typeof AsyncIterator === "function" ? AsyncIterator : Object).prototype), verb("next"), verb("throw"), verb("return", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;
+  function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }
+  function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }
+  function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
+  function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
+  function fulfill(value) { resume("next", value); }
+  function reject(value) { resume("throw", value); }
+  function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
+}
+
+function __asyncDelegator(o) {
+  var i, p;
+  return i = {}, verb("next"), verb("throw", function (e) { throw e; }), verb("return"), i[Symbol.iterator] = function () { return this; }, i;
+  function verb(n, f) { i[n] = o[n] ? function (v) { return (p = !p) ? { value: __await(o[n](v)), done: false } : f ? f(v) : v; } : f; }
+}
+
+function __asyncValues(o) {
+  if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+  var m = o[Symbol.asyncIterator], i;
+  return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+  function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+  function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+}
+
+function __makeTemplateObject(cooked, raw) {
+  if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+  return cooked;
+};
+
+var __setModuleDefault = Object.create ? (function(o, v) {
+  Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+  o["default"] = v;
+};
+
+function __importStar(mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  __setModuleDefault(result, mod);
+  return result;
+}
+
+function __importDefault(mod) {
+  return (mod && mod.__esModule) ? mod : { default: mod };
+}
+
+function __classPrivateFieldGet(receiver, state, kind, f) {
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+  return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+}
+
+function __classPrivateFieldSet(receiver, state, value, kind, f) {
+  if (kind === "m") throw new TypeError("Private method is not writable");
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+  return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+}
+
+function __classPrivateFieldIn(state, receiver) {
+  if (receiver === null || (typeof receiver !== "object" && typeof receiver !== "function")) throw new TypeError("Cannot use 'in' operator on non-object");
+  return typeof state === "function" ? receiver === state : state.has(receiver);
+}
+
+function __addDisposableResource(env, value, async) {
+  if (value !== null && value !== void 0) {
+    if (typeof value !== "object" && typeof value !== "function") throw new TypeError("Object expected.");
+    var dispose, inner;
+    if (async) {
+      if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
+      dispose = value[Symbol.asyncDispose];
+    }
+    if (dispose === void 0) {
+      if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
+      dispose = value[Symbol.dispose];
+      if (async) inner = dispose;
+    }
+    if (typeof dispose !== "function") throw new TypeError("Object not disposable.");
+    if (inner) dispose = function() { try { inner.call(this); } catch (e) { return Promise.reject(e); } };
+    env.stack.push({ value: value, dispose: dispose, async: async });
+  }
+  else if (async) {
+    env.stack.push({ async: true });
+  }
+  return value;
+}
+
+var _SuppressedError = typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+  var e = new Error(message);
+  return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
+function __disposeResources(env) {
+  function fail(e) {
+    env.error = env.hasError ? new _SuppressedError(e, env.error, "An error was suppressed during disposal.") : e;
+    env.hasError = true;
+  }
+  var r, s = 0;
+  function next() {
+    while (r = env.stack.pop()) {
+      try {
+        if (!r.async && s === 1) return s = 0, env.stack.push(r), Promise.resolve().then(next);
+        if (r.dispose) {
+          var result = r.dispose.call(r.value);
+          if (r.async) return s |= 2, Promise.resolve(result).then(next, function(e) { fail(e); return next(); });
+        }
+        else s |= 1;
+      }
+      catch (e) {
+        fail(e);
+      }
+    }
+    if (s === 1) return env.hasError ? Promise.reject(env.error) : Promise.resolve();
+    if (env.hasError) throw env.error;
+  }
+  return next();
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  __extends,
+  __assign,
+  __rest,
+  __decorate,
+  __param,
+  __metadata,
+  __awaiter,
+  __generator,
+  __createBinding,
+  __exportStar,
+  __values,
+  __read,
+  __spread,
+  __spreadArrays,
+  __spreadArray,
+  __await,
+  __asyncGenerator,
+  __asyncDelegator,
+  __asyncValues,
+  __makeTemplateObject,
+  __importStar,
+  __importDefault,
+  __classPrivateFieldGet,
+  __classPrivateFieldSet,
+  __classPrivateFieldIn,
+  __addDisposableResource,
+  __disposeResources,
+});
+
 
 /***/ })
 
@@ -6554,7 +4366,7 @@ exports.StreamDeckWeb = StreamDeckWeb;
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
@@ -6591,9 +4403,8 @@ exports.StreamDeckWeb = StreamDeckWeb;
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+// This entry need to be wrapped in an IIFE because it uses a non-standard name for the exports (exports).
 (() => {
-"use strict";
 var exports = __webpack_exports__;
 var __webpack_unused_export__;
 
@@ -6647,34 +4458,35 @@ async function demoChange() {
 }
 async function openDevice(device) {
     appendLog(`Device opened. Serial: ${await device.getSerialNumber()} Firmware: ${await device.getFirmwareVersion()}`);
-    device.on('down', (key) => {
-        appendLog(`Key ${key} down`);
-        currentDemo.keyDown(device, key).catch(console.error);
+    device.on('down', (control) => {
+        if (control.type === 'button') {
+            appendLog(`Key ${control.index} down`);
+            currentDemo.keyDown(device, control.index).catch(console.error);
+        }
+        else {
+            appendLog(`Encoder ${control.index} down`);
+        }
     });
-    device.on('up', (key) => {
-        appendLog(`Key ${key} up`);
-        currentDemo.keyUp(device, key).catch(console.error);
+    device.on('up', (control) => {
+        if (control.type === 'button') {
+            appendLog(`Key ${control.index} up`);
+            currentDemo.keyUp(device, control.index).catch(console.error);
+        }
+        else {
+            appendLog(`Encoder ${control.index} down`);
+        }
     });
-    device.on('encoderDown', (encoder) => {
-        appendLog(`Encoder ${encoder} down`);
+    device.on('rotate', (control, amount) => {
+        appendLog(`Encoder ${control.index} rotate (${amount})`);
     });
-    device.on('encoderUp', (encoder) => {
-        appendLog(`Encoder ${encoder} up`);
+    device.on('lcdShortPress', (control, position) => {
+        appendLog(`LCD (${control.id}) short press (${position.x},${position.y})`);
     });
-    device.on('rotateLeft', (encoder, amount) => {
-        appendLog(`Encoder ${encoder} left (${amount})`);
+    device.on('lcdLongPress', (control, position) => {
+        appendLog(`LCD (${control.id}) long press (${position.x},${position.y})`);
     });
-    device.on('rotateRight', (encoder, amount) => {
-        appendLog(`Encoder ${encoder} right (${amount})`);
-    });
-    device.on('lcdShortPress', (encoder, position) => {
-        appendLog(`LCD short press ${encoder} (${position.x},${position.y})`);
-    });
-    device.on('lcdLongPress', (encoder, position) => {
-        appendLog(`LCD long press ${encoder} (${position.x},${position.y})`);
-    });
-    device.on('lcdSwipe', (_fromEncoder, _toEncoder, fromPosition, toPosition) => {
-        appendLog(`LCD swipe (${fromPosition.x},${fromPosition.y}) -> (${toPosition.x},${toPosition.y})`);
+    device.on('lcdSwipe', (control, fromPosition, toPosition) => {
+        appendLog(`LCD (${control.id}) swipe (${fromPosition.x},${fromPosition.y}) -> (${toPosition.x},${toPosition.y})`);
     });
     await currentDemo.start(device);
     // Sample actions
