@@ -50,6 +50,6 @@ export function StreamDeckStudioFactory(
 	options: Required<OpenStreamDeckOptions>,
 	propertiesService?: PropertiesService,
 ): StreamDeckBase {
-	const services = createBaseGen2Properties(device, options, studioProperties, null, propertiesService ?? null, true)
+	const services = createBaseGen2Properties(device, options, studioProperties, propertiesService ?? null, true)
 	return new StreamDeckBase(device, options, services)
 }

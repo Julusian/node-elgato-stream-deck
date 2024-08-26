@@ -1,7 +1,7 @@
 import type { HIDDevice } from './hid-device.js'
 import { DeviceModelId, MODEL_NAMES } from './id.js'
 import type { StreamDeck } from './types.js'
-import type { OpenStreamDeckOptions, StreamDeckProperties } from './models/base.js'
+import type { OpenStreamDeckOptions } from './models/base.js'
 import { StreamDeckOriginalFactory } from './models/original.js'
 import { StreamDeckMiniFactory } from './models/mini.js'
 import { StreamDeckXLFactory } from './models/xl.js'
@@ -16,11 +16,9 @@ import type { PropertiesService } from './services/properties/interface.js'
 export * from './types.js'
 export * from './id.js'
 export * from './controlDefinition.js'
-export { HIDDevice, HIDDeviceInfo, ChildHIDDeviceInfo, HIDDeviceEvents } from './hid-device.js'
+export { HIDDevice, HIDDeviceInfo, HIDDeviceEvents, ChildHIDDeviceInfo } from './hid-device.js'
 export { OpenStreamDeckOptions } from './models/base.js'
 export { StreamDeckProxy } from './proxy.js'
-export { ChildHIDDevice } from './child-hid-device.js'
-export { parseDevice2Info } from './device2-info.js'
 
 /** Elgato vendor id */
 export const VENDOR_ID = 0x0fd9
@@ -38,14 +36,6 @@ export interface DeviceModelSpec {
 
 	factory: (
 		device: HIDDevice,
-		options: Required<OpenStreamDeckOptions>,
-		propertiesService?: PropertiesService,
-	) => StreamDeck
-
-	/** If this can be a child device, the factory to create it */
-	device2Factory?: (
-		virtualDevice: HIDDevice,
-		parentDeviceProperties: StreamDeckProperties,
 		options: Required<OpenStreamDeckOptions>,
 		propertiesService?: PropertiesService,
 	) => StreamDeck
@@ -94,7 +84,6 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0084],
 		factory: StreamDeckPlusFactory,
-		// device2Factory: StreamDeckPlusDevice2Factory,
 
 		hasNativeTcp: false,
 	},

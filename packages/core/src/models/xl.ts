@@ -21,7 +21,7 @@ const xlProperties: StreamDeckGen2Properties = {
 }
 
 export function StreamDeckXLFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
-	const services = createBaseGen2Properties(device, options, xlProperties, null, null)
+	const services = createBaseGen2Properties(device, options, xlProperties, null)
 
 	return new StreamDeckBase(device, options, services)
 }

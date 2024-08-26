@@ -6,8 +6,8 @@ import type {
 	ChildHIDDeviceInfo,
 	StreamDeckTcpChildDeviceInfo,
 } from '@elgato-stream-deck/core'
-import { parseDevice2Info } from '@elgato-stream-deck/core'
 import type { SocketWrapper } from './socketWrapper.js'
+import { parseDevice2Info } from './device2Info.js'
 
 class QueuedCommand {
 	public readonly promise: Promise<Buffer>
@@ -196,10 +196,5 @@ export class TcpHidDevice extends EventEmitter<HIDDeviceEvents> implements HIDDe
 		const device2Info = await this.#executeSingletonCommand(0x1c, true)
 
 		return parseDevice2Info(device2Info)
-	}
-
-	public async openChildDevice(): Promise<HIDDevice | null> {
-		// TODO - implement
-		throw new Error('Method not implemented.')
 	}
 }

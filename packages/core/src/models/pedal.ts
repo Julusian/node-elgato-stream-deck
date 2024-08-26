@@ -58,12 +58,11 @@ export function StreamDeckPedalFactory(device: HIDDevice, options: Required<Open
 
 	return new StreamDeckBase(device, options, {
 		deviceProperties: pedalProperties,
-		parentDeviceProperties: null,
 		events,
 		properties: new PedalPropertiesService(device),
 		buttonsLcd: new PedalLcdService(),
 		lcdSegmentDisplay: null,
-		inputService: new ButtonOnlyInputService(pedalProperties, events, 0),
+		inputService: new ButtonOnlyInputService(pedalProperties, events),
 		encoderLed: null,
 	})
 }

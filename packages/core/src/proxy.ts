@@ -3,8 +3,6 @@ import type { DeviceModelId } from './id.js'
 import type { StreamDeck, StreamDeckEvents } from './types.js'
 import type { StreamDeckControlDefinition } from './controlDefinition.js'
 
-export type StreamDeckProxyFactory = (device: StreamDeck) => StreamDeckProxy | null // nocommit - remove the null
-
 /**
  * A minimal proxy around a StreamDeck instance.
  * This is intended to be used by libraries wrapping this that want to add more methods to the StreamDeck
@@ -12,11 +10,9 @@ export type StreamDeckProxyFactory = (device: StreamDeck) => StreamDeckProxy | n
 
 export class StreamDeckProxy implements StreamDeck {
 	protected readonly device: StreamDeck
-	readonly #wrapChildDevice: StreamDeckProxyFactory
 
-	constructor(device: StreamDeck, wrapChildDevice: StreamDeckProxyFactory) {
+	constructor(device: StreamDeck) {
 		this.device = device
-		this.#wrapChildDevice = wrapChildDevice
 	}
 
 	public get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
@@ -42,16 +38,6 @@ export class StreamDeckProxy implements StreamDeck {
 		...args: Parameters<StreamDeck['calculateFillPanelDimensions']>
 	): ReturnType<StreamDeck['calculateFillPanelDimensions']> {
 		return this.device.calculateFillPanelDimensions(...args)
-	}
-
-	public async openChildDevice(
-		...args: Parameters<StreamDeck['openChildDevice']>
-	): ReturnType<StreamDeck['openChildDevice']> {
-		const childDevice = await this.device.openChildDevice(...args)
-		if (!childDevice) return null
-
-		// The wrapper doesn't need to be reused, as open can only be called once
-		return this.#wrapChildDevice(childDevice)
 	}
 
 	public async close(): Promise<void> {

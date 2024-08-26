@@ -24,7 +24,7 @@ export function StreamDeckOriginalMK2Factory(
 	device: HIDDevice,
 	options: Required<OpenStreamDeckOptions>,
 ): StreamDeckBase {
-	const services = createBaseGen2Properties(device, options, origMK2Properties, null, null)
+	const services = createBaseGen2Properties(device, options, origMK2Properties, null)
 
 	return new StreamDeckBase(device, options, services)
 }

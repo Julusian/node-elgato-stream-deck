@@ -86,7 +86,7 @@ const lcdSegmentControls = plusProperties.CONTROLS.filter(
 )
 
 export function StreamDeckPlusFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
-	const services = createBaseGen2Properties(device, options, plusProperties, null, null, true)
+	const services = createBaseGen2Properties(device, options, plusProperties, null, true)
 	services.lcdSegmentDisplay = new StreamDeckPlusLcdService(options.encodeJPEG, device, lcdSegmentControls)
 
 	return new StreamDeckBase(device, options, services)

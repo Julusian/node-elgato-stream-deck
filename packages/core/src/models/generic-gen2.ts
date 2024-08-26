@@ -25,7 +25,6 @@ export function createBaseGen2Properties(
 	device: HIDDevice,
 	options: Required<OpenStreamDeckOptions>,
 	properties: StreamDeckGen2Properties,
-	parentDeviceProperties: StreamDeckProperties | null,
 	propertiesService: PropertiesService | null,
 	disableXYFlip?: boolean,
 ): StreamDeckServicesDefinition {
@@ -33,27 +32,18 @@ export function createBaseGen2Properties(
 
 	const events = new CallbackHook<StreamDeckEvents>()
 
-	const buttonIndexOffset = parentDeviceProperties
-		? parentDeviceProperties.CONTROLS.filter((c) => c.type === 'button').length
-		: 0
-	const encoderIndexOffset = parentDeviceProperties
-		? parentDeviceProperties.CONTROLS.filter((c) => c.type === 'encoder').length
-		: 0
-
 	return {
 		deviceProperties: fullProperties,
-		parentDeviceProperties,
 		events,
 		properties: propertiesService ?? new Gen2PropertiesService(device),
 		buttonsLcd: new DefaultButtonsLcdService(
-			new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator(buttonIndexOffset)),
+			new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator()),
 			new JpegButtonLcdImagePacker(options.encodeJPEG, !disableXYFlip),
 			device,
 			fullProperties,
-			buttonIndexOffset,
 		),
 		lcdSegmentDisplay: null,
-		inputService: new Gen2InputService(fullProperties, events, buttonIndexOffset, encoderIndexOffset),
+		inputService: new Gen2InputService(fullProperties, events),
 		encoderLed: new EncoderLedService(device, properties.CONTROLS),
 	}
 }

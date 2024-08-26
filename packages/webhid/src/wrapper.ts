@@ -10,7 +10,7 @@ export class StreamDeckWeb extends StreamDeckProxy {
 	private readonly hid: WebHIDDevice
 
 	constructor(device: StreamDeck, hid: WebHIDDevice) {
-		super(device, (device) => new StreamDeckWeb(device, hid))
+		super(device)
 		this.hid = hid
 	}
 

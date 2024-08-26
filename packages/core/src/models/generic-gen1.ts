@@ -38,7 +38,6 @@ export function StreamDeckGen1Factory(
 
 	return new StreamDeckBase(device, options, {
 		deviceProperties: fullProperties,
-		parentDeviceProperties: null,
 		events,
 		properties: new Gen1PropertiesService(device),
 		buttonsLcd: new DefaultButtonsLcdService(
@@ -46,10 +45,9 @@ export function StreamDeckGen1Factory(
 			new BitmapButtonLcdImagePacker(targetOptions, bmpImagePPM),
 			device,
 			fullProperties,
-			0,
 		),
 		lcdSegmentDisplay: null,
-		inputService: new ButtonOnlyInputService(fullProperties, events, 0),
+		inputService: new ButtonOnlyInputService(fullProperties, events),
 		encoderLed: null,
 	})
 }

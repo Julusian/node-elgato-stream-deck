@@ -22,7 +22,7 @@ export class StreamDeckTcpWrapper extends StreamDeckProxy implements StreamDeckT
 	}
 
 	constructor(socket: SocketWrapper, device: TcpHidDevice, streamdeck: StreamDeck) {
-		super(streamdeck, () => null)
+		super(streamdeck)
 
 		this.#socket = socket
 		this.#device = device

@@ -8,16 +8,10 @@ export class ButtonOnlyInputService implements StreamDeckInputService {
 	protected readonly deviceProperties: Readonly<StreamDeckProperties>
 	readonly #keyState: boolean[]
 	readonly #eventSource: CallbackHook<StreamDeckEvents>
-	readonly #hidOffset: number
 
-	constructor(
-		deviceProperties: Readonly<StreamDeckProperties>,
-		eventSource: CallbackHook<StreamDeckEvents>,
-		hidOffset: number,
-	) {
+	constructor(deviceProperties: Readonly<StreamDeckProperties>, eventSource: CallbackHook<StreamDeckEvents>) {
 		this.deviceProperties = deviceProperties
 		this.#eventSource = eventSource
-		this.#hidOffset = hidOffset
 
 		const maxButtonIndex = this.deviceProperties.CONTROLS.filter(
 			(control): control is StreamDeckButtonControlDefinition => control.type === 'button',
@@ -31,7 +25,7 @@ export class ButtonOnlyInputService implements StreamDeckInputService {
 		for (const control of this.deviceProperties.CONTROLS) {
 			if (control.type !== 'button') continue
 
-			const keyPressed = Boolean(data[dataOffset + control.hidIndex + this.#hidOffset])
+			const keyPressed = Boolean(data[dataOffset + control.hidIndex])
 			const stateChanged = keyPressed !== this.#keyState[control.index]
 			if (stateChanged) {
 				this.#keyState[control.index] = keyPressed

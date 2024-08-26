@@ -19,8 +19,6 @@ export interface HIDDevice extends EventEmitter<HIDDeviceEvents> {
 
 	getDeviceInfo(): Promise<HIDDeviceInfo>
 
-	openChildDevice(): Promise<HIDDevice | null>
-
 	getChildDeviceInfo(): Promise<ChildHIDDeviceInfo | null>
 }
 

@@ -72,13 +72,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	calculateFillPanelDimensions(options?: FillPanelDimensionsOptions): Dimension | null
 
 	/**
-	 * Open the child device, if supported and connected
-	 * If the child has already been opened, this will fail
-	 * // nocommit fail by throwing or null?
-	 */
-	openChildDevice(): Promise<StreamDeck | null>
-
-	/**
 	 * Close the device
 	 */
 	close(): Promise<void>

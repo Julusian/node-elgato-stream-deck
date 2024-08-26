@@ -62,7 +62,7 @@ const lcdSegmentControls = neoProperties.CONTROLS.filter(
 )
 
 export function StreamDeckNeoFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
-	const services = createBaseGen2Properties(device, options, neoProperties, null, null)
+	const services = createBaseGen2Properties(device, options, neoProperties, null)
 	services.lcdSegmentDisplay = new StreamDeckNeoLcdService(options.encodeJPEG, device, lcdSegmentControls)
 
 	return new StreamDeckBase(device, options, services)

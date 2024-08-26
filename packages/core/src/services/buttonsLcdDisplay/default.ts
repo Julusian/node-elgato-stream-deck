@@ -15,21 +15,17 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	readonly #imagePacker: ButtonLcdImagePacker
 	readonly #device: Pick<HIDDevice, 'sendReports' | 'sendFeatureReport'>
 	readonly #deviceProperties: Readonly<StreamDeckProperties>
-	readonly hidOffset: number
 
 	constructor(
 		imageWriter: StreamdeckImageWriter,
 		imagePacker: ButtonLcdImagePacker,
 		device: Pick<HIDDevice, 'sendReports' | 'sendFeatureReport'>,
 		deviceProperties: Readonly<StreamDeckProperties>,
-		hidOffset: number,
 	) {
 		this.#imageWriter = imageWriter
 		this.#imagePacker = imagePacker
 		this.#device = device
 		this.#deviceProperties = deviceProperties
-
-		this.hidOffset = hidOffset
 	}
 
 	private getLcdButtonControls(): StreamDeckButtonControlDefinitionLcdFeedback[] {
@@ -263,7 +259,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	}
 
 	private async sendKeyRgb(keyIndex: number, red: number, green: number, blue: number): Promise<void> {
-		await this.#device.sendFeatureReport(new Uint8Array([0x03, 0x06, this.hidOffset + keyIndex, red, green, blue]))
+		await this.#device.sendFeatureReport(new Uint8Array([0x03, 0x06, keyIndex, red, green, blue]))
 	}
 
 	private async fillImageRangeControl(

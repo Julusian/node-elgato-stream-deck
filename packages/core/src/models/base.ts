@@ -52,7 +52,6 @@ export type StreamDeckProperties = Readonly<{
 
 export interface StreamDeckServicesDefinition {
 	deviceProperties: StreamDeckProperties
-	parentDeviceProperties: StreamDeckProperties | null
 	events: CallbackHook<StreamDeckEvents>
 	properties: PropertiesService
 	buttonsLcd: ButtonsLcdDisplayService
@@ -140,25 +139,6 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 
 	public calculateFillPanelDimensions(options?: FillPanelDimensionsOptions): Dimension | null {
 		return this.#buttonsLcdService.calculateFillPanelDimensions(options)
-	}
-
-	public async openChildDevice(): Promise<StreamDeck | null> {
-		if (!this.deviceProperties.SUPPORTS_CHILD_DEVICES) return null
-
-		const childDevice = await this.device.openChildDevice()
-		if (!childDevice) return null
-
-		const deviceInfo = await childDevice.getDeviceInfo()
-
-		console.log('info', deviceInfo)
-
-		const model = DEVICE_MODELS.find(
-			(m) => deviceInfo.vendorId === VENDOR_ID && m.productIds.includes(deviceInfo.productId),
-		)
-		if (!model || !model.device2Factory) throw new Error('Stream Deck is of unexpected type.')
-
-		// nocommit this needs to remember there is a child opened and reject subsequent calls. until the child is closed
-		return model.device2Factory(childDevice, this.deviceProperties, this.#options) // TODO - properties service?
 	}
 
 	public async close(): Promise<void> {

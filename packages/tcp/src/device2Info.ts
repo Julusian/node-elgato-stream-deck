@@ -1,4 +1,4 @@
-import type { StreamDeckTcpChildDeviceInfo } from './types.js'
+import type { StreamDeckTcpChildDeviceInfo } from '@elgato-stream-deck/core'
 
 export function parseDevice2Info(device2Info: Buffer): Omit<StreamDeckTcpChildDeviceInfo, 'model'> | null {
 	if (device2Info.readUInt8(4) !== 0x02) {
