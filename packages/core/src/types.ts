@@ -1,11 +1,21 @@
-import * as EventEmitter from 'eventemitter3'
-import { DeviceModelId, EncoderIndex, KeyIndex } from './id'
-import { HIDDeviceInfo } from './device'
+import type * as EventEmitter from 'eventemitter3'
+import type { DeviceModelId, Dimension, KeyIndex } from './id.js'
+import type { HIDDeviceInfo } from './hid-device.js'
+import type {
+	StreamDeckButtonControlDefinition,
+	StreamDeckControlDefinition,
+	StreamDeckEncoderControlDefinition,
+	StreamDeckLcdStripControlDefinition,
+} from './controlDefinition.js'
 
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
 }
-export type FillPanelOptions = FillImageOptions
+export interface FillPanelOptions extends FillImageOptions, FillPanelDimensionsOptions {}
+
+export interface FillPanelDimensionsOptions {
+	withPadding?: boolean
+}
 
 export interface FillLcdImageOptions extends FillImageOptions {
 	width: number
@@ -18,62 +28,32 @@ export interface LcdPosition {
 }
 
 export type StreamDeckEvents = {
-	down: [key: KeyIndex]
-	up: [key: KeyIndex]
+	down: [control: StreamDeckButtonControlDefinition | StreamDeckEncoderControlDefinition]
+	up: [control: StreamDeckButtonControlDefinition | StreamDeckEncoderControlDefinition]
 	error: [err: unknown]
-	rotateLeft: [encoder: EncoderIndex, amount: number]
-	rotateRight: [encoder: EncoderIndex, amount: number]
-	encoderDown: [encoder: EncoderIndex]
-	encoderUp: [encoder: EncoderIndex]
-	lcdShortPress: [encoder: EncoderIndex, position: LcdPosition]
-	lcdLongPress: [encoder: EncoderIndex, position: LcdPosition]
-	lcdSwipe: [fromEncoder: EncoderIndex, toEncoder: EncoderIndex, from: LcdPosition, to: LcdPosition]
-}
-
-export interface LcdSegmentSize {
-	width: number
-	height: number
+	rotate: [control: StreamDeckEncoderControlDefinition, amount: number]
+	lcdShortPress: [control: StreamDeckLcdStripControlDefinition, position: LcdPosition]
+	lcdLongPress: [control: StreamDeckLcdStripControlDefinition, position: LcdPosition]
+	lcdSwipe: [control: StreamDeckLcdStripControlDefinition, from: LcdPosition, to: LcdPosition]
 }
 
 export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
-	/** The number of keys on this streamdeck */
-	readonly NUM_KEYS: number
-	/** The number of columns on this streamdeck */
-	readonly KEY_COLUMNS: number
-	/** The number of rows on this streamdeck */
-	readonly KEY_ROWS: number
-	/** The number of touch keys on this streamdeck */
-	readonly NUM_TOUCH_KEYS: number
+	/** List of the controls on this streamdeck */
+	readonly CONTROLS: Readonly<StreamDeckControlDefinition[]>
 
-	/** The number of encoders on this streamdeck (if any) */
-	readonly NUM_ENCODERS: number
-	/** The full size of the lcd strip on this streamdeck (if any) */
-	readonly LCD_STRIP_SIZE: LcdSegmentSize | undefined
-	/** The size of the lcd per encoder on this streamdeck (if any) */
-	readonly LCD_ENCODER_SIZE: LcdSegmentSize | undefined
-
-	/** The horizontal/vertical resolution of the buttons */
-	readonly ICON_SIZE: number
-	/** The total number of pixels of a button */
-	readonly ICON_PIXELS: number
-	/** The number of bytes for a RGB encoded image for a button */
-	readonly ICON_BYTES: number
-
-	/** The horizontal spacing in pixels between each button */
-	readonly KEY_SPACING_HORIZONTAL: number
-	/** The vertical spacing in pixels between each button */
-	readonly KEY_SPACING_VERTICAL: number
+	// TODO: replace these with a definition on each button control which gives it a coordinate inside of the display
+	// These are removed temporarily until this is done, to avoid this being another breaking change if it does want to change
+	// /** The horizontal spacing in pixels between each button */
+	// readonly KEY_SPACING_HORIZONTAL: number
+	// /** The vertical spacing in pixels between each button */
+	// readonly KEY_SPACING_VERTICAL: number
 
 	/** The model of this device */
 	readonly MODEL: DeviceModelId
 	/** The name of the product/model */
 	readonly PRODUCT_NAME: string
 
-	/**
-	 * Checks if a keyIndex is valid. Throws an error on failure
-	 * @param keyIndex The key to check
-	 */
-	checkValidKeyIndex(keyIndex: KeyIndex, includeTouchKeys?: boolean): void
+	calculateFillPanelDimensions(options?: FillPanelDimensionsOptions): Dimension | null
 
 	/**
 	 * Close the device
@@ -102,7 +82,11 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} options Options to control the write
 	 */
-	fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Buffer, options?: FillImageOptions): Promise<void>
+	fillKeyBuffer(
+		keyIndex: KeyIndex,
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		options?: FillImageOptions,
+	): Promise<void>
 
 	/**
 	 * Fills the whole panel with an image in a Buffer.
@@ -110,31 +94,41 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} options Options to control the write
 	 */
-	fillPanelBuffer(imageBuffer: Buffer, options?: FillPanelOptions): Promise<void>
+	fillPanelBuffer(imageBuffer: Uint8Array | Uint8ClampedArray, options?: FillPanelOptions): Promise<void>
 
 	/**
 	 * Fill the whole lcd strip
+	 * @param {number} lcdIndex The id of the lcd strip to draw to
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
 	 */
-	fillLcd(imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
-
-	/**
-	 * Fills the lcd strip above an encoder
-	 * @param {number} index The encoder to draw above
-	 * @param {Buffer} imageBuffer The image to write
-	 * @param {Object} sourceOptions Options to control the write
-	 */
-	fillEncoderLcd(index: EncoderIndex, imageBuffer: Buffer, sourceOptions: FillImageOptions): Promise<void>
+	fillLcd(
+		lcdIndex: number,
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		sourceOptions: FillImageOptions,
+	): Promise<void>
 
 	/**
 	 * Fill a region of the lcd strip, ignoring the boundaries of the encoders
+	 * @param {number} lcdIndex The id of the lcd strip to draw to
 	 * @param {number} x The x position to draw to
 	 * @param {number} y The y position to draw to
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
 	 */
-	fillLcdRegion(x: number, y: number, imageBuffer: Buffer, sourceOptions: FillLcdImageOptions): Promise<void>
+	fillLcdRegion(
+		lcdIndex: number,
+		x: number,
+		y: number,
+		imageBuffer: Uint8Array,
+		sourceOptions: FillLcdImageOptions,
+	): Promise<void>
+
+	/**
+	 * Clear the lcd strip to black
+	 * @param {number} lcdIndex The id of the lcd strip to clear
+	 */
+	clearLcdStrip(lcdIndex: number): Promise<void>
 
 	/**
 	 * Clears the given key.

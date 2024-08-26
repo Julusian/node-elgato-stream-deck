@@ -19,15 +19,7 @@ This library has nothing to do with the streamdeck software produced by Elgato. 
 
 ### Important
 
-You need to provide a Buffer polyfill to the browser for this library. We recommend using [buffer](https://www.npmjs.com/package/buffer) which can be added to your webpack config with:
-
-```
-plugins: [
-	new ProvidePlugin({
-		Buffer: ['buffer', 'Buffer'],
-	}),
-],
-```
+Since v7.0.0, the `buffer` polyfill is no longer been necessary. If you find that it is still needed somewhere, please report it as that is a bug.
 
 ## Linux
 

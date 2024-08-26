@@ -1,10 +1,29 @@
-import { DEVICE_MODELS, OpenStreamDeckOptions, StreamDeck, VENDOR_ID } from '@elgato-stream-deck/core'
-import { WebHIDDevice } from './device'
-import { encodeJPEG } from './jpeg'
-import { StreamDeckWeb } from './wrapper'
+/* eslint-disable n/no-unsupported-features/node-builtins */
 
-export { DeviceModelId, KeyIndex, StreamDeck, LcdPosition } from '@elgato-stream-deck/core'
-export { StreamDeckWeb } from './wrapper'
+import type { OpenStreamDeckOptions, StreamDeck } from '@elgato-stream-deck/core'
+import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'
+import { WebHIDDevice } from './hid-device.js'
+import { encodeJPEG } from './jpeg.js'
+import { StreamDeckWeb } from './wrapper.js'
+
+export {
+	VENDOR_ID,
+	DeviceModelId,
+	KeyIndex,
+	StreamDeck,
+	LcdPosition,
+	Dimension,
+	StreamDeckControlDefinitionBase,
+	StreamDeckButtonControlDefinition,
+	StreamDeckButtonControlDefinitionNoFeedback,
+	StreamDeckButtonControlDefinitionRgbFeedback,
+	StreamDeckButtonControlDefinitionLcdFeedback,
+	StreamDeckEncoderControlDefinition,
+	StreamDeckLcdStripControlDefinition,
+	StreamDeckControlDefinition,
+	OpenStreamDeckOptions,
+} from '@elgato-stream-deck/core'
+export { StreamDeckWeb } from './wrapper.js'
 
 /**
  * Request the user to select some streamdecks to open
@@ -33,7 +52,7 @@ export async function getStreamDecks(options?: OpenStreamDeckOptions): Promise<S
 	const validDevices = browserDevices.filter((d) => d.vendorId === VENDOR_ID)
 
 	const resultDevices = await Promise.all(
-		validDevices.map(async (dev) => openDevice(dev, options).catch((_) => null)) // Ignore failures
+		validDevices.map(async (dev) => openDevice(dev, options).catch((_) => null)), // Ignore failures
 	)
 
 	return resultDevices.filter((v): v is StreamDeckWeb => !!v)
@@ -46,9 +65,11 @@ export async function getStreamDecks(options?: OpenStreamDeckOptions): Promise<S
  */
 export async function openDevice(
 	browserDevice: HIDDevice,
-	userOptions?: OpenStreamDeckOptions
+	userOptions?: OpenStreamDeckOptions,
 ): Promise<StreamDeckWeb> {
-	const model = DEVICE_MODELS.find((m) => m.productId === browserDevice.productId)
+	const model = DEVICE_MODELS.find(
+		(m) => browserDevice.vendorId === VENDOR_ID && m.productIds.includes(browserDevice.productId),
+	)
 	if (!model) {
 		throw new Error('Stream Deck is of unexpected type.')
 	}
@@ -57,13 +78,12 @@ export async function openDevice(
 
 	try {
 		const options: Required<OpenStreamDeckOptions> = {
-			useOriginalKeyOrder: false,
 			encodeJPEG: encodeJPEG,
 			...userOptions,
 		}
 
 		const browserHid = new WebHIDDevice(browserDevice)
-		const device: StreamDeck = new model.class(browserHid, options || {})
+		const device: StreamDeck = model.factory(browserHid, options || {})
 		return new StreamDeckWeb(device, browserHid)
 	} catch (e) {
 		await browserDevice.close().catch(() => null) // Suppress error

@@ -1,6 +1,6 @@
-import { StreamDeckWeb } from '@elgato-stream-deck/webhid'
+import type { StreamDeckWeb } from '@elgato-stream-deck/webhid'
 import { toCanvas } from 'html-to-image'
-import { Demo } from './demo'
+import type { Demo } from './demo.js'
 
 function getRandomColor() {
 	const letters = '0123456789ABCDEF'

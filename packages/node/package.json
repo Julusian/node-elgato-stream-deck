@@ -53,9 +53,10 @@
 	},
 	"dependencies": {
 		"@elgato-stream-deck/core": "6.2.2",
+		"eventemitter3": "^4.0.7",
 		"jpeg-js": "^0.4.4",
 		"node-hid": "^3.1.0",
-		"tslib": "^2.6.3"
+		"tslib": "^2.7.0"
 	},
 	"peerDependencies": {
 		"@julusian/jpeg-turbo": "^1.1.2 || ^2.0.0"

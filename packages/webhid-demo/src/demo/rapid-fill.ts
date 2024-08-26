@@ -1,5 +1,5 @@
-import { StreamDeck } from '@elgato-stream-deck/webhid'
-import { Demo } from './demo'
+import type { StreamDeck } from '@elgato-stream-deck/webhid'
+import type { Demo } from './demo.js'
 
 function getRandomIntInclusive(min: number, max: number) {
 	min = Math.ceil(min)
@@ -21,8 +21,10 @@ export class RapidFillDemo implements Demo {
 					console.log('Filling with rgb(%d, %d, %d)', r, g, b)
 
 					const ps: Array<Promise<void>> = []
-					for (let i = 0; i < device.NUM_KEYS; i++) {
-						ps.push(device.fillKeyColor(i, r, g, b))
+					for (const control of device.CONTROLS) {
+						if (control.type === 'button') {
+							ps.push(device.fillKeyColor(control.index, r, g, b))
+						}
 					}
 
 					this.running = Promise.all(ps)

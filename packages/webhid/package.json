@@ -35,8 +35,9 @@
 	"dependencies": {
 		"@elgato-stream-deck/core": "6.2.2",
 		"@types/w3c-web-hid": "^1.0.6",
+		"eventemitter3": "^4.0.7",
 		"p-queue": "^6.6.2",
-		"tslib": "^2.6.3"
+		"tslib": "^2.7.0"
 	},
 	"engines": {
 		"node": ">=18.18"

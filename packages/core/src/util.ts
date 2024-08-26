@@ -1,4 +1,4 @@
-import { InternalFillImageOptions } from './models/base'
+import type { InternalFillImageOptions } from './services/imagePacker/interface.js'
 
 export interface FillImageTargetOptions {
 	colorMode: 'bgr' | 'rgba'
@@ -8,16 +8,17 @@ export interface FillImageTargetOptions {
 }
 
 export function transformImageBuffer(
-	imageBuffer: Buffer,
+	imageBuffer: Uint8Array | Uint8ClampedArray,
 	sourceOptions: InternalFillImageOptions,
 	targetOptions: FillImageTargetOptions,
 	destPadding: number,
 	imageWidth: number,
-	imageHeight?: number
-): Buffer {
-	if (!imageHeight) imageHeight = imageWidth
+	imageHeight: number,
+): Uint8Array {
+	const imageBufferView = uint8ArrayToDataView(imageBuffer)
 
-	const byteBuffer = Buffer.alloc(destPadding + imageWidth * imageHeight * targetOptions.colorMode.length)
+	const byteBuffer = new Uint8Array(destPadding + imageWidth * imageHeight * targetOptions.colorMode.length)
+	const byteBufferView = uint8ArrayToDataView(byteBuffer)
 
 	const flipColours = sourceOptions.format.substring(0, 3) !== targetOptions.colorMode.substring(0, 3)
 
@@ -37,22 +38,22 @@ export function transformImageBuffer(
 
 			const srcOffset = y2 * sourceOptions.stride + sourceOptions.offset + x2 * sourceOptions.format.length
 
-			const red = imageBuffer.readUInt8(srcOffset)
-			const green = imageBuffer.readUInt8(srcOffset + 1)
-			const blue = imageBuffer.readUInt8(srcOffset + 2)
+			const red = imageBufferView.getUint8(srcOffset)
+			const green = imageBufferView.getUint8(srcOffset + 1)
+			const blue = imageBufferView.getUint8(srcOffset + 2)
 
 			const targetOffset = rowOffset + x * targetOptions.colorMode.length
 			if (flipColours) {
-				byteBuffer.writeUInt8(blue, targetOffset)
-				byteBuffer.writeUInt8(green, targetOffset + 1)
-				byteBuffer.writeUInt8(red, targetOffset + 2)
+				byteBufferView.setUint8(targetOffset, blue)
+				byteBufferView.setUint8(targetOffset + 1, green)
+				byteBufferView.setUint8(targetOffset + 2, red)
 			} else {
-				byteBuffer.writeUInt8(red, targetOffset)
-				byteBuffer.writeUInt8(green, targetOffset + 1)
-				byteBuffer.writeUInt8(blue, targetOffset + 2)
+				byteBufferView.setUint8(targetOffset, red)
+				byteBufferView.setUint8(targetOffset + 1, green)
+				byteBufferView.setUint8(targetOffset + 2, blue)
 			}
 			if (targetOptions.colorMode.length === 4) {
-				byteBuffer.writeUInt8(255, targetOffset + 3)
+				byteBufferView.setUint8(targetOffset + 3, 255)
 			}
 		}
 	}
@@ -61,26 +62,38 @@ export function transformImageBuffer(
 }
 
 export const BMP_HEADER_LENGTH = 54
-export function writeBMPHeader(buf: Buffer, iconSize: number, iconBytes: number, imagePPM: number): void {
+export function writeBMPHeader(
+	buf: Uint8Array,
+	imageWidth: number,
+	imageHeight: number,
+	imageBytes: number,
+	imagePPM: number,
+): void {
+	const bufView = uint8ArrayToDataView(buf)
 	// Uses header format BITMAPINFOHEADER https://en.wikipedia.org/wiki/BMP_file_format
 
 	// Bitmap file header
-	buf.write('BM')
-	buf.writeUInt32LE(iconBytes + 54, 2)
-	buf.writeInt16LE(0, 6)
-	buf.writeInt16LE(0, 8)
-	buf.writeUInt32LE(54, 10) // Full header size
+	bufView.setUint8(0, 0x42) // B
+	bufView.setUint8(1, 0x4d) // M
+	bufView.setUint32(2, imageBytes + 54, true)
+	bufView.setInt16(6, 0, true)
+	bufView.setInt16(8, 0, true)
+	bufView.setUint32(10, 54, true) // Full header size
 
 	// DIB header (BITMAPINFOHEADER)
-	buf.writeUInt32LE(40, 14) // DIB header size
-	buf.writeInt32LE(iconSize, 18)
-	buf.writeInt32LE(iconSize, 22)
-	buf.writeInt16LE(1, 26) // Color planes
-	buf.writeInt16LE(24, 28) // Bit depth
-	buf.writeInt32LE(0, 30) // Compression
-	buf.writeInt32LE(iconBytes, 34) // Image size
-	buf.writeInt32LE(imagePPM, 38) // Horizontal resolution ppm
-	buf.writeInt32LE(imagePPM, 42) // Vertical resolution ppm
-	buf.writeInt32LE(0, 46) // Colour pallette size
-	buf.writeInt32LE(0, 50) // 'Important' Colour count
+	bufView.setUint32(14, 40, true) // DIB header size
+	bufView.setInt32(18, imageWidth, true)
+	bufView.setInt32(22, imageHeight, true)
+	bufView.setInt16(26, 1, true) // Color planes
+	bufView.setInt16(28, 24, true) // Bit depth
+	bufView.setInt32(30, 0, true) // Compression
+	bufView.setInt32(34, imageBytes, true) // Image size
+	bufView.setInt32(38, imagePPM, true) // Horizontal resolution ppm
+	bufView.setInt32(42, imagePPM, true) // Vertical resolution ppm
+	bufView.setInt32(46, 0, true) // Colour pallette size
+	bufView.setInt32(50, 0, true) // 'Important' Colour count
+}
+
+export function uint8ArrayToDataView(buffer: Uint8Array | Uint8ClampedArray): DataView {
+	return new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength)
 }

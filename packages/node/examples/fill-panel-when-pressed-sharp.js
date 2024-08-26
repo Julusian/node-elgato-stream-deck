@@ -1,3 +1,4 @@
+// @ts-check
 const path = require('path')
 const sharp = require('sharp')
 const { listStreamDecks, openStreamDeck } = require('../dist/index')
@@ -10,6 +11,9 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 	const streamDeck = await openStreamDeck(devices[0].path)
 	await streamDeck.clearPanel()
 
+	const panelDimensions = streamDeck.calculateFillPanelDimensions()
+	if (!panelDimensions) throw new Error("Streamdeck doesn't support fillPanel")
+
 	streamDeck.getSerialNumber().then((ser) => {
 		console.log('serial', ser)
 	})
@@ -17,44 +21,51 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 		console.log('firmware', ser)
 	})
 
+	/** @type {import('@elgato-stream-deck/core').StreamDeckLcdStripControlDefinition} */
+	// @ts-expect-error case to ignore the | undefined
+	const lcdStripControl = streamDeck.CONTROLS.find((control) => control.type === 'lcd-strip' && control.id === 0)
+
+	const buttonCount = streamDeck.CONTROLS.filter((control) => control.type === 'button').length
+
 	const imgField = await sharp(path.resolve(__dirname, 'fixtures/sunny_field.png'))
 		.flatten()
-		.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
+		.resize(panelDimensions.width, panelDimensions.height)
 		.raw()
 		.toBuffer()
 	const imgMosaic = await sharp(path.resolve(__dirname, '../../../fixtures/mosaic.png'))
 		.flatten()
-		.resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
+		.resize(panelDimensions.width, panelDimensions.height)
 		.raw()
 		.toBuffer()
 
-	const imgFieldLcd = streamDeck.LCD_STRIP_SIZE
+	const imgFieldLcd = lcdStripControl
 		? await sharp(path.resolve(__dirname, 'fixtures/sunny_field.png'))
 				.flatten()
-				.resize(streamDeck.LCD_STRIP_SIZE.width, streamDeck.LCD_STRIP_SIZE.height)
+				.resize(lcdStripControl.pixelSize.width, lcdStripControl.pixelSize.height)
 				.raw()
 				.toBuffer()
 		: undefined
-	const imgMosaicLcd = streamDeck.LCD_STRIP_SIZE
+	const imgMosaicLcd = lcdStripControl
 		? await sharp(path.resolve(__dirname, '../../../fixtures/mosaic.png'))
 				.flatten()
-				.resize(streamDeck.LCD_STRIP_SIZE.width, streamDeck.LCD_STRIP_SIZE.height)
+				.resize(lcdStripControl.pixelSize.width, lcdStripControl.pixelSize.height)
 				.raw()
 				.toBuffer()
 		: undefined
 
 	let filled = false
-	streamDeck.on('down', (keyIndex) => {
-		if (filled) {
-			return
-		}
+	streamDeck.on('down', (control) => {
+		if (control.type !== 'button') return
+
+		if (filled) return
 
 		filled = true
 
 		let image
 		let imageLcd
+		/** @type {[number, number, number]} */
 		let color
-		if (keyIndex > streamDeck.NUM_KEYS / 2) {
+		if (control.index > buttonCount / 2) {
 			console.log('Filling entire panel with an image of a sunny field.')
 			image = imgField
 			imageLcd = imgFieldLcd
@@ -68,14 +79,16 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 
 		streamDeck.fillPanelBuffer(image).catch((e) => console.error('Fill failed:', e))
 		if (imageLcd) {
-			streamDeck.fillLcd(imageLcd, { format: 'rgb' }).catch((e) => console.error('Fill lcd failed:', e))
+			streamDeck
+				.fillLcd(lcdStripControl.id, imageLcd, { format: 'rgb' })
+				.catch((e) => console.error('Fill lcd failed:', e))
 		}
-		if (streamDeck.NUM_TOUCH_KEYS) {
-			for (let index = 0; index < streamDeck.NUM_TOUCH_KEYS; index++) {
-				streamDeck
-					.fillKeyColor(index + streamDeck.NUM_KEYS, ...color)
-					.catch((e) => console.error('Set touch colour failed:', e))
-			}
+
+		for (const control of streamDeck.CONTROLS) {
+			if (control.type !== 'button') continue
+			if (control.feedbackType !== 'rgb') continue
+
+			streamDeck.fillKeyColor(control.index, ...color).catch((e) => console.error('Set touch colour failed:', e))
 		}
 	})
 

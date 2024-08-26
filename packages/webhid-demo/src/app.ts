@@ -1,5 +1,6 @@
-import { requestStreamDecks, getStreamDecks, StreamDeckWeb, LcdPosition } from '@elgato-stream-deck/webhid'
-import { Demo } from './demo/demo'
+import type { StreamDeckWeb, LcdPosition } from '@elgato-stream-deck/webhid'
+import { requestStreamDecks, getStreamDecks } from '@elgato-stream-deck/webhid'
+import type { Demo } from './demo/demo'
 import { DomImageDemo } from './demo/dom'
 import { FillWhenPressedDemo } from './demo/fill-when-pressed'
 import { RapidFillDemo } from './demo/rapid-fill'
@@ -57,38 +58,36 @@ async function demoChange() {
 async function openDevice(device: StreamDeckWeb): Promise<void> {
 	appendLog(`Device opened. Serial: ${await device.getSerialNumber()} Firmware: ${await device.getFirmwareVersion()}`)
 
-	device.on('down', (key: number) => {
-		appendLog(`Key ${key} down`)
-		currentDemo.keyDown(device, key).catch(console.error)
-	})
-	device.on('up', (key: number) => {
-		appendLog(`Key ${key} up`)
-		currentDemo.keyUp(device, key).catch(console.error)
-	})
-	device.on('encoderDown', (encoder: number) => {
-		appendLog(`Encoder ${encoder} down`)
-	})
-	device.on('encoderUp', (encoder: number) => {
-		appendLog(`Encoder ${encoder} up`)
-	})
-	device.on('rotateLeft', (encoder: number, amount: number) => {
-		appendLog(`Encoder ${encoder} left (${amount})`)
-	})
-	device.on('rotateRight', (encoder: number, amount: number) => {
-		appendLog(`Encoder ${encoder} right (${amount})`)
-	})
-	device.on('lcdShortPress', (encoder: number, position: LcdPosition) => {
-		appendLog(`LCD short press ${encoder} (${position.x},${position.y})`)
-	})
-	device.on('lcdLongPress', (encoder: number, position: LcdPosition) => {
-		appendLog(`LCD long press ${encoder} (${position.x},${position.y})`)
-	})
-	device.on(
-		'lcdSwipe',
-		(_fromEncoder: number, _toEncoder: number, fromPosition: LcdPosition, toPosition: LcdPosition) => {
-			appendLog(`LCD swipe (${fromPosition.x},${fromPosition.y}) -> (${toPosition.x},${toPosition.y})`)
+	device.on('down', (control) => {
+		if (control.type === 'button') {
+			appendLog(`Key ${control.index} down`)
+			currentDemo.keyDown(device, control.index).catch(console.error)
+		} else {
+			appendLog(`Encoder ${control.index} down`)
 		}
-	)
+	})
+	device.on('up', (control) => {
+		if (control.type === 'button') {
+			appendLog(`Key ${control.index} up`)
+			currentDemo.keyUp(device, control.index).catch(console.error)
+		} else {
+			appendLog(`Encoder ${control.index} down`)
+		}
+	})
+	device.on('rotate', (control, amount) => {
+		appendLog(`Encoder ${control.index} rotate (${amount})`)
+	})
+	device.on('lcdShortPress', (control, position: LcdPosition) => {
+		appendLog(`LCD (${control.id}) short press (${position.x},${position.y})`)
+	})
+	device.on('lcdLongPress', (control, position: LcdPosition) => {
+		appendLog(`LCD (${control.id}) long press (${position.x},${position.y})`)
+	})
+	device.on('lcdSwipe', (control, fromPosition: LcdPosition, toPosition: LcdPosition) => {
+		appendLog(
+			`LCD (${control.id}) swipe (${fromPosition.x},${fromPosition.y}) -> (${toPosition.x},${toPosition.y})`,
+		)
+	})
 
 	await currentDemo.start(device)
 

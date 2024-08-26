@@ -1,4 +1,3 @@
-/* eslint-disable jest/no-standalone-expect */
 import { EventEmitter } from 'events'
 import type { Device, HIDAsync } from 'node-hid'
 export class DummyHID extends EventEmitter implements HIDAsync {
@@ -34,11 +33,6 @@ export class DummyHID extends EventEmitter implements HIDAsync {
 	}
 	public async setNonBlocking(_no_block: boolean): Promise<void> {
 		throw new Error('Method not implemented.')
-	}
-
-	public async generateDeviceInfo(): Promise<Device> {
-		// TODO - remove this!
-		throw new Error('Not implemented')
 	}
 
 	public getDeviceInfo = jest.fn(async (): Promise<Device> => {

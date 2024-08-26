@@ -1,0 +1,9 @@
+{
+	"files": [],
+	"references": [
+		{ "path": "./packages/core/tsconfig.build.json" },
+		{ "path": "./packages/node/tsconfig.build.json" },
+		{ "path": "./packages/webhid/tsconfig.build.json" },
+		{ "path": "./packages/webhid-demo/tsconfig.json" }
+	]
+}

@@ -1,3 +1,4 @@
+// @ts-check
 const { openStreamDeck, listStreamDecks } = require('../dist/index')
 
 listStreamDecks().then(async (devices) => {
@@ -19,15 +20,16 @@ listStreamDecks().then(async (devices) => {
 					const g = getRandomIntInclusive(0, 255)
 					const b = getRandomIntInclusive(0, 255)
 					console.log('Filling with rgb(%d, %d, %d)', r, g, b)
-					for (let i = 0; i < streamDeck.NUM_KEYS + streamDeck.NUM_TOUCH_KEYS; i++) {
-						await streamDeck.fillKeyColor(i, r, g, b)
-					}
 
-					if (streamDeck.LCD_STRIP_SIZE) {
-						const lcdBuffer = Buffer.alloc(
-							streamDeck.LCD_STRIP_SIZE.width * streamDeck.LCD_STRIP_SIZE.height * 4
-						).fill(Buffer.from([r, g, b, 255]))
-						await streamDeck.fillLcd(lcdBuffer, { format: 'rgba' })
+					for (const control of streamDeck.CONTROLS) {
+						if (control.type === 'button' && control.feedbackType !== 'none') {
+							await streamDeck.fillKeyColor(control.index, r, g, b)
+						} else if (control.type === 'lcd-strip') {
+							const lcdBuffer = Buffer.alloc(control.pixelSize.width * control.pixelSize.height * 4).fill(
+								Buffer.from([r, g, b, 255]),
+							)
+							await streamDeck.fillLcd(control.id, lcdBuffer, { format: 'rgba' })
+						}
 					}
 				} catch (e) {
 					console.error('Fill failed:', e)

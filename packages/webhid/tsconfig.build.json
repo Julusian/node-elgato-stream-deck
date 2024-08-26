@@ -1,5 +1,5 @@
 {
-	"extends": "@sofie-automation/code-standard-preset/ts/tsconfig.lib",
+	"extends": "../../tsconfig.base.json",
 	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules/**", "src/**/*spec.ts", "src/**/__tests__/*", "src/**/__mocks__/*", "dist/**"],
 	"compilerOptions": {
@@ -9,8 +9,7 @@
 			"*": ["./node_modules/*"],
 			"@elgato-stream-deck/webhid": ["./src/index.ts"]
 		},
-		"lib": ["dom"],
-		"types": ["w3c-web-hid"],
-		"importHelpers": false
+		"lib": ["ES2023", "dom"],
+		"types": ["w3c-web-hid"]
 	}
 }

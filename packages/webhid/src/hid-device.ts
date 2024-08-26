@@ -1,12 +1,12 @@
-import { HIDDevice as CoreHIDDevice, HIDDeviceInfo } from '@elgato-stream-deck/core'
-import { EventEmitter } from 'events'
+import type { HIDDevice as CoreHIDDevice, HIDDeviceEvents, HIDDeviceInfo } from '@elgato-stream-deck/core'
+import * as EventEmitter from 'eventemitter3'
 import Queue from 'p-queue'
 
 /**
  * The wrapped browser HIDDevice.
  * This translates it into the common format expected by @elgato-stream-deck/core
  */
-export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
+export class WebHIDDevice extends EventEmitter<HIDDeviceEvents> implements CoreHIDDevice {
 	private readonly device: HIDDevice
 
 	private readonly reportQueue = new Queue({ concurrency: 1 })
@@ -20,7 +20,7 @@ export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 		this.device.addEventListener('inputreport', (event) => {
 			// Button press
 			if (event.reportId === 0x01) {
-				const data = new Uint8Array(event.data.buffer)
+				const data = new Uint8Array(event.data.buffer, event.data.byteOffset, event.data.byteLength)
 				this.emit('input', data)
 			}
 		})
@@ -34,17 +34,17 @@ export class WebHIDDevice extends EventEmitter implements CoreHIDDevice {
 		return this.device.forget()
 	}
 
-	public async sendFeatureReport(data: Buffer): Promise<void> {
-		return this.device.sendFeatureReport(data[0], new Uint8Array(data.subarray(1)))
+	public async sendFeatureReport(data: Uint8Array): Promise<void> {
+		return this.device.sendFeatureReport(data[0], data.subarray(1))
 	}
-	public async getFeatureReport(reportId: number, _reportLength: number): Promise<Buffer> {
+	public async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
 		const view = await this.device.receiveFeatureReport(reportId)
-		return Buffer.from(view.buffer)
+		return new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
 	}
-	public async sendReports(buffers: Buffer[]): Promise<void> {
+	public async sendReports(buffers: Uint8Array[]): Promise<void> {
 		return this.reportQueue.add(async () => {
 			for (const data of buffers) {
-				await this.device.sendReport(data[0], new Uint8Array(data.subarray(1)))
+				await this.device.sendReport(data[0], data.subarray(1))
 			}
 		})
 	}

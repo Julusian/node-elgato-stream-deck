@@ -1,13 +1,5 @@
 import * as jpegJS from 'jpeg-js'
-
-let jpegTurbo: typeof import('@julusian/jpeg-turbo') | undefined
-try {
-	// eslint-disable-next-line node/no-extraneous-require
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-	jpegTurbo = require('@julusian/jpeg-turbo')
-} catch (e) {
-	// This is expected and can be ignored
-}
+import type { EncodeOptions } from '@julusian/jpeg-turbo'
 
 export interface JPEGEncodeOptions {
 	quality: number
@@ -24,15 +16,17 @@ const DEFAULT_QUALITY = 95
  * @param height Hieght of the image
  */
 export async function encodeJPEG(
-	buffer: Buffer,
+	buffer: Uint8Array,
 	width: number,
 	height: number,
-	options: JPEGEncodeOptions | undefined
-): Promise<Buffer> {
+	options: JPEGEncodeOptions | undefined,
+): Promise<Uint8Array> {
 	try {
+		const jpegTurbo = await import('@julusian/jpeg-turbo')
+
 		// Try using jpeg-turbo if it is available
-		if (jpegTurbo && jpegTurbo.bufferSize && !!jpegTurbo.compressSync) {
-			const encodeOptions: import('@julusian/jpeg-turbo').EncodeOptions = {
+		if (jpegTurbo.bufferSize && !!jpegTurbo.compress) {
+			const encodeOptions: EncodeOptions = {
 				format: jpegTurbo.FORMAT_RGBA,
 				width,
 				height,
@@ -41,12 +35,11 @@ export async function encodeJPEG(
 			}
 			if (buffer.length === width * height * 4) {
 				const tmpBuffer = Buffer.alloc(jpegTurbo.bufferSize(encodeOptions))
-				return jpegTurbo.compress(buffer, tmpBuffer, encodeOptions)
+				return jpegTurbo.compress(Buffer.from(buffer), tmpBuffer, encodeOptions) // Future: avoid rewrap
 			}
 		}
-	} catch (e) {
+	} catch (_e) {
 		// TODO - log error
-		jpegTurbo = undefined
 	}
 
 	// If jpeg-turbo is unavailable or fails, then fallback to jpeg-js
@@ -56,7 +49,7 @@ export async function encodeJPEG(
 			height,
 			data: buffer,
 		},
-		options ? options.quality : DEFAULT_QUALITY
+		options ? options.quality : DEFAULT_QUALITY,
 	)
-	return Promise.resolve(jpegBuffer2.data)
+	return jpegBuffer2.data
 }
