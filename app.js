@@ -2129,7 +2129,7 @@ class StreamDeckBase extends EventEmitter {
     deviceProperties;
     #propertiesService;
     #buttonsLcdService;
-    #lcdStripDisplayService;
+    #lcdSegmentDisplayService;
     #inputService;
     // private readonly options: Readonly<OpenStreamDeckOptions>
     constructor(device, _options, services) {
@@ -2138,7 +2138,7 @@ class StreamDeckBase extends EventEmitter {
         this.deviceProperties = services.deviceProperties;
         this.#propertiesService = services.properties;
         this.#buttonsLcdService = services.buttonsLcd;
-        this.#lcdStripDisplayService = services.lcdStripDisplay;
+        this.#lcdSegmentDisplayService = services.lcdSegmentDisplay;
         this.#inputService = services.inputService;
         // propogate events
         services.events?.listen((key, ...args) => this.emit(key, ...args));
@@ -2195,24 +2195,24 @@ class StreamDeckBase extends EventEmitter {
     async clearPanel() {
         const ps = [];
         ps.push(this.#buttonsLcdService.clearPanel());
-        if (this.#lcdStripDisplayService)
-            ps.push(this.#lcdStripDisplayService.clearAllLcdStrips());
+        if (this.#lcdSegmentDisplayService)
+            ps.push(this.#lcdSegmentDisplayService.clearAllLcdSegments());
         await Promise.all(ps);
     }
     async fillLcd(...args) {
-        if (!this.#lcdStripDisplayService)
+        if (!this.#lcdSegmentDisplayService)
             throw new Error('Not supported for this model');
-        return this.#lcdStripDisplayService.fillLcd(...args);
+        return this.#lcdSegmentDisplayService.fillLcd(...args);
     }
     async fillLcdRegion(...args) {
-        if (!this.#lcdStripDisplayService)
+        if (!this.#lcdSegmentDisplayService)
             throw new Error('Not supported for this model');
-        return this.#lcdStripDisplayService.fillLcdRegion(...args);
+        return this.#lcdSegmentDisplayService.fillLcdRegion(...args);
     }
-    async clearLcdStrip(...args) {
-        if (!this.#lcdStripDisplayService)
+    async clearLcdSegment(...args) {
+        if (!this.#lcdSegmentDisplayService)
             throw new Error('Not supported for this model');
-        return this.#lcdStripDisplayService.clearLcdStrip(...args);
+        return this.#lcdSegmentDisplayService.clearLcdSegment(...args);
     }
 }
 exports.StreamDeckBase = StreamDeckBase;
@@ -2246,7 +2246,7 @@ function StreamDeckGen1Factory(device, options, properties, imageWriter, targetO
         events,
         properties: new gen1_js_1.Gen1PropertiesService(device),
         buttonsLcd: new default_js_1.DefaultButtonsLcdService(imageWriter, new bitmap_js_1.BitmapButtonLcdImagePacker(targetOptions, bmpImagePPM), device, fullProperties),
-        lcdStripDisplay: null,
+        lcdSegmentDisplay: null,
         inputService: new gen1_js_2.ButtonOnlyInputService(fullProperties, events),
     });
 }
@@ -2282,7 +2282,7 @@ function createBaseGen2Properties(device, options, properties, disableXYFlip) {
         events,
         properties: new gen2_js_1.Gen2PropertiesService(device),
         buttonsLcd: new default_js_1.DefaultButtonsLcdService(new imageWriter_js_1.StreamdeckDefaultImageWriter(new headerGenerator_js_1.StreamdeckGen2ImageHeaderGenerator()), new jpeg_js_1.JpegButtonLcdImagePacker(options.encodeJPEG, !disableXYFlip), device, fullProperties),
-        lcdStripDisplay: null,
+        lcdSegmentDisplay: null,
         inputService: new gen2_js_2.Gen2InputService(fullProperties, events),
     };
 }
@@ -2326,7 +2326,7 @@ const base_js_1 = __webpack_require__(67);
 const id_js_1 = __webpack_require__(444);
 const generic_gen2_js_1 = __webpack_require__(442);
 const controlsGenerator_js_1 = __webpack_require__(794);
-const neo_js_1 = __webpack_require__(60);
+const neo_js_1 = __webpack_require__(325);
 const neoControls = (0, controlsGenerator_js_1.generateButtonsGrid)(4, 2, { width: 96, height: 96 });
 neoControls.push({
     type: 'button',
@@ -2336,10 +2336,11 @@ neoControls.push({
     hidIndex: 8,
     feedbackType: 'rgb',
 }, {
-    type: 'lcd-strip',
+    type: 'lcd-segment',
     row: 2,
     column: 1,
     columnSpan: 2,
+    rowSpan: 1,
     id: 0,
     pixelSize: {
         width: 248,
@@ -2361,10 +2362,10 @@ const neoProperties = {
     KEY_SPACING_HORIZONTAL: 30,
     KEY_SPACING_VERTICAL: 30,
 };
-const lcdStripControls = neoProperties.CONTROLS.filter((control) => control.type === 'lcd-strip');
+const lcdSegmentControls = neoProperties.CONTROLS.filter((control) => control.type === 'lcd-segment');
 function StreamDeckNeoFactory(device, options) {
     const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, neoProperties);
-    services.lcdStripDisplay = new neo_js_1.StreamDeckNeoLcdService(options.encodeJPEG, device, lcdStripControls);
+    services.lcdSegmentDisplay = new neo_js_1.StreamDeckNeoLcdService(options.encodeJPEG, device, lcdSegmentControls);
     return new base_js_1.StreamDeckBase(device, options, services);
 }
 //# sourceMappingURL=neo.js.map
@@ -2502,7 +2503,7 @@ function StreamDeckPedalFactory(device, options) {
         events,
         properties: new pedal_js_1.PedalPropertiesService(device),
         buttonsLcd: new pedal_js_2.PedalLcdService(),
-        lcdStripDisplay: null,
+        lcdSegmentDisplay: null,
         inputService: new gen1_js_1.ButtonOnlyInputService(pedalProperties, events),
     });
 }
@@ -2520,13 +2521,14 @@ const base_js_1 = __webpack_require__(67);
 const generic_gen2_js_1 = __webpack_require__(442);
 const id_js_1 = __webpack_require__(444);
 const controlsGenerator_js_1 = __webpack_require__(794);
-const plus_js_1 = __webpack_require__(88);
+const plus_js_1 = __webpack_require__(864);
 const plusControls = (0, controlsGenerator_js_1.generateButtonsGrid)(4, 2, { width: 120, height: 120 });
 plusControls.push({
-    type: 'lcd-strip',
+    type: 'lcd-segment',
     row: 2,
     column: 0,
     columnSpan: 4,
+    rowSpan: 1,
     id: 0,
     pixelSize: Object.freeze({
         width: 800,
@@ -2565,10 +2567,10 @@ const plusProperties = {
     KEY_SPACING_HORIZONTAL: 99,
     KEY_SPACING_VERTICAL: 40,
 };
-const lcdStripControls = plusProperties.CONTROLS.filter((control) => control.type === 'lcd-strip');
+const lcdSegmentControls = plusProperties.CONTROLS.filter((control) => control.type === 'lcd-segment');
 function StreamDeckPlusFactory(device, options) {
     const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, plusProperties, true);
-    services.lcdStripDisplay = new plus_js_1.StreamDeckPlusLcdService(options.encodeJPEG, device, lcdStripControls);
+    services.lcdSegmentDisplay = new plus_js_1.StreamDeckPlusLcdService(options.encodeJPEG, device, lcdSegmentControls);
     return new base_js_1.StreamDeckBase(device, options, services);
 }
 //# sourceMappingURL=plus.js.map
@@ -2672,8 +2674,8 @@ class StreamDeckProxy {
     async fillLcdRegion(...args) {
         return this.device.fillLcdRegion(...args);
     }
-    async clearLcdStrip(...args) {
-        return this.device.clearLcdStrip(...args);
+    async clearLcdSegment(...args) {
+        return this.device.clearLcdSegment(...args);
     }
     /**
      * EventEmitter
@@ -3227,14 +3229,14 @@ class Gen2InputService extends gen1_js_1.ButtonOnlyInputService {
     #eventSource;
     #encoderControls;
     #encoderState;
-    #lcdStripControls;
+    #lcdSegmentControls;
     constructor(deviceProperties, eventSource) {
         super(deviceProperties, eventSource);
         this.#eventSource = eventSource;
         this.#encoderControls = deviceProperties.CONTROLS.filter((control) => control.type === 'encoder');
         const maxIndex = Math.max(-1, ...this.#encoderControls.map((control) => control.index));
         this.#encoderState = new Array(maxIndex + 1).fill(false);
-        this.#lcdStripControls = deviceProperties.CONTROLS.filter((control) => control.type === 'lcd-strip');
+        this.#lcdSegmentControls = deviceProperties.CONTROLS.filter((control) => control.type === 'lcd-segment');
     }
     handleInput(data) {
         const inputType = data[0];
@@ -3243,17 +3245,17 @@ class Gen2InputService extends gen1_js_1.ButtonOnlyInputService {
                 super.handleInput(data);
                 break;
             case 0x02: // LCD
-                this.#handleLcdStripInput(data);
+                this.#handleLcdSegmentInput(data);
                 break;
             case 0x03: // Encoder
                 this.#handleEncoderInput(data);
                 break;
         }
     }
-    #handleLcdStripInput(data) {
+    #handleLcdSegmentInput(data) {
         // Future: This will need to handle selecting the correct control
-        const lcdStripControl = this.#lcdStripControls.find((control) => control.id === 0);
-        if (!lcdStripControl)
+        const lcdSegmentControl = this.#lcdSegmentControls.find((control) => control.id === 0);
+        if (!lcdSegmentControl)
             return;
         const bufferView = (0, util_js_1.uint8ArrayToDataView)(data);
         const position = {
@@ -3262,10 +3264,10 @@ class Gen2InputService extends gen1_js_1.ButtonOnlyInputService {
         };
         switch (data[3]) {
             case 1: // short press
-                this.#eventSource.emit('lcdShortPress', lcdStripControl, position);
+                this.#eventSource.emit('lcdShortPress', lcdSegmentControl, position);
                 break;
             case 2: // long press
-                this.#eventSource.emit('lcdLongPress', lcdStripControl, position);
+                this.#eventSource.emit('lcdLongPress', lcdSegmentControl, position);
                 break;
             case 3: {
                 // swipe
@@ -3273,7 +3275,7 @@ class Gen2InputService extends gen1_js_1.ButtonOnlyInputService {
                     x: bufferView.getUint16(9, true),
                     y: bufferView.getUint16(11, true),
                 };
-                this.#eventSource.emit('lcdSwipe', lcdStripControl, position, positionTo);
+                this.#eventSource.emit('lcdSwipe', lcdSegmentControl, position, positionTo);
                 break;
             }
         }
@@ -3312,7 +3314,7 @@ exports.Gen2InputService = Gen2InputService;
 
 /***/ }),
 
-/***/ 60:
+/***/ 325:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -3337,7 +3339,7 @@ class StreamDeckNeoLcdService {
     async fillLcd(index, imageBuffer, sourceOptions) {
         const lcdControl = this.#lcdControls.find((control) => control.id === index);
         if (!lcdControl)
-            throw new Error(`Invalid lcd strip index ${index}`);
+            throw new Error(`Invalid lcd segment index ${index}`);
         const imageSize = lcdControl.pixelSize.width * lcdControl.pixelSize.height * sourceOptions.format.length;
         if (imageBuffer.length !== imageSize) {
             throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
@@ -3347,19 +3349,19 @@ class StreamDeckNeoLcdService {
         const packets = this.#lcdImageWriter.generateFillImageWrites(null, byteBuffer);
         await this.#device.sendReports(packets);
     }
-    async clearLcdStrip(index) {
+    async clearLcdSegment(index) {
         const lcdControl = this.#lcdControls.find((control) => control.id === index);
         if (!lcdControl)
-            throw new Error(`Invalid lcd strip index ${index}`);
+            throw new Error(`Invalid lcd segment index ${index}`);
         const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4);
         await this.fillLcd(index, buffer, {
             format: 'rgba',
         });
     }
-    async clearAllLcdStrips() {
+    async clearAllLcdSegments() {
         const ps = [];
         for (const control of this.#lcdControls) {
-            ps.push(this.clearLcdStrip(control.id));
+            ps.push(this.clearLcdSegment(control.id));
         }
         await Promise.all(ps);
     }
@@ -3378,7 +3380,7 @@ exports.StreamDeckNeoLcdService = StreamDeckNeoLcdService;
 
 /***/ }),
 
-/***/ 88:
+/***/ 864:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -3400,7 +3402,7 @@ class StreamDeckPlusLcdService {
     async fillLcd(index, buffer, sourceOptions) {
         const lcdControl = this.#lcdControls.find((control) => control.id === index);
         if (!lcdControl)
-            throw new Error(`Invalid lcd strip index ${index}`);
+            throw new Error(`Invalid lcd segment index ${index}`);
         return this.fillControlRegion(lcdControl, 0, 0, buffer, {
             format: sourceOptions.format,
             width: lcdControl.pixelSize.width,
@@ -3410,13 +3412,13 @@ class StreamDeckPlusLcdService {
     async fillLcdRegion(index, x, y, imageBuffer, sourceOptions) {
         const lcdControl = this.#lcdControls.find((control) => control.id === index);
         if (!lcdControl)
-            throw new Error(`Invalid lcd strip index ${index}`);
+            throw new Error(`Invalid lcd segment index ${index}`);
         return this.fillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions);
     }
-    async clearLcdStrip(index) {
+    async clearLcdSegment(index) {
         const lcdControl = this.#lcdControls.find((control) => control.id === index);
         if (!lcdControl)
-            throw new Error(`Invalid lcd strip index ${index}`);
+            throw new Error(`Invalid lcd segment index ${index}`);
         const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4);
         await this.fillControlRegion(lcdControl, 0, 0, buffer, {
             format: 'rgba',
@@ -3424,10 +3426,10 @@ class StreamDeckPlusLcdService {
             height: lcdControl.pixelSize.height,
         });
     }
-    async clearAllLcdStrips() {
+    async clearAllLcdSegments() {
         const ps = [];
         for (const control of this.#lcdControls) {
-            ps.push(this.clearLcdStrip(control.id));
+            ps.push(this.clearLcdSegment(control.id));
         }
         await Promise.all(ps);
     }
@@ -3435,10 +3437,10 @@ class StreamDeckPlusLcdService {
         // Basic bounds checking
         const maxSize = lcdControl.pixelSize;
         if (x < 0 || x + sourceOptions.width > maxSize.width) {
-            throw new TypeError(`Image will not fit within the lcd strip`);
+            throw new TypeError(`Image will not fit within the lcd segment`);
         }
         if (y < 0 || y + sourceOptions.height > maxSize.height) {
-            throw new TypeError(`Image will not fit within the lcd strip`);
+            throw new TypeError(`Image will not fit within the lcd segment`);
         }
         const imageSize = sourceOptions.width * sourceOptions.height * sourceOptions.format.length;
         if (imageBuffer.length !== imageSize) {
@@ -4417,7 +4419,7 @@ const chase_1 = __webpack_require__(889);
 if (true) {
     const elm = document.querySelector('#version_str');
     if (elm) {
-        elm.innerHTML = `v${"6.2.2"}`;
+        elm.innerHTML = `v${"7.0.0-0"}`;
     }
 }
 function appendLog(str) {
