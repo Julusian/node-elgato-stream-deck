@@ -85,10 +85,10 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		if (this.#deviceProperties.FULLSCREEN_PANELS > 0) {
 			// TODO - should this be a separate property?
 			for (let screenIndex = 0; screenIndex < this.#deviceProperties.FULLSCREEN_PANELS; screenIndex++) {
-				const buffer = Buffer.alloc(1024)
-				buffer.writeUint8(0x03, 0)
-				buffer.writeUint8(0x05, 1)
-				buffer.writeUint8(screenIndex, 2) // TODO - index
+				const buffer = new Uint8Array(1024)
+				buffer[0] = 0x03
+				buffer[1] = 0x05
+				buffer[2] = screenIndex // TODO - index
 				ps.push(this.#device.sendReports([buffer]))
 			}
 			// TODO - clear rgb?

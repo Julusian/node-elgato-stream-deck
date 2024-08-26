@@ -30,13 +30,13 @@ export class EncoderLedService {
 
 		if (!control.hasLed) throw new Error('Encoder does not have an LED')
 
-		const buffer = Buffer.alloc(1024)
-		buffer.writeUInt8(0x02, 0)
-		buffer.writeUInt8(0x10, 1)
-		buffer.writeUInt8(encoder, 2)
-		buffer.writeUInt8(red, 3)
-		buffer.writeUInt8(green, 4)
-		buffer.writeUInt8(blue, 5)
+		const buffer = new Uint8Array(1024)
+		buffer[0] = 0x02
+		buffer[1] = 0x10
+		buffer[2] = encoder
+		buffer[3] = red
+		buffer[4] = green
+		buffer[5] = blue
 		await this.#device.sendReports([buffer])
 	}
 
@@ -51,16 +51,21 @@ export class EncoderLedService {
 
 		if (control.ledRingSteps <= 0) throw new Error('Encoder does not have an LED ring')
 
-		const buffer = Buffer.alloc(1024)
-		buffer.fill(Buffer.from([red, green, blue]), 3, 3 + control.ledRingSteps * 3)
-		buffer.writeUint8(0x02, 0)
-		buffer.writeUint8(0x0f, 1)
-		buffer.writeUint8(encoder, 2)
+		const buffer = new Uint8Array(1024)
+		buffer[0] = 0x02
+		buffer[1] = 0x0f
+		buffer[2] = encoder
+		for (let i = 0; i < control.ledRingSteps; i++) {
+			const offset = 3 + i * 3
+			buffer[offset] = red
+			buffer[offset + 1] = green
+			buffer[offset + 2] = blue
+		}
 
 		await this.#device.sendReports([buffer])
 	}
 
-	public async setEncoderRingColors(encoder: EncoderIndex, colors: number[] | Buffer | Uint8Array): Promise<void> {
+	public async setEncoderRingColors(encoder: EncoderIndex, colors: number[] | Uint8Array): Promise<void> {
 		const control = this.#encoderControls.find((c) => c.index === encoder)
 		if (!control) throw new Error(`Invalid encoder index ${encoder}`)
 
@@ -68,11 +73,13 @@ export class EncoderLedService {
 
 		if (colors.length !== control.ledRingSteps * 3) throw new Error('Invalid colors length')
 
-		const buffer = Buffer.alloc(1024)
-		Buffer.from(colors).copy(buffer, 3, 0, control.ledRingSteps * 3)
-		buffer.writeUint8(0x02, 0)
-		buffer.writeUint8(0x0f, 1)
-		buffer.writeUint8(encoder, 2)
+		const colorsBuffer = colors instanceof Uint8Array ? colors : new Uint8Array(colors)
+
+		const buffer = new Uint8Array(1024)
+		buffer[0] = 0x02
+		buffer[1] = 0x0f
+		buffer[2] = encoder
+		buffer.set(colorsBuffer, 3)
 
 		await this.#device.sendReports([buffer])
 	}

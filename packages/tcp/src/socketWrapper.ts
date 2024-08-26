@@ -163,7 +163,7 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 		}
 	}
 
-	sendMessages(buffers: Buffer[]): void {
+	sendMessages(buffers: Uint8Array[]): void {
 		// TODO - await write?
 		for (const buffer of buffers) {
 			this.#socket.write(buffer)

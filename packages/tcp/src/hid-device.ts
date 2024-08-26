@@ -1,10 +1,11 @@
 import * as EventEmitter from 'events'
-import type {
-	HIDDeviceInfo,
-	HIDDevice,
-	HIDDeviceEvents,
-	ChildHIDDeviceInfo,
-	StreamDeckTcpChildDeviceInfo,
+import {
+	type HIDDeviceInfo,
+	type HIDDevice,
+	type HIDDeviceEvents,
+	type ChildHIDDeviceInfo,
+	type StreamDeckTcpChildDeviceInfo,
+	uint8ArrayToDataView,
 } from '@elgato-stream-deck/core'
 import type { SocketWrapper } from './socketWrapper.js'
 import { parseDevice2Info } from './device2Info.js'
@@ -98,23 +99,23 @@ export class TcpHidDevice extends EventEmitter<HIDDeviceEvents> implements HIDDe
 		// await this.#socket.close()
 	}
 
-	async sendFeatureReport(data: Buffer): Promise<void> {
+	async sendFeatureReport(data: Uint8Array): Promise<void> {
 		// Ensure the buffer is 1024 bytes long
 		let dataFull = data
 		if (data.length != 1024) {
-			dataFull = Buffer.alloc(1024)
-			data.copy(dataFull, 0, 0, Math.min(data.length, dataFull.length))
+			dataFull = new Uint8Array(1024)
+			dataFull.set(data.slice(0, Math.min(data.length, dataFull.length)))
 		}
 
 		this.#socket.sendMessages([dataFull])
 	}
 
-	async getFeatureReport(reportId: number, _reportLength: number): Promise<Buffer> {
+	async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
 		return this.#executeSingletonCommand(reportId, this.#isPrimary)
 	}
 
 	readonly #pendingSingletonCommands = new Map<number, QueuedCommand>()
-	async #executeSingletonCommand(commandType: number, isPrimary: boolean): Promise<Buffer> {
+	async #executeSingletonCommand(commandType: number, isPrimary: boolean): Promise<Uint8Array> {
 		// if (!this.connected) throw new Error('Not connected')
 
 		const existingCommand = this.#pendingSingletonCommands.get(commandType)
@@ -167,8 +168,9 @@ export class TcpHidDevice extends EventEmitter<HIDDeviceEvents> implements HIDDe
 		const devicePath = `tcp://${this.#socket.address}:${this.#socket.port}`
 
 		if (this.#isPrimary) {
-			const vendorId = deviceInfo.data.readUInt16LE(12)
-			const productId = deviceInfo.data.readUInt16LE(14)
+			const dataView = uint8ArrayToDataView(deviceInfo.data)
+			const vendorId = dataView.getUint16(12, true)
+			const productId = dataView.getUint16(14, true)
 
 			this.#loadedHidInfo = {
 				vendorId: vendorId,

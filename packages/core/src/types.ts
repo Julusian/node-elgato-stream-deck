@@ -147,7 +147,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param index The encoder to fill
 	 * @param colors rgb packed pixel values for the encoder ring
 	 */
-	setEncoderRingColors(index: EncoderIndex, colors: number[] | Buffer | Uint8Array): Promise<void>
+	setEncoderRingColors(index: EncoderIndex, colors: number[] | Uint8Array): Promise<void>
 
 	/**
 	 * Fill a region of the lcd segment, ignoring the boundaries of the encoders

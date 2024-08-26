@@ -20,6 +20,7 @@ export type { HIDDevice, HIDDeviceInfo, HIDDeviceEvents, ChildHIDDeviceInfo } fr
 export type { OpenStreamDeckOptions } from './models/base.js'
 export { StreamDeckProxy } from './proxy.js'
 export type { PropertiesService } from './services/properties/interface.js'
+export { uint8ArrayToDataView } from './util.js'
 
 /** Elgato vendor id */
 export const VENDOR_ID = 0x0fd9
