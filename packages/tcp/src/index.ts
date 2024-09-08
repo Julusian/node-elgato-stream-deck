@@ -18,5 +18,6 @@ export {
 export * from './types.js'
 export * from './connectionManager.js'
 export * from './discoveryService.js'
+export { DEFAULT_TCP_PORT } from './constants.js'
 
 export { JPEGEncodeOptions }
