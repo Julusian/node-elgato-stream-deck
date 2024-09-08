@@ -2,7 +2,9 @@
 	"files": [],
 	"references": [
 		{ "path": "./packages/core/tsconfig.json" },
+		{ "path": "./packages/node-lib/tsconfig.json" },
 		{ "path": "./packages/node/tsconfig.json" },
+		{ "path": "./packages/tcp/tsconfig.json" },
 		{ "path": "./packages/webhid/tsconfig.json" },
 		{ "path": "./packages/webhid-demo/tsconfig.json" }
 	]

@@ -1,4 +1,4 @@
-import type * as EventEmitter from 'eventemitter3'
+import type { EventEmitter } from 'eventemitter3'
 import type { DeviceModelId } from './id.js'
 import type { StreamDeck, StreamDeckEvents } from './types.js'
 import type { StreamDeckControlDefinition } from './controlDefinition.js'
@@ -9,7 +9,7 @@ import type { StreamDeckControlDefinition } from './controlDefinition.js'
  */
 
 export class StreamDeckProxy implements StreamDeck {
-	protected device: StreamDeck
+	protected readonly device: StreamDeck
 
 	constructor(device: StreamDeck) {
 		this.device = device
@@ -29,6 +29,9 @@ export class StreamDeckProxy implements StreamDeck {
 	}
 	public get PRODUCT_NAME(): string {
 		return this.device.PRODUCT_NAME
+	}
+	public get HAS_NFC_READER(): boolean {
+		return this.device.HAS_NFC_READER
 	}
 
 	public calculateFillPanelDimensions(
@@ -83,6 +86,24 @@ export class StreamDeckProxy implements StreamDeck {
 		return this.device.fillLcd(...args)
 	}
 
+	public async setEncoderColor(
+		...args: Parameters<StreamDeck['setEncoderColor']>
+	): ReturnType<StreamDeck['setEncoderColor']> {
+		return this.device.setEncoderColor(...args)
+	}
+
+	public async setEncoderRingSingleColor(
+		...args: Parameters<StreamDeck['setEncoderRingSingleColor']>
+	): ReturnType<StreamDeck['setEncoderRingSingleColor']> {
+		return this.device.setEncoderRingSingleColor(...args)
+	}
+
+	public async setEncoderRingColors(
+		...args: Parameters<StreamDeck['setEncoderRingColors']>
+	): ReturnType<StreamDeck['setEncoderRingColors']> {
+		return this.device.setEncoderRingColors(...args)
+	}
+
 	public async fillLcdRegion(
 		...args: Parameters<StreamDeck['fillLcdRegion']>
 	): ReturnType<StreamDeck['fillLcdRegion']> {
@@ -93,6 +114,12 @@ export class StreamDeckProxy implements StreamDeck {
 		...args: Parameters<StreamDeck['clearLcdSegment']>
 	): ReturnType<StreamDeck['clearLcdSegment']> {
 		return this.device.clearLcdSegment(...args)
+	}
+
+	public async getChildDeviceInfo(
+		...args: Parameters<StreamDeck['getChildDeviceInfo']>
+	): ReturnType<StreamDeck['getChildDeviceInfo']> {
+		return this.device.getChildDeviceInfo(...args)
 	}
 
 	/**

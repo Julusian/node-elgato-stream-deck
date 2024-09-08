@@ -1,7 +1,7 @@
 import type { HIDDevice } from '../hid-device.js'
 import type { OpenStreamDeckOptions, StreamDeckProperties } from './base.js'
 import { StreamDeckBase } from './base.js'
-import { DeviceModelId } from '../id.js'
+import { DeviceModelId, MODEL_NAMES } from '../id.js'
 import type { StreamDeckControlDefinition } from '../controlDefinition.js'
 import { freezeDefinitions } from '../controlsGenerator.js'
 import { PedalPropertiesService } from '../services/properties/pedal.js'
@@ -39,7 +39,7 @@ const pedalControls: StreamDeckControlDefinition[] = [
 
 const pedalProperties: StreamDeckProperties = {
 	MODEL: DeviceModelId.PEDAL,
-	PRODUCT_NAME: 'Stream Deck Pedal',
+	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.PEDAL],
 	KEY_DATA_OFFSET: 3,
 	SUPPORTS_RGB_KEY_FILL: false,
 
@@ -47,6 +47,10 @@ const pedalProperties: StreamDeckProperties = {
 
 	KEY_SPACING_HORIZONTAL: 0,
 	KEY_SPACING_VERTICAL: 0,
+
+	FULLSCREEN_PANELS: 0,
+	HAS_NFC_READER: false,
+	SUPPORTS_CHILD_DEVICES: false,
 }
 
 export function StreamDeckPedalFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
@@ -59,5 +63,6 @@ export function StreamDeckPedalFactory(device: HIDDevice, options: Required<Open
 		buttonsLcd: new PedalLcdService(),
 		lcdSegmentDisplay: null,
 		inputService: new ButtonOnlyInputService(pedalProperties, events),
+		encoderLed: null,
 	})
 }

@@ -1,5 +1,6 @@
 import type { DeviceModelId, HIDDevice, HIDDeviceEvents, HIDDeviceInfo } from '@elgato-stream-deck/core'
-import * as EventEmitter from 'eventemitter3'
+import type { ChildHIDDeviceInfo } from '@elgato-stream-deck/core/dist/hid-device'
+import { EventEmitter } from 'eventemitter3'
 import type { HIDAsync, Device as NodeHIDDeviceInfo } from 'node-hid'
 
 /**
@@ -62,5 +63,10 @@ export class NodeHIDDevice extends EventEmitter<HIDDeviceEvents> implements HIDD
 			productId: info.productId,
 			vendorId: info.vendorId,
 		}
+	}
+
+	public async getChildDeviceInfo(): Promise<ChildHIDDeviceInfo | null> {
+		// Not supported
+		return null
 	}
 }

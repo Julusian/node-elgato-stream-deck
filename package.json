@@ -56,7 +56,9 @@
   },
   "workspaces": [
     "packages/core",
+    "packages/node-lib",
     "packages/node",
+    "packages/tcp",
     "packages/webhid",
     "packages/webhid-demo"
   ],

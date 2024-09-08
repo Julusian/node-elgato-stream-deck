@@ -1,5 +1,5 @@
-import type * as EventEmitter from 'eventemitter3'
-import type { DeviceModelId, Dimension, KeyIndex } from './id.js'
+import type { EventEmitter } from 'eventemitter3'
+import type { DeviceModelId, Dimension, EncoderIndex, KeyIndex } from './id.js'
 import type { HIDDeviceInfo } from './hid-device.js'
 import type {
 	StreamDeckButtonControlDefinition,
@@ -7,6 +7,12 @@ import type {
 	StreamDeckEncoderControlDefinition,
 	StreamDeckLcdSegmentControlDefinition,
 } from './controlDefinition.js'
+
+export interface StreamDeckTcpChildDeviceInfo extends HIDDeviceInfo {
+	readonly model: DeviceModelId
+	readonly serialNumber: string
+	readonly tcpPort: number
+}
 
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
@@ -35,6 +41,8 @@ export type StreamDeckEvents = {
 	lcdShortPress: [control: StreamDeckLcdSegmentControlDefinition, position: LcdPosition]
 	lcdLongPress: [control: StreamDeckLcdSegmentControlDefinition, position: LcdPosition]
 	lcdSwipe: [control: StreamDeckLcdSegmentControlDefinition, from: LcdPosition, to: LcdPosition]
+
+	nfcRead: [id: string]
 }
 
 export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
@@ -52,6 +60,9 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	readonly MODEL: DeviceModelId
 	/** The name of the product/model */
 	readonly PRODUCT_NAME: string
+
+	/** Whether this device has a nfc reader */
+	readonly HAS_NFC_READER: boolean
 
 	/**
 	 * Calculate the dimensions to use for `fillPanelBuffer`, to fill the whole button lcd panel with a single image.
@@ -114,6 +125,31 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	): Promise<void>
 
 	/**
+	 * Fills the primary led of an encoder
+	 * @param {number} index The encoder to fill
+	 * @param {number} r The color's red value. 0 - 255
+	 * @param {number} g The color's green value. 0 - 255
+	 * @param {number} b The color's blue value. 0 -255
+	 */
+	setEncoderColor(index: EncoderIndex, r: number, g: number, b: number): Promise<void>
+
+	/**
+	 * Fills the led ring of an encoder with a single color
+	 * @param {number} index The encoder to fill
+	 * @param {number} r The color's red value. 0 - 255
+	 * @param {number} g The color's green value. 0 - 255
+	 * @param {number} b The color's blue value. 0 -255
+	 */
+	setEncoderRingSingleColor(index: EncoderIndex, r: number, g: number, b: number): Promise<void>
+
+	/**
+	 * Fill the led ring of an encoder
+	 * @param index The encoder to fill
+	 * @param colors rgb packed pixel values for the encoder ring
+	 */
+	setEncoderRingColors(index: EncoderIndex, colors: number[] | Uint8Array): Promise<void>
+
+	/**
 	 * Fill a region of the lcd segment, ignoring the boundaries of the encoders
 	 * @param {number} lcdIndex The id of the lcd segment to draw to
 	 * @param {number} x The x position to draw to
@@ -168,4 +204,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * Get serial number from Stream Deck
 	 */
 	getSerialNumber(): Promise<string>
+
+	getChildDeviceInfo(): Promise<StreamDeckTcpChildDeviceInfo | null>
 }

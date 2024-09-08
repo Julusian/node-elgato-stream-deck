@@ -41,6 +41,9 @@ export class Gen2InputService extends ButtonOnlyInputService {
 			case 0x03: // Encoder
 				this.#handleEncoderInput(data)
 				break
+			case 0x04: // NFC
+				this.#handleNfcRead(data)
+				break
 		}
 	}
 
@@ -100,5 +103,14 @@ export class Gen2InputService extends ButtonOnlyInputService {
 				}
 				break
 		}
+	}
+
+	#handleNfcRead(data: Uint8Array): void {
+		if (!this.deviceProperties.HAS_NFC_READER) return
+
+		const length = data[1] + data[2] * 256
+		const id = new TextDecoder('ascii').decode(data.subarray(3, 3 + length))
+
+		this.#eventSource.emit('nfcRead', id)
 	}
 }

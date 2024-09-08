@@ -1,7 +1,7 @@
 import type { HIDDevice } from '../hid-device.js'
 import type { OpenStreamDeckOptions } from './base.js'
 import { StreamDeckBase } from './base.js'
-import { DeviceModelId } from '../id.js'
+import { DeviceModelId, MODEL_NAMES } from '../id.js'
 import type { StreamDeckGen2Properties } from './generic-gen2.js'
 import { createBaseGen2Properties } from './generic-gen2.js'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
@@ -46,19 +46,23 @@ neoControls.push(
 
 const neoProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.NEO,
-	PRODUCT_NAME: 'Stream Deck Neo',
+	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.NEO],
 
 	CONTROLS: freezeDefinitions(neoControls),
 
 	KEY_SPACING_HORIZONTAL: 30,
 	KEY_SPACING_VERTICAL: 30,
+
+	FULLSCREEN_PANELS: 0,
+	HAS_NFC_READER: false,
+	SUPPORTS_CHILD_DEVICES: false,
 }
 const lcdSegmentControls = neoProperties.CONTROLS.filter(
 	(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
 )
 
 export function StreamDeckNeoFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
-	const services = createBaseGen2Properties(device, options, neoProperties)
+	const services = createBaseGen2Properties(device, options, neoProperties, null)
 	services.lcdSegmentDisplay = new StreamDeckNeoLcdService(options.encodeJPEG, device, lcdSegmentControls)
 
 	return new StreamDeckBase(device, options, services)

@@ -5,9 +5,10 @@ const { listStreamDecks, openStreamDeck, DeviceModelId } = require('../dist/inde
 
 ;(async () => {
 	const devices = await listStreamDecks()
-	if (!devices[0]) throw new Error('No device found')
+	const plusDevice = devices.find((dev) => dev.model === DeviceModelId.PLUS)
+	if (!plusDevice) throw new Error('No device found')
 
-	const streamDeck = await openStreamDeck(devices[0].path)
+	const streamDeck = await openStreamDeck(plusDevice.path)
 	await streamDeck.clearPanel()
 
 	if (streamDeck.MODEL !== DeviceModelId.PLUS) throw new Error('This demo only supports the plus')
@@ -55,14 +56,14 @@ const { listStreamDecks, openStreamDeck, DeviceModelId } = require('../dist/inde
 	streamDeck.on('rotate', (control, amount) => {
 		console.log('Encoder rotate #%d (%d)', control.index, amount)
 	})
-	streamDeck.on('lcdShortPress', (index, pos) => {
-		console.log('lcd short press #%d (%d, %d)', index, pos.x, pos.y)
+	streamDeck.on('lcdShortPress', (control, pos) => {
+		console.log('lcd short press #%d (%d, %d)', control.id, pos.x, pos.y)
 	})
-	streamDeck.on('lcdLongPress', (index, pos) => {
-		console.log('lcd long press #%d (%d, %d)', index, pos.x, pos.y)
+	streamDeck.on('lcdLongPress', (control, pos) => {
+		console.log('lcd long press #%d (%d, %d)', control.id, pos.x, pos.y)
 	})
-	streamDeck.on('lcdSwipe', (index, index2, pos, pos2) => {
-		console.log('lcd swipe #%d->#%d (%d, %d)->(%d, %d)', index, index2, pos.x, pos.y, pos2.x, pos2.y)
+	streamDeck.on('lcdSwipe', (control, from, to) => {
+		console.log('lcd swipe #%d (%d, %d)->(%d, %d)', control.id, from.x, from.y, to.x, to.y)
 	})
 
 	streamDeck.on('error', (error) => {

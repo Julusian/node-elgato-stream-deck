@@ -1,0 +1,45 @@
+{
+	"name": "@elgato-stream-deck/node-lib",
+	"version": "7.0.0-0",
+	"description": "Helpers for a npm module for interfacing with the Elgato Stream Deck",
+	"main": "dist/lib.js",
+	"typings": "dist/lib.d.ts",
+	"license": "MIT",
+	"homepage": "https://github.com/julusian/node-elgato-stream-deck#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/julusian/node-elgato-stream-deck.git"
+	},
+	"bugs": {
+		"url": "https://github.com/julusian/node-elgato-stream-deck/issues"
+	},
+	"author": {
+		"name": "Julian Waller",
+		"email": "git@julusian.co.uk"
+	},
+	"keywords": [
+		"elgato",
+		"stream",
+		"deck",
+		"streamdeck",
+		"hid",
+		"usb",
+		"hardware",
+		"interface",
+		"controller"
+	],
+	"files": [
+		"dist",
+		"udev"
+	],
+	"engines": {
+		"node": ">=18.18"
+	},
+	"dependencies": {
+		"jpeg-js": "^0.4.4",
+		"tslib": "^2.6.3"
+	},
+	"peerDependencies": {
+		"@julusian/jpeg-turbo": "^1.1.2 || ^2.0.0"
+	}
+}

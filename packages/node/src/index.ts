@@ -2,8 +2,8 @@ import type { OpenStreamDeckOptions, StreamDeck } from '@elgato-stream-deck/core
 import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'
 import * as HID from 'node-hid'
 import { NodeHIDDevice, StreamDeckDeviceInfo } from './hid-device.js'
-import { encodeJPEG, JPEGEncodeOptions } from './jpeg.js'
 import { StreamDeckNode } from './wrapper.js'
+import { encodeJPEG, JPEGEncodeOptions } from '@elgato-stream-deck/node-lib'
 
 export {
 	VENDOR_ID,

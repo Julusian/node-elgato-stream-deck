@@ -34,6 +34,7 @@ module.exports = {
 	preset: 'ts-jest',
 
 	moduleNameMapper: {
+		'@elgato-stream-deck/node-lib': '<rootDir>/packages/node-lib/src/lib.ts',
 		'@elgato-stream-deck/(.+)': '<rootDir>/packages/$1/src',
 		'^(..?/.+).js?$': '$1',
 	},
