@@ -1,6 +1,6 @@
 {
 	"name": "@elgato-stream-deck/tcp",
-	"version": "7.0.0-0",
+	"version": "7.0.0",
 	"description": "An npm module for interfacing with select Elgato Stream Deck devices in node over tcp",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
@@ -36,8 +36,8 @@
 		"node": ">=18.18"
 	},
 	"dependencies": {
-		"@elgato-stream-deck/core": "7.0.0-0",
-		"@elgato-stream-deck/node-lib": "7.0.0-0",
+		"@elgato-stream-deck/core": "7.0.0",
+		"@elgato-stream-deck/node-lib": "7.0.0",
 		"@julusian/bonjour-service": "^1.3.0-2",
 		"eventemitter3": "^5.0.1",
 		"tslib": "^2.6.3"
