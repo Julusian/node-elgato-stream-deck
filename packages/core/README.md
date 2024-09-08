@@ -13,3 +13,4 @@ You should not be importing this package directly, instead you will want to do s
 
 -   [`@elgato-stream-deck/node`](https://npm.im/@elgato-stream-deck/node)
 -   [`@elgato-stream-deck/webhid`](https://npm.im/@elgato-stream-deck/webhid)
+-   [`@elgato-stream-deck/tcp`](https://npm.im/@elgato-stream-deck/tcp)

@@ -16,6 +16,7 @@ Check one of the installable packages for installation and usage instructions:
 
 -   [`@elgato-stream-deck/node`](https://npm.im/@elgato-stream-deck/node)
 -   [`@elgato-stream-deck/webhid`](https://npm.im/@elgato-stream-deck/webhid)
+-   [`@elgato-stream-deck/tcp`](https://npm.im/@elgato-stream-deck/tcp)
 
 ### Have another hid target you wish to use?
 
