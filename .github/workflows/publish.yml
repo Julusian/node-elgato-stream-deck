@@ -27,7 +27,7 @@ jobs:
           else
 
             PUBLISHED_VERSION=$(yarn npm info --json @elgato-stream-deck/node | jq -c '.version' -r)
-            THIS_VERSION=$(node -p "require('./package.json').version")
+            THIS_VERSION=$(node -p "require('./packages/node/package.json').version")
             # Simple bash helper to comapre version numbers
             verlte() {
               [  "$1" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
