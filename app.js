@@ -2,7 +2,7 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 646:
+/***/ 2646:
 /***/ ((module) => {
 
 
@@ -345,7 +345,7 @@ if (true) {
 
 /***/ }),
 
-/***/ 559:
+/***/ 2559:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 // ESM COMPAT FLAG
@@ -1266,7 +1266,7 @@ async function getFontEmbedCSS(node, options = {}) {
 
 /***/ }),
 
-/***/ 651:
+/***/ 3651:
 /***/ ((module) => {
 
 
@@ -1288,14 +1288,14 @@ module.exports = (promise, onFinally) => {
 
 /***/ }),
 
-/***/ 968:
+/***/ 4968:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const EventEmitter = __webpack_require__(646);
-const p_timeout_1 = __webpack_require__(455);
-const priority_queue_1 = __webpack_require__(856);
+const EventEmitter = __webpack_require__(9210);
+const p_timeout_1 = __webpack_require__(9455);
+const priority_queue_1 = __webpack_require__(8856);
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const empty = () => { };
 const timeoutError = new p_timeout_1.TimeoutError();
@@ -1602,7 +1602,7 @@ exports["default"] = lowerBound;
 
 /***/ }),
 
-/***/ 856:
+/***/ 8856:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -1641,12 +1641,355 @@ exports["default"] = PriorityQueue;
 
 /***/ }),
 
-/***/ 455:
+/***/ 9210:
+/***/ ((module) => {
+
+
+
+var has = Object.prototype.hasOwnProperty
+  , prefix = '~';
+
+/**
+ * Constructor to create a storage for our `EE` objects.
+ * An `Events` instance is a plain object whose properties are event names.
+ *
+ * @constructor
+ * @private
+ */
+function Events() {}
+
+//
+// We try to not inherit from `Object.prototype`. In some engines creating an
+// instance in this way is faster than calling `Object.create(null)` directly.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// character to make sure that the built-in object properties are not
+// overridden or used as an attack vector.
+//
+if (Object.create) {
+  Events.prototype = Object.create(null);
+
+  //
+  // This hack is needed because the `__proto__` property is still inherited in
+  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
+  //
+  if (!new Events().__proto__) prefix = false;
+}
+
+/**
+ * Representation of a single event listener.
+ *
+ * @param {Function} fn The listener function.
+ * @param {*} context The context to invoke the listener with.
+ * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
+ * @constructor
+ * @private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Add a listener for a given event.
+ *
+ * @param {EventEmitter} emitter Reference to the `EventEmitter` instance.
+ * @param {(String|Symbol)} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {*} context The context to invoke the listener with.
+ * @param {Boolean} once Specify if the listener is a one-time listener.
+ * @returns {EventEmitter}
+ * @private
+ */
+function addListener(emitter, event, fn, context, once) {
+  if (typeof fn !== 'function') {
+    throw new TypeError('The listener must be a function');
+  }
+
+  var listener = new EE(fn, context || emitter, once)
+    , evt = prefix ? prefix + event : event;
+
+  if (!emitter._events[evt]) emitter._events[evt] = listener, emitter._eventsCount++;
+  else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);
+  else emitter._events[evt] = [emitter._events[evt], listener];
+
+  return emitter;
+}
+
+/**
+ * Clear event by name.
+ *
+ * @param {EventEmitter} emitter Reference to the `EventEmitter` instance.
+ * @param {(String|Symbol)} evt The Event name.
+ * @private
+ */
+function clearEvent(emitter, evt) {
+  if (--emitter._eventsCount === 0) emitter._events = new Events();
+  else delete emitter._events[evt];
+}
+
+/**
+ * Minimal `EventEmitter` interface that is molded against the Node.js
+ * `EventEmitter` interface.
+ *
+ * @constructor
+ * @public
+ */
+function EventEmitter() {
+  this._events = new Events();
+  this._eventsCount = 0;
+}
+
+/**
+ * Return an array listing the events for which the emitter has registered
+ * listeners.
+ *
+ * @returns {Array}
+ * @public
+ */
+EventEmitter.prototype.eventNames = function eventNames() {
+  var names = []
+    , events
+    , name;
+
+  if (this._eventsCount === 0) return names;
+
+  for (name in (events = this._events)) {
+    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    return names.concat(Object.getOwnPropertySymbols(events));
+  }
+
+  return names;
+};
+
+/**
+ * Return the listeners registered for a given event.
+ *
+ * @param {(String|Symbol)} event The event name.
+ * @returns {Array} The registered listeners.
+ * @public
+ */
+EventEmitter.prototype.listeners = function listeners(event) {
+  var evt = prefix ? prefix + event : event
+    , handlers = this._events[evt];
+
+  if (!handlers) return [];
+  if (handlers.fn) return [handlers.fn];
+
+  for (var i = 0, l = handlers.length, ee = new Array(l); i < l; i++) {
+    ee[i] = handlers[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Return the number of listeners listening to a given event.
+ *
+ * @param {(String|Symbol)} event The event name.
+ * @returns {Number} The number of listeners.
+ * @public
+ */
+EventEmitter.prototype.listenerCount = function listenerCount(event) {
+  var evt = prefix ? prefix + event : event
+    , listeners = this._events[evt];
+
+  if (!listeners) return 0;
+  if (listeners.fn) return 1;
+  return listeners.length;
+};
+
+/**
+ * Calls each of the listeners registered for a given event.
+ *
+ * @param {(String|Symbol)} event The event name.
+ * @returns {Boolean} `true` if the event had listeners, else `false`.
+ * @public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if (listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Add a listener for a given event.
+ *
+ * @param {(String|Symbol)} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {*} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  return addListener(this, event, fn, context, false);
+};
+
+/**
+ * Add a one-time listener for a given event.
+ *
+ * @param {(String|Symbol)} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {*} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  return addListener(this, event, fn, context, true);
+};
+
+/**
+ * Remove the listeners of a given event.
+ *
+ * @param {(String|Symbol)} event The event name.
+ * @param {Function} fn Only remove the listeners that match this function.
+ * @param {*} context Only remove the listeners that have this context.
+ * @param {Boolean} once Only remove one-time listeners.
+ * @returns {EventEmitter} `this`.
+ * @public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return this;
+  if (!fn) {
+    clearEvent(this, evt);
+    return this;
+  }
+
+  var listeners = this._events[evt];
+
+  if (listeners.fn) {
+    if (
+      listeners.fn === fn &&
+      (!once || listeners.once) &&
+      (!context || listeners.context === context)
+    ) {
+      clearEvent(this, evt);
+    }
+  } else {
+    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+      if (
+        listeners[i].fn !== fn ||
+        (once && !listeners[i].once) ||
+        (context && listeners[i].context !== context)
+      ) {
+        events.push(listeners[i]);
+      }
+    }
+
+    //
+    // Reset the array, or remove it completely if we have no more listeners.
+    //
+    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
+    else clearEvent(this, evt);
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners, or those of the specified event.
+ *
+ * @param {(String|Symbol)} [event] The event name.
+ * @returns {EventEmitter} `this`.
+ * @public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  var evt;
+
+  if (event) {
+    evt = prefix ? prefix + event : event;
+    if (this._events[evt]) clearEvent(this, evt);
+  } else {
+    this._events = new Events();
+    this._eventsCount = 0;
+  }
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Allow `EventEmitter` to be imported as module namespace.
+//
+EventEmitter.EventEmitter = EventEmitter;
+
+//
+// Expose the module.
+//
+if (true) {
+  module.exports = EventEmitter;
+}
+
+
+/***/ }),
+
+/***/ 9455:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 
-const pFinally = __webpack_require__(651);
+const pFinally = __webpack_require__(3651);
 
 class TimeoutError extends Error {
 	constructor(message) {
@@ -1705,7 +2048,7 @@ module.exports.TimeoutError = TimeoutError;
 
 /***/ }),
 
-/***/ 889:
+/***/ 1889:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1791,13 +2134,13 @@ exports.ChaseDemo = ChaseDemo;
 
 /***/ }),
 
-/***/ 35:
+/***/ 2035:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DomImageDemo = void 0;
-const html_to_image_1 = __webpack_require__(559);
+const html_to_image_1 = __webpack_require__(2559);
 function getRandomColor() {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -1862,7 +2205,7 @@ exports.DomImageDemo = DomImageDemo;
 
 /***/ }),
 
-/***/ 964:
+/***/ 4964:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1895,7 +2238,7 @@ exports.FillWhenPressedDemo = FillWhenPressedDemo;
 
 /***/ }),
 
-/***/ 215:
+/***/ 1215:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1953,7 +2296,7 @@ exports.RapidFillDemo = RapidFillDemo;
 
 /***/ }),
 
-/***/ 173:
+/***/ 2173:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1962,14 +2305,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 794:
+/***/ 3794:
 /***/ ((__unused_webpack_module, exports) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateButtonsGrid = generateButtonsGrid;
 exports.freezeDefinitions = freezeDefinitions;
-function generateButtonsGrid(width, height, pixelSize, rtl = false) {
+function generateButtonsGrid(width, height, pixelSize, rtl = false, columnOffset = 0) {
     const controls = [];
     for (let row = 0; row < height; row++) {
         for (let column = 0; column < width; column++) {
@@ -1978,7 +2321,7 @@ function generateButtonsGrid(width, height, pixelSize, rtl = false) {
             controls.push({
                 type: 'button',
                 row,
-                column,
+                column: column + columnOffset,
                 index,
                 hidIndex,
                 feedbackType: 'lcd',
@@ -2001,12 +2344,12 @@ function freezeDefinitions(controls) {
 
 /***/ }),
 
-/***/ 444:
+/***/ 6444:
 /***/ ((__unused_webpack_module, exports) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DeviceModelId = void 0;
+exports.MODEL_NAMES = exports.DeviceModelId = void 0;
 var DeviceModelId;
 (function (DeviceModelId) {
     DeviceModelId["ORIGINAL"] = "original";
@@ -2017,32 +2360,47 @@ var DeviceModelId;
     DeviceModelId["PEDAL"] = "pedal";
     DeviceModelId["PLUS"] = "plus";
     DeviceModelId["NEO"] = "neo";
+    DeviceModelId["STUDIO"] = "studio";
 })(DeviceModelId || (exports.DeviceModelId = DeviceModelId = {}));
+exports.MODEL_NAMES = {
+    [DeviceModelId.ORIGINAL]: 'Stream Deck',
+    [DeviceModelId.MINI]: 'Stream Deck Mini',
+    [DeviceModelId.XL]: 'Stream Deck XL',
+    [DeviceModelId.ORIGINALV2]: 'Stream Deck',
+    [DeviceModelId.ORIGINALMK2]: 'Stream Deck MK.2',
+    [DeviceModelId.PLUS]: 'Stream Deck +',
+    [DeviceModelId.PEDAL]: 'Stream Deck Pedal',
+    [DeviceModelId.NEO]: 'Stream Deck Neo',
+    [DeviceModelId.STUDIO]: 'Stream Deck Studio',
+};
 //# sourceMappingURL=id.js.map
 
 /***/ }),
 
-/***/ 601:
+/***/ 8601:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DEVICE_MODELS = exports.DEVICE_MODELS2 = exports.DeviceModelType = exports.VENDOR_ID = exports.StreamDeckProxy = void 0;
-const tslib_1 = __webpack_require__(823);
-const id_js_1 = __webpack_require__(444);
+exports.DEVICE_MODELS = exports.DEVICE_MODELS2 = exports.DeviceModelType = exports.VENDOR_ID = exports.uint8ArrayToDataView = exports.StreamDeckProxy = void 0;
+const tslib_1 = __webpack_require__(5823);
+const id_js_1 = __webpack_require__(6444);
 const original_js_1 = __webpack_require__(745);
-const mini_js_1 = __webpack_require__(321);
-const xl_js_1 = __webpack_require__(766);
-const originalv2_js_1 = __webpack_require__(150);
-const original_mk2_js_1 = __webpack_require__(158);
-const plus_js_1 = __webpack_require__(562);
-const pedal_js_1 = __webpack_require__(756);
-const neo_js_1 = __webpack_require__(350);
-tslib_1.__exportStar(__webpack_require__(64), exports);
-tslib_1.__exportStar(__webpack_require__(444), exports);
-tslib_1.__exportStar(__webpack_require__(173), exports);
-var proxy_js_1 = __webpack_require__(481);
+const mini_js_1 = __webpack_require__(2321);
+const xl_js_1 = __webpack_require__(2766);
+const originalv2_js_1 = __webpack_require__(769);
+const original_mk2_js_1 = __webpack_require__(1158);
+const plus_js_1 = __webpack_require__(1562);
+const pedal_js_1 = __webpack_require__(7756);
+const neo_js_1 = __webpack_require__(9350);
+const studio_js_1 = __webpack_require__(7724);
+tslib_1.__exportStar(__webpack_require__(5064), exports);
+tslib_1.__exportStar(__webpack_require__(6444), exports);
+tslib_1.__exportStar(__webpack_require__(2173), exports);
+var proxy_js_1 = __webpack_require__(6481);
 Object.defineProperty(exports, "StreamDeckProxy", ({ enumerable: true, get: function () { return proxy_js_1.StreamDeckProxy; } }));
+var util_js_1 = __webpack_require__(4369);
+Object.defineProperty(exports, "uint8ArrayToDataView", ({ enumerable: true, get: function () { return util_js_1.uint8ArrayToDataView; } }));
 /** Elgato vendor id */
 exports.VENDOR_ID = 0x0fd9;
 var DeviceModelType;
@@ -2056,60 +2414,79 @@ exports.DEVICE_MODELS2 = {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x0060],
         factory: original_js_1.StreamDeckOriginalFactory,
+        hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.MINI]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x0063, 0x0090],
         factory: mini_js_1.StreamDeckMiniFactory,
+        hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.XL]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x006c, 0x008f],
         factory: xl_js_1.StreamDeckXLFactory,
+        hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.ORIGINALV2]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x006d],
         factory: originalv2_js_1.StreamDeckOriginalV2Factory,
+        hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.ORIGINALMK2]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x0080],
         factory: original_mk2_js_1.StreamDeckOriginalMK2Factory,
+        hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.PLUS]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x0084],
         factory: plus_js_1.StreamDeckPlusFactory,
+        hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.PEDAL]: {
         type: DeviceModelType.PEDAL,
         productIds: [0x0086],
         factory: pedal_js_1.StreamDeckPedalFactory,
+        hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.NEO]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x009a],
         factory: neo_js_1.StreamDeckNeoFactory,
+        hasNativeTcp: false,
+    },
+    [id_js_1.DeviceModelId.STUDIO]: {
+        type: DeviceModelType.STREAMDECK,
+        productIds: [0x00aa],
+        factory: studio_js_1.StreamDeckStudioFactory,
+        hasNativeTcp: true,
     },
 };
 /** @deprecated maybe? */
-exports.DEVICE_MODELS = Object.entries(exports.DEVICE_MODELS2).map(([id, spec]) => ({
-    id: id,
-    ...spec,
-}));
+exports.DEVICE_MODELS = Object.entries(exports.DEVICE_MODELS2).map(([id, spec]) => {
+    const modelId = id;
+    return {
+        id: modelId,
+        productName: id_js_1.MODEL_NAMES[modelId],
+        ...spec,
+    };
+});
 //# sourceMappingURL=index.js.map
 
 /***/ }),
 
-/***/ 67:
+/***/ 7067:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckBase = void 0;
-const EventEmitter = __webpack_require__(646);
-class StreamDeckBase extends EventEmitter {
+const eventemitter3_1 = __webpack_require__(2646);
+const index_js_1 = __webpack_require__(8601);
+class StreamDeckBase extends eventemitter3_1.EventEmitter {
     get CONTROLS() {
         return this.deviceProperties.CONTROLS;
     }
@@ -2125,21 +2502,27 @@ class StreamDeckBase extends EventEmitter {
     get PRODUCT_NAME() {
         return this.deviceProperties.PRODUCT_NAME;
     }
+    get HAS_NFC_READER() {
+        return this.deviceProperties.HAS_NFC_READER;
+    }
     device;
     deviceProperties;
+    // readonly #options: Readonly<Required<OpenStreamDeckOptions>>
     #propertiesService;
     #buttonsLcdService;
     #lcdSegmentDisplayService;
     #inputService;
-    // private readonly options: Readonly<OpenStreamDeckOptions>
+    #encoderLedService;
     constructor(device, _options, services) {
         super();
         this.device = device;
         this.deviceProperties = services.deviceProperties;
+        // this.#options = options
         this.#propertiesService = services.properties;
         this.#buttonsLcdService = services.buttonsLcd;
         this.#lcdSegmentDisplayService = services.lcdSegmentDisplay;
         this.#inputService = services.inputService;
+        this.#encoderLedService = services.encoderLed;
         // propogate events
         services.events?.listen((key, ...args) => this.emit(key, ...args));
         this.device.on('input', (data) => this.#inputService.handleInput(data));
@@ -2214,28 +2597,57 @@ class StreamDeckBase extends EventEmitter {
             throw new Error('Not supported for this model');
         return this.#lcdSegmentDisplayService.clearLcdSegment(...args);
     }
+    async setEncoderColor(...args) {
+        if (!this.#encoderLedService)
+            throw new Error('Not supported for this model');
+        return this.#encoderLedService.setEncoderColor(...args);
+    }
+    async setEncoderRingSingleColor(...args) {
+        if (!this.#encoderLedService)
+            throw new Error('Not supported for this model');
+        return this.#encoderLedService.setEncoderRingSingleColor(...args);
+    }
+    async setEncoderRingColors(...args) {
+        if (!this.#encoderLedService)
+            throw new Error('Not supported for this model');
+        return this.#encoderLedService.setEncoderRingColors(...args);
+    }
+    async getChildDeviceInfo() {
+        const info = await this.device.getChildDeviceInfo();
+        if (!info || info.vendorId !== index_js_1.VENDOR_ID)
+            return null;
+        const model = index_js_1.DEVICE_MODELS.find((m) => m.productIds.includes(info.productId));
+        if (!model)
+            return null;
+        return {
+            ...info,
+            model: model.id,
+        };
+    }
 }
 exports.StreamDeckBase = StreamDeckBase;
 //# sourceMappingURL=base.js.map
 
 /***/ }),
 
-/***/ 367:
+/***/ 9367:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckGen1Factory = StreamDeckGen1Factory;
-const base_js_1 = __webpack_require__(67);
+const base_js_1 = __webpack_require__(7067);
 const gen1_js_1 = __webpack_require__(993);
-const default_js_1 = __webpack_require__(826);
-const bitmap_js_1 = __webpack_require__(483);
+const default_js_1 = __webpack_require__(9826);
+const bitmap_js_1 = __webpack_require__(3483);
 const callback_hook_js_1 = __webpack_require__(659);
-const gen1_js_2 = __webpack_require__(632);
+const gen1_js_2 = __webpack_require__(2632);
 function extendDevicePropertiesForGen1(rawProps) {
     return {
         ...rawProps,
         KEY_DATA_OFFSET: 0,
+        HAS_NFC_READER: false,
+        SUPPORTS_CHILD_DEVICES: false,
     };
 }
 function StreamDeckGen1Factory(device, options, properties, imageWriter, targetOptions, bmpImagePPM) {
@@ -2248,6 +2660,7 @@ function StreamDeckGen1Factory(device, options, properties, imageWriter, targetO
         buttonsLcd: new default_js_1.DefaultButtonsLcdService(imageWriter, new bitmap_js_1.BitmapButtonLcdImagePacker(targetOptions, bmpImagePPM), device, fullProperties),
         lcdSegmentDisplay: null,
         inputService: new gen1_js_2.ButtonOnlyInputService(fullProperties, events),
+        encoderLed: null,
     });
 }
 //# sourceMappingURL=generic-gen1.js.map
@@ -2260,13 +2673,14 @@ function StreamDeckGen1Factory(device, options, properties, imageWriter, targetO
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createBaseGen2Properties = createBaseGen2Properties;
-const imageWriter_js_1 = __webpack_require__(845);
-const headerGenerator_js_1 = __webpack_require__(117);
-const default_js_1 = __webpack_require__(826);
+const imageWriter_js_1 = __webpack_require__(3845);
+const headerGenerator_js_1 = __webpack_require__(3117);
+const default_js_1 = __webpack_require__(9826);
 const callback_hook_js_1 = __webpack_require__(659);
-const gen2_js_1 = __webpack_require__(352);
-const jpeg_js_1 = __webpack_require__(582);
-const gen2_js_2 = __webpack_require__(769);
+const gen2_js_1 = __webpack_require__(1352);
+const jpeg_js_1 = __webpack_require__(3582);
+const gen2_js_2 = __webpack_require__(2769);
+const encoderLed_js_1 = __webpack_require__(4777);
 function extendDevicePropertiesForGen2(rawProps) {
     return {
         ...rawProps,
@@ -2274,40 +2688,42 @@ function extendDevicePropertiesForGen2(rawProps) {
         SUPPORTS_RGB_KEY_FILL: true,
     };
 }
-function createBaseGen2Properties(device, options, properties, disableXYFlip) {
+function createBaseGen2Properties(device, options, properties, propertiesService, disableXYFlip) {
     const fullProperties = extendDevicePropertiesForGen2(properties);
     const events = new callback_hook_js_1.CallbackHook();
     return {
         deviceProperties: fullProperties,
         events,
-        properties: new gen2_js_1.Gen2PropertiesService(device),
+        properties: propertiesService ?? new gen2_js_1.Gen2PropertiesService(device),
         buttonsLcd: new default_js_1.DefaultButtonsLcdService(new imageWriter_js_1.StreamdeckDefaultImageWriter(new headerGenerator_js_1.StreamdeckGen2ImageHeaderGenerator()), new jpeg_js_1.JpegButtonLcdImagePacker(options.encodeJPEG, !disableXYFlip), device, fullProperties),
         lcdSegmentDisplay: null,
         inputService: new gen2_js_2.Gen2InputService(fullProperties, events),
+        encoderLed: new encoderLed_js_1.EncoderLedService(device, properties.CONTROLS),
     };
 }
 //# sourceMappingURL=generic-gen2.js.map
 
 /***/ }),
 
-/***/ 321:
+/***/ 2321:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckMiniFactory = StreamDeckMiniFactory;
-const generic_gen1_js_1 = __webpack_require__(367);
-const id_js_1 = __webpack_require__(444);
-const controlsGenerator_js_1 = __webpack_require__(794);
-const imageWriter_js_1 = __webpack_require__(845);
-const headerGenerator_js_1 = __webpack_require__(117);
+const generic_gen1_js_1 = __webpack_require__(9367);
+const id_js_1 = __webpack_require__(6444);
+const controlsGenerator_js_1 = __webpack_require__(3794);
+const imageWriter_js_1 = __webpack_require__(3845);
+const headerGenerator_js_1 = __webpack_require__(3117);
 const miniProperties = {
     MODEL: id_js_1.DeviceModelId.MINI,
-    PRODUCT_NAME: 'Stream Deck Mini',
+    PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.MINI],
     SUPPORTS_RGB_KEY_FILL: false, // TODO - verify this
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(3, 2, { width: 80, height: 80 })),
     KEY_SPACING_HORIZONTAL: 28,
     KEY_SPACING_VERTICAL: 28,
+    FULLSCREEN_PANELS: 0,
 };
 function StreamDeckMiniFactory(device, options) {
     return (0, generic_gen1_js_1.StreamDeckGen1Factory)(device, options, miniProperties, new imageWriter_js_1.StreamdeckDefaultImageWriter(new headerGenerator_js_1.StreamdeckGen1ImageHeaderGenerator()), { colorMode: 'bgr', rotate: true, yFlip: true }, 2835);
@@ -2316,17 +2732,17 @@ function StreamDeckMiniFactory(device, options) {
 
 /***/ }),
 
-/***/ 350:
+/***/ 9350:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckNeoFactory = StreamDeckNeoFactory;
-const base_js_1 = __webpack_require__(67);
-const id_js_1 = __webpack_require__(444);
+const base_js_1 = __webpack_require__(7067);
+const id_js_1 = __webpack_require__(6444);
 const generic_gen2_js_1 = __webpack_require__(442);
-const controlsGenerator_js_1 = __webpack_require__(794);
-const neo_js_1 = __webpack_require__(325);
+const controlsGenerator_js_1 = __webpack_require__(3794);
+const neo_js_1 = __webpack_require__(7325);
 const neoControls = (0, controlsGenerator_js_1.generateButtonsGrid)(4, 2, { width: 96, height: 96 });
 neoControls.push({
     type: 'button',
@@ -2357,14 +2773,17 @@ neoControls.push({
 });
 const neoProperties = {
     MODEL: id_js_1.DeviceModelId.NEO,
-    PRODUCT_NAME: 'Stream Deck Neo',
+    PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.NEO],
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)(neoControls),
     KEY_SPACING_HORIZONTAL: 30,
     KEY_SPACING_VERTICAL: 30,
+    FULLSCREEN_PANELS: 0,
+    HAS_NFC_READER: false,
+    SUPPORTS_CHILD_DEVICES: false,
 };
 const lcdSegmentControls = neoProperties.CONTROLS.filter((control) => control.type === 'lcd-segment');
 function StreamDeckNeoFactory(device, options) {
-    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, neoProperties);
+    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, neoProperties, null);
     services.lcdSegmentDisplay = new neo_js_1.StreamDeckNeoLcdService(options.encodeJPEG, device, lcdSegmentControls);
     return new base_js_1.StreamDeckBase(device, options, services);
 }
@@ -2372,25 +2791,28 @@ function StreamDeckNeoFactory(device, options) {
 
 /***/ }),
 
-/***/ 158:
+/***/ 1158:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckOriginalMK2Factory = StreamDeckOriginalMK2Factory;
-const base_js_1 = __webpack_require__(67);
+const base_js_1 = __webpack_require__(7067);
 const generic_gen2_js_1 = __webpack_require__(442);
-const id_js_1 = __webpack_require__(444);
-const controlsGenerator_js_1 = __webpack_require__(794);
+const id_js_1 = __webpack_require__(6444);
+const controlsGenerator_js_1 = __webpack_require__(3794);
 const origMK2Properties = {
     MODEL: id_js_1.DeviceModelId.ORIGINALMK2,
-    PRODUCT_NAME: 'Stream Deck MK2',
+    PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.ORIGINALMK2],
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(5, 3, { width: 72, height: 72 })),
     KEY_SPACING_HORIZONTAL: 25,
     KEY_SPACING_VERTICAL: 25,
+    FULLSCREEN_PANELS: 0,
+    HAS_NFC_READER: false,
+    SUPPORTS_CHILD_DEVICES: false,
 };
 function StreamDeckOriginalMK2Factory(device, options) {
-    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, origMK2Properties);
+    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, origMK2Properties, null);
     return new base_js_1.StreamDeckBase(device, options, services);
 }
 //# sourceMappingURL=original-mk2.js.map
@@ -2403,17 +2825,18 @@ function StreamDeckOriginalMK2Factory(device, options) {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckOriginalFactory = StreamDeckOriginalFactory;
-const generic_gen1_js_1 = __webpack_require__(367);
-const id_js_1 = __webpack_require__(444);
-const imageWriter_js_1 = __webpack_require__(845);
-const controlsGenerator_js_1 = __webpack_require__(794);
+const generic_gen1_js_1 = __webpack_require__(9367);
+const id_js_1 = __webpack_require__(6444);
+const imageWriter_js_1 = __webpack_require__(3845);
+const controlsGenerator_js_1 = __webpack_require__(3794);
 const originalProperties = {
     MODEL: id_js_1.DeviceModelId.ORIGINAL,
-    PRODUCT_NAME: 'Stream Deck',
+    PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.ORIGINAL],
     SUPPORTS_RGB_KEY_FILL: false,
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(5, 3, { width: 72, height: 72 }, true)),
     KEY_SPACING_HORIZONTAL: 25,
     KEY_SPACING_VERTICAL: 25,
+    FULLSCREEN_PANELS: 0,
 };
 function StreamDeckOriginalFactory(device, options) {
     return (0, generic_gen1_js_1.StreamDeckGen1Factory)(device, options, originalProperties, new imageWriter_js_1.StreamdeckOriginalImageWriter(), { colorMode: 'bgr', xFlip: true }, 3780);
@@ -2422,45 +2845,48 @@ function StreamDeckOriginalFactory(device, options) {
 
 /***/ }),
 
-/***/ 150:
+/***/ 769:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckOriginalV2Factory = StreamDeckOriginalV2Factory;
-const base_js_1 = __webpack_require__(67);
+const base_js_1 = __webpack_require__(7067);
 const generic_gen2_js_1 = __webpack_require__(442);
-const id_js_1 = __webpack_require__(444);
-const controlsGenerator_js_1 = __webpack_require__(794);
+const id_js_1 = __webpack_require__(6444);
+const controlsGenerator_js_1 = __webpack_require__(3794);
 const origV2Properties = {
     MODEL: id_js_1.DeviceModelId.ORIGINALV2,
-    PRODUCT_NAME: 'Stream Deck',
+    PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.ORIGINALV2],
     // SUPPORTS_RGB_KEY_FILL: false, // TODO - verify SUPPORTS_RGB_KEY_FILL
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(5, 3, { width: 72, height: 72 })),
     KEY_SPACING_HORIZONTAL: 25,
     KEY_SPACING_VERTICAL: 25,
+    FULLSCREEN_PANELS: 0,
+    HAS_NFC_READER: false,
+    SUPPORTS_CHILD_DEVICES: false,
 };
 function StreamDeckOriginalV2Factory(device, options) {
-    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, origV2Properties);
+    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, origV2Properties, null);
     return new base_js_1.StreamDeckBase(device, options, services);
 }
 //# sourceMappingURL=originalv2.js.map
 
 /***/ }),
 
-/***/ 756:
+/***/ 7756:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckPedalFactory = StreamDeckPedalFactory;
-const base_js_1 = __webpack_require__(67);
-const id_js_1 = __webpack_require__(444);
-const controlsGenerator_js_1 = __webpack_require__(794);
-const pedal_js_1 = __webpack_require__(874);
-const pedal_js_2 = __webpack_require__(183);
+const base_js_1 = __webpack_require__(7067);
+const id_js_1 = __webpack_require__(6444);
+const controlsGenerator_js_1 = __webpack_require__(3794);
+const pedal_js_1 = __webpack_require__(3874);
+const pedal_js_2 = __webpack_require__(7183);
 const callback_hook_js_1 = __webpack_require__(659);
-const gen1_js_1 = __webpack_require__(632);
+const gen1_js_1 = __webpack_require__(2632);
 const pedalControls = [
     {
         type: 'button',
@@ -2489,12 +2915,15 @@ const pedalControls = [
 ];
 const pedalProperties = {
     MODEL: id_js_1.DeviceModelId.PEDAL,
-    PRODUCT_NAME: 'Stream Deck Pedal',
+    PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.PEDAL],
     KEY_DATA_OFFSET: 3,
     SUPPORTS_RGB_KEY_FILL: false,
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)(pedalControls),
     KEY_SPACING_HORIZONTAL: 0,
     KEY_SPACING_VERTICAL: 0,
+    FULLSCREEN_PANELS: 0,
+    HAS_NFC_READER: false,
+    SUPPORTS_CHILD_DEVICES: false,
 };
 function StreamDeckPedalFactory(device, options) {
     const events = new callback_hook_js_1.CallbackHook();
@@ -2505,23 +2934,24 @@ function StreamDeckPedalFactory(device, options) {
         buttonsLcd: new pedal_js_2.PedalLcdService(),
         lcdSegmentDisplay: null,
         inputService: new gen1_js_1.ButtonOnlyInputService(pedalProperties, events),
+        encoderLed: null,
     });
 }
 //# sourceMappingURL=pedal.js.map
 
 /***/ }),
 
-/***/ 562:
+/***/ 1562:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckPlusFactory = StreamDeckPlusFactory;
-const base_js_1 = __webpack_require__(67);
+const base_js_1 = __webpack_require__(7067);
 const generic_gen2_js_1 = __webpack_require__(442);
-const id_js_1 = __webpack_require__(444);
-const controlsGenerator_js_1 = __webpack_require__(794);
-const plus_js_1 = __webpack_require__(864);
+const id_js_1 = __webpack_require__(6444);
+const controlsGenerator_js_1 = __webpack_require__(3794);
+const plus_js_1 = __webpack_require__(5864);
 const plusControls = (0, controlsGenerator_js_1.generateButtonsGrid)(4, 2, { width: 120, height: 120 });
 plusControls.push({
     type: 'lcd-segment',
@@ -2541,35 +2971,46 @@ plusControls.push({
     column: 0,
     index: 0,
     hidIndex: 0,
+    hasLed: false,
+    ledRingSteps: 0,
 }, {
     type: 'encoder',
     row: 3,
     column: 1,
     index: 1,
     hidIndex: 1,
+    hasLed: false,
+    ledRingSteps: 0,
 }, {
     type: 'encoder',
     row: 3,
     column: 2,
     index: 2,
     hidIndex: 2,
+    hasLed: false,
+    ledRingSteps: 0,
 }, {
     type: 'encoder',
     row: 3,
     column: 3,
     index: 3,
     hidIndex: 3,
+    hasLed: false,
+    ledRingSteps: 0,
 });
 const plusProperties = {
     MODEL: id_js_1.DeviceModelId.PLUS,
-    PRODUCT_NAME: 'Stream Deck +',
+    PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.PLUS],
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)(plusControls),
     KEY_SPACING_HORIZONTAL: 99,
     KEY_SPACING_VERTICAL: 40,
+    FULLSCREEN_PANELS: 0,
+    HAS_NFC_READER: false,
+    SUPPORTS_CHILD_DEVICES: false,
 };
 const lcdSegmentControls = plusProperties.CONTROLS.filter((control) => control.type === 'lcd-segment');
 function StreamDeckPlusFactory(device, options) {
-    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, plusProperties, true);
+    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, plusProperties, null, true);
     services.lcdSegmentDisplay = new plus_js_1.StreamDeckPlusLcdService(options.encodeJPEG, device, lcdSegmentControls);
     return new base_js_1.StreamDeckBase(device, options, services);
 }
@@ -2577,32 +3018,85 @@ function StreamDeckPlusFactory(device, options) {
 
 /***/ }),
 
-/***/ 766:
+/***/ 7724:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.studioProperties = void 0;
+exports.StreamDeckStudioFactory = StreamDeckStudioFactory;
+const base_js_1 = __webpack_require__(7067);
+const generic_gen2_js_1 = __webpack_require__(442);
+const id_js_1 = __webpack_require__(6444);
+const controlsGenerator_js_1 = __webpack_require__(3794);
+const studioControls = [
+    {
+        type: 'encoder',
+        row: 0,
+        column: 0,
+        index: 0,
+        hidIndex: 0,
+        hasLed: true,
+        ledRingSteps: 24,
+    },
+    ...(0, controlsGenerator_js_1.generateButtonsGrid)(16, 2, { width: 144, height: 112 }, false, 1),
+    {
+        type: 'encoder',
+        row: 0,
+        column: 17,
+        index: 1,
+        hidIndex: 1,
+        hasLed: true,
+        ledRingSteps: 24,
+    },
+];
+exports.studioProperties = {
+    MODEL: id_js_1.DeviceModelId.STUDIO,
+    PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.STUDIO],
+    CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)(studioControls),
+    KEY_SPACING_HORIZONTAL: 0, // TODO
+    KEY_SPACING_VERTICAL: 0, // TODO
+    FULLSCREEN_PANELS: 2,
+    HAS_NFC_READER: true,
+    SUPPORTS_CHILD_DEVICES: true,
+};
+function StreamDeckStudioFactory(device, options, propertiesService) {
+    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, exports.studioProperties, propertiesService ?? null, true);
+    return new base_js_1.StreamDeckBase(device, options, services);
+}
+//# sourceMappingURL=studio.js.map
+
+/***/ }),
+
+/***/ 2766:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckXLFactory = StreamDeckXLFactory;
-const base_js_1 = __webpack_require__(67);
+const base_js_1 = __webpack_require__(7067);
 const generic_gen2_js_1 = __webpack_require__(442);
-const id_js_1 = __webpack_require__(444);
-const controlsGenerator_js_1 = __webpack_require__(794);
+const id_js_1 = __webpack_require__(6444);
+const controlsGenerator_js_1 = __webpack_require__(3794);
 const xlProperties = {
     MODEL: id_js_1.DeviceModelId.XL,
-    PRODUCT_NAME: 'Stream Deck XL',
+    PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.XL],
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(8, 4, { width: 96, height: 96 })),
     KEY_SPACING_HORIZONTAL: 32,
     KEY_SPACING_VERTICAL: 39,
+    FULLSCREEN_PANELS: 0,
+    HAS_NFC_READER: false,
+    SUPPORTS_CHILD_DEVICES: false,
 };
 function StreamDeckXLFactory(device, options) {
-    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, xlProperties);
+    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, xlProperties, null);
     return new base_js_1.StreamDeckBase(device, options, services);
 }
 //# sourceMappingURL=xl.js.map
 
 /***/ }),
 
-/***/ 481:
+/***/ 6481:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -2631,6 +3125,9 @@ class StreamDeckProxy {
     }
     get PRODUCT_NAME() {
         return this.device.PRODUCT_NAME;
+    }
+    get HAS_NFC_READER() {
+        return this.device.HAS_NFC_READER;
     }
     calculateFillPanelDimensions(...args) {
         return this.device.calculateFillPanelDimensions(...args);
@@ -2671,11 +3168,23 @@ class StreamDeckProxy {
     async fillLcd(...args) {
         return this.device.fillLcd(...args);
     }
+    async setEncoderColor(...args) {
+        return this.device.setEncoderColor(...args);
+    }
+    async setEncoderRingSingleColor(...args) {
+        return this.device.setEncoderRingSingleColor(...args);
+    }
+    async setEncoderRingColors(...args) {
+        return this.device.setEncoderRingColors(...args);
+    }
     async fillLcdRegion(...args) {
         return this.device.fillLcdRegion(...args);
     }
     async clearLcdSegment(...args) {
         return this.device.clearLcdSegment(...args);
+    }
+    async getChildDeviceInfo(...args) {
+        return this.device.getChildDeviceInfo(...args);
     }
     /**
      * EventEmitter
@@ -2731,7 +3240,7 @@ exports.StreamDeckProxy = StreamDeckProxy;
 
 /***/ }),
 
-/***/ 826:
+/***/ 9826:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -2787,29 +3296,42 @@ class DefaultButtonsLcdService {
     }
     async clearPanel() {
         const ps = [];
-        for (const control of this.#deviceProperties.CONTROLS) {
-            if (control.type !== 'button')
-                continue;
-            switch (control.feedbackType) {
-                case 'rgb':
-                    ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0));
-                    break;
-                case 'lcd':
-                    if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL) {
+        if (this.#deviceProperties.FULLSCREEN_PANELS > 0) {
+            // TODO - should this be a separate property?
+            for (let screenIndex = 0; screenIndex < this.#deviceProperties.FULLSCREEN_PANELS; screenIndex++) {
+                const buffer = new Uint8Array(1024);
+                buffer[0] = 0x03;
+                buffer[1] = 0x05;
+                buffer[2] = screenIndex; // TODO - index
+                ps.push(this.#device.sendReports([buffer]));
+            }
+            // TODO - clear rgb?
+        }
+        else {
+            for (const control of this.#deviceProperties.CONTROLS) {
+                if (control.type !== 'button')
+                    continue;
+                switch (control.feedbackType) {
+                    case 'rgb':
                         ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0));
-                    }
-                    else {
-                        const pixels = new Uint8Array(control.pixelSize.width * control.pixelSize.height * 3);
-                        ps.push(this.fillImageRangeControl(control, pixels, {
-                            format: 'rgb',
-                            offset: 0,
-                            stride: control.pixelSize.width * 3,
-                        }));
-                    }
-                    break;
-                case 'none':
-                    // Do nothing
-                    break;
+                        break;
+                    case 'lcd':
+                        if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL) {
+                            ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0));
+                        }
+                        else {
+                            const pixels = new Uint8Array(control.pixelSize.width * control.pixelSize.height * 3);
+                            ps.push(this.fillImageRangeControl(control, pixels, {
+                                format: 'rgb',
+                                offset: 0,
+                                stride: control.pixelSize.width * 3,
+                            }));
+                        }
+                        break;
+                    case 'none':
+                        // Do nothing
+                        break;
+                }
             }
         }
         await Promise.all(ps);
@@ -2946,7 +3468,7 @@ exports.DefaultButtonsLcdService = DefaultButtonsLcdService;
 
 /***/ }),
 
-/***/ 183:
+/***/ 7183:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3003,13 +3525,91 @@ exports.CallbackHook = CallbackHook;
 
 /***/ }),
 
-/***/ 483:
+/***/ 4777:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EncoderLedService = void 0;
+class EncoderLedService {
+    #device;
+    #encoderControls;
+    constructor(device, allControls) {
+        this.#device = device;
+        this.#encoderControls = allControls.filter((control) => control.type === 'encoder');
+    }
+    async clearAll() {
+        const ps = [];
+        for (const control of this.#encoderControls) {
+            if (control.hasLed)
+                ps.push(this.setEncoderColor(control.index, 0, 0, 0));
+            if (control.ledRingSteps > 0)
+                ps.push(this.setEncoderRingSingleColor(control.index, 0, 0, 0));
+        }
+        await Promise.all(ps);
+    }
+    async setEncoderColor(encoder, red, green, blue) {
+        const control = this.#encoderControls.find((c) => c.index === encoder);
+        if (!control)
+            throw new Error(`Invalid encoder index ${encoder}`);
+        if (!control.hasLed)
+            throw new Error('Encoder does not have an LED');
+        const buffer = new Uint8Array(1024);
+        buffer[0] = 0x02;
+        buffer[1] = 0x10;
+        buffer[2] = encoder;
+        buffer[3] = red;
+        buffer[4] = green;
+        buffer[5] = blue;
+        await this.#device.sendReports([buffer]);
+    }
+    async setEncoderRingSingleColor(encoder, red, green, blue) {
+        const control = this.#encoderControls.find((c) => c.index === encoder);
+        if (!control)
+            throw new Error(`Invalid encoder index ${encoder}`);
+        if (control.ledRingSteps <= 0)
+            throw new Error('Encoder does not have an LED ring');
+        const buffer = new Uint8Array(1024);
+        buffer[0] = 0x02;
+        buffer[1] = 0x0f;
+        buffer[2] = encoder;
+        for (let i = 0; i < control.ledRingSteps; i++) {
+            const offset = 3 + i * 3;
+            buffer[offset] = red;
+            buffer[offset + 1] = green;
+            buffer[offset + 2] = blue;
+        }
+        await this.#device.sendReports([buffer]);
+    }
+    async setEncoderRingColors(encoder, colors) {
+        const control = this.#encoderControls.find((c) => c.index === encoder);
+        if (!control)
+            throw new Error(`Invalid encoder index ${encoder}`);
+        if (control.ledRingSteps <= 0)
+            throw new Error('Encoder does not have an LED ring');
+        if (colors.length !== control.ledRingSteps * 3)
+            throw new Error('Invalid colors length');
+        const colorsBuffer = colors instanceof Uint8Array ? colors : new Uint8Array(colors);
+        const buffer = new Uint8Array(1024);
+        buffer[0] = 0x02;
+        buffer[1] = 0x0f;
+        buffer[2] = encoder;
+        buffer.set(colorsBuffer, 3);
+        await this.#device.sendReports([buffer]);
+    }
+}
+exports.EncoderLedService = EncoderLedService;
+//# sourceMappingURL=encoderLed.js.map
+
+/***/ }),
+
+/***/ 3483:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BitmapButtonLcdImagePacker = void 0;
-const util_js_1 = __webpack_require__(369);
+const util_js_1 = __webpack_require__(4369);
 class BitmapButtonLcdImagePacker {
     #targetOptions;
     #bmpImagePPM;
@@ -3028,13 +3628,13 @@ exports.BitmapButtonLcdImagePacker = BitmapButtonLcdImagePacker;
 
 /***/ }),
 
-/***/ 582:
+/***/ 3582:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.JpegButtonLcdImagePacker = void 0;
-const util_js_1 = __webpack_require__(369);
+const util_js_1 = __webpack_require__(4369);
 class JpegButtonLcdImagePacker {
     #encodeJPEG;
     #xyFlip;
@@ -3052,13 +3652,13 @@ exports.JpegButtonLcdImagePacker = JpegButtonLcdImagePacker;
 
 /***/ }),
 
-/***/ 117:
+/***/ 3117:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamdeckNeoLcdImageHeaderGenerator = exports.StreamdeckPlusLcdImageHeaderGenerator = exports.StreamdeckGen2ImageHeaderGenerator = exports.StreamdeckGen1ImageHeaderGenerator = void 0;
-const util_js_1 = __webpack_require__(369);
+const util_js_1 = __webpack_require__(4369);
 class StreamdeckGen1ImageHeaderGenerator {
     getFillImageCommandHeaderLength() {
         return 16;
@@ -3125,13 +3725,13 @@ exports.StreamdeckNeoLcdImageHeaderGenerator = StreamdeckNeoLcdImageHeaderGenera
 
 /***/ }),
 
-/***/ 845:
+/***/ 3845:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamdeckDefaultImageWriter = exports.StreamdeckOriginalImageWriter = void 0;
-const headerGenerator_js_1 = __webpack_require__(117);
+const headerGenerator_js_1 = __webpack_require__(3117);
 class StreamdeckOriginalImageWriter {
     headerGenerator = new headerGenerator_js_1.StreamdeckGen1ImageHeaderGenerator();
     generateFillImageWrites(props, byteBuffer) {
@@ -3177,25 +3777,25 @@ exports.StreamdeckDefaultImageWriter = StreamdeckDefaultImageWriter;
 
 /***/ }),
 
-/***/ 632:
+/***/ 2632:
 /***/ ((__unused_webpack_module, exports) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ButtonOnlyInputService = void 0;
 class ButtonOnlyInputService {
-    #deviceProperties;
+    deviceProperties;
     #keyState;
     #eventSource;
     constructor(deviceProperties, eventSource) {
-        this.#deviceProperties = deviceProperties;
+        this.deviceProperties = deviceProperties;
         this.#eventSource = eventSource;
-        const maxButtonIndex = this.#deviceProperties.CONTROLS.filter((control) => control.type === 'button').map((control) => control.index);
+        const maxButtonIndex = this.deviceProperties.CONTROLS.filter((control) => control.type === 'button').map((control) => control.index);
         this.#keyState = new Array(Math.max(-1, ...maxButtonIndex) + 1).fill(false);
     }
     handleInput(data) {
-        const dataOffset = this.#deviceProperties.KEY_DATA_OFFSET || 0;
-        for (const control of this.#deviceProperties.CONTROLS) {
+        const dataOffset = this.deviceProperties.KEY_DATA_OFFSET || 0;
+        for (const control of this.deviceProperties.CONTROLS) {
             if (control.type !== 'button')
                 continue;
             const keyPressed = Boolean(data[dataOffset + control.hidIndex]);
@@ -3217,14 +3817,14 @@ exports.ButtonOnlyInputService = ButtonOnlyInputService;
 
 /***/ }),
 
-/***/ 769:
+/***/ 2769:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Gen2InputService = void 0;
-const gen1_js_1 = __webpack_require__(632);
-const util_js_1 = __webpack_require__(369);
+const gen1_js_1 = __webpack_require__(2632);
+const util_js_1 = __webpack_require__(4369);
 class Gen2InputService extends gen1_js_1.ButtonOnlyInputService {
     #eventSource;
     #encoderControls;
@@ -3249,6 +3849,9 @@ class Gen2InputService extends gen1_js_1.ButtonOnlyInputService {
                 break;
             case 0x03: // Encoder
                 this.#handleEncoderInput(data);
+                break;
+            case 0x04: // NFC
+                this.#handleNfcRead(data);
                 break;
         }
     }
@@ -3308,21 +3911,28 @@ class Gen2InputService extends gen1_js_1.ButtonOnlyInputService {
                 break;
         }
     }
+    #handleNfcRead(data) {
+        if (!this.deviceProperties.HAS_NFC_READER)
+            return;
+        const length = data[1] + data[2] * 256;
+        const id = new TextDecoder('ascii').decode(data.subarray(3, 3 + length));
+        this.#eventSource.emit('nfcRead', id);
+    }
 }
 exports.Gen2InputService = Gen2InputService;
 //# sourceMappingURL=gen2.js.map
 
 /***/ }),
 
-/***/ 325:
+/***/ 7325:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckNeoLcdService = void 0;
-const headerGenerator_js_1 = __webpack_require__(117);
-const imageWriter_js_1 = __webpack_require__(845);
-const util_js_1 = __webpack_require__(369);
+const headerGenerator_js_1 = __webpack_require__(3117);
+const imageWriter_js_1 = __webpack_require__(3845);
+const util_js_1 = __webpack_require__(4369);
 class StreamDeckNeoLcdService {
     #encodeJPEG;
     #device;
@@ -3380,15 +3990,15 @@ exports.StreamDeckNeoLcdService = StreamDeckNeoLcdService;
 
 /***/ }),
 
-/***/ 864:
+/***/ 5864:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckPlusLcdService = void 0;
-const headerGenerator_js_1 = __webpack_require__(117);
-const imageWriter_js_1 = __webpack_require__(845);
-const util_js_1 = __webpack_require__(369);
+const headerGenerator_js_1 = __webpack_require__(3117);
+const imageWriter_js_1 = __webpack_require__(3845);
+const util_js_1 = __webpack_require__(4369);
 class StreamDeckPlusLcdService {
     #encodeJPEG;
     #device;
@@ -3527,7 +4137,7 @@ exports.Gen1PropertiesService = Gen1PropertiesService;
 
 /***/ }),
 
-/***/ 352:
+/***/ 1352:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3579,7 +4189,7 @@ exports.Gen2PropertiesService = Gen2PropertiesService;
 
 /***/ }),
 
-/***/ 874:
+/***/ 3874:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3611,7 +4221,7 @@ exports.PedalPropertiesService = PedalPropertiesService;
 
 /***/ }),
 
-/***/ 64:
+/***/ 5064:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3620,7 +4230,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 369:
+/***/ 4369:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3699,19 +4309,19 @@ function uint8ArrayToDataView(buffer) {
 
 /***/ }),
 
-/***/ 863:
+/***/ 2863:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.WebHIDDevice = void 0;
-const EventEmitter = __webpack_require__(646);
-const p_queue_1 = __webpack_require__(968);
+const eventemitter3_1 = __webpack_require__(2646);
+const p_queue_1 = __webpack_require__(4968);
 /**
  * The wrapped browser HIDDevice.
  * This translates it into the common format expected by @elgato-stream-deck/core
  */
-class WebHIDDevice extends EventEmitter {
+class WebHIDDevice extends eventemitter3_1.EventEmitter {
     device;
     reportQueue = new p_queue_1.default({ concurrency: 1 });
     constructor(device) {
@@ -3754,13 +4364,17 @@ class WebHIDDevice extends EventEmitter {
             vendorId: this.device.vendorId,
         };
     }
+    async getChildDeviceInfo() {
+        // Not supported
+        return null;
+    }
 }
 exports.WebHIDDevice = WebHIDDevice;
 //# sourceMappingURL=hid-device.js.map
 
 /***/ }),
 
-/***/ 253:
+/***/ 8253:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -3770,14 +4384,14 @@ exports.StreamDeckWeb = exports.DeviceModelId = exports.VENDOR_ID = void 0;
 exports.requestStreamDecks = requestStreamDecks;
 exports.getStreamDecks = getStreamDecks;
 exports.openDevice = openDevice;
-const core_1 = __webpack_require__(601);
-const hid_device_js_1 = __webpack_require__(863);
-const jpeg_js_1 = __webpack_require__(443);
-const wrapper_js_1 = __webpack_require__(26);
-var core_2 = __webpack_require__(601);
+const core_1 = __webpack_require__(8601);
+const hid_device_js_1 = __webpack_require__(2863);
+const jpeg_js_1 = __webpack_require__(8443);
+const wrapper_js_1 = __webpack_require__(3026);
+var core_2 = __webpack_require__(8601);
 Object.defineProperty(exports, "VENDOR_ID", ({ enumerable: true, get: function () { return core_2.VENDOR_ID; } }));
 Object.defineProperty(exports, "DeviceModelId", ({ enumerable: true, get: function () { return core_2.DeviceModelId; } }));
-var wrapper_js_2 = __webpack_require__(26);
+var wrapper_js_2 = __webpack_require__(3026);
 Object.defineProperty(exports, "StreamDeckWeb", ({ enumerable: true, get: function () { return wrapper_js_2.StreamDeckWeb; } }));
 /**
  * Request the user to select some streamdecks to open
@@ -3834,7 +4448,7 @@ async function openDevice(browserDevice, userOptions) {
 
 /***/ }),
 
-/***/ 443:
+/***/ 8443:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3876,13 +4490,13 @@ async function encodeJPEG(buffer, width, height) {
 
 /***/ }),
 
-/***/ 26:
+/***/ 3026:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckWeb = void 0;
-const core_1 = __webpack_require__(601);
+const core_1 = __webpack_require__(8601);
 /**
  * A StreamDeck instance.
  * This is an extended variant of the class, to provide some more web friendly helpers, such as accepting a canvas
@@ -3928,7 +4542,7 @@ exports.StreamDeckWeb = StreamDeckWeb;
 
 /***/ }),
 
-/***/ 823:
+/***/ 5823:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -4411,11 +5025,11 @@ var exports = __webpack_exports__;
 var __webpack_unused_export__;
 
 __webpack_unused_export__ = ({ value: true });
-const webhid_1 = __webpack_require__(253);
-const dom_1 = __webpack_require__(35);
-const fill_when_pressed_1 = __webpack_require__(964);
-const rapid_fill_1 = __webpack_require__(215);
-const chase_1 = __webpack_require__(889);
+const webhid_1 = __webpack_require__(8253);
+const dom_1 = __webpack_require__(2035);
+const fill_when_pressed_1 = __webpack_require__(4964);
+const rapid_fill_1 = __webpack_require__(1215);
+const chase_1 = __webpack_require__(1889);
 if (true) {
     const elm = document.querySelector('#version_str');
     if (elm) {
