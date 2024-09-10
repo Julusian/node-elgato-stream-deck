@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.1](https://github.com/julusian/node-elgato-stream-deck/compare/v7.0.0...v7.0.1) (2024-09-10)
+
+
+### Bug Fixes
+
+* disable `SUPPORTS_RGB_KEY_FILL` for some models [#101](https://github.com/julusian/node-elgato-stream-deck/issues/101) ([d752b41](https://github.com/julusian/node-elgato-stream-deck/commit/d752b41726a37f3740ef5dafd85ec72408b19433))
+
+
+
+
+
 # [7.0.0](https://github.com/julusian/node-elgato-stream-deck/compare/v7.0.0-0...v7.0.0) (2024-09-08)
 
 
