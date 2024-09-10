@@ -573,7 +573,7 @@ describe('StreamDeck XL', () => {
 		expect(streamDeck2.MODEL).toEqual(DeviceModelId.XL)
 	})
 
-	runForDevice(devicePath, DeviceModelId.XL, true)
+	runForDevice(devicePath, DeviceModelId.XL, false)
 
 	test('setBrightness', async () => {
 		const device = getDevice()
@@ -702,7 +702,7 @@ describe('StreamDeck Original V2', () => {
 		expect(streamDeck2.MODEL).toEqual(DeviceModelId.ORIGINALV2)
 	})
 
-	runForDevice(devicePath, DeviceModelId.ORIGINALV2, true)
+	runForDevice(devicePath, DeviceModelId.ORIGINALV2, false)
 
 	test.skip('fillImage', async () => {
 		const device = getDevice()
