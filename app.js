@@ -2685,7 +2685,6 @@ function extendDevicePropertiesForGen2(rawProps) {
     return {
         ...rawProps,
         KEY_DATA_OFFSET: 3,
-        SUPPORTS_RGB_KEY_FILL: true,
     };
 }
 function createBaseGen2Properties(device, options, properties, propertiesService, disableXYFlip) {
@@ -2780,6 +2779,7 @@ const neoProperties = {
     FULLSCREEN_PANELS: 0,
     HAS_NFC_READER: false,
     SUPPORTS_CHILD_DEVICES: false,
+    SUPPORTS_RGB_KEY_FILL: true,
 };
 const lcdSegmentControls = neoProperties.CONTROLS.filter((control) => control.type === 'lcd-segment');
 function StreamDeckNeoFactory(device, options) {
@@ -2804,6 +2804,7 @@ const controlsGenerator_js_1 = __webpack_require__(3794);
 const origMK2Properties = {
     MODEL: id_js_1.DeviceModelId.ORIGINALMK2,
     PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.ORIGINALMK2],
+    SUPPORTS_RGB_KEY_FILL: false, // TODO - verify SUPPORTS_RGB_KEY_FILL
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(5, 3, { width: 72, height: 72 })),
     KEY_SPACING_HORIZONTAL: 25,
     KEY_SPACING_VERTICAL: 25,
@@ -2858,7 +2859,7 @@ const controlsGenerator_js_1 = __webpack_require__(3794);
 const origV2Properties = {
     MODEL: id_js_1.DeviceModelId.ORIGINALV2,
     PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.ORIGINALV2],
-    // SUPPORTS_RGB_KEY_FILL: false, // TODO - verify SUPPORTS_RGB_KEY_FILL
+    SUPPORTS_RGB_KEY_FILL: false, // TODO - verify SUPPORTS_RGB_KEY_FILL
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(5, 3, { width: 72, height: 72 })),
     KEY_SPACING_HORIZONTAL: 25,
     KEY_SPACING_VERTICAL: 25,
@@ -3001,6 +3002,7 @@ plusControls.push({
 const plusProperties = {
     MODEL: id_js_1.DeviceModelId.PLUS,
     PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.PLUS],
+    SUPPORTS_RGB_KEY_FILL: true,
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)(plusControls),
     KEY_SPACING_HORIZONTAL: 99,
     KEY_SPACING_VERTICAL: 40,
@@ -3053,6 +3055,7 @@ const studioControls = [
 exports.studioProperties = {
     MODEL: id_js_1.DeviceModelId.STUDIO,
     PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.STUDIO],
+    SUPPORTS_RGB_KEY_FILL: true,
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)(studioControls),
     KEY_SPACING_HORIZONTAL: 0, // TODO
     KEY_SPACING_VERTICAL: 0, // TODO
@@ -3081,6 +3084,7 @@ const controlsGenerator_js_1 = __webpack_require__(3794);
 const xlProperties = {
     MODEL: id_js_1.DeviceModelId.XL,
     PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.XL],
+    SUPPORTS_RGB_KEY_FILL: false, // rev2 doesn't support it, even though rev1 does
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)((0, controlsGenerator_js_1.generateButtonsGrid)(8, 4, { width: 96, height: 96 })),
     KEY_SPACING_HORIZONTAL: 32,
     KEY_SPACING_VERTICAL: 39,
@@ -5033,7 +5037,7 @@ const chase_1 = __webpack_require__(1889);
 if (true) {
     const elm = document.querySelector('#version_str');
     if (elm) {
-        elm.innerHTML = `v${"7.0.0"}`;
+        elm.innerHTML = `v${"7.0.1"}`;
     }
 }
 function appendLog(str) {
