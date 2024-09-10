@@ -9,6 +9,7 @@ import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 const xlProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.XL,
 	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.XL],
+	SUPPORTS_RGB_KEY_FILL: false, // rev2 doesn't support it, even though rev1 does
 
 	CONTROLS: freezeDefinitions(generateButtonsGrid(8, 4, { width: 96, height: 96 })),
 

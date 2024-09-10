@@ -56,6 +56,7 @@ const neoProperties: StreamDeckGen2Properties = {
 	FULLSCREEN_PANELS: 0,
 	HAS_NFC_READER: false,
 	SUPPORTS_CHILD_DEVICES: false,
+	SUPPORTS_RGB_KEY_FILL: true,
 }
 const lcdSegmentControls = neoProperties.CONTROLS.filter(
 	(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',

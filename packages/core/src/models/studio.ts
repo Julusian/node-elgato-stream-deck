@@ -33,6 +33,7 @@ const studioControls: StreamDeckControlDefinition[] = [
 export const studioProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.STUDIO,
 	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.STUDIO],
+	SUPPORTS_RGB_KEY_FILL: true,
 
 	CONTROLS: freezeDefinitions(studioControls),
 

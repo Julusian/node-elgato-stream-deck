@@ -15,11 +15,10 @@ function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): Stre
 	return {
 		...rawProps,
 		KEY_DATA_OFFSET: 3,
-		SUPPORTS_RGB_KEY_FILL: true,
 	}
 }
 
-export type StreamDeckGen2Properties = Omit<StreamDeckProperties, 'KEY_DATA_OFFSET' | 'SUPPORTS_RGB_KEY_FILL'>
+export type StreamDeckGen2Properties = Omit<StreamDeckProperties, 'KEY_DATA_OFFSET'>
 
 export function createBaseGen2Properties(
 	device: HIDDevice,

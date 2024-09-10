@@ -9,6 +9,7 @@ import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 const origMK2Properties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.ORIGINALMK2,
 	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.ORIGINALMK2],
+	SUPPORTS_RGB_KEY_FILL: false, // TODO - verify SUPPORTS_RGB_KEY_FILL
 
 	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3, { width: 72, height: 72 })),
 

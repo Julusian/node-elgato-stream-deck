@@ -71,6 +71,7 @@ plusControls.push(
 const plusProperties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.PLUS,
 	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.PLUS],
+	SUPPORTS_RGB_KEY_FILL: true,
 
 	CONTROLS: freezeDefinitions(plusControls),
 
