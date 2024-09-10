@@ -56,10 +56,30 @@ export class StreamDeckProxy implements StreamDeck {
 	): ReturnType<StreamDeck['fillKeyBuffer']> {
 		return this.device.fillKeyBuffer(...args)
 	}
+	public async prepareFillKeyBuffer(
+		...args: Parameters<StreamDeck['prepareFillKeyBuffer']>
+	): ReturnType<StreamDeck['prepareFillKeyBuffer']> {
+		return this.device.prepareFillKeyBuffer(...args)
+	}
+	public async sendPreparedFillKeyBuffer(
+		...args: Parameters<StreamDeck['sendPreparedFillKeyBuffer']>
+	): ReturnType<StreamDeck['sendPreparedFillKeyBuffer']> {
+		return this.device.sendPreparedFillKeyBuffer(...args)
+	}
 	public async fillPanelBuffer(
 		...args: Parameters<StreamDeck['fillPanelBuffer']>
 	): ReturnType<StreamDeck['fillPanelBuffer']> {
 		return this.device.fillPanelBuffer(...args)
+	}
+	public async prepareFillPanelBuffer(
+		...args: Parameters<StreamDeck['prepareFillPanelBuffer']>
+	): ReturnType<StreamDeck['prepareFillPanelBuffer']> {
+		return this.device.prepareFillPanelBuffer(...args)
+	}
+	public async sendPreparedFillPanelBuffer(
+		...args: Parameters<StreamDeck['sendPreparedFillPanelBuffer']>
+	): ReturnType<StreamDeck['sendPreparedFillPanelBuffer']> {
+		return this.device.sendPreparedFillPanelBuffer(...args)
 	}
 	public async clearKey(...args: Parameters<StreamDeck['clearKey']>): ReturnType<StreamDeck['clearKey']> {
 		return this.device.clearKey(...args)

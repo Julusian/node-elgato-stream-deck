@@ -38,6 +38,9 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 		.raw()
 		.toBuffer()
 
+	const preparedField = await streamDeck.prepareFillPanelBuffer(imgField)
+	const preparedMosaic = await streamDeck.prepareFillPanelBuffer(imgMosaic)
+
 	const imgFieldLcd = lcdSegmentControl
 		? await sharp(path.resolve(__dirname, 'fixtures/sunny_field.png'))
 				.flatten()
@@ -67,17 +70,17 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 		let color
 		if (control.index > buttonCount / 2) {
 			console.log('Filling entire panel with an image of a sunny field.')
-			image = imgField
+			image = preparedField
 			imageLcd = imgFieldLcd
 			color = [0, 255, 0]
 		} else {
 			console.log('Filling entire panel with a mosaic which will show each key as a different color.')
-			image = imgMosaic
+			image = preparedMosaic
 			imageLcd = imgMosaicLcd
 			color = [255, 0, 255]
 		}
 
-		streamDeck.fillPanelBuffer(image).catch((e) => console.error('Fill failed:', e))
+		streamDeck.sendPreparedFillPanelBuffer(image).catch((e) => console.error('Fill failed:', e))
 		if (imageLcd) {
 			streamDeck
 				.fillLcd(lcdSegmentControl.id, imageLcd, { format: 'rgb' })

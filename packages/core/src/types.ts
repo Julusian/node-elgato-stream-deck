@@ -7,6 +7,7 @@ import type {
 	StreamDeckEncoderControlDefinition,
 	StreamDeckLcdSegmentControlDefinition,
 } from './controlDefinition.js'
+import { PreparedBuffer } from './preparedBuffer.js'
 
 export interface StreamDeckTcpChildDeviceInfo extends HIDDeviceInfo {
 	readonly model: DeviceModelId
@@ -105,12 +106,54 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	): Promise<void>
 
 	/**
+	 * Prepare to fill the given key with an image in a Buffer.
+	 * Note: The result is only guaranteed to be valid for this specific StreamDeck and the same library version, but is safe to store externally.
+	 *
+	 * @param {number} keyIndex The key to fill
+	 * @param {Buffer} imageBuffer The image to write
+	 * @param {Object} options Options to control the write
+	 * @param {boolean} jsonSafe Whether the result should be packed to be safe to json serialize
+	 */
+	prepareFillKeyBuffer(
+		keyIndex: KeyIndex,
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		options?: FillImageOptions,
+		jsonSafe?: boolean,
+	): Promise<PreparedBuffer>
+
+	/**
+	 * Send a prepared fill key operation
+	 *
+	 * @param {PreparedBuffer} buffer The prepared buffer to draw
+	 */
+	sendPreparedFillKeyBuffer(buffer: PreparedBuffer): Promise<void>
+
+	/**
 	 * Fills the whole panel with an image in a Buffer.
 	 *
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} options Options to control the write
 	 */
 	fillPanelBuffer(imageBuffer: Uint8Array | Uint8ClampedArray, options?: FillPanelOptions): Promise<void>
+
+	/**
+	 * Prepare to fill the whole panel with an image in a Buffer.
+	 * Note: The result is only guaranteed to be valid for this specific StreamDeck and the same library version, but is safe to store externally.
+	 *
+	 * @param {Buffer} imageBuffer The image to write
+	 * @param {Object} options Options to control the write
+	 */
+	prepareFillPanelBuffer(
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		options?: FillPanelOptions,
+	): Promise<PreparedBuffer>
+
+	/**
+	 * Send a prepared fill panel operation
+	 *
+	 * @param {PreparedBuffer} buffer The prepared buffer to draw
+	 */
+	sendPreparedFillPanelBuffer(buffer: PreparedBuffer): Promise<void>
 
 	/**
 	 * Fill the whole lcd segment

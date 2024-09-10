@@ -8,7 +8,7 @@ export interface InternalFillImageOptions extends FillImageOptions {
 
 export interface ButtonLcdImagePacker {
 	convertPixelBuffer(
-		sourceBuffer: Uint8Array,
+		sourceBuffer: Uint8Array | Uint8ClampedArray,
 		sourceOptions: InternalFillImageOptions,
 		targetSize: Dimension,
 	): Promise<Uint8Array>
