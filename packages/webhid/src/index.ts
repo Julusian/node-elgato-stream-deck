@@ -11,6 +11,7 @@ export {
 	DeviceModelId,
 	KeyIndex,
 	StreamDeck,
+	StreamDeckProxy,
 	LcdPosition,
 	Dimension,
 	StreamDeckControlDefinitionBase,
@@ -21,8 +22,11 @@ export {
 	StreamDeckEncoderControlDefinition,
 	StreamDeckLcdSegmentControlDefinition,
 	StreamDeckControlDefinition,
+	StreamDeckTcpChildDeviceInfo,
 	OpenStreamDeckOptions,
+	PreparedBuffer,
 } from '@elgato-stream-deck/core'
+
 export { StreamDeckWeb } from './wrapper.js'
 
 /**
