@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.2](https://github.com/julusian/node-elgato-stream-deck/compare/v7.0.1...v7.0.2) (2024-09-16)
+
+**Note:** Version bump only for package @elgato-stream-deck/node
+
+
+
+
+
 ## [7.0.1](https://github.com/julusian/node-elgato-stream-deck/compare/v7.0.0...v7.0.1) (2024-09-10)
 
 **Note:** Version bump only for package @elgato-stream-deck/node
