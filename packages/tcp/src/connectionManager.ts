@@ -54,14 +54,20 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 	#onSocketConnected = (socket: SocketWrapper) => {
 		const connectionId = this.#getConnectionId(socket.address, socket.port)
 
-		// TODO - error handling?
 		const fakeHidDevice = new TcpHidDevice(socket)
+
+		// Setup a temporary error handler, in case an error gets produced during the setup
+		const tmpErrorHandler = () => {
+			// No-op?
+		}
+		fakeHidDevice.on('error', tmpErrorHandler)
 
 		fakeHidDevice
 			.getDeviceInfo()
 			.then((info) => {
 				const model = DEVICE_MODELS.find((m) => m.productIds.includes(info.productId))
 				if (!model) {
+					// Note: leave the temporary error handler, to ensure it can't cause a crash
 					this.emit('error', `Found StreamDeck with unknown productId: ${info.productId.toString(16)}`)
 					return
 				}
@@ -69,6 +75,8 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 				const propertiesService = fakeHidDevice.isPrimary ? new TcpPropertiesService(fakeHidDevice) : undefined
 				const streamdeckSocket = model.factory(fakeHidDevice, this.#openOptions, propertiesService)
 				const streamDeckTcp = new StreamDeckTcpWrapper(socket, fakeHidDevice, streamdeckSocket)
+
+				fakeHidDevice.off('error', tmpErrorHandler)
 
 				this.#streamdecks.set(connectionId, streamDeckTcp)
 
