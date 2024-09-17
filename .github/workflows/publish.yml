@@ -25,6 +25,7 @@ jobs:
           if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
             echo "No Token"
           else
+            corepack enable
 
             PUBLISHED_VERSION=$(yarn npm info --json @elgato-stream-deck/node | jq -c '.version' -r)
             THIS_VERSION=$(node -p "require('./packages/node/package.json').version")
