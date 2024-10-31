@@ -3385,7 +3385,7 @@ class DefaultButtonsLcdService {
             await this.fillImageRangeControl(control, pixels, {
                 format: 'rgba',
                 offset: 0,
-                stride: control.pixelSize.width * 3,
+                stride: control.pixelSize.width * 4,
             });
         }
     }
