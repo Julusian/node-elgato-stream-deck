@@ -2382,7 +2382,7 @@ exports.MODEL_NAMES = {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DEVICE_MODELS = exports.DEVICE_MODELS2 = exports.DeviceModelType = exports.VENDOR_ID = exports.uint8ArrayToDataView = exports.StreamDeckProxy = void 0;
+exports.DEVICE_MODELS = exports.DEVICE_MODELS2 = exports.DeviceModelType = exports.VENDOR_ID = exports.parseAllFirmwareVersionsHelper = exports.uint8ArrayToDataView = exports.StreamDeckProxy = void 0;
 const tslib_1 = __webpack_require__(5823);
 const id_js_1 = __webpack_require__(6444);
 const original_js_1 = __webpack_require__(745);
@@ -2401,6 +2401,8 @@ var proxy_js_1 = __webpack_require__(6481);
 Object.defineProperty(exports, "StreamDeckProxy", ({ enumerable: true, get: function () { return proxy_js_1.StreamDeckProxy; } }));
 var util_js_1 = __webpack_require__(4369);
 Object.defineProperty(exports, "uint8ArrayToDataView", ({ enumerable: true, get: function () { return util_js_1.uint8ArrayToDataView; } }));
+var all_firmware_js_1 = __webpack_require__(3339);
+Object.defineProperty(exports, "parseAllFirmwareVersionsHelper", ({ enumerable: true, get: function () { return all_firmware_js_1.parseAllFirmwareVersionsHelper; } }));
 /** Elgato vendor id */
 exports.VENDOR_ID = 0x0fd9;
 var DeviceModelType;
@@ -4101,24 +4103,24 @@ exports.StreamDeckPlusLcdService = StreamDeckPlusLcdService;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseAllFirmwareVersionsHelper = parseAllFirmwareVersionsHelper;
-const util_1 = __webpack_require__(4369);
+const util_js_1 = __webpack_require__(4369);
 async function parseAllFirmwareVersionsHelper(reportData) {
     const decoder = new TextDecoder('ascii');
     const versions = {};
     if (reportData.ap2) {
-        const ap2DataDataView = (0, util_1.uint8ArrayToDataView)(reportData.ap2);
+        const ap2DataDataView = (0, util_js_1.uint8ArrayToDataView)(reportData.ap2);
         versions.AP2 = decoder.decode(reportData.ap2.subarray(6, 6 + 8));
         versions.AP2_CHECKSUM = ap2DataDataView.getUint32(2, false).toString(16);
     }
     if (reportData.encoderLd && (reportData.encoderLd[0] === 0x18 || reportData.encoderLd[1] === 0x18)) {
-        const encoderLdDataView = (0, util_1.uint8ArrayToDataView)(reportData.encoderLd);
+        const encoderLdDataView = (0, util_js_1.uint8ArrayToDataView)(reportData.encoderLd);
         versions.ENCODER_LD_1 = decoder.decode(reportData.encoderLd.subarray(2, 2 + 8));
         versions.ENCODER_LD_1_CHECKSUM = encoderLdDataView.getUint32(10, false).toString(16);
         versions.ENCODER_LD_2 = decoder.decode(reportData.encoderLd.subarray(14, 14 + 8));
         versions.ENCODER_LD_2_CHECKSUM = encoderLdDataView.getUint32(22, false).toString(16);
     }
     if (reportData.encoderAp2 && (reportData.encoderAp2[0] === 0x18 || reportData.encoderAp2[1] === 0x18)) {
-        const encoderAp2DataView = (0, util_1.uint8ArrayToDataView)(reportData.encoderAp2);
+        const encoderAp2DataView = (0, util_js_1.uint8ArrayToDataView)(reportData.encoderAp2);
         versions.ENCODER_AP2_1 = decoder.decode(reportData.encoderAp2.subarray(2, 2 + 8));
         versions.ENCODER_AP2_1_CHECKSUM = encoderAp2DataView.getUint32(10, false).toString(16);
         versions.ENCODER_AP2_2 = decoder.decode(reportData.encoderAp2.subarray(14, 14 + 8));
@@ -4296,16 +4298,16 @@ exports.PedalPropertiesService = PedalPropertiesService;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StudioPropertiesService = void 0;
-const all_firmware_1 = __webpack_require__(3339);
-const gen2_1 = __webpack_require__(1352);
-class StudioPropertiesService extends gen2_1.Gen2PropertiesService {
+const all_firmware_js_1 = __webpack_require__(3339);
+const gen2_js_1 = __webpack_require__(1352);
+class StudioPropertiesService extends gen2_js_1.Gen2PropertiesService {
     async getAllFirmwareVersions() {
         const [ap2Data, encoderAp2Data, encoderLdData] = await Promise.all([
             this.device.getFeatureReport(0x05, 32),
             this.device.getFeatureReport(0x11, 32),
             this.device.getFeatureReport(0x13, 32),
         ]);
-        return (0, all_firmware_1.parseAllFirmwareVersionsHelper)({
+        return (0, all_firmware_js_1.parseAllFirmwareVersionsHelper)({
             ap2: ap2Data,
             encoderAp2: encoderAp2Data,
             encoderLd: encoderLdData,
