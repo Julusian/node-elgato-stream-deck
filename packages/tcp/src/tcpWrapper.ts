@@ -44,6 +44,9 @@ export class StreamDeckTcpWrapper extends StreamDeckProxy implements StreamDeckT
 
 		const data = await this.#device.getFeatureReport(0x85, -1)
 
-		return new TextDecoder('hex').decode(data.subarray(4, 10)) // TODO - add colons
+		// This would be nice to do with a TextDecoder, but that doesn't support hex and we are in nodejs so don't need to
+		return Array.from(data.subarray(4, 10))
+			.map((v) => v.toString(16).padStart(2, '0'))
+			.join(':')
 	}
 }
