@@ -134,7 +134,7 @@ export class StreamDeckProxy implements StreamDeck {
 	}
 
 	public listeners<T extends EventEmitter.EventNames<StreamDeckEvents>>(
-		event: T
+		event: T,
 	): Array<EventEmitter.EventListener<StreamDeckEvents, T>> {
 		return this.device.listeners(event)
 	}
@@ -156,7 +156,7 @@ export class StreamDeckProxy implements StreamDeck {
 	public on<T extends EventEmitter.EventNames<StreamDeckEvents>>(
 		event: T,
 		fn: EventEmitter.EventListener<StreamDeckEvents, T>,
-		context?: unknown
+		context?: unknown,
 	): this {
 		this.device.on(event, fn, context)
 		return this
@@ -164,7 +164,7 @@ export class StreamDeckProxy implements StreamDeck {
 	public addListener<T extends EventEmitter.EventNames<StreamDeckEvents>>(
 		event: T,
 		fn: EventEmitter.EventListener<StreamDeckEvents, T>,
-		context?: unknown
+		context?: unknown,
 	): this {
 		this.device.addListener(event, fn, context)
 		return this
@@ -176,7 +176,7 @@ export class StreamDeckProxy implements StreamDeck {
 	public once<T extends EventEmitter.EventNames<StreamDeckEvents>>(
 		event: T,
 		fn: EventEmitter.EventListener<StreamDeckEvents, T>,
-		context?: unknown
+		context?: unknown,
 	): this {
 		this.device.once(event, fn, context)
 		return this
@@ -189,7 +189,7 @@ export class StreamDeckProxy implements StreamDeck {
 		event: T,
 		fn?: EventEmitter.EventListener<StreamDeckEvents, T>,
 		context?: unknown,
-		once?: boolean
+		once?: boolean,
 	): this {
 		this.device.removeListener(event, fn, context, once)
 		return this
@@ -198,7 +198,7 @@ export class StreamDeckProxy implements StreamDeck {
 		event: T,
 		fn?: EventEmitter.EventListener<StreamDeckEvents, T>,
 		context?: unknown,
-		once?: boolean
+		once?: boolean,
 	): this {
 		this.device.off(event, fn, context, once)
 		return this

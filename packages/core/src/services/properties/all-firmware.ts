@@ -1,4 +1,4 @@
-import { uint8ArrayToDataView } from '../../util'
+import { uint8ArrayToDataView } from '../../util.js'
 
 export async function parseAllFirmwareVersionsHelper(reportData: {
 	// Future: LD, AP1?

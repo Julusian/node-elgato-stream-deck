@@ -21,6 +21,7 @@ export type { OpenStreamDeckOptions } from './models/base.js'
 export { StreamDeckProxy } from './proxy.js'
 export type { PropertiesService } from './services/properties/interface.js'
 export { uint8ArrayToDataView } from './util.js'
+export { parseAllFirmwareVersionsHelper } from './services/properties/all-firmware.js'
 
 /** Elgato vendor id */
 export const VENDOR_ID = 0x0fd9

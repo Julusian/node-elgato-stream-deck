@@ -1,5 +1,5 @@
-import { parseAllFirmwareVersionsHelper } from './all-firmware'
-import { Gen2PropertiesService } from './gen2'
+import { parseAllFirmwareVersionsHelper } from './all-firmware.js'
+import { Gen2PropertiesService } from './gen2.js'
 
 export class StudioPropertiesService extends Gen2PropertiesService {
 	public async getAllFirmwareVersions(): Promise<Record<string, string>> {

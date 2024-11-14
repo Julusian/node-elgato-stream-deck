@@ -101,7 +101,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	fillKeyBuffer(
 		keyIndex: KeyIndex,
 		imageBuffer: Uint8Array | Uint8ClampedArray,
-		options?: FillImageOptions
+		options?: FillImageOptions,
 	): Promise<void>
 
 	/**
@@ -121,7 +121,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	fillLcd(
 		lcdIndex: number,
 		imageBuffer: Uint8Array | Uint8ClampedArray,
-		sourceOptions: FillImageOptions
+		sourceOptions: FillImageOptions,
 	): Promise<void>
 
 	/**
@@ -162,7 +162,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 		x: number,
 		y: number,
 		imageBuffer: Uint8Array,
-		sourceOptions: FillLcdImageOptions
+		sourceOptions: FillLcdImageOptions,
 	): Promise<void>
 
 	/**
