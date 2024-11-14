@@ -44,6 +44,8 @@ export interface StreamDeckEncoderControlDefinition extends StreamDeckControlDef
 
 	/** The number of steps in encoder led rings (if any) */
 	ledRingSteps: number
+	/** Encoding offset of the ring leds */
+	lcdRingOffset?: number
 }
 
 export interface StreamDeckLcdSegmentControlDefinition extends StreamDeckControlDefinitionBase {
