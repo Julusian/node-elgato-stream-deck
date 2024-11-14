@@ -73,7 +73,16 @@ export class EncoderLedService {
 
 		if (colors.length !== control.ledRingSteps * 3) throw new Error('Invalid colors length')
 
-		const colorsBuffer = colors instanceof Uint8Array ? colors : new Uint8Array(colors)
+		let colorsBuffer = colors instanceof Uint8Array ? colors : new Uint8Array(colors)
+
+		// If there is an offset, repack the buffer to change the start point
+		if (control.lcdRingOffset) {
+			const oldColorsBuffer = colorsBuffer
+			colorsBuffer = new Uint8Array(oldColorsBuffer.length)
+
+			colorsBuffer.set(oldColorsBuffer.slice(control.lcdRingOffset * 3), 0)
+			colorsBuffer.set(oldColorsBuffer.slice(0, control.lcdRingOffset * 3), control.lcdRingOffset * 3)
+		}
 
 		const buffer = new Uint8Array(1024)
 		buffer[0] = 0x02

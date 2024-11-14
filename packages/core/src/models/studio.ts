@@ -27,6 +27,7 @@ const studioControls: StreamDeckControlDefinition[] = [
 
 		hasLed: true,
 		ledRingSteps: 24,
+		lcdRingOffset: 12,
 	},
 ]
 
