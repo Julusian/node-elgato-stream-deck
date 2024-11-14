@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.1.1](https://github.com/julusian/node-elgato-stream-deck/compare/v7.1.0...v7.1.1) (2024-11-14)
+
+
+### Bug Fixes
+
+* simplify firmware versions ([1b94c63](https://github.com/julusian/node-elgato-stream-deck/commit/1b94c63a6742bfe47d424acdf4c70927d62066b2))
+
+
+
+
+
 # [7.1.0](https://github.com/julusian/node-elgato-stream-deck/compare/v7.0.2...v7.1.0) (2024-11-14)
 
 
