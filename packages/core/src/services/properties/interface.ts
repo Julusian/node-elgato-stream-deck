@@ -5,5 +5,7 @@ export interface PropertiesService {
 
 	getFirmwareVersion(): Promise<string>
 
+	getAllFirmwareVersions(): Promise<Record<string, string>>
+
 	getSerialNumber(): Promise<string>
 }

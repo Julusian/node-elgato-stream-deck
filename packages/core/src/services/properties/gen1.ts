@@ -44,6 +44,11 @@ export class Gen1PropertiesService implements PropertiesService {
 		return new TextDecoder('ascii').decode(val.subarray(5, end === -1 ? undefined : end))
 	}
 
+	public async getAllFirmwareVersions(): Promise<Record<string, string>> {
+		// Not supported for gen1 models
+		return {}
+	}
+
 	public async getSerialNumber(): Promise<string> {
 		let val: Uint8Array
 		try {

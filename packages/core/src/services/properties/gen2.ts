@@ -42,6 +42,13 @@ export class Gen2PropertiesService implements PropertiesService {
 		return new TextDecoder('ascii').decode(val.subarray(6, end))
 	}
 
+	public async getAllFirmwareVersions(): Promise<Record<string, string>> {
+		return {
+			AP2: await this.getFirmwareVersion(),
+			// TODO AP2_CHECKSUM - uint32be after length
+		}
+	}
+
 	public async getSerialNumber(): Promise<string> {
 		const val = await this.#device.getFeatureReport(6, 32)
 		const end = val[1] + 2

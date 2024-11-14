@@ -33,6 +33,10 @@ connectionManager.on('connected', async (streamDeck) => {
 	})
 	console.log('connected!')
 
+	streamDeck.getAllFirmwareVersions().then((versions) => {
+		console.log('all versions', versions)
+	})
+
 	const img = await sharp(path.resolve('fixtures/github_logo.png'))
 		.flatten()
 		.resize(streamDeck.BUTTON_WIDTH_PX, streamDeck.BUTTON_HEIGHT_PX)

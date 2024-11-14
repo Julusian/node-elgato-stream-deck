@@ -95,7 +95,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	constructor(
 		device: HIDDevice,
 		_options: Readonly<Required<OpenStreamDeckOptions>>,
-		services: StreamDeckServicesDefinition,
+		services: StreamDeckServicesDefinition
 	) {
 		super()
 
@@ -120,11 +120,11 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 
 	protected checkValidKeyIndex(
 		keyIndex: KeyIndex,
-		feedbackType: StreamDeckButtonControlDefinition['feedbackType'] | null,
+		feedbackType: StreamDeckButtonControlDefinition['feedbackType'] | null
 	): void {
 		const buttonControl = this.deviceProperties.CONTROLS.find(
 			(control): control is StreamDeckButtonControlDefinition =>
-				control.type === 'button' && control.index === keyIndex,
+				control.type === 'button' && control.index === keyIndex
 		)
 
 		if (!buttonControl) {
@@ -158,6 +158,9 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 
 	public async getFirmwareVersion(): Promise<string> {
 		return this.#propertiesService.getFirmwareVersion()
+	}
+	public async getAllFirmwareVersions(): Promise<Record<string, string>> {
+		return this.#propertiesService.getAllFirmwareVersions()
 	}
 	public async getSerialNumber(): Promise<string> {
 		return this.#propertiesService.getSerialNumber()
