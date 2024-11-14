@@ -18,18 +18,16 @@ export async function parseAllFirmwareVersionsHelper(reportData: {
 
 	if (reportData.encoderLd && (reportData.encoderLd[0] === 0x18 || reportData.encoderLd[1] === 0x18)) {
 		const encoderLdDataView = uint8ArrayToDataView(reportData.encoderLd)
-		versions.ENCODER_LD_1 = decoder.decode(reportData.encoderLd.subarray(2, 2 + 8))
-		versions.ENCODER_LD_1_CHECKSUM = encoderLdDataView.getUint32(10, false).toString(16)
-		versions.ENCODER_LD_2 = decoder.decode(reportData.encoderLd.subarray(14, 14 + 8))
-		versions.ENCODER_LD_2_CHECKSUM = encoderLdDataView.getUint32(22, false).toString(16)
+		// Sample just the first encoder, they should all be the same
+		versions.ENCODER_LD = decoder.decode(reportData.encoderLd.subarray(2, 2 + 8))
+		versions.ENCODER_LD_CHECKSUM = encoderLdDataView.getUint32(10, false).toString(16)
 	}
 
 	if (reportData.encoderAp2 && (reportData.encoderAp2[0] === 0x18 || reportData.encoderAp2[1] === 0x18)) {
 		const encoderAp2DataView = uint8ArrayToDataView(reportData.encoderAp2)
-		versions.ENCODER_AP2_1 = decoder.decode(reportData.encoderAp2.subarray(2, 2 + 8))
-		versions.ENCODER_AP2_1_CHECKSUM = encoderAp2DataView.getUint32(10, false).toString(16)
-		versions.ENCODER_AP2_2 = decoder.decode(reportData.encoderAp2.subarray(14, 14 + 8))
-		versions.ENCODER_AP2_2_CHECKSUM = encoderAp2DataView.getUint32(22, false).toString(16)
+		// Sample just the first encoder, they should all be the same
+		versions.ENCODER_AP2 = decoder.decode(reportData.encoderAp2.subarray(2, 2 + 8))
+		versions.ENCODER_AP2_CHECKSUM = encoderAp2DataView.getUint32(10, false).toString(16)
 	}
 
 	return versions
