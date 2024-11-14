@@ -5,6 +5,7 @@ import { DeviceModelId, MODEL_NAMES } from '../id.js'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 import type { StreamDeckControlDefinition } from '../controlDefinition.js'
 import type { PropertiesService } from '../services/properties/interface.js'
+import { StudioPropertiesService } from '../services/properties/studio.js'
 
 const studioControls: StreamDeckControlDefinition[] = [
 	{
@@ -52,6 +53,12 @@ export function StreamDeckStudioFactory(
 	options: Required<OpenStreamDeckOptions>,
 	propertiesService?: PropertiesService,
 ): StreamDeckBase {
-	const services = createBaseGen2Properties(device, options, studioProperties, propertiesService ?? null, true)
+	const services = createBaseGen2Properties(
+		device,
+		options,
+		studioProperties,
+		propertiesService ?? new StudioPropertiesService(device),
+		true,
+	)
 	return new StreamDeckBase(device, options, services)
 }

@@ -28,6 +28,7 @@ function generateEncoderColor(value, max) {
 
 	console.log('firmware', await streamDeck.getFirmwareVersion())
 	console.log('serial number', await streamDeck.getSerialNumber())
+	console.log('all-firmware', await streamDeck.getAllFirmwareVersions())
 
 	/** @type {import('@elgato-stream-deck/core').StreamDeckEncoderControlDefinition[]} */
 	const encoders = streamDeck.CONTROLS.filter((control) => control.type === 'encoder')

@@ -2,10 +2,10 @@ import type { HIDDevice } from '../../hid-device.js'
 import type { PropertiesService } from './interface.js'
 
 export class Gen2PropertiesService implements PropertiesService {
-	readonly #device: HIDDevice
+	protected readonly device: HIDDevice
 
 	constructor(device: HIDDevice) {
-		this.#device = device
+		this.device = device
 	}
 
 	public async setBrightness(percentage: number): Promise<void> {
@@ -21,7 +21,7 @@ export class Gen2PropertiesService implements PropertiesService {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		]);
-		await this.#device.sendFeatureReport(brightnessCommandBuffer)
+		await this.device.sendFeatureReport(brightnessCommandBuffer)
 	}
 
 	public async resetToLogo(): Promise<void> {
@@ -33,11 +33,11 @@ export class Gen2PropertiesService implements PropertiesService {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		]);
-		await this.#device.sendFeatureReport(resetCommandBuffer)
+		await this.device.sendFeatureReport(resetCommandBuffer)
 	}
 
 	public async getFirmwareVersion(): Promise<string> {
-		const val = await this.#device.getFeatureReport(5, 32)
+		const val = await this.device.getFeatureReport(5, 32)
 		const end = val[1] + 2
 		return new TextDecoder('ascii').decode(val.subarray(6, end))
 	}
@@ -50,7 +50,7 @@ export class Gen2PropertiesService implements PropertiesService {
 	}
 
 	public async getSerialNumber(): Promise<string> {
-		const val = await this.#device.getFeatureReport(6, 32)
+		const val = await this.device.getFeatureReport(6, 32)
 		const end = val[1] + 2
 		return new TextDecoder('ascii').decode(val.subarray(2, end))
 	}

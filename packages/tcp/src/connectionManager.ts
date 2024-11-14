@@ -4,9 +4,10 @@ import { DEFAULT_TCP_PORT } from './constants.js'
 import { SocketWrapper } from './socketWrapper.js'
 import { type JPEGEncodeOptions, encodeJPEG } from '@elgato-stream-deck/node-lib'
 import type { HIDDevice, OpenStreamDeckOptions, ChildHIDDeviceInfo, PropertiesService } from '@elgato-stream-deck/core'
-import { DEVICE_MODELS, uint8ArrayToDataView } from '@elgato-stream-deck/core'
+import { DEVICE_MODELS } from '@elgato-stream-deck/core'
 import { StreamDeckTcpWrapper } from './tcpWrapper.js'
 import { TcpHidDevice } from './hid-device.js'
+import { parseAllFirmwareVersionsHelper } from '@elgato-stream-deck/core/dist/services/properties/all-firmware.js'
 
 export interface StreamDeckTcpConnectionManagerEvents {
 	connected: [streamdeck: StreamDeckTcp]
@@ -284,41 +285,17 @@ class TcpPropertiesService implements PropertiesService {
 	}
 
 	public async getAllFirmwareVersions(): Promise<Record<string, string>> {
-		// Future: LD, AP1?
 		const [ap2Data, encoderAp2Data, encoderLdData] = await Promise.all([
 			this.#device.getFeatureReport(0x83, -1),
 			this.#device.getFeatureReport(0x86, -1),
 			this.#device.getFeatureReport(0x8a, -1),
 		])
 
-		const decoder = new TextDecoder('ascii')
-
-		const ap2DataDataView = uint8ArrayToDataView(ap2Data)
-
-		const versions: Record<string, string> = {
-			AP2: decoder.decode(ap2Data.subarray(8, 16)),
-			AP2_CHECKSUM: ap2DataDataView.getUint32(4, false).toString(16),
-		}
-
-		const encoderLdDataLen = encoderLdData[2]
-		if (encoderLdDataLen === 0x18) {
-			const encoderLdDataView = uint8ArrayToDataView(encoderLdData)
-			versions.ENCODER_LD_1 = decoder.decode(encoderLdData.subarray(4, 4 + 8))
-			versions.ENCODER_LD_1_CHECKSUM = encoderLdDataView.getUint32(12, false).toString(16)
-			versions.ENCODER_LD_2 = decoder.decode(encoderLdData.subarray(16, 16 + 8))
-			versions.ENCODER_LD_2_CHECKSUM = encoderLdDataView.getUint32(24, false).toString(16)
-		}
-
-		const encoderAp2DataLen = encoderAp2Data[2]
-		if (encoderAp2DataLen === 0x18) {
-			const encoderAp2DataView = uint8ArrayToDataView(encoderAp2Data)
-			versions.ENCODER_AP2_1 = decoder.decode(encoderAp2Data.subarray(4, 4 + 8))
-			versions.ENCODER_AP2_1_CHECKSUM = encoderAp2DataView.getUint32(12, false).toString(16)
-			versions.ENCODER_AP2_2 = decoder.decode(encoderAp2Data.subarray(16, 16 + 8))
-			versions.ENCODER_AP2_2_CHECKSUM = encoderAp2DataView.getUint32(24, false).toString(16)
-		}
-
-		return versions
+		return parseAllFirmwareVersionsHelper({
+			ap2: ap2Data.slice(2),
+			encoderAp2: encoderAp2Data.slice(2),
+			encoderLd: encoderLdData.slice(2),
+		})
 	}
 
 	public async getSerialNumber(): Promise<string> {
