@@ -5,14 +5,20 @@ export {
 	DeviceModelId,
 	KeyIndex,
 	StreamDeck,
+	StreamDeckProxy,
 	LcdPosition,
 	Dimension,
 	StreamDeckControlDefinitionBase,
 	StreamDeckButtonControlDefinition,
+	StreamDeckButtonControlDefinitionNoFeedback,
+	StreamDeckButtonControlDefinitionRgbFeedback,
+	StreamDeckButtonControlDefinitionLcdFeedback,
 	StreamDeckEncoderControlDefinition,
 	StreamDeckLcdSegmentControlDefinition,
 	StreamDeckControlDefinition,
+	StreamDeckTcpChildDeviceInfo,
 	OpenStreamDeckOptions,
+	PreparedBuffer,
 } from '@elgato-stream-deck/core'
 
 export * from './types.js'
