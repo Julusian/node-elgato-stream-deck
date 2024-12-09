@@ -1,6 +1,6 @@
 {
 	"name": "@elgato-stream-deck/node",
-	"version": "7.1.1",
+	"version": "7.1.2",
 	"description": "An npm module for interfacing with the Elgato Stream Deck in node",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
@@ -52,8 +52,8 @@
 		"node": ">=18.18"
 	},
 	"dependencies": {
-		"@elgato-stream-deck/core": "7.1.1",
-		"@elgato-stream-deck/node-lib": "7.1.1",
+		"@elgato-stream-deck/core": "7.1.2",
+		"@elgato-stream-deck/node-lib": "7.1.2",
 		"eventemitter3": "^5.0.1",
 		"node-hid": "^3.1.0",
 		"tslib": "^2.7.0"

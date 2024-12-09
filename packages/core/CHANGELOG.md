@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.1.2](https://github.com/julusian/node-elgato-stream-deck/compare/v7.1.1...v7.1.2) (2024-12-09)
+
+
+### Bug Fixes
+
+* studio clearPanel over usb ([6282b1b](https://github.com/julusian/node-elgato-stream-deck/commit/6282b1b401ce5a17955c3dc01e0757773efa520c))
+
+
+
+
+
 ## [7.1.1](https://github.com/julusian/node-elgato-stream-deck/compare/v7.1.0...v7.1.1) (2024-11-14)
 
 
