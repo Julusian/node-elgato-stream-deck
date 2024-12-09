@@ -37,9 +37,10 @@ connectionManager.on('connected', async (streamDeck) => {
 		console.log('all versions', versions)
 	})
 
+	const firstButton = streamDeck.CONTROLS.find((control) => control.type === 'button')
 	const img = await sharp(path.resolve('fixtures/github_logo.png'))
 		.flatten()
-		.resize(streamDeck.BUTTON_WIDTH_PX, streamDeck.BUTTON_HEIGHT_PX)
+		.resize(firstButton.pixelSize.width, firstButton.pixelSize.height)
 		.raw()
 		.toBuffer()
 
@@ -54,7 +55,7 @@ connectionManager.on('connected', async (streamDeck) => {
 
 	if (fullImg) {
 		console.log('send fill')
-		streamDeck.fillPanelBuffer(fullImg).catch((e) => console.log('fullImg failed', e))
+		// streamDeck.fillPanelBuffer(fullImg).catch((e) => console.log('fullImg failed', e))
 
 		console.log('post send fill')
 	}

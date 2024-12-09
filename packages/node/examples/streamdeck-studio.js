@@ -43,9 +43,10 @@ function generateEncoderColor(value, max) {
 			.catch((e) => console.error('Fill failed:', e))
 	}
 
+	const firstButton = streamDeck.CONTROLS.find((control) => control.type === 'button')
 	const img = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 		.flatten()
-		.resize(streamDeck.BUTTON_WIDTH_PX, streamDeck.BUTTON_HEIGHT_PX)
+		.resize(firstButton.pixelSize.width, firstButton.pixelSize.height)
 		.raw()
 		.toBuffer()
 
