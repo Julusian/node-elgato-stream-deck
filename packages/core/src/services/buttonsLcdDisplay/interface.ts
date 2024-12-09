@@ -1,5 +1,6 @@
 import type { Dimension, KeyIndex } from '../../id.js'
 import type { FillImageOptions, FillPanelDimensionsOptions, FillPanelOptions } from '../../types.js'
+import type { PreparedBuffer } from '../../preparedBuffer.js'
 
 export interface GridSpan {
 	minRow: number
@@ -16,5 +17,19 @@ export interface ButtonsLcdDisplayService {
 
 	fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
 	fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Uint8Array, options?: FillImageOptions): Promise<void>
+	prepareFillKeyBuffer(
+		keyIndex: KeyIndex,
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		options: FillImageOptions | undefined,
+		jsonSafe: boolean | undefined,
+	): Promise<PreparedBuffer>
+	sendPreparedFillKeyBuffer(buffer: PreparedBuffer): Promise<void>
+
 	fillPanelBuffer(imageBuffer: Uint8Array, options: FillPanelOptions | undefined): Promise<void>
+	prepareFillPanelBuffer(
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		options: FillPanelOptions | undefined,
+		jsonSafe: boolean | undefined,
+	): Promise<PreparedBuffer>
+	sendPreparedFillPanelBuffer(buffer: PreparedBuffer): Promise<void>
 }
