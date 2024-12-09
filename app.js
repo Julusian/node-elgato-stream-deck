@@ -3313,11 +3313,7 @@ class DefaultButtonsLcdService {
         if (this.#deviceProperties.FULLSCREEN_PANELS > 0) {
             // TODO - should this be a separate property?
             for (let screenIndex = 0; screenIndex < this.#deviceProperties.FULLSCREEN_PANELS; screenIndex++) {
-                const buffer = new Uint8Array(1024);
-                buffer[0] = 0x03;
-                buffer[1] = 0x05;
-                buffer[2] = screenIndex; // TODO - index
-                ps.push(this.#device.sendReports([buffer]));
+                ps.push(this.#device.sendFeatureReport(new Uint8Array([0x03, 0x05, screenIndex, 0, 0, 0])));
             }
             // TODO - clear rgb?
         }
