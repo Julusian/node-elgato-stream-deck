@@ -17,6 +17,7 @@ import type { CallbackHook } from '../services/callback-hook.js'
 import type { StreamDeckInputService } from '../services/input/interface.js'
 import { DEVICE_MODELS, VENDOR_ID } from '../index.js'
 import type { EncoderLedService } from '../services/encoderLed.js'
+import type { PreparedBuffer } from '../preparedBuffer.js'
 
 export type EncodeJPEGHelper = (buffer: Uint8Array, width: number, height: number) => Promise<Uint8Array>
 
@@ -178,8 +179,33 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		await this.#buttonsLcdService.fillKeyBuffer(keyIndex, imageBuffer, options)
 	}
 
+	public async prepareFillKeyBuffer(
+		keyIndex: KeyIndex,
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		options?: FillImageOptions,
+		jsonSafe?: boolean,
+	): Promise<PreparedBuffer> {
+		return this.#buttonsLcdService.prepareFillKeyBuffer(keyIndex, imageBuffer, options, jsonSafe)
+	}
+
+	public async sendPreparedFillKeyBuffer(buffer: PreparedBuffer): Promise<void> {
+		await this.#buttonsLcdService.sendPreparedFillKeyBuffer(buffer)
+	}
+
 	public async fillPanelBuffer(imageBuffer: Uint8Array, options?: FillPanelOptions): Promise<void> {
 		await this.#buttonsLcdService.fillPanelBuffer(imageBuffer, options)
+	}
+
+	public async prepareFillPanelBuffer(
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		options?: FillPanelOptions,
+		jsonSafe?: boolean,
+	): Promise<PreparedBuffer> {
+		return this.#buttonsLcdService.prepareFillPanelBuffer(imageBuffer, options, jsonSafe)
+	}
+
+	public async sendPreparedFillPanelBuffer(buffer: PreparedBuffer): Promise<void> {
+		await this.#buttonsLcdService.sendPreparedFillPanelBuffer(buffer)
 	}
 
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
