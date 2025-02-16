@@ -7,7 +7,7 @@ import type {
 	StreamDeckEncoderControlDefinition,
 	StreamDeckLcdSegmentControlDefinition,
 } from './controlDefinition.js'
-import { PreparedBuffer } from './preparedBuffer.js'
+import type { PreparedBuffer } from './preparedBuffer.js'
 
 export interface StreamDeckTcpChildDeviceInfo extends HIDDeviceInfo {
 	readonly model: DeviceModelId
@@ -255,5 +255,9 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 */
 	getSerialNumber(): Promise<string>
 
+	/**
+	 * Get information about a child device connected to this Stream Deck, if any is connected
+	 * Note: This is only available for the Stream Deck Studio, but is safe to call for other models
+	 */
 	getChildDeviceInfo(): Promise<StreamDeckTcpChildDeviceInfo | null>
 }
