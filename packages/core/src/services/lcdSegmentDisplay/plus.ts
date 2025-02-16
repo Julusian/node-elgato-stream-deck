@@ -7,6 +7,8 @@ import type { LcdSegmentDisplayService } from './interface.js'
 import type { FillImageOptions, FillLcdImageOptions } from '../../types.js'
 import { transformImageBuffer } from '../../util.js'
 import type { EncodeJPEGHelper } from '../../models/base.js'
+import { unwrapPreparedBufferToBuffer, wrapBufferToPreparedBuffer, type PreparedBuffer } from '../../preparedBuffer.js'
+import { DeviceModelId } from '../../id.js'
 
 export class StreamDeckPlusLcdService implements LcdSegmentDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper
@@ -33,11 +35,12 @@ export class StreamDeckPlusLcdService implements LcdSegmentDisplayService {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
 		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
-		return this.fillControlRegion(lcdControl, 0, 0, buffer, {
+		const packets = await this.prepareFillControlRegion(lcdControl, 0, 0, buffer, {
 			format: sourceOptions.format,
 			width: lcdControl.pixelSize.width,
 			height: lcdControl.pixelSize.height,
 		})
+		await this.#device.sendReports(packets)
 	}
 
 	public async fillLcdRegion(
@@ -50,7 +53,28 @@ export class StreamDeckPlusLcdService implements LcdSegmentDisplayService {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
 		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
-		return this.fillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions)
+		const packets = await this.prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions)
+		await this.#device.sendReports(packets)
+	}
+
+	public async prepareFillLcdRegion(
+		index: number,
+		x: number,
+		y: number,
+		imageBuffer: Uint8Array,
+		sourceOptions: FillLcdImageOptions,
+		jsonSafe?: boolean,
+	): Promise<PreparedBuffer> {
+		const lcdControl = this.#lcdControls.find((control) => control.id === index)
+		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
+
+		const packets = await this.prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions)
+		return wrapBufferToPreparedBuffer(DeviceModelId.PLUS, 'fill-lcd-region', packets, jsonSafe ?? false)
+	}
+
+	public async sendPreparedFillLcdRegion(buffer: PreparedBuffer): Promise<void> {
+		const packets = unwrapPreparedBufferToBuffer(DeviceModelId.PLUS, 'fill-lcd-region', buffer)
+		await this.#device.sendReports(packets)
 	}
 
 	public async clearLcdSegment(index: number): Promise<void> {
@@ -59,11 +83,12 @@ export class StreamDeckPlusLcdService implements LcdSegmentDisplayService {
 
 		const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4)
 
-		await this.fillControlRegion(lcdControl, 0, 0, buffer, {
+		const packets = await this.prepareFillControlRegion(lcdControl, 0, 0, buffer, {
 			format: 'rgba',
 			width: lcdControl.pixelSize.width,
 			height: lcdControl.pixelSize.height,
 		})
+		await this.#device.sendReports(packets)
 	}
 
 	public async clearAllLcdSegments(): Promise<void> {
@@ -75,13 +100,13 @@ export class StreamDeckPlusLcdService implements LcdSegmentDisplayService {
 		await Promise.all(ps)
 	}
 
-	private async fillControlRegion(
+	private async prepareFillControlRegion(
 		lcdControl: StreamDeckLcdSegmentControlDefinition,
 		x: number,
 		y: number,
 		imageBuffer: Uint8Array | Uint8ClampedArray,
 		sourceOptions: FillLcdImageOptions,
-	): Promise<void> {
+	): Promise<Uint8Array[]> {
 		// Basic bounds checking
 		const maxSize = lcdControl.pixelSize
 		if (x < 0 || x + sourceOptions.width > maxSize.width) {
@@ -99,8 +124,7 @@ export class StreamDeckPlusLcdService implements LcdSegmentDisplayService {
 		// A lot of this drawing code is heavily based on the normal button
 		const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions)
 
-		const packets = this.#lcdImageWriter.generateFillImageWrites({ ...sourceOptions, x, y }, byteBuffer)
-		await this.#device.sendReports(packets)
+		return this.#lcdImageWriter.generateFillImageWrites({ ...sourceOptions, x, y }, byteBuffer)
 	}
 
 	private async convertFillLcdBuffer(

@@ -133,6 +133,18 @@ export class StreamDeckProxy implements StreamDeck {
 		return this.device.fillLcdRegion(...args)
 	}
 
+	public async prepareFillLcdRegion(
+		...args: Parameters<StreamDeck['prepareFillLcdRegion']>
+	): ReturnType<StreamDeck['prepareFillLcdRegion']> {
+		return this.device.prepareFillLcdRegion(...args)
+	}
+
+	public async sendPreparedFillLcdRegion(
+		...args: Parameters<StreamDeck['sendPreparedFillLcdRegion']>
+	): ReturnType<StreamDeck['sendPreparedFillLcdRegion']> {
+		return this.device.sendPreparedFillLcdRegion(...args)
+	}
+
 	public async clearLcdSegment(
 		...args: Parameters<StreamDeck['clearLcdSegment']>
 	): ReturnType<StreamDeck['clearLcdSegment']> {

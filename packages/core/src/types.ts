@@ -146,6 +146,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	prepareFillPanelBuffer(
 		imageBuffer: Uint8Array | Uint8ClampedArray,
 		options?: FillPanelOptions,
+		jsonSafe?: boolean,
 	): Promise<PreparedBuffer>
 
 	/**
@@ -207,6 +208,32 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 		imageBuffer: Uint8Array,
 		sourceOptions: FillLcdImageOptions,
 	): Promise<void>
+
+	/**
+	 * Prepare to fill region of the lcd with an image in a Buffer.
+	 * Note: The result is only guaranteed to be valid for this specific StreamDeck and the same library version, but is safe to store externally.
+	 *
+	 * @param {number} lcdIndex The id of the lcd segment to draw to
+	 * @param {number} x The x position to draw to
+	 * @param {number} y The y position to draw to
+	 * @param {Buffer} imageBuffer The image to write
+	 * @param {Object} sourceOptions Options to control the write
+	 */
+	prepareFillLcdRegion(
+		lcdIndex: number,
+		x: number,
+		y: number,
+		imageBuffer: Uint8Array,
+		sourceOptions: FillLcdImageOptions,
+		jsonSafe?: boolean,
+	): Promise<PreparedBuffer>
+
+	/**
+	 * Send a prepared fill region of the lcd operation
+	 *
+	 * @param {PreparedBuffer} buffer The prepared buffer to draw
+	 */
+	sendPreparedFillLcdRegion(buffer: PreparedBuffer): Promise<void>
 
 	/**
 	 * Clear the lcd segment to black
