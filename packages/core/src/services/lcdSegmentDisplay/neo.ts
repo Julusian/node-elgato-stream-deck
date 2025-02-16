@@ -8,6 +8,7 @@ import type { LcdSegmentDisplayService } from './interface.js'
 import type { FillLcdImageOptions, FillImageOptions } from '../../types.js'
 import { transformImageBuffer } from '../../util.js'
 import type { EncodeJPEGHelper } from '../../models/base.js'
+import type { PreparedBuffer } from '../../preparedBuffer.js'
 
 export class StreamDeckNeoLcdService implements LcdSegmentDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper
@@ -33,6 +34,21 @@ export class StreamDeckNeoLcdService implements LcdSegmentDisplayService {
 		_imageBuffer: Uint8Array,
 		_sourceOptions: FillLcdImageOptions,
 	): Promise<void> {
+		throw new Error('Not supported for this model')
+	}
+
+	public async prepareFillLcdRegion(
+		_index: number,
+		_x: number,
+		_y: number,
+		_imageBuffer: Uint8Array,
+		_sourceOptions: FillLcdImageOptions,
+		_jsonSafe?: boolean,
+	): Promise<PreparedBuffer> {
+		throw new Error('Not supported for this model')
+	}
+
+	public async sendPreparedFillLcdRegion(_buffer: PreparedBuffer): Promise<void> {
 		throw new Error('Not supported for this model')
 	}
 

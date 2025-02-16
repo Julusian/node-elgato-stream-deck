@@ -238,6 +238,22 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		return this.#lcdSegmentDisplayService.fillLcdRegion(...args)
 	}
 
+	public async prepareFillLcdRegion(
+		...args: Parameters<StreamDeck['prepareFillLcdRegion']>
+	): ReturnType<StreamDeck['prepareFillLcdRegion']> {
+		if (!this.#lcdSegmentDisplayService) throw new Error('Not supported for this model')
+
+		return this.#lcdSegmentDisplayService.prepareFillLcdRegion(...args)
+	}
+
+	public async sendPreparedFillLcdRegion(
+		...args: Parameters<StreamDeck['sendPreparedFillLcdRegion']>
+	): ReturnType<StreamDeck['sendPreparedFillLcdRegion']> {
+		if (!this.#lcdSegmentDisplayService) throw new Error('Not supported for this model')
+
+		return this.#lcdSegmentDisplayService.sendPreparedFillLcdRegion(...args)
+	}
+
 	public async clearLcdSegment(
 		...args: Parameters<StreamDeck['clearLcdSegment']>
 	): ReturnType<StreamDeck['clearLcdSegment']> {
