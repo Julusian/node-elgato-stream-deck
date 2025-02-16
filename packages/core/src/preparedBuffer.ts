@@ -1,5 +1,13 @@
-import type { DeviceModelId } from './id'
+import type { DeviceModelId } from './id.js'
 
+/**
+ * This represents a buffer that has been prepared for sending to a Stream Deck.
+ * Note: The result is only guaranteed to be valid for this specific StreamDeck and the same library version, but is safe to store externally.
+ *
+ * This is an opaque type, and should not be viewed/inspected directly.
+ *
+ * It may be serialized to JSON, but only if it was generated with the `jsonSafe` flag set to `true`.
+ */
 export interface PreparedBuffer {
 	readonly __internal__: never
 }
