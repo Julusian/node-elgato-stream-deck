@@ -33,9 +33,6 @@ export class FakeLcdService implements ButtonsLcdDisplayService {
 		// Not supported
 		throw new Error('Not supported')
 	}
-	public async sendPreparedFillKeyBuffer(_buffer: PreparedBuffer): Promise<void> {
-		// Not supported
-	}
 	public async fillPanelBuffer(_imageBuffer: Uint8Array, _options?: FillPanelOptions): Promise<void> {
 		// Not supported
 	}
@@ -46,8 +43,5 @@ export class FakeLcdService implements ButtonsLcdDisplayService {
 	): Promise<PreparedBuffer> {
 		// Not supported
 		throw new Error('Not supported')
-	}
-	public async sendPreparedFillPanelBuffer(_buffer: PreparedBuffer): Promise<void> {
-		// Not supported
 	}
 }

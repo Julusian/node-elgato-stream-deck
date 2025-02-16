@@ -23,7 +23,6 @@ export interface ButtonsLcdDisplayService {
 		options: FillImageOptions | undefined,
 		jsonSafe: boolean | undefined,
 	): Promise<PreparedBuffer>
-	sendPreparedFillKeyBuffer(buffer: PreparedBuffer): Promise<void>
 
 	fillPanelBuffer(imageBuffer: Uint8Array, options: FillPanelOptions | undefined): Promise<void>
 	prepareFillPanelBuffer(
@@ -31,5 +30,4 @@ export interface ButtonsLcdDisplayService {
 		options: FillPanelOptions | undefined,
 		jsonSafe: boolean | undefined,
 	): Promise<PreparedBuffer>
-	sendPreparedFillPanelBuffer(buffer: PreparedBuffer): Promise<void>
 }

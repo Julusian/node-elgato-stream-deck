@@ -7,7 +7,7 @@ import type { LcdSegmentDisplayService } from './interface.js'
 import type { FillImageOptions, FillLcdImageOptions } from '../../types.js'
 import { transformImageBuffer } from '../../util.js'
 import type { EncodeJPEGHelper } from '../../models/base.js'
-import { unwrapPreparedBufferToBuffer, wrapBufferToPreparedBuffer, type PreparedBuffer } from '../../preparedBuffer.js'
+import { wrapBufferToPreparedBuffer, type PreparedBuffer } from '../../preparedBuffer.js'
 import { DeviceModelId } from '../../id.js'
 
 export class StreamDeckPlusLcdService implements LcdSegmentDisplayService {
@@ -70,11 +70,6 @@ export class StreamDeckPlusLcdService implements LcdSegmentDisplayService {
 
 		const packets = await this.prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions)
 		return wrapBufferToPreparedBuffer(DeviceModelId.PLUS, 'fill-lcd-region', packets, jsonSafe ?? false)
-	}
-
-	public async sendPreparedFillLcdRegion(buffer: PreparedBuffer): Promise<void> {
-		const packets = unwrapPreparedBufferToBuffer(DeviceModelId.PLUS, 'fill-lcd-region', buffer)
-		await this.#device.sendReports(packets)
 	}
 
 	public async clearLcdSegment(index: number): Promise<void> {

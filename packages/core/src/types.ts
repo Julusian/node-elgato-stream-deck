@@ -83,6 +83,13 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	getHidDeviceInfo(): Promise<HIDDeviceInfo>
 
 	/**
+	 * Send a prepared buffer operation
+	 *
+	 * @param {PreparedBuffer} buffer The prepared buffer to draw
+	 */
+	sendPreparedBuffer(buffer: PreparedBuffer): Promise<void>
+
+	/**
 	 * Fills the given key with a solid color.
 	 *
 	 * @param {number} keyIndex The key to fill
@@ -122,13 +129,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	): Promise<PreparedBuffer>
 
 	/**
-	 * Send a prepared fill key operation
-	 *
-	 * @param {PreparedBuffer} buffer The prepared buffer to draw
-	 */
-	sendPreparedFillKeyBuffer(buffer: PreparedBuffer): Promise<void>
-
-	/**
 	 * Fills the whole panel with an image in a Buffer.
 	 *
 	 * @param {Buffer} imageBuffer The image to write
@@ -148,13 +148,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 		options?: FillPanelOptions,
 		jsonSafe?: boolean,
 	): Promise<PreparedBuffer>
-
-	/**
-	 * Send a prepared fill panel operation
-	 *
-	 * @param {PreparedBuffer} buffer The prepared buffer to draw
-	 */
-	sendPreparedFillPanelBuffer(buffer: PreparedBuffer): Promise<void>
 
 	/**
 	 * Fill the whole lcd segment
@@ -227,13 +220,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 		sourceOptions: FillLcdImageOptions,
 		jsonSafe?: boolean,
 	): Promise<PreparedBuffer>
-
-	/**
-	 * Send a prepared fill region of the lcd operation
-	 *
-	 * @param {PreparedBuffer} buffer The prepared buffer to draw
-	 */
-	sendPreparedFillLcdRegion(buffer: PreparedBuffer): Promise<void>
 
 	/**
 	 * Clear the lcd segment to black

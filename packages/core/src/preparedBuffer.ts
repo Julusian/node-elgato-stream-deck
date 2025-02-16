@@ -3,6 +3,7 @@ import type { DeviceModelId } from './id.js'
 /**
  * This represents a buffer that has been prepared for sending to a Stream Deck.
  * Note: The result is only guaranteed to be valid for this specific StreamDeck and the same library version, but is safe to store externally.
+ * If it sent to the wrong model, the result is undefined behaviour.
  *
  * This is an opaque type, and should not be viewed/inspected directly.
  *
@@ -43,13 +44,13 @@ export function wrapBufferToPreparedBuffer(
 
 export function unwrapPreparedBufferToBuffer(
 	modelId: DeviceModelId,
-	type: string,
+	// type: string,
 	prepared: PreparedBuffer,
 ): Uint8Array[] {
 	const preparedInternal = prepared as any as PreparedButtonDrawInternal
 	if (preparedInternal.modelId !== modelId) throw new Error('Prepared buffer is for a different model!')
 
-	if (preparedInternal.type !== type) throw new Error('Prepared buffer is for a different type!')
+	// if (preparedInternal.type !== type) throw new Error('Prepared buffer is for a different type!')
 
 	return preparedInternal.do_not_touch.map((b) => {
 		if (typeof b === 'string') {

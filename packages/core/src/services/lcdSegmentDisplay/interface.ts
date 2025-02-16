@@ -50,13 +50,6 @@ export interface LcdSegmentDisplayService {
 	): Promise<PreparedBuffer>
 
 	/**
-	 * Send a prepared fill region of the lcd operation
-	 *
-	 * @param {PreparedBuffer} buffer The prepared buffer to draw
-	 */
-	sendPreparedFillLcdRegion(buffer: PreparedBuffer): Promise<void>
-
-	/**
 	 * Clear the lcd segment to black
 	 * @param {number} lcdIndex The id of the lcd segment to clear
 	 */

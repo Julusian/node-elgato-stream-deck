@@ -17,7 +17,7 @@ import type { CallbackHook } from '../services/callback-hook.js'
 import type { StreamDeckInputService } from '../services/input/interface.js'
 import { DEVICE_MODELS, VENDOR_ID } from '../index.js'
 import type { EncoderLedService } from '../services/encoderLed.js'
-import type { PreparedBuffer } from '../preparedBuffer.js'
+import { unwrapPreparedBufferToBuffer, type PreparedBuffer } from '../preparedBuffer.js'
 
 export type EncodeJPEGHelper = (buffer: Uint8Array, width: number, height: number) => Promise<Uint8Array>
 
@@ -167,6 +167,11 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		return this.#propertiesService.getSerialNumber()
 	}
 
+	public async sendPreparedBuffer(buffer: PreparedBuffer): Promise<void> {
+		const packets = unwrapPreparedBufferToBuffer(this.deviceProperties.MODEL, buffer)
+		await this.device.sendReports(packets)
+	}
+
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		this.checkValidKeyIndex(keyIndex, null)
 
@@ -188,10 +193,6 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		return this.#buttonsLcdService.prepareFillKeyBuffer(keyIndex, imageBuffer, options, jsonSafe)
 	}
 
-	public async sendPreparedFillKeyBuffer(buffer: PreparedBuffer): Promise<void> {
-		await this.#buttonsLcdService.sendPreparedFillKeyBuffer(buffer)
-	}
-
 	public async fillPanelBuffer(imageBuffer: Uint8Array, options?: FillPanelOptions): Promise<void> {
 		await this.#buttonsLcdService.fillPanelBuffer(imageBuffer, options)
 	}
@@ -202,10 +203,6 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		jsonSafe?: boolean,
 	): Promise<PreparedBuffer> {
 		return this.#buttonsLcdService.prepareFillPanelBuffer(imageBuffer, options, jsonSafe)
-	}
-
-	public async sendPreparedFillPanelBuffer(buffer: PreparedBuffer): Promise<void> {
-		await this.#buttonsLcdService.sendPreparedFillPanelBuffer(buffer)
 	}
 
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
@@ -244,14 +241,6 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		if (!this.#lcdSegmentDisplayService) throw new Error('Not supported for this model')
 
 		return this.#lcdSegmentDisplayService.prepareFillLcdRegion(...args)
-	}
-
-	public async sendPreparedFillLcdRegion(
-		...args: Parameters<StreamDeck['sendPreparedFillLcdRegion']>
-	): ReturnType<StreamDeck['sendPreparedFillLcdRegion']> {
-		if (!this.#lcdSegmentDisplayService) throw new Error('Not supported for this model')
-
-		return this.#lcdSegmentDisplayService.sendPreparedFillLcdRegion(...args)
 	}
 
 	public async clearLcdSegment(
