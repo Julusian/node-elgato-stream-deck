@@ -80,7 +80,7 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 			color = [255, 0, 255]
 		}
 
-		streamDeck.sendPreparedFillPanelBuffer(image).catch((e) => console.error('Fill failed:', e))
+		streamDeck.sendPreparedBuffer(image).catch((e) => console.error('Fill failed:', e))
 		if (imageLcd) {
 			streamDeck
 				.fillLcd(lcdSegmentControl.id, imageLcd, { format: 'rgb' })

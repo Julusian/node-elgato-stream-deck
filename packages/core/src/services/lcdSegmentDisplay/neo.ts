@@ -48,10 +48,6 @@ export class StreamDeckNeoLcdService implements LcdSegmentDisplayService {
 		throw new Error('Not supported for this model')
 	}
 
-	public async sendPreparedFillLcdRegion(_buffer: PreparedBuffer): Promise<void> {
-		throw new Error('Not supported for this model')
-	}
-
 	public async fillLcd(index: number, imageBuffer: Uint8Array, sourceOptions: FillImageOptions): Promise<void> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
 		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)

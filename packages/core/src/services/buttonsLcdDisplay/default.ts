@@ -9,7 +9,7 @@ import type { FillPanelDimensionsOptions, FillImageOptions, FillPanelOptions } f
 import type { StreamdeckImageWriter } from '../imageWriter/types.js'
 import type { ButtonsLcdDisplayService, GridSpan } from './interface.js'
 import type { ButtonLcdImagePacker, InternalFillImageOptions } from '../imagePacker/interface.js'
-import { unwrapPreparedBufferToBuffer, wrapBufferToPreparedBuffer, type PreparedBuffer } from '../../preparedBuffer.js'
+import { wrapBufferToPreparedBuffer, type PreparedBuffer } from '../../preparedBuffer.js'
 
 export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	readonly #imageWriter: StreamdeckImageWriter
@@ -230,10 +230,6 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		const packets = await this.prepareFillKeyBufferInner(keyIndex, imageBuffer, options)
 		return wrapBufferToPreparedBuffer(this.#deviceProperties.MODEL, 'fill-key', packets, jsonSafe ?? false)
 	}
-	public async sendPreparedFillKeyBuffer(buffer: PreparedBuffer): Promise<void> {
-		const packets = unwrapPreparedBufferToBuffer(this.#deviceProperties.MODEL, 'fill-key', buffer)
-		await this.#device.sendReports(packets)
-	}
 
 	public async fillPanelBuffer(
 		imageBuffer: Uint8Array | Uint8ClampedArray,
@@ -304,10 +300,6 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	): Promise<PreparedBuffer> {
 		const packets = await this.prepareFillPanelBufferInner(imageBuffer, options)
 		return wrapBufferToPreparedBuffer(this.#deviceProperties.MODEL, 'fill-panel', packets, jsonSafe ?? false)
-	}
-	public async sendPreparedFillPanelBuffer(buffer: PreparedBuffer): Promise<void> {
-		const packets = unwrapPreparedBufferToBuffer(this.#deviceProperties.MODEL, 'fill-panel', buffer)
-		await this.#device.sendReports(packets)
 	}
 
 	private async sendKeyRgb(keyIndex: number, red: number, green: number, blue: number): Promise<void> {
