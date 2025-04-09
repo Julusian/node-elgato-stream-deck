@@ -61,7 +61,7 @@ The root methods exposed by the library are as follows. For more information it 
 // TODO
 ```
 
-The StreamDeck type can be found [here](/packages/core/src/models/types.ts#L15)
+The `StreamDeck` type can be found [here](/packages/core/src/types.ts#L48).
 
 ## Example
 
@@ -69,7 +69,7 @@ The StreamDeck type can be found [here](/packages/core/src/models/types.ts#L15)
 // TODO
 ```
 
-Some more complex demos can be found in the [examples](examples/) folder.
+Some more complex demos can be found in the [examples](/packages/tcp/examples/) folder.
 
 ## Contributing
 

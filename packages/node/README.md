@@ -92,7 +92,7 @@ export function getStreamDeckInfo(path: string): Promise<StreamDeckDeviceInfo | 
 export function openStreamDeck(devicePath: string, userOptions?: OpenStreamDeckOptionsNode): Promise<StreamDeck>
 ```
 
-The StreamDeck type can be found [here](/packages/core/src/models/types.ts#L15)
+The `StreamDeck` type can be found [here](/packages/core/src/types.ts#L48).
 
 ## Example
 
@@ -127,7 +127,7 @@ await myStreamDeck.fillKeyColor(4, 255, 0, 0)
 console.log('Successfully wrote a red square to key 4.')
 ```
 
-Some more complex demos can be found in the [examples](examples/) folder.
+Some more complex demos can be found in the [examples](/packages/node/examples/) folder.
 
 ## Contributing
 
