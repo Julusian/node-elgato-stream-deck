@@ -48,6 +48,11 @@ export class StreamDeckProxy implements StreamDeck {
 	): ReturnType<StreamDeck['getHidDeviceInfo']> {
 		return this.device.getHidDeviceInfo(...args)
 	}
+	public async sendPreparedBuffer(
+		...args: Parameters<StreamDeck['sendPreparedBuffer']>
+	): ReturnType<StreamDeck['sendPreparedBuffer']> {
+		return this.device.sendPreparedBuffer(...args)
+	}
 	public async fillKeyColor(...args: Parameters<StreamDeck['fillKeyColor']>): ReturnType<StreamDeck['fillKeyColor']> {
 		return this.device.fillKeyColor(...args)
 	}
@@ -56,10 +61,20 @@ export class StreamDeckProxy implements StreamDeck {
 	): ReturnType<StreamDeck['fillKeyBuffer']> {
 		return this.device.fillKeyBuffer(...args)
 	}
+	public async prepareFillKeyBuffer(
+		...args: Parameters<StreamDeck['prepareFillKeyBuffer']>
+	): ReturnType<StreamDeck['prepareFillKeyBuffer']> {
+		return this.device.prepareFillKeyBuffer(...args)
+	}
 	public async fillPanelBuffer(
 		...args: Parameters<StreamDeck['fillPanelBuffer']>
 	): ReturnType<StreamDeck['fillPanelBuffer']> {
 		return this.device.fillPanelBuffer(...args)
+	}
+	public async prepareFillPanelBuffer(
+		...args: Parameters<StreamDeck['prepareFillPanelBuffer']>
+	): ReturnType<StreamDeck['prepareFillPanelBuffer']> {
+		return this.device.prepareFillPanelBuffer(...args)
 	}
 	public async clearKey(...args: Parameters<StreamDeck['clearKey']>): ReturnType<StreamDeck['clearKey']> {
 		return this.device.clearKey(...args)
@@ -111,6 +126,12 @@ export class StreamDeckProxy implements StreamDeck {
 		...args: Parameters<StreamDeck['fillLcdRegion']>
 	): ReturnType<StreamDeck['fillLcdRegion']> {
 		return this.device.fillLcdRegion(...args)
+	}
+
+	public async prepareFillLcdRegion(
+		...args: Parameters<StreamDeck['prepareFillLcdRegion']>
+	): ReturnType<StreamDeck['prepareFillLcdRegion']> {
+		return this.device.prepareFillLcdRegion(...args)
 	}
 
 	public async clearLcdSegment(
