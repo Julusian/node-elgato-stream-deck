@@ -14,6 +14,9 @@ export enum DeviceModelId {
 	PLUS = 'plus',
 	NEO = 'neo',
 	STUDIO = 'studio',
+	MODULE6 = '6-module',
+	MODULE15 = '15-module',
+	MODULE32 = '32-module',
 }
 
 export const MODEL_NAMES: { [key in DeviceModelId]: string } = {
@@ -26,4 +29,7 @@ export const MODEL_NAMES: { [key in DeviceModelId]: string } = {
 	[DeviceModelId.PEDAL]: 'Stream Deck Pedal',
 	[DeviceModelId.NEO]: 'Stream Deck Neo',
 	[DeviceModelId.STUDIO]: 'Stream Deck Studio',
+	[DeviceModelId.MODULE6]: 'Stream Deck 6 Module',
+	[DeviceModelId.MODULE15]: 'Stream Deck 15 Module',
+	[DeviceModelId.MODULE32]: 'Stream Deck 32 Module',
 }

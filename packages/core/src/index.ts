@@ -3,10 +3,9 @@ import { DeviceModelId, MODEL_NAMES } from './id.js'
 import type { StreamDeck } from './types.js'
 import type { OpenStreamDeckOptions } from './models/base.js'
 import { StreamDeckOriginalFactory } from './models/original.js'
-import { StreamDeckMiniFactory } from './models/mini.js'
-import { StreamDeckXLFactory } from './models/xl.js'
-import { StreamDeckOriginalV2Factory } from './models/originalv2.js'
-import { StreamDeckOriginalMK2Factory } from './models/original-mk2.js'
+import { StreamDeck6KeyFactory } from './models/6-key.js'
+import { StreamDeck32KeyFactory } from './models/32-key.js'
+import { StreamDeck15KeyFactory } from './models/15-key.js'
 import { StreamDeckPlusFactory } from './models/plus.js'
 import { StreamDeckPedalFactory } from './models/pedal.js'
 import { StreamDeckNeoFactory } from './models/neo.js'
@@ -40,7 +39,7 @@ export interface DeviceModelSpec {
 	factory: (
 		device: HIDDevice,
 		options: Required<OpenStreamDeckOptions>,
-		propertiesService?: PropertiesService,
+		tcpPropertiesService?: PropertiesService,
 	) => StreamDeck
 
 	hasNativeTcp: boolean
@@ -58,28 +57,28 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.MINI]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0063, 0x0090],
-		factory: StreamDeckMiniFactory,
+		factory: (...args) => StreamDeck6KeyFactory(DeviceModelId.MINI, ...args),
 
 		hasNativeTcp: false,
 	},
 	[DeviceModelId.XL]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x006c, 0x008f],
-		factory: StreamDeckXLFactory,
+		factory: (...args) => StreamDeck32KeyFactory(DeviceModelId.XL, ...args),
 
 		hasNativeTcp: false,
 	},
 	[DeviceModelId.ORIGINALV2]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x006d],
-		factory: StreamDeckOriginalV2Factory,
+		factory: (...args) => StreamDeck15KeyFactory(DeviceModelId.ORIGINALV2, ...args),
 
 		hasNativeTcp: false,
 	},
 	[DeviceModelId.ORIGINALMK2]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0080],
-		factory: StreamDeckOriginalMK2Factory,
+		factory: (...args) => StreamDeck15KeyFactory(DeviceModelId.ORIGINALMK2, ...args),
 
 		hasNativeTcp: false,
 	},
@@ -111,6 +110,27 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 
 		hasNativeTcp: true,
 	},
+	[DeviceModelId.MODULE6]: {
+		type: DeviceModelType.STREAMDECK,
+		productIds: [0x00b8],
+		factory: (...args) => StreamDeck6KeyFactory(DeviceModelId.MODULE6, ...args),
+
+		hasNativeTcp: false,
+	},
+	[DeviceModelId.MODULE15]: {
+		type: DeviceModelType.STREAMDECK,
+		productIds: [0x00b9],
+		factory: (...args) => StreamDeck15KeyFactory(DeviceModelId.MODULE15, ...args),
+
+		hasNativeTcp: false,
+	},
+	[DeviceModelId.MODULE32]: {
+		type: DeviceModelType.STREAMDECK,
+		productIds: [0x00ba],
+		factory: (...args) => StreamDeck32KeyFactory(DeviceModelId.MODULE32, ...args),
+
+		hasNativeTcp: false,
+	},
 }
 
 /** @deprecated maybe? */
@@ -118,9 +138,5 @@ export const DEVICE_MODELS: DeviceModelSpec[] = Object.entries<Omit<DeviceModelS
 	DEVICE_MODELS2,
 ).map(([id, spec]) => {
 	const modelId = id as any as DeviceModelId
-	return {
-		id: modelId,
-		productName: MODEL_NAMES[modelId],
-		...spec,
-	}
+	return { id: modelId, productName: MODEL_NAMES[modelId], ...spec }
 })
