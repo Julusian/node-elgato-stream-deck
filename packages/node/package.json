@@ -55,7 +55,7 @@
 		"@elgato-stream-deck/core": "7.1.2",
 		"@elgato-stream-deck/node-lib": "7.1.2",
 		"eventemitter3": "^5.0.1",
-		"node-hid": "^3.1.0",
-		"tslib": "^2.7.0"
+		"node-hid": "^3.1.2",
+		"tslib": "^2.8.1"
 	}
 }

@@ -21,13 +21,13 @@
 	},
 	"dependencies": {
 		"@elgato-stream-deck/webhid": "7.1.2",
-		"html-to-image": "^1.11.11"
+		"html-to-image": "^1.11.13"
 	},
 	"devDependencies": {
 		"copy-webpack-plugin": "^11.0.0",
 		"cross-env": "^7.0.3",
-		"ts-loader": "^9.5.1",
-		"webpack": "^5.94.0",
+		"ts-loader": "^9.5.2",
+		"webpack": "^5.99.8",
 		"webpack-cli": "^5.1.4",
 		"webpack-dev-server": "^4.15.2"
 	}
