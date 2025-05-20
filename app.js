@@ -3583,6 +3583,7 @@ var DeviceModelId;
     DeviceModelId["ORIGINAL"] = "original";
     DeviceModelId["ORIGINALV2"] = "originalv2";
     DeviceModelId["ORIGINALMK2"] = "original-mk2";
+    DeviceModelId["ORIGINALMK2SCISSOR"] = "original-mk2-scissor";
     DeviceModelId["MINI"] = "mini";
     DeviceModelId["XL"] = "xl";
     DeviceModelId["PEDAL"] = "pedal";
@@ -3599,6 +3600,7 @@ exports.MODEL_NAMES = {
     [DeviceModelId.XL]: 'Stream Deck XL',
     [DeviceModelId.ORIGINALV2]: 'Stream Deck',
     [DeviceModelId.ORIGINALMK2]: 'Stream Deck MK.2',
+    [DeviceModelId.ORIGINALMK2SCISSOR]: 'Stream Deck MK.2 (Scissor)',
     [DeviceModelId.PLUS]: 'Stream Deck +',
     [DeviceModelId.PEDAL]: 'Stream Deck Pedal',
     [DeviceModelId.NEO]: 'Stream Deck Neo',
@@ -4309,6 +4311,12 @@ exports.DEVICE_MODELS2 = {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x0080],
         factory: (...args) => (0, _15_key_js_1.StreamDeck15KeyFactory)(id_js_1.DeviceModelId.ORIGINALMK2, ...args),
+        hasNativeTcp: false,
+    },
+    [id_js_1.DeviceModelId.ORIGINALMK2SCISSOR]: {
+        type: DeviceModelType.STREAMDECK,
+        productIds: [0x00a5],
+        factory: (...args) => (0, _15_key_js_1.StreamDeck15KeyFactory)(id_js_1.DeviceModelId.ORIGINALMK2SCISSOR, ...args),
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.PLUS]: {
