@@ -82,6 +82,13 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 
 		hasNativeTcp: false,
 	},
+	[DeviceModelId.ORIGINALMK2SCISSOR]: {
+		type: DeviceModelType.STREAMDECK,
+		productIds: [0x00a5],
+		factory: (...args) => StreamDeck15KeyFactory(DeviceModelId.ORIGINALMK2SCISSOR, ...args),
+
+		hasNativeTcp: false,
+	},
 	[DeviceModelId.PLUS]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0084],
