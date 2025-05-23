@@ -18,6 +18,7 @@ export enum DeviceModelId {
 	MODULE6 = '6-module',
 	MODULE15 = '15-module',
 	MODULE32 = '32-module',
+	NETWORK_DOCK = 'network-dock',
 }
 
 export const MODEL_NAMES: { [key in DeviceModelId]: string } = {
@@ -34,4 +35,5 @@ export const MODEL_NAMES: { [key in DeviceModelId]: string } = {
 	[DeviceModelId.MODULE6]: 'Stream Deck 6 Module',
 	[DeviceModelId.MODULE15]: 'Stream Deck 15 Module',
 	[DeviceModelId.MODULE32]: 'Stream Deck 32 Module',
+	[DeviceModelId.NETWORK_DOCK]: 'Stream Deck Network Dock',
 }

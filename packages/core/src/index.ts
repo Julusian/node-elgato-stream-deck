@@ -28,6 +28,7 @@ export const VENDOR_ID = 0x0fd9
 export enum DeviceModelType {
 	STREAMDECK = 'streamdeck',
 	PEDAL = 'pedal',
+	NETWORK_DOCK = 'network-dock',
 }
 
 export interface DeviceModelSpec {
@@ -137,6 +138,15 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 		factory: (...args) => StreamDeck32KeyFactory(DeviceModelId.MODULE32, ...args),
 
 		hasNativeTcp: false,
+	},
+	[DeviceModelId.NETWORK_DOCK]: {
+		type: DeviceModelType.NETWORK_DOCK,
+		productIds: [],
+		factory: () => {
+			throw new Error('Network dock cannot be opened directly')
+		},
+
+		hasNativeTcp: true,
 	},
 }
 
