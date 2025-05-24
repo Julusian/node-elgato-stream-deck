@@ -143,7 +143,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.NETWORK_DOCK]: {
 		type: DeviceModelType.NETWORK_DOCK,
 		productIds: [0xffff],
-		factory: (...args) => NetworkDockFactory(DeviceModelId.NETWORK_DOCK, ...args),
+		factory: NetworkDockFactory,
 
 		hasNativeTcp: true,
 	},
