@@ -27,10 +27,10 @@ connectionManager.on('connected', async (streamDeck) => {
 	// 	})
 	// 	.catch((e) => console.log('all versions failed', e))
 
-	// streamDeck
-	// 	.getSerialNumber()
-	// 	.then((serial) => console.log('serial', serial))
-	// 	.catch((e) => console.log('serial failed', e))
+	streamDeck
+		.getSerialNumber()
+		.then((serial) => console.log('serial', serial))
+		.catch((e) => console.log('serial failed', e))
 
 	// // streamDeck
 	// // 	.getFirmwareVersion()

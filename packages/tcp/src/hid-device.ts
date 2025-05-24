@@ -226,7 +226,6 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements H
 		this.#socket = socket
 
 		this.#socket.on('dataCora', (data) => {
-			console.log('Received cora data:', data)
 			let singletonCommand: QueuedCommand | undefined
 
 			// TODO - acking?
@@ -286,12 +285,21 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements H
 	}
 
 	async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
-		return this.#executeSingletonCommand({
-			flags: CoraMessageFlags.NONE,
-			hidOp: CoraHidOp.GET_REPORT,
-			messageId: 0,
-			payload: Buffer.from([0x03, reportId]),
-		})
+		if (this.#isPrimary) {
+			return this.#executeSingletonCommand({
+				flags: CoraMessageFlags.NONE,
+				hidOp: CoraHidOp.GET_REPORT,
+				messageId: 0,
+				payload: Buffer.from([0x03, reportId]),
+			})
+		} else {
+			return this.#executeSingletonCommand({
+				flags: CoraMessageFlags.VERBATIM,
+				hidOp: CoraHidOp.GET_REPORT,
+				messageId: 0,
+				payload: Buffer.from([reportId]),
+			})
+		}
 	}
 
 	readonly #pendingSingletonCommands = new Map<number, QueuedCommand>()
@@ -304,7 +312,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements H
 			messageId: messageId,
 		}
 
-		const commandType = msg.payload[1]
+		const commandType = msg.payload[this.#isPrimary ? 1 : 0]
 
 		const command = new QueuedCommand(commandType)
 		this.#pendingSingletonCommands.set(commandType, command)
