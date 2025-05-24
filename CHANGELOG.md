@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.2.0](https://github.com/julusian/node-elgato-stream-deck/compare/v7.1.2...v7.2.0) (2025-05-24)
+
+
+### Features
+
+* add 6 module, 15 module and 32 module ([ca874d8](https://github.com/julusian/node-elgato-stream-deck/commit/ca874d8f857a944871f4aecb97699b8b1cf945f0))
+* add mk2 scissor ([025961d](https://github.com/julusian/node-elgato-stream-deck/commit/025961d1dd9db21afa0c4c5764ae86a0ca977353))
+
+
+
+
+
 ## [7.1.2](https://github.com/julusian/node-elgato-stream-deck/compare/v7.1.1...v7.1.2) (2024-12-09)
 
 
