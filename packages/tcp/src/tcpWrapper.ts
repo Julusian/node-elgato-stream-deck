@@ -3,11 +3,11 @@ import type { StreamDeck } from '@elgato-stream-deck/core'
 import { StreamDeckProxy } from '@elgato-stream-deck/core'
 import type { SocketWrapper } from './socketWrapper.js'
 import type { StreamDeckTcp, StreamDeckTcpEvents } from './types.js'
-import type { TcpHidDevice } from './hid-device.js'
+import type { TcpCoraHidDevice, TcpHidDevice } from './hid-device.js'
 
 export class StreamDeckTcpWrapper extends StreamDeckProxy implements StreamDeckTcp {
 	readonly #socket: SocketWrapper
-	readonly #device: TcpHidDevice
+	readonly #device: TcpHidDevice | TcpCoraHidDevice
 	readonly #tcpEvents = new EventEmitter<StreamDeckTcpEvents>()
 
 	get remoteAddress(): string {
@@ -21,7 +21,7 @@ export class StreamDeckTcpWrapper extends StreamDeckProxy implements StreamDeckT
 		return this.#tcpEvents
 	}
 
-	constructor(socket: SocketWrapper, device: TcpHidDevice, streamdeck: StreamDeck) {
+	constructor(socket: SocketWrapper, device: TcpHidDevice | TcpCoraHidDevice, streamdeck: StreamDeck) {
 		super(streamdeck)
 
 		this.#socket = socket
