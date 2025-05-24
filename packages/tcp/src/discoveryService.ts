@@ -2,7 +2,7 @@ import type { Browser, Service as BonjourService } from '@julusian/bonjour-servi
 import { Bonjour } from '@julusian/bonjour-service'
 import * as EventEmitter from 'events'
 import { DEFAULT_MDNS_QUERY_INTERVAL } from './constants.js'
-import type { DeviceModelId, DeviceModelType } from '@elgato-stream-deck/core'
+import { DeviceModelId, DeviceModelType, MODEL_NAMES } from '@elgato-stream-deck/core'
 import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'
 
 export interface StreamDeckTcpDiscoveryServiceOptions {
@@ -36,6 +36,31 @@ export interface StreamDeckTcpDefinition {
 
 function convertService(service: BonjourService): StreamDeckTcpDefinition | null {
 	if (!service.addresses || service.addresses.length === 0) return null
+
+	const dt = Number(service.txt.dt)
+	if (isNaN(dt)) return null
+
+	if (dt === 215) {
+		// This should be a Stream Deck Network Dock
+		// The implementation isn't ideal, but it works well enough and avoids a breaking change to the types
+
+		return {
+			address: service.addresses[0],
+			port: service.port,
+			name: service.name,
+
+			vendorId: VENDOR_ID,
+			productId: 0xffff, // This doesn't have a product id, but we need to set it to something
+
+			serialNumber: service.txt.sn,
+
+			modelType: DeviceModelType.NETWORK_DOCK,
+			modelId: DeviceModelId.NETWORK_DOCK,
+			modelName: MODEL_NAMES[DeviceModelId.NETWORK_DOCK],
+
+			isPrimary: true,
+		}
+	}
 
 	// Get and parse the vendor and product id
 	const vendorId = Number(service.txt.vid)

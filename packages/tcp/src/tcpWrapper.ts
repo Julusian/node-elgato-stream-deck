@@ -3,7 +3,7 @@ import type { StreamDeck } from '@elgato-stream-deck/core'
 import { StreamDeckProxy } from '@elgato-stream-deck/core'
 import type { SocketWrapper } from './socketWrapper.js'
 import type { StreamDeckTcp, StreamDeckTcpEvents } from './types.js'
-import type { TcpHidDevice } from './hid-device.js'
+import type { TcpHidDevice } from './hid-device/api.js'
 
 export class StreamDeckTcpWrapper extends StreamDeckProxy implements StreamDeckTcp {
 	readonly #socket: SocketWrapper

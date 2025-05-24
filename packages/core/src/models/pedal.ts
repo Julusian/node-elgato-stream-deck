@@ -5,7 +5,7 @@ import { DeviceModelId, MODEL_NAMES } from '../id.js'
 import type { StreamDeckControlDefinition } from '../controlDefinition.js'
 import { freezeDefinitions } from '../controlsGenerator.js'
 import { PedalPropertiesService } from '../services/properties/pedal.js'
-import { PedalLcdService } from '../services/buttonsLcdDisplay/pedal.js'
+import { FakeLcdService } from '../services/buttonsLcdDisplay/fake.js'
 import type { StreamDeckEvents } from '../types.js'
 import { CallbackHook } from '../services/callback-hook.js'
 import { ButtonOnlyInputService } from '../services/input/gen1.js'
@@ -60,7 +60,7 @@ export function StreamDeckPedalFactory(device: HIDDevice, options: Required<Open
 		deviceProperties: pedalProperties,
 		events,
 		properties: new PedalPropertiesService(device),
-		buttonsLcd: new PedalLcdService(),
+		buttonsLcd: new FakeLcdService(),
 		lcdSegmentDisplay: null,
 		inputService: new ButtonOnlyInputService(pedalProperties, events),
 		encoderLed: null,

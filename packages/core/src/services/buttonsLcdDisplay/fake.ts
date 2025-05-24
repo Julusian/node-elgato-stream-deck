@@ -2,7 +2,7 @@ import type { Dimension } from '../../id.js'
 import type { ButtonsLcdDisplayService } from './interface.js'
 import type { FillPanelDimensionsOptions, FillImageOptions, FillPanelOptions } from '../../types.js'
 
-export class PedalLcdService implements ButtonsLcdDisplayService {
+export class FakeLcdService implements ButtonsLcdDisplayService {
 	public calculateFillPanelDimensions(_options?: FillPanelDimensionsOptions): Dimension | null {
 		// Not supported
 		return null
