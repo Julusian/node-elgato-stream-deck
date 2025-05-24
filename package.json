@@ -34,7 +34,7 @@
     "@julusian/jpeg-turbo": "^2.2.0",
     "@tsconfig/node18": "^18.2.4",
     "@types/jest": "^29.5.14",
-    "@types/node": "^18.19.100",
+    "@types/node": "^18.19.103",
     "eslint": "^9.27.0",
     "eslint-plugin-n": "^17.18.0",
     "eslint-plugin-prettier": "^5.4.0",
@@ -62,5 +62,5 @@
     "packages/webhid",
     "packages/webhid-demo"
   ],
-  "packageManager": "yarn@4.4.1"
+  "packageManager": "yarn@4.9.1"
 }

@@ -528,7 +528,7 @@ __metadata:
     cross-env: "npm:^7.0.3"
     html-to-image: "npm:^1.11.13"
     ts-loader: "npm:^9.5.2"
-    webpack: "npm:^5.99.8"
+    webpack: "npm:^5.99.9"
     webpack-cli: "npm:^5.1.4"
     webpack-dev-server: "npm:^4.15.2"
   languageName: unknown
@@ -2712,12 +2712,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^18.19.100":
-  version: 18.19.100
-  resolution: "@types/node@npm:18.19.100"
+"@types/node@npm:^18.19.103":
+  version: 18.19.103
+  resolution: "@types/node@npm:18.19.103"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/5524303171eee6788df45d736f5783b5bea27803a596b9cd5669f45487a619e5d8d41d56dd55b8c85c677ffd7c045edd8daea8c4b37e70290bee2a482fc605f6
+  checksum: 10c0/a119321c90787fca6d0ae929e55a964602123690b4674bb0ef2dc2fb78b25cc7ae4804aa6d4014d1055fd245ba8286c66080765304740978047cc706f19ed934
   languageName: node
   linkType: hard
 
@@ -5119,7 +5119,7 @@ __metadata:
     "@julusian/jpeg-turbo": "npm:^2.2.0"
     "@tsconfig/node18": "npm:^18.2.4"
     "@types/jest": "npm:^29.5.14"
-    "@types/node": "npm:^18.19.100"
+    "@types/node": "npm:^18.19.103"
     eslint: "npm:^9.27.0"
     eslint-plugin-n: "npm:^17.18.0"
     eslint-plugin-prettier: "npm:^5.4.0"
@@ -12442,9 +12442,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.97.1, webpack@npm:^5.99.8":
-  version: 5.99.8
-  resolution: "webpack@npm:5.99.8"
+"webpack@npm:^5.97.1, webpack@npm:^5.99.9":
+  version: 5.99.9
+  resolution: "webpack@npm:5.99.9"
   dependencies:
     "@types/eslint-scope": "npm:^3.7.7"
     "@types/estree": "npm:^1.0.6"
@@ -12475,7 +12475,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10c0/c4852c3b795ed3fba799d2925802a4e259b2de7c2c597f0aaf0e228acfdc6755389ed8c29f1dad86610a9c6ad968c0b57c702b93891d60f09d302af63b2debe0
+  checksum: 10c0/34ec3f19b50bccaf27929e5e5b901b25047f2d414acba7d0967dc98eb4f404d107fb1a4b63095edbca2b006ff5815f1720b131e10b20664b074dfc86b7ffa717
   languageName: node
   linkType: hard
 
