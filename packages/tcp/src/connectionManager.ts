@@ -56,7 +56,6 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 	#onSocketConnected = (socket: SocketWrapper) => {
 		const connectionId = this.#getConnectionId(socket.address, socket.port)
 
-		console.log('opened', connectionId, socket.isCora, socket.isLegacy)
 		const fakeHidDevice: TcpHidDevice = socket.isCora
 			? new TcpCoraHidDevice(socket)
 			: new TcpLegacyHidDevice(socket)
@@ -70,11 +69,6 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 		fakeHidDevice
 			.getDeviceInfo()
 			.then((info) => {
-				// if (info.productId === 0xffff) {
-				// 	// This is a Cora parent device
-
-				// 	console.log('Found Cora parent device', info)
-				// } else {
 				const model = DEVICE_MODELS.find((m) => m.productIds.includes(info.productId))
 				if (!model) {
 					// Note: leave the temporary error handler, to ensure it can't cause a crash
@@ -95,7 +89,6 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 				if (this.#autoConnectToSecondaries && fakeHidDevice.isPrimary) {
 					this.#tryConnectingToSecondary(connectionId, socket, streamDeckTcp)
 				}
-				// }
 			})
 			.catch((err) => {
 				this.emit('error', `Failed to open device ${connectionId}: ${err}`)

@@ -325,7 +325,3 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 		}
 	}
 }
-
-// interface ProtocolStrategy {
-
-// }
