@@ -94,34 +94,20 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 	}
 
 	async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
-		if (this.#isPrimary) {
-			return this.#executeSingletonCommand({
-				flags: CoraMessageFlags.NONE,
-				hidOp: CoraHidOp.GET_REPORT,
-				messageId: 0,
-				payload: Buffer.from([0x03, reportId]),
-			})
-		} else {
-			return this.#executeSingletonCommand({
-				flags: CoraMessageFlags.VERBATIM,
-				hidOp: CoraHidOp.GET_REPORT,
-				messageId: 0,
-				payload: Buffer.from([reportId]),
-			})
-		}
+		return this.#executeSingletonCommand(reportId, this.#isPrimary)
 	}
 
 	readonly #pendingSingletonCommands = new Map<number, QueuedCommand>()
-	async #executeSingletonCommand(msg: SocketCoraMessage): Promise<Uint8Array> {
+	async #executeSingletonCommand(commandType: number, toHost: boolean): Promise<Uint8Array> {
 		// if (!this.connected) throw new Error('Not connected')
 
 		const messageId = Math.floor(Math.random() * 0xffffff) // Random message ID for Cora
-		msg = {
-			...msg,
+		const msg: SocketCoraMessage = {
+			flags: toHost ? CoraMessageFlags.NONE : CoraMessageFlags.VERBATIM,
+			hidOp: CoraHidOp.GET_REPORT,
 			messageId: messageId,
+			payload: toHost ? Buffer.from([0x03, commandType]) : Buffer.from([commandType]),
 		}
-
-		const commandType = msg.payload[this.#isPrimary ? 1 : 0]
 
 		const command = new QueuedCommand(commandType)
 		this.#pendingSingletonCommands.set(commandType, command)
@@ -158,25 +144,11 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		// Cache once loaded. This is a bit of a race condition, but with minimal impact as we already run it before handling the class off anywhere
 		if (this.#loadedHidInfo) return this.#loadedHidInfo
 
-		const primaryBuffer = Buffer.alloc(4)
-		primaryBuffer.writeUint8(0x03, 0)
-		primaryBuffer.writeUint8(0x80, 1)
-
 		const deviceInfo = await Promise.race([
 			// primary port
-			this.#executeSingletonCommand({
-				flags: CoraMessageFlags.NONE,
-				hidOp: CoraHidOp.WRITE,
-				messageId: 0,
-				payload: primaryBuffer,
-			}).then((data) => ({ data, isPrimary: true })),
+			this.#executeSingletonCommand(0x80, true).then((data) => ({ data, isPrimary: true })),
 			// secondary port
-			this.#executeSingletonCommand({
-				flags: CoraMessageFlags.NONE,
-				hidOp: CoraHidOp.WRITE,
-				messageId: 0,
-				payload: Buffer.from([0x03, 0x1c, 0x00, 0x00]), // TODO - this is the wrong command to use, as both primary and child ports will respond to this with the same? data
-			}).then((data) => ({ data, isPrimary: false })),
+			this.#executeSingletonCommand(0x08, false).then((data) => ({ data, isPrimary: false })),
 		])
 		// Future: this internal mutation is a bit of a hack, but it avoids needing to duplicate the singleton logic
 		this.#isPrimary = deviceInfo.isPrimary
@@ -194,10 +166,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 				path: devicePath,
 			}
 		} else {
-			// TODO - could this be fired even if on the primary port?
-
-			// const rawDevice2Info = await this.#executeSingletonCommand(0x1c, true)
-			const rawDevice2Info = deviceInfo.data
+			const rawDevice2Info = await this.#executeSingletonCommand(0x1c, true)
 			const device2Info = parseDevice2Info(rawDevice2Info)
 			if (!device2Info) throw new Error('Failed to get Device info')
 
@@ -214,12 +183,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 	async getChildDeviceInfo(): Promise<ChildHIDDeviceInfo | null> {
 		if (!this.#isPrimary) return null
 
-		const device2Info = await this.#executeSingletonCommand({
-			flags: CoraMessageFlags.NONE,
-			hidOp: CoraHidOp.WRITE,
-			messageId: 0,
-			payload: Buffer.from([0x03, 0x1c]),
-		})
+		const device2Info = await this.#executeSingletonCommand(0x1c, true)
 
 		return parseDevice2Info(device2Info)
 	}

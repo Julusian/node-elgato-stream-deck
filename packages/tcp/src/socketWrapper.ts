@@ -141,7 +141,7 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 
 		// If this is the first packet, check for the packet type
 		if (this.#packetMode === 'unknown') {
-			if (doesStartWithCoraMagic(data)) {
+			if (data.indexOf(CORA_MAGIC) === 0) {
 				this.#packetMode = 'cora'
 			} else if (data[0] === 1 && data[1] === 10) {
 				// Check for SDS packet
@@ -220,16 +220,14 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 		if (!this.#receiveBuffer || this.#receiveBuffer.length < 16) return
 
 		// If the buffer doesn't start with the Cora magic bytes, search for the actual start of the packet
-		if (!doesStartWithCoraMagic(this.#receiveBuffer)) {
-			const buffer = this.#receiveBuffer
-			const startOfPacket = buffer.findIndex((_, index) => doesStartWithCoraMagic(buffer.subarray(index)))
-			if (startOfPacket === -1) {
-				// There was no packet header, discard it and wait for more
-				this.#receiveBuffer = null
-				// TODO - this could fail if the magic is split across two packets
-				return
-			}
-			this.#receiveBuffer = buffer.subarray(startOfPacket)
+		const coraMagicIndex = this.#receiveBuffer.indexOf(CORA_MAGIC)
+		if (coraMagicIndex === -1) {
+			// No Cora magic found, discard the buffer and wait for more data
+			this.#receiveBuffer = this.#receiveBuffer.subarray(-4) // Keep the last 4 bytes, in case they are part of the next packet magic bytes
+			return
+		} else if (coraMagicIndex > 0) {
+			// If the magic is not at the start, slice the buffer to start from the magic
+			this.#receiveBuffer = this.#receiveBuffer.subarray(coraMagicIndex)
 		}
 
 		// While there is a full header
@@ -314,7 +312,6 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	sendLegacyWrites(buffers: Uint8Array[]): void {
 		if (this.#packetMode !== 'legacy') throw new Error('sendLegacyWrites can only be used in legacy mode')
 
-		// TODO - await write?
 		for (const buffer of buffers) {
 			this.#socket.write(buffer)
 		}
@@ -323,22 +320,10 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	sendCoraWrites(messages: SocketCoraMessage[]): void {
 		if (this.#packetMode !== 'cora') throw new Error('sendCoraWrites can only be used in cora mode')
 
-		// TODO - await write?
 		for (const message of messages) {
 			this.#sendCoraMessage(message)
 		}
 	}
-}
-
-function doesStartWithCoraMagic(data: Uint8Array): boolean {
-	// TODO - use Buffer and indexOf?
-
-	for (let i = 0; i < CORA_MAGIC.length; i++) {
-		if (data[i] !== CORA_MAGIC[i]) {
-			return false
-		}
-	}
-	return true
 }
 
 // interface ProtocolStrategy {
