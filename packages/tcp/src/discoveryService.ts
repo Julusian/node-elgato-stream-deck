@@ -50,7 +50,7 @@ function convertService(service: BonjourService): StreamDeckTcpDefinition | null
 			name: service.name,
 
 			vendorId: VENDOR_ID,
-			productId: 0x00, // This doesn't have a product id, but we need to set it to something
+			productId: 0xffff, // This doesn't have a product id, but we need to set it to something
 
 			serialNumber: service.txt.sn,
 
