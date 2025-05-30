@@ -365,8 +365,16 @@ class FakeLcdService {
     async fillKeyBuffer(_keyIndex, _imageBuffer, _options) {
         // Not supported
     }
+    async prepareFillKeyBuffer(_keyIndex, _imageBuffer, _options, _jsonSafe) {
+        // Not supported
+        throw new Error('Not supported');
+    }
     async fillPanelBuffer(_imageBuffer, _options) {
         // Not supported
+    }
+    async prepareFillPanelBuffer(_imageBuffer, _options, _jsonSafe) {
+        // Not supported
+        throw new Error('Not supported');
     }
 }
 exports.FakeLcdService = FakeLcdService;
@@ -3140,6 +3148,64 @@ function NetworkDockFactory(device, options, _tcpPropertiesService) {
 
 /***/ }),
 
+/***/ 5614:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.wrapBufferToPreparedBuffer = wrapBufferToPreparedBuffer;
+exports.unwrapPreparedBufferToBuffer = unwrapPreparedBufferToBuffer;
+function wrapBufferToPreparedBuffer(modelId, type, buffers, jsonSafe) {
+    let encodedBuffers = buffers;
+    if (jsonSafe) {
+        // Use Base64 encoding for binary-safe string conversion
+        if (typeof Buffer !== 'undefined') {
+            encodedBuffers = buffers.map((b) => Buffer.from(b).toString('base64'));
+        }
+        else {
+            encodedBuffers = buffers.map((b) => btoa(String.fromCharCode(...b)));
+        }
+    }
+    return {
+        if_you_change_this_you_will_break_everything: 'This is a encoded form of the buffer, exactly as the Stream Deck expects it. Do not touch this object, or you can crash your stream deck',
+        modelId,
+        type,
+        do_not_touch: encodedBuffers,
+    };
+}
+function unwrapPreparedBufferToBuffer(modelId, 
+// type: string,
+prepared) {
+    const preparedInternal = prepared;
+    if (preparedInternal.modelId !== modelId)
+        throw new Error('Prepared buffer is for a different model!');
+    // if (preparedInternal.type !== type) throw new Error('Prepared buffer is for a different type!')
+    return preparedInternal.do_not_touch.map((b) => {
+        if (typeof b === 'string') {
+            // Decode from Base64 for binary-safe conversion
+            if (typeof Buffer !== 'undefined') {
+                // Fast path for Node.js
+                return Buffer.from(b, 'base64');
+            }
+            else {
+                // Browser fallback
+                return new Uint8Array(atob(b)
+                    .split('')
+                    .map((char) => char.charCodeAt(0)));
+            }
+        }
+        else if (b instanceof Uint8Array) {
+            return b;
+        }
+        else {
+            throw new Error('Prepared buffer is not a string or Uint8Array!');
+        }
+    });
+}
+//# sourceMappingURL=preparedBuffer.js.map
+
+/***/ }),
+
 /***/ 5823:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
@@ -3593,6 +3659,8 @@ exports.StreamDeckPlusLcdService = void 0;
 const headerGenerator_js_1 = __webpack_require__(3117);
 const imageWriter_js_1 = __webpack_require__(3845);
 const util_js_1 = __webpack_require__(4369);
+const preparedBuffer_js_1 = __webpack_require__(5614);
+const id_js_1 = __webpack_require__(6444);
 class StreamDeckPlusLcdService {
     #encodeJPEG;
     #device;
@@ -3607,28 +3675,38 @@ class StreamDeckPlusLcdService {
         const lcdControl = this.#lcdControls.find((control) => control.id === index);
         if (!lcdControl)
             throw new Error(`Invalid lcd segment index ${index}`);
-        return this.fillControlRegion(lcdControl, 0, 0, buffer, {
+        const packets = await this.prepareFillControlRegion(lcdControl, 0, 0, buffer, {
             format: sourceOptions.format,
             width: lcdControl.pixelSize.width,
             height: lcdControl.pixelSize.height,
         });
+        await this.#device.sendReports(packets);
     }
     async fillLcdRegion(index, x, y, imageBuffer, sourceOptions) {
         const lcdControl = this.#lcdControls.find((control) => control.id === index);
         if (!lcdControl)
             throw new Error(`Invalid lcd segment index ${index}`);
-        return this.fillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions);
+        const packets = await this.prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions);
+        await this.#device.sendReports(packets);
+    }
+    async prepareFillLcdRegion(index, x, y, imageBuffer, sourceOptions, jsonSafe) {
+        const lcdControl = this.#lcdControls.find((control) => control.id === index);
+        if (!lcdControl)
+            throw new Error(`Invalid lcd segment index ${index}`);
+        const packets = await this.prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions);
+        return (0, preparedBuffer_js_1.wrapBufferToPreparedBuffer)(id_js_1.DeviceModelId.PLUS, 'fill-lcd-region', packets, jsonSafe ?? false);
     }
     async clearLcdSegment(index) {
         const lcdControl = this.#lcdControls.find((control) => control.id === index);
         if (!lcdControl)
             throw new Error(`Invalid lcd segment index ${index}`);
         const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4);
-        await this.fillControlRegion(lcdControl, 0, 0, buffer, {
+        const packets = await this.prepareFillControlRegion(lcdControl, 0, 0, buffer, {
             format: 'rgba',
             width: lcdControl.pixelSize.width,
             height: lcdControl.pixelSize.height,
         });
+        await this.#device.sendReports(packets);
     }
     async clearAllLcdSegments() {
         const ps = [];
@@ -3637,7 +3715,7 @@ class StreamDeckPlusLcdService {
         }
         await Promise.all(ps);
     }
-    async fillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions) {
+    async prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions) {
         // Basic bounds checking
         const maxSize = lcdControl.pixelSize;
         if (x < 0 || x + sourceOptions.width > maxSize.width) {
@@ -3652,8 +3730,7 @@ class StreamDeckPlusLcdService {
         }
         // A lot of this drawing code is heavily based on the normal button
         const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions);
-        const packets = this.#lcdImageWriter.generateFillImageWrites({ ...sourceOptions, x, y }, byteBuffer);
-        await this.#device.sendReports(packets);
+        return this.#lcdImageWriter.generateFillImageWrites({ ...sourceOptions, x, y }, byteBuffer);
     }
     async convertFillLcdBuffer(sourceBuffer, sourceOptions) {
         const sourceOptions2 = {
@@ -3787,14 +3864,23 @@ class StreamDeckProxy {
     async getHidDeviceInfo(...args) {
         return this.device.getHidDeviceInfo(...args);
     }
+    async sendPreparedBuffer(...args) {
+        return this.device.sendPreparedBuffer(...args);
+    }
     async fillKeyColor(...args) {
         return this.device.fillKeyColor(...args);
     }
     async fillKeyBuffer(...args) {
         return this.device.fillKeyBuffer(...args);
     }
+    async prepareFillKeyBuffer(...args) {
+        return this.device.prepareFillKeyBuffer(...args);
+    }
     async fillPanelBuffer(...args) {
         return this.device.fillPanelBuffer(...args);
+    }
+    async prepareFillPanelBuffer(...args) {
+        return this.device.prepareFillPanelBuffer(...args);
     }
     async clearKey(...args) {
         return this.device.clearKey(...args);
@@ -3831,6 +3917,9 @@ class StreamDeckProxy {
     }
     async fillLcdRegion(...args) {
         return this.device.fillLcdRegion(...args);
+    }
+    async prepareFillLcdRegion(...args) {
+        return this.device.prepareFillLcdRegion(...args);
     }
     async clearLcdSegment(...args) {
         return this.device.clearLcdSegment(...args);
@@ -3900,6 +3989,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StreamDeckBase = void 0;
 const eventemitter3_1 = __webpack_require__(2646);
 const index_js_1 = __webpack_require__(8601);
+const preparedBuffer_js_1 = __webpack_require__(5614);
 class StreamDeckBase extends eventemitter3_1.EventEmitter {
     get CONTROLS() {
         return this.deviceProperties.CONTROLS;
@@ -3977,6 +4067,10 @@ class StreamDeckBase extends eventemitter3_1.EventEmitter {
     async getSerialNumber() {
         return this.#propertiesService.getSerialNumber();
     }
+    async sendPreparedBuffer(buffer) {
+        const packets = (0, preparedBuffer_js_1.unwrapPreparedBufferToBuffer)(this.deviceProperties.MODEL, buffer);
+        await this.device.sendReports(packets);
+    }
     async fillKeyColor(keyIndex, r, g, b) {
         this.checkValidKeyIndex(keyIndex, null);
         await this.#buttonsLcdService.fillKeyColor(keyIndex, r, g, b);
@@ -3985,8 +4079,14 @@ class StreamDeckBase extends eventemitter3_1.EventEmitter {
         this.checkValidKeyIndex(keyIndex, 'lcd');
         await this.#buttonsLcdService.fillKeyBuffer(keyIndex, imageBuffer, options);
     }
+    async prepareFillKeyBuffer(keyIndex, imageBuffer, options, jsonSafe) {
+        return this.#buttonsLcdService.prepareFillKeyBuffer(keyIndex, imageBuffer, options, jsonSafe);
+    }
     async fillPanelBuffer(imageBuffer, options) {
         await this.#buttonsLcdService.fillPanelBuffer(imageBuffer, options);
+    }
+    async prepareFillPanelBuffer(imageBuffer, options, jsonSafe) {
+        return this.#buttonsLcdService.prepareFillPanelBuffer(imageBuffer, options, jsonSafe);
     }
     async clearKey(keyIndex) {
         this.checkValidKeyIndex(keyIndex, null);
@@ -4008,6 +4108,11 @@ class StreamDeckBase extends eventemitter3_1.EventEmitter {
         if (!this.#lcdSegmentDisplayService)
             throw new Error('Not supported for this model');
         return this.#lcdSegmentDisplayService.fillLcdRegion(...args);
+    }
+    async prepareFillLcdRegion(...args) {
+        if (!this.#lcdSegmentDisplayService)
+            throw new Error('Not supported for this model');
+        return this.#lcdSegmentDisplayService.prepareFillLcdRegion(...args);
     }
     async clearLcdSegment(...args) {
         if (!this.#lcdSegmentDisplayService)
@@ -4067,6 +4172,9 @@ class StreamDeckNeoLcdService {
         this.#lcdControls = lcdControls;
     }
     async fillLcdRegion(_index, _x, _y, _imageBuffer, _sourceOptions) {
+        throw new Error('Not supported for this model');
+    }
+    async prepareFillLcdRegion(_index, _x, _y, _imageBuffer, _sourceOptions, _jsonSafe) {
         throw new Error('Not supported for this model');
     }
     async fillLcd(index, imageBuffer, sourceOptions) {
@@ -4239,7 +4347,7 @@ function StreamDeckPedalFactory(device, options) {
 
 /* eslint-disable n/no-unsupported-features/node-builtins */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckWeb = exports.DeviceModelId = exports.VENDOR_ID = void 0;
+exports.StreamDeckWeb = exports.StreamDeckProxy = exports.DeviceModelId = exports.VENDOR_ID = void 0;
 exports.requestStreamDecks = requestStreamDecks;
 exports.getStreamDecks = getStreamDecks;
 exports.openDevice = openDevice;
@@ -4250,6 +4358,7 @@ const wrapper_js_1 = __webpack_require__(3026);
 var core_2 = __webpack_require__(8601);
 Object.defineProperty(exports, "VENDOR_ID", ({ enumerable: true, get: function () { return core_2.VENDOR_ID; } }));
 Object.defineProperty(exports, "DeviceModelId", ({ enumerable: true, get: function () { return core_2.DeviceModelId; } }));
+Object.defineProperty(exports, "StreamDeckProxy", ({ enumerable: true, get: function () { return core_2.StreamDeckProxy; } }));
 var wrapper_js_2 = __webpack_require__(3026);
 Object.defineProperty(exports, "StreamDeckWeb", ({ enumerable: true, get: function () { return wrapper_js_2.StreamDeckWeb; } }));
 /**
@@ -5023,11 +5132,12 @@ module.exports.TimeoutError = TimeoutError;
 /***/ }),
 
 /***/ 9826:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DefaultButtonsLcdService = void 0;
+const preparedBuffer_js_1 = __webpack_require__(5614);
 class DefaultButtonsLcdService {
     #imageWriter;
     #imagePacker;
@@ -5099,6 +5209,7 @@ class DefaultButtonsLcdService {
                         }
                         else {
                             const pixels = new Uint8Array(control.pixelSize.width * control.pixelSize.height * 3);
+                            // TODO - caching?
                             ps.push(this.fillImageRangeControl(control, pixels, {
                                 format: 'rgb',
                                 offset: 0,
@@ -5123,6 +5234,7 @@ class DefaultButtonsLcdService {
         }
         else {
             const pixels = new Uint8Array(control.pixelSize.width * control.pixelSize.height * 3);
+            // TODO - caching?
             await this.fillImageRangeControl(control, pixels, {
                 format: 'rgb',
                 offset: 0,
@@ -5164,6 +5276,10 @@ class DefaultButtonsLcdService {
         }
     }
     async fillKeyBuffer(keyIndex, imageBuffer, options) {
+        const packets = await this.prepareFillKeyBufferInner(keyIndex, imageBuffer, options);
+        await this.#device.sendReports(packets);
+    }
+    async prepareFillKeyBufferInner(keyIndex, imageBuffer, options) {
         const sourceFormat = options?.format ?? 'rgb';
         this.checkSourceFormat(sourceFormat);
         const control = this.#deviceProperties.CONTROLS.find((control) => control.type === 'button' && control.index === keyIndex);
@@ -5175,13 +5291,21 @@ class DefaultButtonsLcdService {
         if (imageBuffer.length !== imageSize) {
             throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
         }
-        await this.fillImageRangeControl(control, imageBuffer, {
+        return this.prepareFillImageRangeControl(control, imageBuffer, {
             format: sourceFormat,
             offset: 0,
             stride: control.pixelSize.width * sourceFormat.length,
         });
     }
+    async prepareFillKeyBuffer(keyIndex, imageBuffer, options, jsonSafe) {
+        const packets = await this.prepareFillKeyBufferInner(keyIndex, imageBuffer, options);
+        return (0, preparedBuffer_js_1.wrapBufferToPreparedBuffer)(this.#deviceProperties.MODEL, 'fill-key', packets, jsonSafe ?? false);
+    }
     async fillPanelBuffer(imageBuffer, options) {
+        const packets = await this.prepareFillPanelBufferInner(imageBuffer, options);
+        await this.#device.sendReports(packets);
+    }
+    async prepareFillPanelBufferInner(imageBuffer, options) {
         const sourceFormat = options?.format ?? 'rgb';
         this.checkSourceFormat(sourceFormat);
         const buttonLcdControls = this.getLcdButtonControls();
@@ -5204,23 +5328,31 @@ class DefaultButtonsLcdService {
             const rowOffset = stride * controlRow * control.pixelSize.height;
             const colOffset = controlCol * iconSize;
             // TODO: Implement padding
-            ps.push(this.fillImageRangeControl(control, imageBuffer, {
+            ps.push(this.prepareFillImageRangeControl(control, imageBuffer, {
                 format: sourceFormat,
                 offset: rowOffset + colOffset,
                 stride,
             }));
         }
-        await Promise.all(ps);
+        const packets = await Promise.all(ps);
+        return packets.flat();
+    }
+    async prepareFillPanelBuffer(imageBuffer, options, jsonSafe) {
+        const packets = await this.prepareFillPanelBufferInner(imageBuffer, options);
+        return (0, preparedBuffer_js_1.wrapBufferToPreparedBuffer)(this.#deviceProperties.MODEL, 'fill-panel', packets, jsonSafe ?? false);
     }
     async sendKeyRgb(keyIndex, red, green, blue) {
         await this.#device.sendFeatureReport(new Uint8Array([0x03, 0x06, keyIndex, red, green, blue]));
     }
     async fillImageRangeControl(buttonControl, imageBuffer, sourceOptions) {
+        const packets = await this.prepareFillImageRangeControl(buttonControl, imageBuffer, sourceOptions);
+        await this.#device.sendReports(packets);
+    }
+    async prepareFillImageRangeControl(buttonControl, imageBuffer, sourceOptions) {
         if (buttonControl.feedbackType !== 'lcd')
             throw new TypeError(`keyIndex ${buttonControl.index} does not support lcd feedback`);
         const byteBuffer = await this.#imagePacker.convertPixelBuffer(imageBuffer, sourceOptions, buttonControl.pixelSize);
-        const packets = this.#imageWriter.generateFillImageWrites({ keyIndex: buttonControl.hidIndex }, byteBuffer);
-        await this.#device.sendReports(packets);
+        return this.#imageWriter.generateFillImageWrites({ keyIndex: buttonControl.hidIndex }, byteBuffer);
     }
     checkRGBValue(value) {
         if (value < 0 || value > 255) {
