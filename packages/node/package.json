@@ -46,7 +46,8 @@
 	],
 	"files": [
 		"dist",
-		"udev"
+		"udev",
+		"udev-generator-rules.json"
 	],
 	"engines": {
 		"node": ">=18.18"

@@ -30,7 +30,8 @@
 	],
 	"files": [
 		"dist",
-		"udev"
+		"udev",
+		"udev-generator-rules.json"
 	],
 	"dependencies": {
 		"@elgato-stream-deck/core": "7.3.0",

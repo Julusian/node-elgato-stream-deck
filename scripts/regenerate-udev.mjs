@@ -23,9 +23,14 @@ const desktopStr = generator.generateFile({
 	mode: 'desktop',
 })
 
+const rulesJSON = JSON.stringify(generator.rules, undefined, '\t')
+
 await fs.writeFile(new URL('../packages/node/udev/50-elgato-stream-deck-user.rules', import.meta.url), desktopStr)
 await fs.writeFile(new URL('../packages/node/udev/50-elgato-stream-deck-headless.rules', import.meta.url), headlessStr)
 
 await fs.writeFile(new URL('../packages/webhid/udev/50-elgato-stream-deck-user.rules', import.meta.url), desktopStr)
+
+await fs.writeFile(new URL('../packages/node/udev-generator-rules.json', import.meta.url), rulesJSON)
+await fs.writeFile(new URL('../packages/webhid/udev-generator-rules.json', import.meta.url), rulesJSON)
 
 console.log('Udev rules regenerated successfully!')

@@ -76,3 +76,4 @@ typings/
 !.yarn/versions
 
 hack-*
+udev-generator-rules.json
