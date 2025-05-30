@@ -87,6 +87,31 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  verify-udev-generation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+      - name: yarn install
+        run: |
+          corepack enable
+          yarn install
+      - name: generate files
+        run: |
+          yarn build:root
+          yarn build:udev
+      - name: verify files are up to date
+        uses: infotroph/tree-is-clean@v1.0.6
+        with:
+          check_untracked: false
+
   publish-demo:
     name: Publish demo to Github Pages
     runs-on: ubuntu-latest

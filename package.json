@@ -7,7 +7,8 @@
     "dev": "run build:root --watch",
     "dev:demo": "yarn workspace @elgato-stream-deck/webhid-demo start",
     "build": "run build:root && yarn workspace @elgato-stream-deck/webhid-demo build",
-    "build:root": "(run g:rimraf packages/*/dist || true) && run g:tsc --build tsconfig.build.json",
+    "build:root": "(run g:rimraf packages/*/dist || true) && run g:tsc --build tsconfig.build.json && run build:udev",
+    "build:udev": "node ./scripts/regenerate-udev.mjs",
     "test": "run lint && run unit",
     "unit": "jest",
     "lint:raw": "eslint",
@@ -52,6 +53,7 @@
     "ts-node": "^10.9.2",
     "typescript": "~5.5.4",
     "typescript-eslint": "^8.32.1",
+    "udev-generator": "^1.0.1",
     "usb": "^2.15.0"
   },
   "workspaces": [
