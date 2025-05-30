@@ -7,6 +7,7 @@ import type {
 	StreamDeckEncoderControlDefinition,
 	StreamDeckLcdSegmentControlDefinition,
 } from './controlDefinition.js'
+import type { PreparedBuffer } from './preparedBuffer.js'
 
 export interface StreamDeckTcpChildDeviceInfo extends HIDDeviceInfo {
 	readonly model: DeviceModelId
@@ -82,6 +83,13 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	getHidDeviceInfo(): Promise<HIDDeviceInfo>
 
 	/**
+	 * Send a prepared buffer operation
+	 *
+	 * @param {PreparedBuffer} buffer The prepared buffer to draw
+	 */
+	sendPreparedBuffer(buffer: PreparedBuffer): Promise<void>
+
+	/**
 	 * Fills the given key with a solid color.
 	 *
 	 * @param {number} keyIndex The key to fill
@@ -105,12 +113,42 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	): Promise<void>
 
 	/**
+	 * Prepare to fill the given key with an image in a Buffer.
+	 * Note: The result is only guaranteed to be valid for this specific StreamDeck and the same library version, but is safe to store externally.
+	 *
+	 * @param {number} keyIndex The key to fill
+	 * @param {Buffer} imageBuffer The image to write
+	 * @param {Object} options Options to control the write
+	 * @param {boolean} jsonSafe Whether the result should be packed to be safe to json serialize
+	 */
+	prepareFillKeyBuffer(
+		keyIndex: KeyIndex,
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		options?: FillImageOptions,
+		jsonSafe?: boolean,
+	): Promise<PreparedBuffer>
+
+	/**
 	 * Fills the whole panel with an image in a Buffer.
 	 *
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} options Options to control the write
 	 */
 	fillPanelBuffer(imageBuffer: Uint8Array | Uint8ClampedArray, options?: FillPanelOptions): Promise<void>
+
+	/**
+	 * Prepare to fill the whole panel with an image in a Buffer.
+	 * Note: The result is only guaranteed to be valid for this specific StreamDeck and the same library version, but is safe to store externally.
+	 *
+	 * @param {Buffer} imageBuffer The image to write
+	 * @param {Object} options Options to control the write
+	 * @param {boolean} jsonSafe Whether the result should be packed to be safe to json serialize
+	 */
+	prepareFillPanelBuffer(
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		options?: FillPanelOptions,
+		jsonSafe?: boolean,
+	): Promise<PreparedBuffer>
 
 	/**
 	 * Fill the whole lcd segment
@@ -166,6 +204,26 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	): Promise<void>
 
 	/**
+	 * Prepare to fill region of the lcd with an image in a Buffer.
+	 * Note: The result is only guaranteed to be valid for this specific StreamDeck and the same library version, but is safe to store externally.
+	 *
+	 * @param {number} lcdIndex The id of the lcd segment to draw to
+	 * @param {number} x The x position to draw to
+	 * @param {number} y The y position to draw to
+	 * @param {Buffer} imageBuffer The image to write
+	 * @param {Object} sourceOptions Options to control the write
+	 * @param {boolean} jsonSafe Whether the result should be packed to be safe to json serialize
+	 */
+	prepareFillLcdRegion(
+		lcdIndex: number,
+		x: number,
+		y: number,
+		imageBuffer: Uint8Array,
+		sourceOptions: FillLcdImageOptions,
+		jsonSafe?: boolean,
+	): Promise<PreparedBuffer>
+
+	/**
 	 * Clear the lcd segment to black
 	 * @param {number} lcdIndex The id of the lcd segment to clear
 	 */
@@ -212,5 +270,9 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 */
 	getSerialNumber(): Promise<string>
 
+	/**
+	 * Get information about a child device connected to this Stream Deck, if any is connected
+	 * Note: This is only available for the Stream Deck Studio, but is safe to call for other models
+	 */
 	getChildDeviceInfo(): Promise<StreamDeckTcpChildDeviceInfo | null>
 }

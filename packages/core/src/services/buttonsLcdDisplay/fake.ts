@@ -1,6 +1,7 @@
-import type { Dimension } from '../../id.js'
+import type { Dimension, KeyIndex } from '../../id.js'
 import type { ButtonsLcdDisplayService } from './interface.js'
 import type { FillPanelDimensionsOptions, FillImageOptions, FillPanelOptions } from '../../types.js'
+import type { PreparedBuffer } from '../../preparedBuffer.js'
 
 export class FakeLcdService implements ButtonsLcdDisplayService {
 	public calculateFillPanelDimensions(_options?: FillPanelDimensionsOptions): Dimension | null {
@@ -23,7 +24,24 @@ export class FakeLcdService implements ButtonsLcdDisplayService {
 	): Promise<void> {
 		// Not supported
 	}
+	public async prepareFillKeyBuffer(
+		_keyIndex: KeyIndex,
+		_imageBuffer: Uint8Array | Uint8ClampedArray,
+		_options: FillImageOptions | undefined,
+		_jsonSafe: boolean | undefined,
+	): Promise<PreparedBuffer> {
+		// Not supported
+		throw new Error('Not supported')
+	}
 	public async fillPanelBuffer(_imageBuffer: Uint8Array, _options?: FillPanelOptions): Promise<void> {
 		// Not supported
+	}
+	public async prepareFillPanelBuffer(
+		_imageBuffer: Uint8Array | Uint8ClampedArray,
+		_options: FillPanelOptions | undefined,
+		_jsonSafe: boolean | undefined,
+	): Promise<PreparedBuffer> {
+		// Not supported
+		throw new Error('Not supported')
 	}
 }
