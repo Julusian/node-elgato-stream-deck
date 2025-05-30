@@ -326,6 +326,54 @@ exports.Gen2PropertiesService = Gen2PropertiesService;
 
 /***/ }),
 
+/***/ 1488:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.FakeInputService = void 0;
+class FakeInputService {
+    handleInput(_data) {
+        // Noop
+    }
+}
+exports.FakeInputService = FakeInputService;
+//# sourceMappingURL=fake.js.map
+
+/***/ }),
+
+/***/ 1510:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.FakeLcdService = void 0;
+class FakeLcdService {
+    calculateFillPanelDimensions(_options) {
+        // Not supported
+        return null;
+    }
+    async clearKey(_keyIndex) {
+        // Not supported
+    }
+    async clearPanel() {
+        // Not supported
+    }
+    async fillKeyColor(_keyIndex, _r, _g, _b) {
+        // Not supported
+    }
+    async fillKeyBuffer(_keyIndex, _imageBuffer, _options) {
+        // Not supported
+    }
+    async fillPanelBuffer(_imageBuffer, _options) {
+        // Not supported
+    }
+}
+exports.FakeLcdService = FakeLcdService;
+//# sourceMappingURL=fake.js.map
+
+/***/ }),
+
 /***/ 1562:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -2488,6 +2536,47 @@ exports.PedalPropertiesService = PedalPropertiesService;
 
 /***/ }),
 
+/***/ 4154:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.NetworkDockPropertiesService = void 0;
+const all_firmware_js_1 = __webpack_require__(3339);
+class NetworkDockPropertiesService {
+    #device;
+    constructor(device) {
+        this.#device = device;
+    }
+    async setBrightness(_percentage) {
+        // Noop
+    }
+    async resetToLogo() {
+        // Noop
+    }
+    async getFirmwareVersion() {
+        const data = await this.#device.getFeatureReport(0x83, -1);
+        return new TextDecoder('ascii').decode(data.subarray(8, 16));
+    }
+    async getAllFirmwareVersions() {
+        const [ap2Data] = await Promise.all([this.#device.getFeatureReport(0x83, -1)]);
+        return (0, all_firmware_js_1.parseAllFirmwareVersionsHelper)({
+            ap2: ap2Data.slice(2),
+            encoderAp2: null,
+            encoderLd: null,
+        });
+    }
+    async getSerialNumber() {
+        const data = await this.#device.getFeatureReport(0x84, -1);
+        const length = data[3];
+        return new TextDecoder('ascii').decode(data.subarray(4, 4 + length));
+    }
+}
+exports.NetworkDockPropertiesService = NetworkDockPropertiesService;
+//# sourceMappingURL=network-dock.js.map
+
+/***/ }),
+
 /***/ 4369:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -3007,6 +3096,47 @@ function StreamDeck6KeyFactory(model, device, options, _tcpPropertiesService) {
     return (0, generic_gen1_js_1.StreamDeckGen1Factory)(device, options, properties, new imageWriter_js_1.StreamdeckDefaultImageWriter(new headerGenerator_js_1.StreamdeckGen1ImageHeaderGenerator()), { colorMode: 'bgr', rotate: true, yFlip: true }, 2835);
 }
 //# sourceMappingURL=6-key.js.map
+
+/***/ }),
+
+/***/ 5448:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.NetworkDockFactory = NetworkDockFactory;
+const base_js_1 = __webpack_require__(7067);
+const id_js_1 = __webpack_require__(6444);
+const controlsGenerator_js_1 = __webpack_require__(3794);
+const callback_hook_js_1 = __webpack_require__(659);
+const fake_js_1 = __webpack_require__(1510);
+const fake_js_2 = __webpack_require__(1488);
+const network_dock_js_1 = __webpack_require__(4154);
+const networkDockProperties = {
+    MODEL: id_js_1.DeviceModelId.NETWORK_DOCK,
+    PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.NETWORK_DOCK],
+    KEY_DATA_OFFSET: 0,
+    SUPPORTS_RGB_KEY_FILL: false,
+    CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)([]),
+    KEY_SPACING_HORIZONTAL: 0,
+    KEY_SPACING_VERTICAL: 0,
+    FULLSCREEN_PANELS: 0,
+    HAS_NFC_READER: false,
+    SUPPORTS_CHILD_DEVICES: true,
+};
+function NetworkDockFactory(device, options, _tcpPropertiesService) {
+    const events = new callback_hook_js_1.CallbackHook();
+    return new base_js_1.StreamDeckBase(device, options, {
+        deviceProperties: networkDockProperties,
+        events,
+        properties: new network_dock_js_1.NetworkDockPropertiesService(device),
+        buttonsLcd: new fake_js_1.FakeLcdService(),
+        lcdSegmentDisplay: null,
+        inputService: new fake_js_2.FakeInputService(),
+        encoderLed: null,
+    });
+}
+//# sourceMappingURL=network-dock.js.map
 
 /***/ }),
 
@@ -3593,6 +3723,7 @@ var DeviceModelId;
     DeviceModelId["MODULE6"] = "6-module";
     DeviceModelId["MODULE15"] = "15-module";
     DeviceModelId["MODULE32"] = "32-module";
+    DeviceModelId["NETWORK_DOCK"] = "network-dock";
 })(DeviceModelId || (exports.DeviceModelId = DeviceModelId = {}));
 exports.MODEL_NAMES = {
     [DeviceModelId.ORIGINAL]: 'Stream Deck',
@@ -3608,6 +3739,7 @@ exports.MODEL_NAMES = {
     [DeviceModelId.MODULE6]: 'Stream Deck 6 Module',
     [DeviceModelId.MODULE15]: 'Stream Deck 15 Module',
     [DeviceModelId.MODULE32]: 'Stream Deck 32 Module',
+    [DeviceModelId.NETWORK_DOCK]: 'Stream Deck Network Dock',
 };
 //# sourceMappingURL=id.js.map
 
@@ -3915,38 +4047,6 @@ exports.StreamDeckBase = StreamDeckBase;
 
 /***/ }),
 
-/***/ 7183:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PedalLcdService = void 0;
-class PedalLcdService {
-    calculateFillPanelDimensions(_options) {
-        // Not supported
-        return null;
-    }
-    async clearKey(_keyIndex) {
-        // Not supported
-    }
-    async clearPanel() {
-        // Not supported
-    }
-    async fillKeyColor(_keyIndex, _r, _g, _b) {
-        // Not supported
-    }
-    async fillKeyBuffer(_keyIndex, _imageBuffer, _options) {
-        // Not supported
-    }
-    async fillPanelBuffer(_imageBuffer, _options) {
-        // Not supported
-    }
-}
-exports.PedalLcdService = PedalLcdService;
-//# sourceMappingURL=pedal.js.map
-
-/***/ }),
-
 /***/ 7325:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -4076,7 +4176,7 @@ const base_js_1 = __webpack_require__(7067);
 const id_js_1 = __webpack_require__(6444);
 const controlsGenerator_js_1 = __webpack_require__(3794);
 const pedal_js_1 = __webpack_require__(3874);
-const pedal_js_2 = __webpack_require__(7183);
+const fake_js_1 = __webpack_require__(1510);
 const callback_hook_js_1 = __webpack_require__(659);
 const gen1_js_1 = __webpack_require__(2632);
 const pedalControls = [
@@ -4123,7 +4223,7 @@ function StreamDeckPedalFactory(device, options) {
         deviceProperties: pedalProperties,
         events,
         properties: new pedal_js_1.PedalPropertiesService(device),
-        buttonsLcd: new pedal_js_2.PedalLcdService(),
+        buttonsLcd: new fake_js_1.FakeLcdService(),
         lcdSegmentDisplay: null,
         inputService: new gen1_js_1.ButtonOnlyInputService(pedalProperties, events),
         encoderLed: null,
@@ -4265,6 +4365,7 @@ const plus_js_1 = __webpack_require__(1562);
 const pedal_js_1 = __webpack_require__(7756);
 const neo_js_1 = __webpack_require__(9350);
 const studio_js_1 = __webpack_require__(7724);
+const network_dock_js_1 = __webpack_require__(5448);
 tslib_1.__exportStar(__webpack_require__(5064), exports);
 tslib_1.__exportStar(__webpack_require__(6444), exports);
 tslib_1.__exportStar(__webpack_require__(2173), exports);
@@ -4280,6 +4381,7 @@ var DeviceModelType;
 (function (DeviceModelType) {
     DeviceModelType["STREAMDECK"] = "streamdeck";
     DeviceModelType["PEDAL"] = "pedal";
+    DeviceModelType["NETWORK_DOCK"] = "network-dock";
 })(DeviceModelType || (exports.DeviceModelType = DeviceModelType = {}));
 /** List of all the known models, and the classes to use them */
 exports.DEVICE_MODELS2 = {
@@ -4360,6 +4462,12 @@ exports.DEVICE_MODELS2 = {
         productIds: [0x00ba],
         factory: (...args) => (0, _32_key_js_1.StreamDeck32KeyFactory)(id_js_1.DeviceModelId.MODULE32, ...args),
         hasNativeTcp: false,
+    },
+    [id_js_1.DeviceModelId.NETWORK_DOCK]: {
+        type: DeviceModelType.NETWORK_DOCK,
+        productIds: [0xffff], // Note: This isn't a real product id, but matches what is reported when querying the device
+        factory: network_dock_js_1.NetworkDockFactory,
+        hasNativeTcp: true,
     },
 };
 /** @deprecated maybe? */
