@@ -6,7 +6,7 @@ export interface SocketWrapperEvents {
 	error: [str: string, e: any]
 	connected: [self: SocketWrapper]
 	disconnected: [self: SocketWrapper]
-	data: [data: Buffer] // TODO - remove?
+	dataLegacy: [data: Buffer]
 	dataCora: [message: SocketCoraMessage]
 }
 
@@ -209,7 +209,7 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 			this.#socket.write(ackBuffer)
 		} else {
 			try {
-				this.emit('data', packet)
+				this.emit('dataLegacy', packet)
 			} catch (e) {
 				this.emit('error', 'Handle data error', e)
 			}

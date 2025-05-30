@@ -37,8 +37,6 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		this.#socket.on('dataCora', (data) => {
 			let singletonCommand: QueuedCommand | undefined
 
-			// TODO - acking?
-
 			if (data.payload[0] === 0x01 && data.payload[1] === 0x0b) {
 				// Query about Device 2
 				singletonCommand = this.#pendingSingletonCommands.get(0x1c)

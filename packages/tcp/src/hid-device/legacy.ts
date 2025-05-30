@@ -34,7 +34,7 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 
 		this.#socket = socket
 
-		this.#socket.on('data', (data) => {
+		this.#socket.on('dataLegacy', (data) => {
 			let singletonCommand: QueuedCommand | undefined
 
 			if (data[0] === 0x01 && data[1] === 0x0b) {
