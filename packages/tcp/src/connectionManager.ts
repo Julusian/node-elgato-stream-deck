@@ -6,7 +6,9 @@ import { type JPEGEncodeOptions, encodeJPEG } from '@elgato-stream-deck/node-lib
 import type { HIDDevice, OpenStreamDeckOptions, ChildHIDDeviceInfo, PropertiesService } from '@elgato-stream-deck/core'
 import { DEVICE_MODELS, parseAllFirmwareVersionsHelper } from '@elgato-stream-deck/core'
 import { StreamDeckTcpWrapper } from './tcpWrapper.js'
-import { TcpHidDevice } from './hid-device.js'
+import { TcpLegacyHidDevice } from './hid-device/legacy.js'
+import { TcpCoraHidDevice } from './hid-device/cora.js'
+import type { TcpHidDevice } from './hid-device/api.js'
 
 export interface StreamDeckTcpConnectionManagerEvents {
 	connected: [streamdeck: StreamDeckTcp]
@@ -54,7 +56,9 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 	#onSocketConnected = (socket: SocketWrapper) => {
 		const connectionId = this.#getConnectionId(socket.address, socket.port)
 
-		const fakeHidDevice = new TcpHidDevice(socket)
+		const fakeHidDevice: TcpHidDevice = socket.isCora
+			? new TcpCoraHidDevice(socket)
+			: new TcpLegacyHidDevice(socket)
 
 		// Setup a temporary error handler, in case an error gets produced during the setup
 		const tmpErrorHandler = () => {

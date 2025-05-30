@@ -11,6 +11,7 @@ import { StreamDeckPedalFactory } from './models/pedal.js'
 import { StreamDeckNeoFactory } from './models/neo.js'
 import { StreamDeckStudioFactory } from './models/studio.js'
 import type { PropertiesService } from './services/properties/interface.js'
+import { NetworkDockFactory } from './models/network-dock.js'
 
 export * from './types.js'
 export * from './id.js'
@@ -28,6 +29,7 @@ export const VENDOR_ID = 0x0fd9
 export enum DeviceModelType {
 	STREAMDECK = 'streamdeck',
 	PEDAL = 'pedal',
+	NETWORK_DOCK = 'network-dock',
 }
 
 export interface DeviceModelSpec {
@@ -137,6 +139,13 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 		factory: (...args) => StreamDeck32KeyFactory(DeviceModelId.MODULE32, ...args),
 
 		hasNativeTcp: false,
+	},
+	[DeviceModelId.NETWORK_DOCK]: {
+		type: DeviceModelType.NETWORK_DOCK,
+		productIds: [0xffff], // Note: This isn't a real product id, but matches what is reported when querying the device
+		factory: NetworkDockFactory,
+
+		hasNativeTcp: true,
 	},
 }
 

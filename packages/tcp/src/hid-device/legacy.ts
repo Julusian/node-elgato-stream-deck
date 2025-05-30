@@ -1,41 +1,22 @@
 import * as EventEmitter from 'events'
 import {
 	type HIDDeviceInfo,
-	type HIDDevice,
 	type HIDDeviceEvents,
 	type ChildHIDDeviceInfo,
 	type StreamDeckTcpChildDeviceInfo,
 	uint8ArrayToDataView,
 } from '@elgato-stream-deck/core'
-import type { SocketWrapper } from './socketWrapper.js'
-import { parseDevice2Info } from './device2Info.js'
-
-class QueuedCommand {
-	public readonly promise: Promise<Buffer>
-	public readonly commandType: number
-
-	constructor(commandType: number) {
-		this.commandType = commandType
-		this.promise = new Promise<Buffer>((resolve, reject) => {
-			this.resolve = resolve
-			this.reject = reject
-		})
-	}
-
-	resolve(_res: Buffer) {
-		throw new Error('No promise to resolve')
-	}
-
-	reject(_res: any) {
-		throw new Error('No promise to reject')
-	}
-}
+import type { SocketWrapper } from '../socketWrapper.js'
+import { parseDevice2Info } from '../device2Info.js'
+import { QueuedCommand } from './util.js'
+import type { TcpHidDevice } from './api.js'
 
 /**
  * A HIDDevice implementation for TCP connections
  * This isn't really HID, but it fits the existing structure well enough
+ * Note: this gets destroyed when the socket is closed, so we can rely on this for resetting the state
  */
-export class TcpHidDevice extends EventEmitter<HIDDeviceEvents> implements HIDDevice {
+export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements TcpHidDevice {
 	readonly #socket: SocketWrapper
 	#isPrimary = true
 	#onChildInfoChange: ((info: Omit<StreamDeckTcpChildDeviceInfo, 'model'> | null) => void) | null = null
@@ -53,7 +34,7 @@ export class TcpHidDevice extends EventEmitter<HIDDeviceEvents> implements HIDDe
 
 		this.#socket = socket
 
-		this.#socket.on('data', (data) => {
+		this.#socket.on('dataLegacy', (data) => {
 			let singletonCommand: QueuedCommand | undefined
 
 			if (data[0] === 0x01 && data[1] === 0x0b) {
@@ -107,7 +88,7 @@ export class TcpHidDevice extends EventEmitter<HIDDeviceEvents> implements HIDDe
 			dataFull.set(data.slice(0, Math.min(data.length, dataFull.length)))
 		}
 
-		this.#socket.sendMessages([dataFull])
+		this.#socket.sendLegacyWrites([dataFull])
 	}
 
 	async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
@@ -137,7 +118,7 @@ export class TcpHidDevice extends EventEmitter<HIDDeviceEvents> implements HIDDe
 		} else {
 			b.writeUint8(commandType, 0)
 		}
-		this.#socket.sendMessages([b])
+		this.#socket.sendLegacyWrites([b])
 
 		// TODO - improve this timeout
 		setTimeout(() => {
@@ -148,7 +129,7 @@ export class TcpHidDevice extends EventEmitter<HIDDeviceEvents> implements HIDDe
 	}
 
 	async sendReports(buffers: Buffer[]): Promise<void> {
-		this.#socket.sendMessages(buffers)
+		this.#socket.sendLegacyWrites(buffers)
 	}
 
 	#loadedHidInfo: HIDDeviceInfo | undefined
