@@ -53,6 +53,7 @@
     "ts-node": "^10.9.2",
     "typescript": "~5.5.4",
     "typescript-eslint": "^8.32.1",
+    "udev-generator": "^1.0.1",
     "usb": "^2.15.0"
   },
   "workspaces": [

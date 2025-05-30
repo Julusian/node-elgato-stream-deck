@@ -3,8 +3,7 @@
 
 import fs from 'node:fs/promises'
 
-// eslint-disable-next-line n/no-missing-import
-import { UdevRuleGenerator } from '../../udev-generator/dist/main.js'
+import { UdevRuleGenerator } from 'udev-generator'
 import { DEVICE_MODELS2, VENDOR_ID } from '@elgato-stream-deck/core'
 
 const generator = new UdevRuleGenerator()
@@ -25,12 +24,24 @@ const desktopStr = generator.generateFile({
 
 const rulesJSON = JSON.stringify(generator.rules, undefined, '\t')
 
-await fs.writeFile(new URL('../packages/node/udev/50-elgato-stream-deck-user.rules', import.meta.url), desktopStr)
-await fs.writeFile(new URL('../packages/node/udev/50-elgato-stream-deck-headless.rules', import.meta.url), headlessStr)
+await fs.writeFile(
+	new URL('../packages/node/udev/50-elgato-stream-deck-user.rules', import.meta.url),
+	desktopStr,
+	'utf8',
+)
+await fs.writeFile(
+	new URL('../packages/node/udev/50-elgato-stream-deck-headless.rules', import.meta.url),
+	headlessStr,
+	'utf8',
+)
 
-await fs.writeFile(new URL('../packages/webhid/udev/50-elgato-stream-deck-user.rules', import.meta.url), desktopStr)
+await fs.writeFile(
+	new URL('../packages/webhid/udev/50-elgato-stream-deck-user.rules', import.meta.url),
+	desktopStr,
+	'utf8',
+)
 
-await fs.writeFile(new URL('../packages/node/udev-generator-rules.json', import.meta.url), rulesJSON)
-await fs.writeFile(new URL('../packages/webhid/udev-generator-rules.json', import.meta.url), rulesJSON)
+await fs.writeFile(new URL('../packages/node/udev-generator-rules.json', import.meta.url), rulesJSON, 'utf8')
+await fs.writeFile(new URL('../packages/webhid/udev-generator-rules.json', import.meta.url), rulesJSON, 'utf8')
 
 console.log('Udev rules regenerated successfully!')
