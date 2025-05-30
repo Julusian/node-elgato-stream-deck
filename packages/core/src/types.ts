@@ -142,6 +142,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 *
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} options Options to control the write
+	 * @param {boolean} jsonSafe Whether the result should be packed to be safe to json serialize
 	 */
 	prepareFillPanelBuffer(
 		imageBuffer: Uint8Array | Uint8ClampedArray,
@@ -211,6 +212,7 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {number} y The y position to draw to
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
+	 * @param {boolean} jsonSafe Whether the result should be packed to be safe to json serialize
 	 */
 	prepareFillLcdRegion(
 		lcdIndex: number,

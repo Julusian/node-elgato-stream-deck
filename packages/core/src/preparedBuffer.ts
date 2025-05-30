@@ -29,8 +29,12 @@ export function wrapBufferToPreparedBuffer(
 	let encodedBuffers: PreparedButtonDrawInternal['do_not_touch'] = buffers
 
 	if (jsonSafe) {
-		const decoder = new TextDecoder()
-		encodedBuffers = buffers.map((b) => decoder.decode(b))
+		// Use Base64 encoding for binary-safe string conversion
+		if (typeof Buffer !== 'undefined') {
+			encodedBuffers = buffers.map((b) => Buffer.from(b).toString('base64'))
+		} else {
+			encodedBuffers = buffers.map((b) => btoa(String.fromCharCode(...b)))
+		}
 	}
 
 	return {
@@ -54,7 +58,18 @@ export function unwrapPreparedBufferToBuffer(
 
 	return preparedInternal.do_not_touch.map((b) => {
 		if (typeof b === 'string') {
-			return new TextEncoder().encode(b)
+			// Decode from Base64 for binary-safe conversion
+			if (typeof Buffer !== 'undefined') {
+				// Fast path for Node.js
+				return Buffer.from(b, 'base64')
+			} else {
+				// Browser fallback
+				return new Uint8Array(
+					atob(b)
+						.split('')
+						.map((char) => char.charCodeAt(0)),
+				)
+			}
 		} else if (b instanceof Uint8Array) {
 			return b
 		} else {
