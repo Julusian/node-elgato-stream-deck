@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.3.0](https://github.com/julusian/node-elgato-stream-deck/compare/v7.2.0...v7.3.0) (2025-05-30)
+
+
+### Features
+
+* prepared buffers ([#102](https://github.com/julusian/node-elgato-stream-deck/issues/102)) ([026cbf3](https://github.com/julusian/node-elgato-stream-deck/commit/026cbf37f643096002a5a8385f26e59d5a390d24))
+
+
+
+
+
 # [7.2.0](https://github.com/julusian/node-elgato-stream-deck/compare/v7.1.2...v7.2.0) (2025-05-24)
 
 
