@@ -83,7 +83,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 	async sendFeatureReport(data: Uint8Array): Promise<void> {
 		this.#socket.sendCoraWrites([
 			{
-				flags: CoraMessageFlags.NONE,
+				flags: CoraMessageFlags.VERBATIM,
 				hidOp: CoraHidOp.SEND_REPORT,
 				messageId: 0,
 				payload: Buffer.from(data),

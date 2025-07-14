@@ -25,6 +25,7 @@ const customConfig = [
 		rules: {
 			'n/no-extraneous-require': 'off',
 			'n/no-extraneous-import': 'off',
+			'n/no-process-exit': 'off',
 		},
 	},
 	{
