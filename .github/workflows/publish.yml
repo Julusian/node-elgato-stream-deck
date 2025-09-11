@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+      - run: corepack enable
       - name: Use Node.js 18.x
         uses: actions/setup-node@v5
         with:
@@ -25,8 +26,6 @@ jobs:
           if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
             echo "No Token"
           else
-            corepack enable
-
             PUBLISHED_VERSION=$(yarn npm info --json @elgato-stream-deck/node | jq -c '.version' -r)
             THIS_VERSION=$(node -p "require('./packages/node/package.json').version")
             # Simple bash helper to comapre version numbers

@@ -69,12 +69,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y yasm libudev-dev libusb-1.0-0-dev
+      - run: corepack enable
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node-version }}
       - run: |
-          corepack enable
           yarn install
         env:
           CI: true
@@ -95,13 +95,13 @@ jobs:
       - uses: actions/checkout@v5
         with:
           persist-credentials: false
+      - run: corepack enable
       - name: Use Node.js
         uses: actions/setup-node@v5
         with:
           node-version: 22.x
       - name: yarn install
         run: |
-          corepack enable
           yarn install
       - name: generate files
         run: |
@@ -126,13 +126,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+      - run: corepack enable
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: 18.x
       - name: Prepare build
         run: |
-          corepack enable
           yarn install
           yarn build
         env:
