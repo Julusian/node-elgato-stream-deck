@@ -13,12 +13,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y yasm libudev-dev libusb-1.0-0-dev
+      - run: corepack enable
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: 18.x
       - run: |
-          corepack enable
           yarn install
         env:
           CI: true
@@ -38,12 +38,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y yasm libudev-dev libusb-1.0-0-dev
+      - run: corepack enable
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: 18.x
       - run: |
-          corepack enable
           yarn install
         env:
           CI: true
