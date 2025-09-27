@@ -19,14 +19,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18.x
+      - name: Enable corepack
+        run: corepack enable
       - name: Check release is desired
         id: do-publish
         run: |
           if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
             echo "No Token"
           else
-            corepack enable
-
             PUBLISHED_VERSION=$(yarn npm info --json @elgato-stream-deck/node | jq -c '.version' -r)
             THIS_VERSION=$(node -p "require('./packages/node/package.json').version")
             # Simple bash helper to comapre version numbers
@@ -49,7 +49,6 @@ jobs:
       - name: Prepare build
         if: ${{ steps.do-publish.outputs.tag }}
         run: |
-          corepack enable
           yarn install
           yarn build
         env:
@@ -59,7 +58,7 @@ jobs:
         run: |
           yarn config set npmAuthToken $NPM_AUTH_TOKEN
 
-          yarn workspaces foreach --all -pt --exclude elgato-stream-deck-packages --exclude @elgato-stream-deck/webhid-demo npm publish --access=public --tag ${{ steps.do-publish.outputs.tag }}
+          yarn workspaces foreach --all -pt --exclude elgato-stream-deck-packages --exclude @elgato-stream-deck/webhid-demo npm publish --access=public --provenance --tag ${{ steps.do-publish.outputs.tag }}
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           CI: true

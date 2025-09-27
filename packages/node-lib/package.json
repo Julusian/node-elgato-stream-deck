@@ -8,7 +8,8 @@
 	"homepage": "https://github.com/julusian/node-elgato-stream-deck#readme",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/julusian/node-elgato-stream-deck.git"
+		"url": "https://github.com/Julusian/node-elgato-stream-deck",
+		"directory": "packages/node-lib"
 	},
 	"bugs": {
 		"url": "https://github.com/julusian/node-elgato-stream-deck/issues"
