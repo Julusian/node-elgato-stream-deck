@@ -17,18 +17,17 @@
 	},
 	"scripts": {
 		"start": "webpack serve --mode development --color",
-		"build": "run g:rimraf dist && cross-env NODE_ENV=production webpack --progress"
+		"build": "run g:rimraf dist && NODE_ENV=production webpack --progress"
 	},
 	"dependencies": {
 		"@elgato-stream-deck/webhid": "7.3.2",
 		"html-to-image": "^1.11.13"
 	},
 	"devDependencies": {
-		"copy-webpack-plugin": "^11.0.0",
-		"cross-env": "^7.0.3",
-		"ts-loader": "^9.5.2",
-		"webpack": "^5.99.9",
-		"webpack-cli": "^5.1.4",
-		"webpack-dev-server": "^4.15.2"
+		"copy-webpack-plugin": "^13.0.1",
+		"ts-loader": "^9.5.4",
+		"webpack": "^5.101.3",
+		"webpack-cli": "^6.0.1",
+		"webpack-dev-server": "^5.2.2"
 	}
 }

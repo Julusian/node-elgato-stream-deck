@@ -1,4 +1,4 @@
-import type { Browser, Service as BonjourService } from '@julusian/bonjour-service'
+import type { Browser, DiscoveredService as BonjourService } from '@julusian/bonjour-service'
 import { Bonjour } from '@julusian/bonjour-service'
 import * as EventEmitter from 'events'
 import { DEFAULT_MDNS_QUERY_INTERVAL } from './constants.js'
