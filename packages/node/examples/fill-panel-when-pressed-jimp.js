@@ -1,6 +1,6 @@
 // @ts-check
 const path = require('path')
-const Jimp = require('jimp')
+const { Jimp } = require('jimp')
 const { listStreamDecks, openStreamDeck } = require('../dist/index')
 
 console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the second image.')
@@ -15,10 +15,10 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 	if (!panelDimensions) throw new Error("Streamdeck doesn't support fillPanel")
 
 	const bmpImgField = await Jimp.read(path.resolve(__dirname, 'fixtures/sunny_field.png')).then((img) => {
-		return img.resize(panelDimensions.width, panelDimensions.height)
+		return img.resize({ w: panelDimensions.width, h: panelDimensions.height })
 	})
 	const bmpImgMosaic = await Jimp.read(path.resolve(__dirname, '../../../fixtures/mosaic.png')).then((img) => {
-		return img.resize(panelDimensions.width, panelDimensions.height)
+		return img.resize({ w: panelDimensions.width, h: panelDimensions.height })
 	})
 
 	/** @type {import('@elgato-stream-deck/core').StreamDeckLcdSegmentControlDefinition} */
@@ -29,12 +29,12 @@ console.log('Press keys 0-7 to show the first image, and keys 8-15 to show the s
 
 	const bmpImgFieldLcd = lcdSegmentControl
 		? await Jimp.read(path.resolve(__dirname, 'fixtures/sunny_field.png')).then((img) => {
-				return img.resize(lcdSegmentControl.pixelSize.width, lcdSegmentControl.pixelSize.height)
+				return img.resize({ w: lcdSegmentControl.pixelSize.width, h: lcdSegmentControl.pixelSize.height })
 			})
 		: undefined
 	const bmpImgMosaicLcd = lcdSegmentControl
 		? await Jimp.read(path.resolve(__dirname, '../../../fixtures/mosaic.png')).then((img) => {
-				return img.resize(lcdSegmentControl.pixelSize.width, lcdSegmentControl.pixelSize.height)
+				return img.resize({ w: lcdSegmentControl.pixelSize.width, h: lcdSegmentControl.pixelSize.height })
 			})
 		: undefined
 

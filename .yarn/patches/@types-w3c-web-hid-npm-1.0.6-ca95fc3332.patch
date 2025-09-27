@@ -1,0 +1,16 @@
+diff --git a/index.d.ts b/index.d.ts
+index 3ff5cdae34bab5e0db645126c05a1876a8b62751..d49ab7bc39774dd2c0044501c1a12c9a187f994a 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -150,9 +150,9 @@ declare class HIDDevice extends EventTarget {
+ 
+     forget(): Promise<void>;
+ 
+-    sendReport(reportId: number, data: BufferSource): Promise<void>;
++    sendReport(reportId: number, data: AllowSharedBufferSource): Promise<void>;
+ 
+-    sendFeatureReport(reportId: number, data: BufferSource): Promise<void>;
++    sendFeatureReport(reportId: number, data: AllowSharedBufferSource): Promise<void>;
+ 
+     receiveFeatureReport(reportId: number): Promise<DataView>;
+ 

@@ -1,6 +1,6 @@
 // @ts-check
 const path = require('path')
-const Jimp = require('jimp')
+const { Jimp } = require('jimp')
 const { listStreamDecks, openStreamDeck } = require('../dist/index')
 
 ;(async () => {
@@ -11,7 +11,7 @@ const { listStreamDecks, openStreamDeck } = require('../dist/index')
 	streamDeck.clearPanel()
 
 	const bmpImg = await Jimp.read(path.resolve(__dirname, 'fixtures/github_logo.png')).then((img) => {
-		return img.resize(streamDeck.BUTTON_WIDTH_PX, streamDeck.BUTTON_HEIGHT_PX)
+		return img.resize({ w: streamDeck.BUTTON_WIDTH_PX, h: streamDeck.BUTTON_HEIGHT_PX })
 	})
 
 	const img = bmpImg.bitmap.data

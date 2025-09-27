@@ -10,7 +10,7 @@ async function addDepsForRoot(root, subdir) {
 		subdir ? `packages/${subdir}/package.json` : 'package.json',
 		'yarn.lock',
 		true,
-		false
+		false,
 	)
 
 	function flattenAndAddDeps(node) {
