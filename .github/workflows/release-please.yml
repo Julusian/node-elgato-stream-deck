@@ -1,0 +1,55 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+name: release-please
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run release-please
+        id: rp
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          config-file: .github/release-please-config.json
+
+      - name: PR info
+        if: steps.rp.outputs.prs_created == 'true'
+        run: |
+          echo "prs_created=${{ steps.rp.outputs.prs_created }}"
+          echo "pr_number=${{ fromJSON(steps.rp.outputs.pr).number }}"
+          echo "pr_branch=${{ fromJSON(steps.rp.outputs.pr).headBranchName }}"
+
+      - name: Checkout PR branch
+        if: steps.rp.outputs.prs_created == 'true' && steps.rp.outputs.pr != ''
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ fromJSON(steps.rp.outputs.pr).headBranchName }}
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Sync version changes
+        if: steps.rp.outputs.prs_created == 'true'
+        run: |
+          corepack enable
+          yarn install
+
+          # Update versions
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          yarn workspaces foreach --all version $NEW_VERSION
+
+      - name: Auto-commit & push
+        if: steps.rp.outputs.prs_created == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore(release): sync versions'
+          file_pattern: yarn.lock packages/*/package.json
