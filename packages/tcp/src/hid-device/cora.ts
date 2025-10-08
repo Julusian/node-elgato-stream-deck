@@ -47,12 +47,12 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 				}
 			} else if (data.payload[0] === 0x01) {
 				this.emit('input', data.payload.subarray(1))
-			} else if (data.payload[0] === 0x03) {
-				// Command for the Studio port
-				singletonCommand = this.#pendingSingletonCommands.get(data.payload[1])
-			} else {
+			} else if (data.flags & CoraMessageFlags.VERBATIM) {
 				// Command for the Device 2 port
 				singletonCommand = this.#pendingSingletonCommands.get(data.payload[0])
+			} else {
+				// Command for the Studio port
+				singletonCommand = this.#pendingSingletonCommands.get(data.payload[1])
 			}
 
 			if (singletonCommand) {
@@ -119,8 +119,11 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		this.#socket.sendCoraWrites([msg])
 
 		// TODO - improve this timeout
+		const timeoutError = new Error('Timeout')
+		// eslint-disable-next-line no-self-assign
+		timeoutError.stack = timeoutError.stack // Ensure stack is captured here
 		setTimeout(() => {
-			command.reject(new Error('Timeout'))
+			command.reject(timeoutError)
 		}, 5000)
 
 		return command.promise
