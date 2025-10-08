@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.3.3](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.3.2...v7.3.3) (2025-10-08)
+
+
+### Bug Fixes
+
+* network dock not working with streamdeck mini ([9688502](https://github.com/Julusian/node-elgato-stream-deck/commit/9688502d4797d4cbace164f540f91e9fbb2338e1))
+
 ## [7.3.2](https://github.com/julusian/node-elgato-stream-deck/compare/v7.3.1...v7.3.2) (2025-07-14)
 
 
