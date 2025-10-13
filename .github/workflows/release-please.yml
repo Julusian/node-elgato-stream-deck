@@ -49,7 +49,7 @@ jobs:
 
       - name: Auto-commit & push
         if: steps.rp.outputs.prs_created == 'true'
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: 'chore(release): sync versions'
           file_pattern: yarn.lock packages/*/package.json
