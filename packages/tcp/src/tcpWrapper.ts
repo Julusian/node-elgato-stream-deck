@@ -1,4 +1,4 @@
-import { EventEmitter } from 'eventemitter3'
+import { EventEmitter } from 'events'
 import type { StreamDeck } from '@elgato-stream-deck/core'
 import { StreamDeckProxy } from '@elgato-stream-deck/core'
 import type { SocketWrapper } from './socketWrapper.js'

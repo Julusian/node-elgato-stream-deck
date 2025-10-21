@@ -1,6 +1,6 @@
 import type { Browser, DiscoveredService as BonjourService } from '@julusian/bonjour-service'
 import { Bonjour } from '@julusian/bonjour-service'
-import * as EventEmitter from 'events'
+import { EventEmitter } from 'events'
 import { DEFAULT_MDNS_QUERY_INTERVAL } from './constants.js'
 import { DeviceModelId, DeviceModelType, MODEL_NAMES } from '@elgato-stream-deck/core'
 import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'

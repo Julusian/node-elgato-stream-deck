@@ -1,6 +1,6 @@
 import type { DeviceModelId, ChildHIDDeviceInfo, OpenStreamDeckOptions, StreamDeck } from '@elgato-stream-deck/core'
 import type { JPEGEncodeOptions } from '@elgato-stream-deck/node-lib'
-import type { EventEmitter } from 'eventemitter3'
+import type { EventEmitter } from 'events'
 
 export interface OpenStreamDeckOptionsTcp extends OpenStreamDeckOptions {
 	/** JPEG quality options for default jpeg encoder */

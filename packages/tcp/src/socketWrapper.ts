@@ -1,5 +1,5 @@
 import { Socket } from 'net'
-import * as EventEmitter from 'events'
+import { EventEmitter } from 'events'
 import { CORA_MAGIC, DEFAULT_TCP_PORT, RECONNECT_INTERVAL, TIMEOUT_DURATION } from './constants.js'
 
 export interface SocketWrapperEvents {
