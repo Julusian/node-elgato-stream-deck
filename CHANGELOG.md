@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.3.4](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.3.3...v7.3.4) (2025-10-21)
+
+
+### Bug Fixes
+
+* **TCP:** Import EventEmitter correctly ([#126](https://github.com/Julusian/node-elgato-stream-deck/issues/126)) ([7d7e53e](https://github.com/Julusian/node-elgato-stream-deck/commit/7d7e53e46bb018fa8cfbd607e24f36f649ab7e8e))
+* unify eventemitter imports ([a55bf39](https://github.com/Julusian/node-elgato-stream-deck/commit/a55bf3964ec58f04a57319f7a722f786b93d3f51))
+
 ## [7.3.3](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.3.2...v7.3.3) (2025-10-08)
 
 
