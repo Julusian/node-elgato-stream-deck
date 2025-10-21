@@ -1,4 +1,4 @@
-import * as EventEmitter from 'events'
+import { EventEmitter } from 'events'
 import type { OpenStreamDeckOptionsTcp, StreamDeckTcp } from './types.js'
 import { DEFAULT_TCP_PORT } from './constants.js'
 import { SocketWrapper } from './socketWrapper.js'
