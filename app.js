@@ -4347,7 +4347,7 @@ function StreamDeckPedalFactory(device, options) {
 
 /* eslint-disable n/no-unsupported-features/node-builtins */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckWeb = exports.StreamDeckProxy = exports.DeviceModelId = exports.VENDOR_ID = void 0;
+exports.StreamDeckWeb = exports.getStreamDeckModelName = exports.StreamDeckProxy = exports.DeviceModelId = exports.VENDOR_ID = void 0;
 exports.requestStreamDecks = requestStreamDecks;
 exports.getStreamDecks = getStreamDecks;
 exports.openDevice = openDevice;
@@ -4359,6 +4359,7 @@ var core_2 = __webpack_require__(8601);
 Object.defineProperty(exports, "VENDOR_ID", ({ enumerable: true, get: function () { return core_2.VENDOR_ID; } }));
 Object.defineProperty(exports, "DeviceModelId", ({ enumerable: true, get: function () { return core_2.DeviceModelId; } }));
 Object.defineProperty(exports, "StreamDeckProxy", ({ enumerable: true, get: function () { return core_2.StreamDeckProxy; } }));
+Object.defineProperty(exports, "getStreamDeckModelName", ({ enumerable: true, get: function () { return core_2.getStreamDeckModelName; } }));
 var wrapper_js_2 = __webpack_require__(3026);
 Object.defineProperty(exports, "StreamDeckWeb", ({ enumerable: true, get: function () { return wrapper_js_2.StreamDeckWeb; } }));
 /**
@@ -4464,6 +4465,7 @@ async function encodeJPEG(buffer, width, height) {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DEVICE_MODELS = exports.DEVICE_MODELS2 = exports.DeviceModelType = exports.VENDOR_ID = exports.parseAllFirmwareVersionsHelper = exports.uint8ArrayToDataView = exports.StreamDeckProxy = void 0;
+exports.getStreamDeckModelName = getStreamDeckModelName;
 const tslib_1 = __webpack_require__(5823);
 const id_js_1 = __webpack_require__(6444);
 const original_js_1 = __webpack_require__(745);
@@ -4584,6 +4586,9 @@ exports.DEVICE_MODELS = Object.entries(exports.DEVICE_MODELS2).map(([id, spec]) 
     const modelId = id;
     return { id: modelId, productName: id_js_1.MODEL_NAMES[modelId], ...spec };
 });
+function getStreamDeckModelName(modelId) {
+    return id_js_1.MODEL_NAMES[modelId] || 'Unknown Stream Deck';
+}
 //# sourceMappingURL=index.js.map
 
 /***/ }),
