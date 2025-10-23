@@ -24,6 +24,7 @@ export {
 	StreamDeckTcpChildDeviceInfo,
 	OpenStreamDeckOptions,
 	PreparedBuffer,
+	getStreamDeckModelName,
 } from '@elgato-stream-deck/core'
 
 export { StreamDeckDeviceInfo, JPEGEncodeOptions }

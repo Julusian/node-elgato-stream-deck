@@ -157,3 +157,7 @@ export const DEVICE_MODELS: DeviceModelSpec[] = Object.entries<Omit<DeviceModelS
 	const modelId = id as any as DeviceModelId
 	return { id: modelId, productName: MODEL_NAMES[modelId], ...spec }
 })
+
+export function getStreamDeckModelName(modelId: DeviceModelId): string {
+	return MODEL_NAMES[modelId] || 'Unknown Stream Deck'
+}

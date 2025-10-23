@@ -25,6 +25,7 @@ export {
 	StreamDeckTcpChildDeviceInfo,
 	OpenStreamDeckOptions,
 	PreparedBuffer,
+	getStreamDeckModelName,
 } from '@elgato-stream-deck/core'
 
 export { StreamDeckWeb } from './wrapper.js'
