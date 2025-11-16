@@ -36,7 +36,14 @@ export class WebHIDDevice extends EventEmitter<HIDDeviceEvents> implements CoreH
 	}
 
 	public async sendFeatureReport(data: Uint8Array): Promise<void> {
-		return this.device.sendFeatureReport(data[0], data.subarray(1))
+		// Ensure the buffer is 32 bytes long
+		let dataFull = data
+		if (data.length != 32) {
+			dataFull = new Uint8Array(32)
+			dataFull.set(data.slice(0, Math.min(data.length, dataFull.length)))
+		}
+
+		return this.device.sendFeatureReport(dataFull[0], dataFull.subarray(1))
 	}
 	public async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
 		const view = await this.device.receiveFeatureReport(reportId)
