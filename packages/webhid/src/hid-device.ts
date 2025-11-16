@@ -11,6 +11,7 @@ export class WebHIDDevice extends EventEmitter<HIDDeviceEvents> implements CoreH
 	private readonly device: HIDDevice
 
 	private readonly reportQueue = new Queue({ concurrency: 1 })
+	private readonly reportByteLengths = new Map<number, number>();
 
 	constructor(device: HIDDevice) {
 		super()
@@ -25,6 +26,15 @@ export class WebHIDDevice extends EventEmitter<HIDDeviceEvents> implements CoreH
 				this.emit('input', data)
 			}
 		})
+
+		// calculate byte length for all feature reports
+		const featureReports = this.device.collections.map((c) => c.featureReports ?? []).flat();
+		for (const report of featureReports) {
+			if (report.reportId && report.items) {
+				const bitsLength = report.items.reduce((sum, item) => sum + (item.reportSize ?? 0) * (item.reportCount ?? 0), 0)
+				this.reportByteLengths.set(report.reportId, Math.ceil(bitsLength / 8.0))
+			}
+		}
 	}
 
 	public async close(): Promise<void> {
@@ -36,14 +46,15 @@ export class WebHIDDevice extends EventEmitter<HIDDeviceEvents> implements CoreH
 	}
 
 	public async sendFeatureReport(data: Uint8Array): Promise<void> {
-		// Ensure the buffer is 32 bytes long
-		let dataFull = data
-		if (data.length != 32) {
-			dataFull = new Uint8Array(32)
-			dataFull.set(data.slice(0, Math.min(data.length, dataFull.length)))
+		// Ensure the buffer is as long as required for the feature report
+		const byteLength = this.reportByteLengths.get(data[0])
+		let dataFull = data.subarray(1)
+		if (byteLength && dataFull.length != byteLength) {
+			dataFull = new Uint8Array(byteLength)
+			dataFull.set(data.subarray(1, Math.min(data.length-1, dataFull.length)))
 		}
 
-		return this.device.sendFeatureReport(dataFull[0], dataFull.subarray(1))
+		return this.device.sendFeatureReport(data[0], dataFull)
 	}
 	public async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
 		const view = await this.device.receiveFeatureReport(reportId)
