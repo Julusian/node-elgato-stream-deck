@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.4.0](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.3.4...v7.4.0) (2025-11-21)
+
+
+### Features
+
+* add getStreamDeckModelName ([469de22](https://github.com/Julusian/node-elgato-stream-deck/commit/469de22780e9fcc3018b1300bdafb31cdc99a922))
+
 ## [7.3.4](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.3.3...v7.3.4) (2025-10-21)
 
 
