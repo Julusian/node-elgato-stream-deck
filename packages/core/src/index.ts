@@ -59,7 +59,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	},
 	[DeviceModelId.MINI]: {
 		type: DeviceModelType.STREAMDECK,
-		productIds: [0x0063, 0x0090],
+		productIds: [0x0063, 0x0090, 0x00b3],
 		factory: (...args) => StreamDeck6KeyFactory(DeviceModelId.MINI, ...args),
 
 		hasNativeTcp: false,
