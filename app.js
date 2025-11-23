@@ -4504,7 +4504,7 @@ exports.DEVICE_MODELS2 = {
     },
     [id_js_1.DeviceModelId.MINI]: {
         type: DeviceModelType.STREAMDECK,
-        productIds: [0x0063, 0x0090],
+        productIds: [0x0063, 0x0090, 0x00b3],
         factory: (...args) => (0, _6_key_js_1.StreamDeck6KeyFactory)(id_js_1.DeviceModelId.MINI, ...args),
         hasNativeTcp: false,
     },
