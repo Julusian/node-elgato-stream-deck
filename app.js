@@ -2137,6 +2137,7 @@ const p_queue_1 = __webpack_require__(4968);
 class WebHIDDevice extends eventemitter3_1.EventEmitter {
     device;
     reportQueue = new p_queue_1.default({ concurrency: 1 });
+    reportByteLengths = new Map();
     constructor(device) {
         super();
         this.device = device;
@@ -2149,6 +2150,14 @@ class WebHIDDevice extends eventemitter3_1.EventEmitter {
                 this.emit('input', data);
             }
         });
+        // calculate byte length for all feature reports
+        const featureReports = this.device.collections.map((c) => c.featureReports ?? []).flat();
+        for (const report of featureReports) {
+            if (report.reportId && report.items) {
+                const bitsLength = report.items.reduce((sum, item) => sum + (item.reportSize ?? 0) * (item.reportCount ?? 0), 0);
+                this.reportByteLengths.set(report.reportId, Math.ceil(bitsLength / 8.0));
+            }
+        }
     }
     async close() {
         return this.device.close();
@@ -2157,7 +2166,14 @@ class WebHIDDevice extends eventemitter3_1.EventEmitter {
         return this.device.forget();
     }
     async sendFeatureReport(data) {
-        return this.device.sendFeatureReport(data[0], data.subarray(1));
+        // Ensure the buffer is as long as required for the feature report
+        const byteLength = this.reportByteLengths.get(data[0]);
+        let dataFull = data.subarray(1);
+        if (byteLength && dataFull.length != byteLength) {
+            dataFull = new Uint8Array(byteLength);
+            dataFull.set(data.subarray(1, Math.min(data.length - 1, dataFull.length)));
+        }
+        return this.device.sendFeatureReport(data[0], dataFull);
     }
     async getFeatureReport(reportId, _reportLength) {
         const view = await this.device.receiveFeatureReport(reportId);
