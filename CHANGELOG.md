@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.4.0](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.3.4...v7.4.0) (2025-11-23)
+
+
+### Features
+
+* add getStreamDeckModelName ([469de22](https://github.com/Julusian/node-elgato-stream-deck/commit/469de22780e9fcc3018b1300bdafb31cdc99a922))
+* Add support for Mini (Discord Edition) ([#134](https://github.com/Julusian/node-elgato-stream-deck/issues/134)) ([f58cc15](https://github.com/Julusian/node-elgato-stream-deck/commit/f58cc1585f1a716a21d2642e0f2a2f0a09059a58))
+
+
+### Bug Fixes
+
+* webhid feature report length not 32 bytes ([#130](https://github.com/Julusian/node-elgato-stream-deck/issues/130)) ([c75993c](https://github.com/Julusian/node-elgato-stream-deck/commit/c75993c139e06ffcbdb00dc8bb607e18ee14a3f3))
+
 ## [7.3.4](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.3.3...v7.3.4) (2025-10-21)
 
 
