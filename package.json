@@ -3,7 +3,6 @@
   "version": "7.3.4",
   "private": true,
   "scripts": {
-    "postinstall": "husky || true && run build:writefile && run build:whatsnew",
     "dev": "run build:root --watch",
     "dev:demo": "yarn workspace @elgato-stream-deck/webhid-demo start",
     "build": "run build:root && run build:udev && yarn workspace @elgato-stream-deck/webhid-demo build",
