@@ -52,9 +52,7 @@ export interface StreamdeckPlusHeaderProps {
 	width: number
 	height: number
 }
-export class StreamdeckPlusLcdImageHeaderGenerator
-	implements StreamdeckImageHeaderGenerator<StreamdeckPlusHeaderProps>
-{
+export class StreamdeckPlusLcdImageHeaderGenerator implements StreamdeckImageHeaderGenerator<StreamdeckPlusHeaderProps> {
 	getFillImageCommandHeaderLength(): number {
 		return 16
 	}

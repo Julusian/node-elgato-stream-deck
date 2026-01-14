@@ -24,9 +24,9 @@ export class StreamdeckOriginalImageWriter implements StreamdeckImageWriter {
 	}
 }
 
-export class StreamdeckDefaultImageWriter<TProps = StreamdeckImageWriterProps>
-	implements StreamdeckImageWriter<TProps>
-{
+export class StreamdeckDefaultImageWriter<
+	TProps = StreamdeckImageWriterProps,
+> implements StreamdeckImageWriter<TProps> {
 	private readonly headerGenerator: StreamdeckImageHeaderGenerator<TProps>
 
 	constructor(headerGenerator: StreamdeckImageHeaderGenerator<TProps>) {

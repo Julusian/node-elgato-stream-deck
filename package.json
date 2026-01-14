@@ -7,7 +7,7 @@
     "dev": "run build:root --watch",
     "dev:demo": "yarn workspace @elgato-stream-deck/webhid-demo start",
     "build": "run build:root && run build:udev && yarn workspace @elgato-stream-deck/webhid-demo build",
-    "build:root": "(run g:rimraf packages/*/dist || true) && run g:tsc --build tsconfig.build.json",
+    "build:root": "(rimraf packages/*/dist || true) && tsc --build tsconfig.build.json",
     "build:udev": "node ./scripts/regenerate-udev.mjs",
     "test": "run lint && run unit",
     "unit": "jest",
@@ -15,9 +15,7 @@
     "lint": "run lint:raw packages",
     "lint-fix": "run lint --fix",
     "validate:dependencies": "yarn npm audit && run license-validate",
-    "license-validate": "node ./scripts/license-check.mjs",
-    "g:tsc": "cd $INIT_CWD && tsc",
-    "g:rimraf": "cd $INIT_CWD && rimraf"
+    "license-validate": "node ./scripts/license-check.mjs"
   },
   "lint-staged": {
     "*.{css,json,md,scss}": [
@@ -28,29 +26,29 @@
     ]
   },
   "devDependencies": {
-    "@companion-module/tools": "^2.4.0",
+    "@companion-module/tools": "^2.5.0",
     "@julusian/jpeg-turbo": "^2.3.0",
-    "@tsconfig/node18": "^18.2.4",
+    "@tsconfig/node18": "^18.2.6",
     "@types/jest": "^30.0.0",
-    "@types/node": "^18.19.127",
-    "eslint": "^9.36.0",
-    "eslint-plugin-n": "^17.23.1",
-    "eslint-plugin-prettier": "^5.5.4",
+    "@types/node": "^18.19.130",
+    "eslint": "^9.39.2",
+    "eslint-plugin-n": "^17.23.2",
+    "eslint-plugin-prettier": "^5.5.5",
     "husky": "^9.1.7",
-    "jest": "^30.1.3",
-    "jest-mock": "^30.0.5",
+    "jest": "^30.2.0",
+    "jest-mock": "^30.2.0",
     "jimp": "^1.6.0",
-    "lint-staged": "^16.2.1",
+    "lint-staged": "^16.2.7",
     "lodash": "^4.17.21",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.4",
     "rimraf": "^5.0.10",
     "sharp": "^0.33.5",
-    "snyk-nodejs-lockfile-parser": "^2.2.2",
-    "ts-jest": "^29.4.4",
+    "snyk-nodejs-lockfile-parser": "^2.5.0",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
-    "typescript": "~5.9.2",
-    "typescript-eslint": "^8.44.1",
-    "udev-generator": "^1.0.1",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.53.0",
+    "udev-generator": "^1.0.2",
     "usb": "^2.16.0"
   },
   "workspaces": [
@@ -64,5 +62,5 @@
   "resolutions": {
     "@types/w3c-web-hid": "patch:@types/w3c-web-hid@npm%3A1.0.6#~/.yarn/patches/@types-w3c-web-hid-npm-1.0.6-ca95fc3332.patch"
   },
-  "packageManager": "yarn@4.10.3"
+  "packageManager": "yarn@4.12.0"
 }
