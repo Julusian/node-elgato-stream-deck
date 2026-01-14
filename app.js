@@ -2,8 +2,8 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 152:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 152
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -28,10 +28,10 @@ function lowerBound(array, value, comparator) {
 exports["default"] = lowerBound;
 
 
-/***/ }),
+/***/ },
 
-/***/ 442:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 442
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -65,10 +65,10 @@ function createBaseGen2Properties(device, options, properties, propertiesService
 }
 //# sourceMappingURL=generic-gen2.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 646:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 646
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -92,10 +92,10 @@ class StudioPropertiesService extends gen2_js_1.Gen2PropertiesService {
 exports.StudioPropertiesService = StudioPropertiesService;
 //# sourceMappingURL=studio.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 659:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 659
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -117,10 +117,10 @@ class CallbackHook {
 exports.CallbackHook = CallbackHook;
 //# sourceMappingURL=callback-hook.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 745:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 745
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -143,10 +143,10 @@ function StreamDeckOriginalFactory(device, options) {
 }
 //# sourceMappingURL=original.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 993:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 993
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -208,10 +208,10 @@ class Gen1PropertiesService {
 exports.Gen1PropertiesService = Gen1PropertiesService;
 //# sourceMappingURL=gen1.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 1215:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 1215
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -266,10 +266,10 @@ class RapidFillDemo {
 exports.RapidFillDemo = RapidFillDemo;
 
 
-/***/ }),
+/***/ },
 
-/***/ 1352:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 1352
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -324,10 +324,10 @@ class Gen2PropertiesService {
 exports.Gen2PropertiesService = Gen2PropertiesService;
 //# sourceMappingURL=gen2.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 1488:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 1488
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -340,10 +340,10 @@ class FakeInputService {
 exports.FakeInputService = FakeInputService;
 //# sourceMappingURL=fake.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 1510:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 1510
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -380,10 +380,10 @@ class FakeLcdService {
 exports.FakeLcdService = FakeLcdService;
 //# sourceMappingURL=fake.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 1562:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 1562
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -458,10 +458,10 @@ function StreamDeckPlusFactory(device, options) {
 }
 //# sourceMappingURL=plus.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 1889:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 1889
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -544,10 +544,10 @@ class ChaseDemo {
 exports.ChaseDemo = ChaseDemo;
 
 
-/***/ }),
+/***/ },
 
-/***/ 1990:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 1990
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -576,10 +576,10 @@ function StreamDeck15KeyFactory(model, device, options, _tcpPropertiesService) {
 }
 //# sourceMappingURL=15-key.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 2035:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 2035
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -647,19 +647,19 @@ class DomImageDemo {
 exports.DomImageDemo = DomImageDemo;
 
 
-/***/ }),
+/***/ },
 
-/***/ 2173:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 2173
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 //# sourceMappingURL=controlDefinition.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 2559:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ 2559
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
@@ -1630,10 +1630,10 @@ async function getFontEmbedCSS(node, options = {}) {
 }
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 2632:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 2632
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -1670,10 +1670,10 @@ class ButtonOnlyInputService {
 exports.ButtonOnlyInputService = ButtonOnlyInputService;
 //# sourceMappingURL=gen1.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 2646:
-/***/ ((module) => {
+/***/ 2646
+(module) {
 
 
 
@@ -2013,10 +2013,10 @@ if (true) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ 2769:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 2769
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2120,10 +2120,10 @@ class Gen2InputService extends gen1_js_1.ButtonOnlyInputService {
 exports.Gen2InputService = Gen2InputService;
 //# sourceMappingURL=gen2.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 2863:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 2863
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2201,10 +2201,10 @@ class WebHIDDevice extends eventemitter3_1.EventEmitter {
 exports.WebHIDDevice = WebHIDDevice;
 //# sourceMappingURL=hid-device.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 3026:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 3026
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2253,10 +2253,10 @@ class StreamDeckWeb extends core_1.StreamDeckProxy {
 exports.StreamDeckWeb = StreamDeckWeb;
 //# sourceMappingURL=wrapper.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 3117:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 3117
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2326,10 +2326,10 @@ class StreamdeckNeoLcdImageHeaderGenerator {
 exports.StreamdeckNeoLcdImageHeaderGenerator = StreamdeckNeoLcdImageHeaderGenerator;
 //# sourceMappingURL=headerGenerator.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 3339:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 3339
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2359,10 +2359,10 @@ async function parseAllFirmwareVersionsHelper(reportData) {
 }
 //# sourceMappingURL=all-firmware.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 3483:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 3483
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2384,10 +2384,10 @@ class BitmapButtonLcdImagePacker {
 exports.BitmapButtonLcdImagePacker = BitmapButtonLcdImagePacker;
 //# sourceMappingURL=bitmap.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 3582:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 3582
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2408,10 +2408,10 @@ class JpegButtonLcdImagePacker {
 exports.JpegButtonLcdImagePacker = JpegButtonLcdImagePacker;
 //# sourceMappingURL=jpeg.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 3651:
-/***/ ((module) => {
+/***/ 3651
+(module) {
 
 
 module.exports = (promise, onFinally) => {
@@ -2430,10 +2430,10 @@ module.exports = (promise, onFinally) => {
 };
 
 
-/***/ }),
+/***/ },
 
-/***/ 3794:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 3794
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2469,10 +2469,10 @@ function freezeDefinitions(controls) {
 }
 //# sourceMappingURL=controlsGenerator.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 3845:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 3845
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2521,10 +2521,10 @@ class StreamdeckDefaultImageWriter {
 exports.StreamdeckDefaultImageWriter = StreamdeckDefaultImageWriter;
 //# sourceMappingURL=imageWriter.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 3874:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 3874
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2558,10 +2558,10 @@ class PedalPropertiesService {
 exports.PedalPropertiesService = PedalPropertiesService;
 //# sourceMappingURL=pedal.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 4154:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 4154
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2599,10 +2599,10 @@ class NetworkDockPropertiesService {
 exports.NetworkDockPropertiesService = NetworkDockPropertiesService;
 //# sourceMappingURL=network-dock.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 4369:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 4369
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2678,10 +2678,10 @@ function uint8ArrayToDataView(buffer) {
 }
 //# sourceMappingURL=util.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 4777:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 4777
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2763,10 +2763,10 @@ class EncoderLedService {
 exports.EncoderLedService = EncoderLedService;
 //# sourceMappingURL=encoderLed.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 4964:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 4964
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2796,10 +2796,10 @@ class FillWhenPressedDemo {
 exports.FillWhenPressedDemo = FillWhenPressedDemo;
 
 
-/***/ }),
+/***/ },
 
-/***/ 4968:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 4968
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -3082,19 +3082,19 @@ class PQueue extends EventEmitter {
 exports["default"] = PQueue;
 
 
-/***/ }),
+/***/ },
 
-/***/ 5064:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 5064
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 //# sourceMappingURL=types.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 5220:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 5220
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -3121,10 +3121,10 @@ function StreamDeck6KeyFactory(model, device, options, _tcpPropertiesService) {
 }
 //# sourceMappingURL=6-key.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 5448:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 5448
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -3162,10 +3162,10 @@ function NetworkDockFactory(device, options, _tcpPropertiesService) {
 }
 //# sourceMappingURL=network-dock.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 5614:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 5614
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -3220,10 +3220,10 @@ prepared) {
 }
 //# sourceMappingURL=preparedBuffer.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 5823:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+/***/ 5823
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -3664,10 +3664,10 @@ function __rewriteRelativeImportExtension(path, preserveJsx) {
 });
 
 
-/***/ }),
+/***/ },
 
-/***/ 5864:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 5864
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -3761,10 +3761,10 @@ class StreamDeckPlusLcdService {
 exports.StreamDeckPlusLcdService = StreamDeckPlusLcdService;
 //# sourceMappingURL=plus.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 6061:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 6061
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -3793,10 +3793,10 @@ function StreamDeck32KeyFactory(model, device, options, _tcpPropertiesService) {
 }
 //# sourceMappingURL=32-key.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 6444:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 6444
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -3836,10 +3836,10 @@ exports.MODEL_NAMES = {
 };
 //# sourceMappingURL=id.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 6481:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 6481
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -3995,10 +3995,10 @@ class StreamDeckProxy {
 exports.StreamDeckProxy = StreamDeckProxy;
 //# sourceMappingURL=proxy.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 7067:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 7067
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -4166,10 +4166,10 @@ class StreamDeckBase extends eventemitter3_1.EventEmitter {
 exports.StreamDeckBase = StreamDeckBase;
 //# sourceMappingURL=base.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 7325:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 7325
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -4235,10 +4235,10 @@ class StreamDeckNeoLcdService {
 exports.StreamDeckNeoLcdService = StreamDeckNeoLcdService;
 //# sourceMappingURL=neo.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 7724:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 7724
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -4288,10 +4288,10 @@ function StreamDeckStudioFactory(device, options, propertiesService) {
 }
 //# sourceMappingURL=studio.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 7756:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 7756
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -4355,10 +4355,10 @@ function StreamDeckPedalFactory(device, options) {
 }
 //# sourceMappingURL=pedal.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 8253:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 8253
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 /* eslint-disable n/no-unsupported-features/node-builtins */
@@ -4431,10 +4431,10 @@ async function openDevice(browserDevice, userOptions) {
 }
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 8443:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 8443
+(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -4473,10 +4473,10 @@ async function encodeJPEG(buffer, width, height) {
 }
 //# sourceMappingURL=jpeg.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 8601:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 8601
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -4607,10 +4607,10 @@ function getStreamDeckModelName(modelId) {
 }
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 8856:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 8856
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -4646,10 +4646,10 @@ class PriorityQueue {
 exports["default"] = PriorityQueue;
 
 
-/***/ }),
+/***/ },
 
-/***/ 9210:
-/***/ ((module) => {
+/***/ 9210
+(module) {
 
 
 
@@ -4989,10 +4989,10 @@ if (true) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ 9350:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 9350
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -5049,10 +5049,10 @@ function StreamDeckNeoFactory(device, options) {
 }
 //# sourceMappingURL=neo.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 9367:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 9367
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -5086,10 +5086,10 @@ function StreamDeckGen1Factory(device, options, properties, imageWriter, targetO
 }
 //# sourceMappingURL=generic-gen1.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 9455:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ 9455
+(module, __unused_webpack_exports, __webpack_require__) {
 
 
 
@@ -5150,10 +5150,10 @@ module.exports["default"] = pTimeout;
 module.exports.TimeoutError = TimeoutError;
 
 
-/***/ }),
+/***/ },
 
-/***/ 9826:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 9826
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -5397,7 +5397,7 @@ class DefaultButtonsLcdService {
 exports.DefaultButtonsLcdService = DefaultButtonsLcdService;
 //# sourceMappingURL=default.js.map
 
-/***/ })
+/***/ }
 
 /******/ 	});
 /************************************************************************/
