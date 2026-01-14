@@ -12,6 +12,7 @@ import { StreamDeckNeoFactory } from './models/neo.js'
 import { StreamDeckStudioFactory } from './models/studio.js'
 import type { PropertiesService } from './services/properties/interface.js'
 import { NetworkDockFactory } from './models/network-dock.js'
+import { StreamDeckPlusXlFactory } from './models/plus-xl.js'
 
 export * from './types.js'
 export * from './id.js'
@@ -147,6 +148,13 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 		factory: NetworkDockFactory,
 
 		hasNativeTcp: true,
+	},
+	[DeviceModelId.PLUS_XL]: {
+		type: DeviceModelType.STREAMDECK,
+		productIds: [0x00c6],
+		factory: StreamDeckPlusXlFactory,
+
+		hasNativeTcp: false,
 	},
 }
 
