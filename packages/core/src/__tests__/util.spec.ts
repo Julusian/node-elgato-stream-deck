@@ -82,4 +82,30 @@ describe('imageToByteArray', () => {
 		)
 		expect(res).toMatchSnapshot()
 	})
+
+	test('non-square rotation', () => {
+		const srcBuffer = getSimpleBuffer(4, 1, 3)
+		const res = transformImageBuffer(
+			srcBuffer,
+			{ format: 'bgr', offset: 0, stride: 4 * 3 },
+			{ colorMode: 'bgr', rotate: true },
+			4,
+			4,
+			1,
+		)
+		expect(res).toMatchSnapshot()
+	})
+
+	test('non-square rotation with flip', () => {
+		const srcBuffer = getSimpleBuffer(4, 1, 3)
+		const res = transformImageBuffer(
+			srcBuffer,
+			{ format: 'bgr', offset: 0, stride: 4 * 3 },
+			{ colorMode: 'bgr', rotate: true, xFlip: true },
+			4,
+			4,
+			1,
+		)
+		expect(res).toMatchSnapshot()
+	})
 })

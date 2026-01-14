@@ -15,6 +15,8 @@ const { listStreamDecks, openStreamDeck, DeviceModelId } = require('../dist/inde
 
 	const sampleButton = streamDeck.CONTROLS.find((c) => c.type === 'button' && c.feedbackType === 'lcd')
 	if (!sampleButton) throw new Error('No LCD button found')
+	const lcdSegment = streamDeck.CONTROLS.find((c) => c.type === 'lcd-segment')
+	if (!lcdSegment) throw new Error('No LCD segment found')
 
 	const img = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 		.flatten()
@@ -24,13 +26,13 @@ const { listStreamDecks, openStreamDeck, DeviceModelId } = require('../dist/inde
 
 	const img3 = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 		.flatten()
-		.resize(800, 100)
+		.resize(lcdSegment.pixelSize.width, lcdSegment.pixelSize.height)
 		.raw()
 		.toBuffer()
 
 	await streamDeck.fillLcdRegion(0, 0, 0, img3, {
-		width: 800,
-		height: 100,
+		width: lcdSegment.pixelSize.width,
+		height: lcdSegment.pixelSize.height,
 		// stride: 800 * 3,
 		// offset: 0,
 		format: 'rgb',
