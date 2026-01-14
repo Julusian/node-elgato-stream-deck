@@ -58,7 +58,7 @@ export function StreamDeckStudioFactory(
 		options,
 		studioProperties,
 		propertiesService ?? new StudioPropertiesService(device),
-		true,
+		{ xFlip: false, yFlip: false },
 	)
 	return new StreamDeckBase(device, options, services)
 }
