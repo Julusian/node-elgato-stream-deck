@@ -8,7 +8,7 @@ import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 import type { StreamDeckControlDefinition, StreamDeckLcdSegmentControlDefinition } from '../controlDefinition.js'
 import { StreamDeckPlusLcdService } from '../services/lcdSegmentDisplay/plus.js'
 
-const plusXlControls: StreamDeckControlDefinition[] = generateButtonsGrid(9, 4, { width: 80, height: 80 })
+const plusXlControls: StreamDeckControlDefinition[] = generateButtonsGrid(9, 4, { width: 112, height: 112 })
 plusXlControls.push(
 	{
 		type: 'lcd-segment',
