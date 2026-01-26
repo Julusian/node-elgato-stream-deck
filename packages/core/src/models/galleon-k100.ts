@@ -87,7 +87,7 @@ export async function GalleonK100Factory(
 	return streamDeck
 }
 
-export class GalleonK100StreamDeck extends StreamDeckBase {
+class GalleonK100StreamDeck extends StreamDeckBase {
 	readonly #pingInterval: NodeJS.Timeout
 
 	constructor(
