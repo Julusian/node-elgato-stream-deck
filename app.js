@@ -43,7 +43,6 @@ const callback_hook_js_1 = __webpack_require__(659);
 const gen2_js_1 = __webpack_require__(1352);
 const jpeg_js_1 = __webpack_require__(3582);
 const gen2_js_2 = __webpack_require__(2769);
-const encoderLed_js_1 = __webpack_require__(4777);
 function extendDevicePropertiesForGen2(rawProps) {
     return {
         ...rawProps,
@@ -60,7 +59,7 @@ function createBaseGen2Properties(device, options, properties, propertiesService
         buttonsLcd: new default_js_1.DefaultButtonsLcdService(new imageWriter_js_1.StreamdeckDefaultImageWriter(new headerGenerator_js_1.StreamdeckGen2ImageHeaderGenerator()), new jpeg_js_1.JpegButtonLcdImagePacker(options.encodeJPEG, !disableXYFlip), device, fullProperties),
         lcdSegmentDisplay: null,
         inputService: new gen2_js_2.Gen2InputService(fullProperties, events),
-        encoderLed: new encoderLed_js_1.EncoderLedService(device, properties.CONTROLS),
+        encoderLed: null,
     };
 }
 //# sourceMappingURL=generic-gen2.js.map
@@ -392,7 +391,7 @@ const base_js_1 = __webpack_require__(7067);
 const generic_gen2_js_1 = __webpack_require__(442);
 const id_js_1 = __webpack_require__(6444);
 const controlsGenerator_js_1 = __webpack_require__(3794);
-const plus_js_1 = __webpack_require__(5864);
+const generic_js_1 = __webpack_require__(2026);
 const plusControls = (0, controlsGenerator_js_1.generateButtonsGrid)(4, 2, { width: 120, height: 120 });
 plusControls.push({
     type: 'lcd-segment',
@@ -453,7 +452,7 @@ const plusProperties = {
 const lcdSegmentControls = plusProperties.CONTROLS.filter((control) => control.type === 'lcd-segment');
 function StreamDeckPlusFactory(device, options) {
     const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, plusProperties, null, true);
-    services.lcdSegmentDisplay = new plus_js_1.StreamDeckPlusLcdService(options.encodeJPEG, device, lcdSegmentControls);
+    services.lcdSegmentDisplay = new generic_js_1.StreamdeckDefaultLcdService(options.encodeJPEG, device, lcdSegmentControls);
     return new base_js_1.StreamDeckBase(device, options, services);
 }
 //# sourceMappingURL=plus.js.map
@@ -575,6 +574,103 @@ function StreamDeck15KeyFactory(model, device, options, _tcpPropertiesService) {
     return new base_js_1.StreamDeckBase(device, options, services);
 }
 //# sourceMappingURL=15-key.js.map
+
+/***/ },
+
+/***/ 2026
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StreamdeckDefaultLcdService = void 0;
+const headerGenerator_js_1 = __webpack_require__(3117);
+const imageWriter_js_1 = __webpack_require__(3845);
+const util_js_1 = __webpack_require__(4369);
+const preparedBuffer_js_1 = __webpack_require__(5614);
+const id_js_1 = __webpack_require__(6444);
+class StreamdeckDefaultLcdService {
+    #encodeJPEG;
+    #device;
+    #lcdControls;
+    #lcdImageWriter = new imageWriter_js_1.StreamdeckDefaultImageWriter(new headerGenerator_js_1.StreamdeckDefaultLcdImageHeaderGenerator());
+    constructor(encodeJPEG, device, lcdControls) {
+        this.#encodeJPEG = encodeJPEG;
+        this.#device = device;
+        this.#lcdControls = lcdControls;
+    }
+    async fillLcd(index, buffer, sourceOptions) {
+        const lcdControl = this.#lcdControls.find((control) => control.id === index);
+        if (!lcdControl)
+            throw new Error(`Invalid lcd segment index ${index}`);
+        const packets = await this.prepareFillControlRegion(lcdControl, 0, 0, buffer, {
+            format: sourceOptions.format,
+            width: lcdControl.pixelSize.width,
+            height: lcdControl.pixelSize.height,
+        });
+        await this.#device.sendReports(packets);
+    }
+    async fillLcdRegion(index, x, y, imageBuffer, sourceOptions) {
+        const lcdControl = this.#lcdControls.find((control) => control.id === index);
+        if (!lcdControl)
+            throw new Error(`Invalid lcd segment index ${index}`);
+        const packets = await this.prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions);
+        await this.#device.sendReports(packets);
+    }
+    async prepareFillLcdRegion(index, x, y, imageBuffer, sourceOptions, jsonSafe) {
+        const lcdControl = this.#lcdControls.find((control) => control.id === index);
+        if (!lcdControl)
+            throw new Error(`Invalid lcd segment index ${index}`);
+        const packets = await this.prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions);
+        return (0, preparedBuffer_js_1.wrapBufferToPreparedBuffer)(id_js_1.DeviceModelId.PLUS, 'fill-lcd-region', packets, jsonSafe ?? false);
+    }
+    async clearLcdSegment(index) {
+        const lcdControl = this.#lcdControls.find((control) => control.id === index);
+        if (!lcdControl)
+            throw new Error(`Invalid lcd segment index ${index}`);
+        const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4);
+        const packets = await this.prepareFillControlRegion(lcdControl, 0, 0, buffer, {
+            format: 'rgba',
+            width: lcdControl.pixelSize.width,
+            height: lcdControl.pixelSize.height,
+        });
+        await this.#device.sendReports(packets);
+    }
+    async clearAllLcdSegments() {
+        const ps = [];
+        for (const control of this.#lcdControls) {
+            ps.push(this.clearLcdSegment(control.id));
+        }
+        await Promise.all(ps);
+    }
+    async prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions) {
+        // Basic bounds checking
+        const maxSize = lcdControl.pixelSize;
+        if (x < 0 || x + sourceOptions.width > maxSize.width) {
+            throw new TypeError(`Image will not fit within the lcd segment`);
+        }
+        if (y < 0 || y + sourceOptions.height > maxSize.height) {
+            throw new TypeError(`Image will not fit within the lcd segment`);
+        }
+        const imageSize = sourceOptions.width * sourceOptions.height * sourceOptions.format.length;
+        if (imageBuffer.length !== imageSize) {
+            throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
+        }
+        // A lot of this drawing code is heavily based on the normal button
+        const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions);
+        return this.#lcdImageWriter.generateFillImageWrites({ ...sourceOptions, x, y }, byteBuffer);
+    }
+    async convertFillLcdBuffer(sourceBuffer, sourceOptions) {
+        const sourceOptions2 = {
+            format: sourceOptions.format,
+            offset: 0,
+            stride: sourceOptions.width * sourceOptions.format.length,
+        };
+        const byteBuffer = (0, util_js_1.transformImageBuffer)(sourceBuffer, sourceOptions2, { colorMode: 'rgba' }, 0, sourceOptions.width, sourceOptions.height);
+        return this.#encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height);
+    }
+}
+exports.StreamdeckDefaultLcdService = StreamdeckDefaultLcdService;
+//# sourceMappingURL=generic.js.map
 
 /***/ },
 
@@ -1632,6 +1728,87 @@ async function getFontEmbedCSS(node, options = {}) {
 
 /***/ },
 
+/***/ 2564
+(__unused_webpack_module, exports) {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GalleonK100EncoderLedService = void 0;
+class GalleonK100EncoderLedService {
+    #device;
+    #encoderControls;
+    constructor(device, allControls) {
+        this.#device = device;
+        this.#encoderControls = allControls.filter((control) => control.type === 'encoder');
+    }
+    async clearAll() {
+        const ps = [];
+        for (const control of this.#encoderControls) {
+            if (control.ledRingSteps > 0)
+                ps.push(this.setEncoderRingSingleColor(control.index, 0, 0, 0));
+        }
+        await Promise.all(ps);
+    }
+    async setEncoderColor(encoder, _red, _green, _blue) {
+        const control = this.#encoderControls.find((c) => c.index === encoder);
+        if (!control)
+            throw new Error(`Invalid encoder index ${encoder}`);
+        throw new Error('Encoder does not have an LED');
+    }
+    async setEncoderRingSingleColor(encoder, red, green, blue) {
+        const control = this.#encoderControls.find((c) => c.index === encoder);
+        if (!control)
+            throw new Error(`Invalid encoder index ${encoder}`);
+        if (control.ledRingSteps <= 0)
+            throw new Error('Encoder does not have an LED ring');
+        // Assume them all the same number of steps
+        const offset = (1 - encoder) * control.ledRingSteps;
+        const ps = [];
+        for (let i = 0; i < control.ledRingSteps; i++) {
+            ps.push(this.#sendEncoderPixelColor(offset + i, red, green, blue));
+        }
+        await Promise.all(ps);
+    }
+    async setEncoderRingColors(encoder, colors) {
+        const control = this.#encoderControls.find((c) => c.index === encoder);
+        if (!control)
+            throw new Error(`Invalid encoder index ${encoder}`);
+        if (control.ledRingSteps <= 0)
+            throw new Error('Encoder does not have an LED ring');
+        if (colors.length !== control.ledRingSteps * 3)
+            throw new Error('Invalid colors length');
+        let colorsArray = colors instanceof Uint8Array ? Array.from(colors) : colors;
+        // If there is an offset, repack the buffer to change the start point
+        if (control.lcdRingOffset) {
+            const oldColorsArray = colorsArray;
+            colorsArray = [];
+            colorsArray.push(...oldColorsArray.slice(control.lcdRingOffset * 3));
+            colorsArray.push(...oldColorsArray.slice(0, control.lcdRingOffset * 3));
+        }
+        // Assume them all the same number of steps
+        const offset = (1 - encoder) * control.ledRingSteps;
+        const ps = [];
+        for (let i = 0; i < control.ledRingSteps; i++) {
+            ps.push(this.#sendEncoderPixelColor(offset + i, colorsArray[i * 3], colorsArray[i * 3 + 1], colorsArray[i * 3 + 2]));
+        }
+        await Promise.all(ps);
+    }
+    async #sendEncoderPixelColor(index, red, green, blue) {
+        const buffer = new Uint8Array(6);
+        buffer[0] = 0x03;
+        buffer[1] = 0x24;
+        buffer[2] = index;
+        buffer[3] = red;
+        buffer[4] = green;
+        buffer[5] = blue;
+        await this.#device.sendFeatureReport(buffer);
+    }
+}
+exports.GalleonK100EncoderLedService = GalleonK100EncoderLedService;
+//# sourceMappingURL=galleonK100.js.map
+
+/***/ },
+
 /***/ 2632
 (__unused_webpack_module, exports) {
 
@@ -2260,7 +2437,7 @@ exports.StreamDeckWeb = StreamDeckWeb;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamdeckNeoLcdImageHeaderGenerator = exports.StreamdeckPlusLcdImageHeaderGenerator = exports.StreamdeckGen2ImageHeaderGenerator = exports.StreamdeckGen1ImageHeaderGenerator = void 0;
+exports.StreamdeckNeoLcdImageHeaderGenerator = exports.StreamdeckDefaultLcdImageHeaderGenerator = exports.StreamdeckGen2ImageHeaderGenerator = exports.StreamdeckGen1ImageHeaderGenerator = void 0;
 const util_js_1 = __webpack_require__(4369);
 class StreamdeckGen1ImageHeaderGenerator {
     getFillImageCommandHeaderLength() {
@@ -2291,7 +2468,7 @@ class StreamdeckGen2ImageHeaderGenerator {
     }
 }
 exports.StreamdeckGen2ImageHeaderGenerator = StreamdeckGen2ImageHeaderGenerator;
-class StreamdeckPlusLcdImageHeaderGenerator {
+class StreamdeckDefaultLcdImageHeaderGenerator {
     getFillImageCommandHeaderLength() {
         return 16;
     }
@@ -2308,7 +2485,7 @@ class StreamdeckPlusLcdImageHeaderGenerator {
         bufferView.setUint16(13, bodyLength, true);
     }
 }
-exports.StreamdeckPlusLcdImageHeaderGenerator = StreamdeckPlusLcdImageHeaderGenerator;
+exports.StreamdeckDefaultLcdImageHeaderGenerator = StreamdeckDefaultLcdImageHeaderGenerator;
 class StreamdeckNeoLcdImageHeaderGenerator {
     getFillImageCommandHeaderLength() {
         return 8;
@@ -2325,6 +2502,102 @@ class StreamdeckNeoLcdImageHeaderGenerator {
 }
 exports.StreamdeckNeoLcdImageHeaderGenerator = StreamdeckNeoLcdImageHeaderGenerator;
 //# sourceMappingURL=headerGenerator.js.map
+
+/***/ },
+
+/***/ 3127
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GalleonK100StreamDeck = void 0;
+exports.GalleonK100Factory = GalleonK100Factory;
+const base_js_1 = __webpack_require__(7067);
+const generic_gen2_js_1 = __webpack_require__(442);
+const id_js_1 = __webpack_require__(6444);
+const controlsGenerator_js_1 = __webpack_require__(3794);
+const galleonK100_js_1 = __webpack_require__(2564);
+const generic_js_1 = __webpack_require__(2026);
+const k100Controls = (0, controlsGenerator_js_1.generateButtonsGrid)(3, 4, { width: 160, height: 160 }, false, 0, 2);
+k100Controls.push({
+    type: 'encoder',
+    row: 0,
+    column: 0,
+    index: 0,
+    hidIndex: 0,
+    hasLed: false,
+    ledRingSteps: 4,
+    lcdRingOffset: 3,
+}, {
+    type: 'encoder',
+    row: 0,
+    column: 2,
+    index: 1,
+    hidIndex: 1,
+    hasLed: false,
+    ledRingSteps: 4,
+    lcdRingOffset: 1,
+}, {
+    type: 'lcd-segment',
+    row: 1,
+    column: 0,
+    columnSpan: 3,
+    rowSpan: 1,
+    id: 0,
+    pixelSize: Object.freeze({
+        width: 720,
+        height: 384,
+    }),
+    drawRegions: true,
+});
+const galleonK100Properties = {
+    MODEL: id_js_1.DeviceModelId.GALLEON_K100,
+    PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.GALLEON_K100],
+    SUPPORTS_RGB_KEY_FILL: true, // TODO - verify SUPPORTS_RGB_KEY_FILL
+    CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)(k100Controls),
+    KEY_SPACING_HORIZONTAL: 64,
+    KEY_SPACING_VERTICAL: 64,
+    FULLSCREEN_PANELS: 0,
+    HAS_NFC_READER: false,
+    SUPPORTS_CHILD_DEVICES: false,
+};
+const lcdSegmentControls = galleonK100Properties.CONTROLS.filter((control) => control.type === 'lcd-segment');
+async function GalleonK100Factory(device, options, _tcpPropertiesService) {
+    const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, galleonK100Properties, null, true);
+    services.encoderLed = new galleonK100_js_1.GalleonK100EncoderLedService(device, galleonK100Properties.CONTROLS);
+    services.lcdSegmentDisplay = new generic_js_1.StreamdeckDefaultLcdService(options.encodeJPEG, device, lcdSegmentControls);
+    const streamDeck = new GalleonK100StreamDeck(device, options, services);
+    // Wait for the device to be ready
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    return streamDeck;
+}
+class GalleonK100StreamDeck extends base_js_1.StreamDeckBase {
+    #pingInterval;
+    constructor(device, options, services) {
+        super(device, options, services);
+        // Stop the ping upon error
+        device.on('error', () => this.#stopPing());
+        this.#pingInterval = setInterval(this.#sendPing, 500);
+        this.#sendPing();
+    }
+    async close() {
+        this.#stopPing();
+        return super.close();
+    }
+    #sendPing = () => {
+        this.device.sendFeatureReport(new Uint8Array([0x03, 0x27])).catch((e) => {
+            // Emit as an error on the streamdeck
+            this.emit('error', e);
+            this.#stopPing();
+        });
+    };
+    #stopPing() {
+        // Stop pinging
+        clearInterval(this.#pingInterval);
+    }
+}
+exports.GalleonK100StreamDeck = GalleonK100StreamDeck;
+//# sourceMappingURL=galleon-k100.js.map
 
 /***/ },
 
@@ -2439,7 +2712,7 @@ module.exports = (promise, onFinally) => {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateButtonsGrid = generateButtonsGrid;
 exports.freezeDefinitions = freezeDefinitions;
-function generateButtonsGrid(width, height, pixelSize, rtl = false, columnOffset = 0) {
+function generateButtonsGrid(width, height, pixelSize, rtl = false, columnOffset = 0, rowOffset = 0) {
     const controls = [];
     for (let row = 0; row < height; row++) {
         for (let column = 0; column < width; column++) {
@@ -2447,7 +2720,7 @@ function generateButtonsGrid(width, height, pixelSize, rtl = false, columnOffset
             const hidIndex = rtl ? flipKeyIndex(width, index) : index;
             controls.push({
                 type: 'button',
-                row,
+                row: row + rowOffset,
                 column: column + columnOffset,
                 index,
                 hidIndex,
@@ -2601,6 +2874,91 @@ exports.NetworkDockPropertiesService = NetworkDockPropertiesService;
 
 /***/ },
 
+/***/ 4258
+(__unused_webpack_module, exports) {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StudioEncoderLedService = void 0;
+class StudioEncoderLedService {
+    #device;
+    #encoderControls;
+    constructor(device, allControls) {
+        this.#device = device;
+        this.#encoderControls = allControls.filter((control) => control.type === 'encoder');
+    }
+    async clearAll() {
+        const ps = [];
+        for (const control of this.#encoderControls) {
+            if (control.hasLed)
+                ps.push(this.setEncoderColor(control.index, 0, 0, 0));
+            if (control.ledRingSteps > 0)
+                ps.push(this.setEncoderRingSingleColor(control.index, 0, 0, 0));
+        }
+        await Promise.all(ps);
+    }
+    async setEncoderColor(encoder, red, green, blue) {
+        const control = this.#encoderControls.find((c) => c.index === encoder);
+        if (!control)
+            throw new Error(`Invalid encoder index ${encoder}`);
+        if (!control.hasLed)
+            throw new Error('Encoder does not have an LED');
+        const buffer = new Uint8Array(1024);
+        buffer[0] = 0x02;
+        buffer[1] = 0x10;
+        buffer[2] = encoder;
+        buffer[3] = red;
+        buffer[4] = green;
+        buffer[5] = blue;
+        await this.#device.sendReports([buffer]);
+    }
+    async setEncoderRingSingleColor(encoder, red, green, blue) {
+        const control = this.#encoderControls.find((c) => c.index === encoder);
+        if (!control)
+            throw new Error(`Invalid encoder index ${encoder}`);
+        if (control.ledRingSteps <= 0)
+            throw new Error('Encoder does not have an LED ring');
+        const buffer = new Uint8Array(1024);
+        buffer[0] = 0x02;
+        buffer[1] = 0x0f;
+        buffer[2] = encoder;
+        for (let i = 0; i < control.ledRingSteps; i++) {
+            const offset = 3 + i * 3;
+            buffer[offset] = red;
+            buffer[offset + 1] = green;
+            buffer[offset + 2] = blue;
+        }
+        await this.#device.sendReports([buffer]);
+    }
+    async setEncoderRingColors(encoder, colors) {
+        const control = this.#encoderControls.find((c) => c.index === encoder);
+        if (!control)
+            throw new Error(`Invalid encoder index ${encoder}`);
+        if (control.ledRingSteps <= 0)
+            throw new Error('Encoder does not have an LED ring');
+        if (colors.length !== control.ledRingSteps * 3)
+            throw new Error('Invalid colors length');
+        let colorsBuffer = colors instanceof Uint8Array ? colors : new Uint8Array(colors);
+        // If there is an offset, repack the buffer to change the start point
+        if (control.lcdRingOffset) {
+            const oldColorsBuffer = colorsBuffer;
+            colorsBuffer = new Uint8Array(oldColorsBuffer.length);
+            colorsBuffer.set(oldColorsBuffer.slice(control.lcdRingOffset * 3), 0);
+            colorsBuffer.set(oldColorsBuffer.slice(0, control.lcdRingOffset * 3), control.lcdRingOffset * 3);
+        }
+        const buffer = new Uint8Array(1024);
+        buffer[0] = 0x02;
+        buffer[1] = 0x0f;
+        buffer[2] = encoder;
+        buffer.set(colorsBuffer, 3);
+        await this.#device.sendReports([buffer]);
+    }
+}
+exports.StudioEncoderLedService = StudioEncoderLedService;
+//# sourceMappingURL=studio.js.map
+
+/***/ },
+
 /***/ 4369
 (__unused_webpack_module, exports) {
 
@@ -2677,91 +3035,6 @@ function uint8ArrayToDataView(buffer) {
     return new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
 }
 //# sourceMappingURL=util.js.map
-
-/***/ },
-
-/***/ 4777
-(__unused_webpack_module, exports) {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.EncoderLedService = void 0;
-class EncoderLedService {
-    #device;
-    #encoderControls;
-    constructor(device, allControls) {
-        this.#device = device;
-        this.#encoderControls = allControls.filter((control) => control.type === 'encoder');
-    }
-    async clearAll() {
-        const ps = [];
-        for (const control of this.#encoderControls) {
-            if (control.hasLed)
-                ps.push(this.setEncoderColor(control.index, 0, 0, 0));
-            if (control.ledRingSteps > 0)
-                ps.push(this.setEncoderRingSingleColor(control.index, 0, 0, 0));
-        }
-        await Promise.all(ps);
-    }
-    async setEncoderColor(encoder, red, green, blue) {
-        const control = this.#encoderControls.find((c) => c.index === encoder);
-        if (!control)
-            throw new Error(`Invalid encoder index ${encoder}`);
-        if (!control.hasLed)
-            throw new Error('Encoder does not have an LED');
-        const buffer = new Uint8Array(1024);
-        buffer[0] = 0x02;
-        buffer[1] = 0x10;
-        buffer[2] = encoder;
-        buffer[3] = red;
-        buffer[4] = green;
-        buffer[5] = blue;
-        await this.#device.sendReports([buffer]);
-    }
-    async setEncoderRingSingleColor(encoder, red, green, blue) {
-        const control = this.#encoderControls.find((c) => c.index === encoder);
-        if (!control)
-            throw new Error(`Invalid encoder index ${encoder}`);
-        if (control.ledRingSteps <= 0)
-            throw new Error('Encoder does not have an LED ring');
-        const buffer = new Uint8Array(1024);
-        buffer[0] = 0x02;
-        buffer[1] = 0x0f;
-        buffer[2] = encoder;
-        for (let i = 0; i < control.ledRingSteps; i++) {
-            const offset = 3 + i * 3;
-            buffer[offset] = red;
-            buffer[offset + 1] = green;
-            buffer[offset + 2] = blue;
-        }
-        await this.#device.sendReports([buffer]);
-    }
-    async setEncoderRingColors(encoder, colors) {
-        const control = this.#encoderControls.find((c) => c.index === encoder);
-        if (!control)
-            throw new Error(`Invalid encoder index ${encoder}`);
-        if (control.ledRingSteps <= 0)
-            throw new Error('Encoder does not have an LED ring');
-        if (colors.length !== control.ledRingSteps * 3)
-            throw new Error('Invalid colors length');
-        let colorsBuffer = colors instanceof Uint8Array ? colors : new Uint8Array(colors);
-        // If there is an offset, repack the buffer to change the start point
-        if (control.lcdRingOffset) {
-            const oldColorsBuffer = colorsBuffer;
-            colorsBuffer = new Uint8Array(oldColorsBuffer.length);
-            colorsBuffer.set(oldColorsBuffer.slice(control.lcdRingOffset * 3), 0);
-            colorsBuffer.set(oldColorsBuffer.slice(0, control.lcdRingOffset * 3), control.lcdRingOffset * 3);
-        }
-        const buffer = new Uint8Array(1024);
-        buffer[0] = 0x02;
-        buffer[1] = 0x0f;
-        buffer[2] = encoder;
-        buffer.set(colorsBuffer, 3);
-        await this.#device.sendReports([buffer]);
-    }
-}
-exports.EncoderLedService = EncoderLedService;
-//# sourceMappingURL=encoderLed.js.map
 
 /***/ },
 
@@ -3666,103 +3939,6 @@ function __rewriteRelativeImportExtension(path, preserveJsx) {
 
 /***/ },
 
-/***/ 5864
-(__unused_webpack_module, exports, __webpack_require__) {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckPlusLcdService = void 0;
-const headerGenerator_js_1 = __webpack_require__(3117);
-const imageWriter_js_1 = __webpack_require__(3845);
-const util_js_1 = __webpack_require__(4369);
-const preparedBuffer_js_1 = __webpack_require__(5614);
-const id_js_1 = __webpack_require__(6444);
-class StreamDeckPlusLcdService {
-    #encodeJPEG;
-    #device;
-    #lcdControls;
-    #lcdImageWriter = new imageWriter_js_1.StreamdeckDefaultImageWriter(new headerGenerator_js_1.StreamdeckPlusLcdImageHeaderGenerator());
-    constructor(encodeJPEG, device, lcdControls) {
-        this.#encodeJPEG = encodeJPEG;
-        this.#device = device;
-        this.#lcdControls = lcdControls;
-    }
-    async fillLcd(index, buffer, sourceOptions) {
-        const lcdControl = this.#lcdControls.find((control) => control.id === index);
-        if (!lcdControl)
-            throw new Error(`Invalid lcd segment index ${index}`);
-        const packets = await this.prepareFillControlRegion(lcdControl, 0, 0, buffer, {
-            format: sourceOptions.format,
-            width: lcdControl.pixelSize.width,
-            height: lcdControl.pixelSize.height,
-        });
-        await this.#device.sendReports(packets);
-    }
-    async fillLcdRegion(index, x, y, imageBuffer, sourceOptions) {
-        const lcdControl = this.#lcdControls.find((control) => control.id === index);
-        if (!lcdControl)
-            throw new Error(`Invalid lcd segment index ${index}`);
-        const packets = await this.prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions);
-        await this.#device.sendReports(packets);
-    }
-    async prepareFillLcdRegion(index, x, y, imageBuffer, sourceOptions, jsonSafe) {
-        const lcdControl = this.#lcdControls.find((control) => control.id === index);
-        if (!lcdControl)
-            throw new Error(`Invalid lcd segment index ${index}`);
-        const packets = await this.prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions);
-        return (0, preparedBuffer_js_1.wrapBufferToPreparedBuffer)(id_js_1.DeviceModelId.PLUS, 'fill-lcd-region', packets, jsonSafe ?? false);
-    }
-    async clearLcdSegment(index) {
-        const lcdControl = this.#lcdControls.find((control) => control.id === index);
-        if (!lcdControl)
-            throw new Error(`Invalid lcd segment index ${index}`);
-        const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4);
-        const packets = await this.prepareFillControlRegion(lcdControl, 0, 0, buffer, {
-            format: 'rgba',
-            width: lcdControl.pixelSize.width,
-            height: lcdControl.pixelSize.height,
-        });
-        await this.#device.sendReports(packets);
-    }
-    async clearAllLcdSegments() {
-        const ps = [];
-        for (const control of this.#lcdControls) {
-            ps.push(this.clearLcdSegment(control.id));
-        }
-        await Promise.all(ps);
-    }
-    async prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions) {
-        // Basic bounds checking
-        const maxSize = lcdControl.pixelSize;
-        if (x < 0 || x + sourceOptions.width > maxSize.width) {
-            throw new TypeError(`Image will not fit within the lcd segment`);
-        }
-        if (y < 0 || y + sourceOptions.height > maxSize.height) {
-            throw new TypeError(`Image will not fit within the lcd segment`);
-        }
-        const imageSize = sourceOptions.width * sourceOptions.height * sourceOptions.format.length;
-        if (imageBuffer.length !== imageSize) {
-            throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`);
-        }
-        // A lot of this drawing code is heavily based on the normal button
-        const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions);
-        return this.#lcdImageWriter.generateFillImageWrites({ ...sourceOptions, x, y }, byteBuffer);
-    }
-    async convertFillLcdBuffer(sourceBuffer, sourceOptions) {
-        const sourceOptions2 = {
-            format: sourceOptions.format,
-            offset: 0,
-            stride: sourceOptions.width * sourceOptions.format.length,
-        };
-        const byteBuffer = (0, util_js_1.transformImageBuffer)(sourceBuffer, sourceOptions2, { colorMode: 'rgba' }, 0, sourceOptions.width, sourceOptions.height);
-        return this.#encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height);
-    }
-}
-exports.StreamDeckPlusLcdService = StreamDeckPlusLcdService;
-//# sourceMappingURL=plus.js.map
-
-/***/ },
-
 /***/ 6061
 (__unused_webpack_module, exports, __webpack_require__) {
 
@@ -3817,6 +3993,7 @@ var DeviceModelId;
     DeviceModelId["MODULE15"] = "15-module";
     DeviceModelId["MODULE32"] = "32-module";
     DeviceModelId["NETWORK_DOCK"] = "network-dock";
+    DeviceModelId["GALLEON_K100"] = "galleon-k100";
 })(DeviceModelId || (exports.DeviceModelId = DeviceModelId = {}));
 exports.MODEL_NAMES = {
     [DeviceModelId.ORIGINAL]: 'Stream Deck',
@@ -3833,6 +4010,7 @@ exports.MODEL_NAMES = {
     [DeviceModelId.MODULE15]: 'Stream Deck 15 Module',
     [DeviceModelId.MODULE32]: 'Stream Deck 32 Module',
     [DeviceModelId.NETWORK_DOCK]: 'Stream Deck Network Dock',
+    [DeviceModelId.GALLEON_K100]: 'Galleon K100 SD',
 };
 //# sourceMappingURL=id.js.map
 
@@ -4113,6 +4291,8 @@ class StreamDeckBase extends eventemitter3_1.EventEmitter {
         ps.push(this.#buttonsLcdService.clearPanel());
         if (this.#lcdSegmentDisplayService)
             ps.push(this.#lcdSegmentDisplayService.clearAllLcdSegments());
+        if (this.#encoderLedService)
+            ps.push(this.#encoderLedService.clearAll());
         await Promise.all(ps);
     }
     async fillLcd(...args) {
@@ -4152,9 +4332,9 @@ class StreamDeckBase extends eventemitter3_1.EventEmitter {
     }
     async getChildDeviceInfo() {
         const info = await this.device.getChildDeviceInfo();
-        if (!info || info.vendorId !== index_js_1.VENDOR_ID)
+        if (!info)
             return null;
-        const model = index_js_1.DEVICE_MODELS.find((m) => m.productIds.includes(info.productId));
+        const model = index_js_1.DEVICE_MODELS.find((m) => m.productIds.includes(info.productId) && m.vendorId === info.vendorId);
         if (!model)
             return null;
         return {
@@ -4249,6 +4429,7 @@ const generic_gen2_js_1 = __webpack_require__(442);
 const id_js_1 = __webpack_require__(6444);
 const controlsGenerator_js_1 = __webpack_require__(3794);
 const studio_js_1 = __webpack_require__(646);
+const studio_js_2 = __webpack_require__(4258);
 const studioControls = [
     {
         type: 'encoder',
@@ -4284,6 +4465,7 @@ exports.studioProperties = {
 };
 function StreamDeckStudioFactory(device, options, propertiesService) {
     const services = (0, generic_gen2_js_1.createBaseGen2Properties)(device, options, exports.studioProperties, propertiesService ?? new studio_js_1.StudioPropertiesService(device), true);
+    services.encoderLed = new studio_js_2.StudioEncoderLedService(device, studioControls);
     return new base_js_1.StreamDeckBase(device, options, services);
 }
 //# sourceMappingURL=studio.js.map
@@ -4363,7 +4545,7 @@ function StreamDeckPedalFactory(device, options) {
 
 /* eslint-disable n/no-unsupported-features/node-builtins */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StreamDeckWeb = exports.getStreamDeckModelName = exports.StreamDeckProxy = exports.DeviceModelId = exports.VENDOR_ID = void 0;
+exports.StreamDeckWeb = exports.getStreamDeckModelName = exports.StreamDeckProxy = exports.DeviceModelId = exports.CORSAIR_VENDOR_ID = exports.VENDOR_ID = void 0;
 exports.requestStreamDecks = requestStreamDecks;
 exports.getStreamDecks = getStreamDecks;
 exports.openDevice = openDevice;
@@ -4373,6 +4555,7 @@ const jpeg_js_1 = __webpack_require__(8443);
 const wrapper_js_1 = __webpack_require__(3026);
 var core_2 = __webpack_require__(8601);
 Object.defineProperty(exports, "VENDOR_ID", ({ enumerable: true, get: function () { return core_2.VENDOR_ID; } }));
+Object.defineProperty(exports, "CORSAIR_VENDOR_ID", ({ enumerable: true, get: function () { return core_2.CORSAIR_VENDOR_ID; } }));
 Object.defineProperty(exports, "DeviceModelId", ({ enumerable: true, get: function () { return core_2.DeviceModelId; } }));
 Object.defineProperty(exports, "StreamDeckProxy", ({ enumerable: true, get: function () { return core_2.StreamDeckProxy; } }));
 Object.defineProperty(exports, "getStreamDeckModelName", ({ enumerable: true, get: function () { return core_2.getStreamDeckModelName; } }));
@@ -4410,7 +4593,7 @@ async function getStreamDecks(options) {
  * @param userOptions Options to customise the device behvaiour
  */
 async function openDevice(browserDevice, userOptions) {
-    const model = core_1.DEVICE_MODELS.find((m) => browserDevice.vendorId === core_1.VENDOR_ID && m.productIds.includes(browserDevice.productId));
+    const model = core_1.DEVICE_MODELS.find((m) => browserDevice.vendorId === m.vendorId && m.productIds.includes(browserDevice.productId));
     if (!model) {
         throw new Error('Stream Deck is of unexpected type.');
     }
@@ -4421,7 +4604,7 @@ async function openDevice(browserDevice, userOptions) {
             ...userOptions,
         };
         const browserHid = new hid_device_js_1.WebHIDDevice(browserDevice);
-        const device = model.factory(browserHid, options || {});
+        const device = await Promise.resolve(model.factory(browserHid, options || {}));
         return new wrapper_js_1.StreamDeckWeb(device, browserHid);
     }
     catch (e) {
@@ -4480,7 +4663,7 @@ async function encodeJPEG(buffer, width, height) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DEVICE_MODELS = exports.DEVICE_MODELS2 = exports.DeviceModelType = exports.VENDOR_ID = exports.parseAllFirmwareVersionsHelper = exports.uint8ArrayToDataView = exports.StreamDeckProxy = void 0;
+exports.DEVICE_MODELS = exports.DEVICE_MODELS2 = exports.DeviceModelType = exports.CORSAIR_VENDOR_ID = exports.VENDOR_ID = exports.parseAllFirmwareVersionsHelper = exports.uint8ArrayToDataView = exports.StreamDeckProxy = void 0;
 exports.getStreamDeckModelName = getStreamDeckModelName;
 const tslib_1 = __webpack_require__(5823);
 const id_js_1 = __webpack_require__(6444);
@@ -4493,6 +4676,7 @@ const pedal_js_1 = __webpack_require__(7756);
 const neo_js_1 = __webpack_require__(9350);
 const studio_js_1 = __webpack_require__(7724);
 const network_dock_js_1 = __webpack_require__(5448);
+const galleon_k100_js_1 = __webpack_require__(3127);
 tslib_1.__exportStar(__webpack_require__(5064), exports);
 tslib_1.__exportStar(__webpack_require__(6444), exports);
 tslib_1.__exportStar(__webpack_require__(2173), exports);
@@ -4504,6 +4688,8 @@ var all_firmware_js_1 = __webpack_require__(3339);
 Object.defineProperty(exports, "parseAllFirmwareVersionsHelper", ({ enumerable: true, get: function () { return all_firmware_js_1.parseAllFirmwareVersionsHelper; } }));
 /** Elgato vendor id */
 exports.VENDOR_ID = 0x0fd9;
+/** Corsair vendor id */
+exports.CORSAIR_VENDOR_ID = 0x1b1c;
 var DeviceModelType;
 (function (DeviceModelType) {
     DeviceModelType["STREAMDECK"] = "streamdeck";
@@ -4515,86 +4701,109 @@ exports.DEVICE_MODELS2 = {
     [id_js_1.DeviceModelId.ORIGINAL]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x0060],
+        vendorId: exports.VENDOR_ID,
         factory: original_js_1.StreamDeckOriginalFactory,
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.MINI]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x0063, 0x0090, 0x00b3],
+        vendorId: exports.VENDOR_ID,
         factory: (...args) => (0, _6_key_js_1.StreamDeck6KeyFactory)(id_js_1.DeviceModelId.MINI, ...args),
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.XL]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x006c, 0x008f],
+        vendorId: exports.VENDOR_ID,
         factory: (...args) => (0, _32_key_js_1.StreamDeck32KeyFactory)(id_js_1.DeviceModelId.XL, ...args),
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.ORIGINALV2]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x006d],
+        vendorId: exports.VENDOR_ID,
         factory: (...args) => (0, _15_key_js_1.StreamDeck15KeyFactory)(id_js_1.DeviceModelId.ORIGINALV2, ...args),
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.ORIGINALMK2]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x0080],
+        vendorId: exports.VENDOR_ID,
         factory: (...args) => (0, _15_key_js_1.StreamDeck15KeyFactory)(id_js_1.DeviceModelId.ORIGINALMK2, ...args),
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.ORIGINALMK2SCISSOR]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x00a5],
+        vendorId: exports.VENDOR_ID,
         factory: (...args) => (0, _15_key_js_1.StreamDeck15KeyFactory)(id_js_1.DeviceModelId.ORIGINALMK2SCISSOR, ...args),
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.PLUS]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x0084],
+        vendorId: exports.VENDOR_ID,
         factory: plus_js_1.StreamDeckPlusFactory,
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.PEDAL]: {
         type: DeviceModelType.PEDAL,
         productIds: [0x0086],
+        vendorId: exports.VENDOR_ID,
         factory: pedal_js_1.StreamDeckPedalFactory,
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.NEO]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x009a],
+        vendorId: exports.VENDOR_ID,
         factory: neo_js_1.StreamDeckNeoFactory,
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.STUDIO]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x00aa],
+        vendorId: exports.VENDOR_ID,
         factory: studio_js_1.StreamDeckStudioFactory,
         hasNativeTcp: true,
     },
     [id_js_1.DeviceModelId.MODULE6]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x00b8],
+        vendorId: exports.VENDOR_ID,
         factory: (...args) => (0, _6_key_js_1.StreamDeck6KeyFactory)(id_js_1.DeviceModelId.MODULE6, ...args),
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.MODULE15]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x00b9],
+        vendorId: exports.VENDOR_ID,
         factory: (...args) => (0, _15_key_js_1.StreamDeck15KeyFactory)(id_js_1.DeviceModelId.MODULE15, ...args),
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.MODULE32]: {
         type: DeviceModelType.STREAMDECK,
         productIds: [0x00ba],
+        vendorId: exports.VENDOR_ID,
         factory: (...args) => (0, _32_key_js_1.StreamDeck32KeyFactory)(id_js_1.DeviceModelId.MODULE32, ...args),
         hasNativeTcp: false,
     },
     [id_js_1.DeviceModelId.NETWORK_DOCK]: {
         type: DeviceModelType.NETWORK_DOCK,
         productIds: [0xffff], // Note: This isn't a real product id, but matches what is reported when querying the device
+        vendorId: exports.VENDOR_ID,
         factory: network_dock_js_1.NetworkDockFactory,
         hasNativeTcp: true,
+    },
+    [id_js_1.DeviceModelId.GALLEON_K100]: {
+        type: DeviceModelType.STREAMDECK,
+        productIds: [0x2b18],
+        vendorId: exports.CORSAIR_VENDOR_ID,
+        factory: galleon_k100_js_1.GalleonK100Factory,
+        hidUsage: 0x01,
+        hidInterface: 0,
+        hasNativeTcp: false,
     },
 };
 /** @deprecated maybe? */
