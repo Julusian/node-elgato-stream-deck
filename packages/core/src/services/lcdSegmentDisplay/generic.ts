@@ -1,7 +1,7 @@
 import type { StreamDeckLcdSegmentControlDefinition } from '../../controlDefinition.js'
 import type { HIDDevice } from '../../hid-device.js'
 import type { InternalFillImageOptions } from '../imagePacker/interface.js'
-import { StreamdeckPlusLcdImageHeaderGenerator } from '../imageWriter/headerGenerator.js'
+import { StreamdeckDefaultLcdImageHeaderGenerator } from '../imageWriter/headerGenerator.js'
 import { StreamdeckDefaultImageWriter } from '../imageWriter/imageWriter.js'
 import type { LcdSegmentDisplayService } from './interface.js'
 import type { FillImageOptions, FillLcdImageOptions } from '../../types.js'
@@ -10,12 +10,12 @@ import type { EncodeJPEGHelper } from '../../models/base.js'
 import { wrapBufferToPreparedBuffer, type PreparedBuffer } from '../../preparedBuffer.js'
 import { DeviceModelId } from '../../id.js'
 
-export class StreamDeckPlusLcdService implements LcdSegmentDisplayService {
+export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper
 	readonly #device: HIDDevice
 	readonly #lcdControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>
 
-	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter(new StreamdeckPlusLcdImageHeaderGenerator())
+	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter(new StreamdeckDefaultLcdImageHeaderGenerator())
 
 	constructor(
 		encodeJPEG: EncodeJPEGHelper,

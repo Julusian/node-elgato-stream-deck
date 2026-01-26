@@ -9,7 +9,6 @@ import { Gen2PropertiesService } from '../services/properties/gen2.js'
 import { JpegButtonLcdImagePacker } from '../services/imagePacker/jpeg.js'
 import { Gen2InputService } from '../services/input/gen2.js'
 import type { PropertiesService } from '../services/properties/interface.js'
-import { EncoderLedService } from '../services/encoderLed.js'
 
 function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): StreamDeckProperties {
 	return {
@@ -43,6 +42,6 @@ export function createBaseGen2Properties(
 		),
 		lcdSegmentDisplay: null,
 		inputService: new Gen2InputService(fullProperties, events),
-		encoderLed: new EncoderLedService(device, properties.CONTROLS),
+		encoderLed: null,
 	}
 }

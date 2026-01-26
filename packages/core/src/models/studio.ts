@@ -6,6 +6,7 @@ import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 import type { StreamDeckControlDefinition } from '../controlDefinition.js'
 import type { PropertiesService } from '../services/properties/interface.js'
 import { StudioPropertiesService } from '../services/properties/studio.js'
+import { StudioEncoderLedService } from '../services/encoderLed/studio.js'
 
 const studioControls: StreamDeckControlDefinition[] = [
 	{
@@ -60,5 +61,7 @@ export function StreamDeckStudioFactory(
 		propertiesService ?? new StudioPropertiesService(device),
 		true,
 	)
+	services.encoderLed = new StudioEncoderLedService(device, studioControls)
+
 	return new StreamDeckBase(device, options, services)
 }

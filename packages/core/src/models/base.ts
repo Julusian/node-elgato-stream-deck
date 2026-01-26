@@ -16,7 +16,7 @@ import type { PropertiesService } from '../services/properties/interface.js'
 import type { CallbackHook } from '../services/callback-hook.js'
 import type { StreamDeckInputService } from '../services/input/interface.js'
 import { DEVICE_MODELS } from '../index.js'
-import type { EncoderLedService } from '../services/encoderLed.js'
+import type { EncoderLedService } from '../services/encoderLed/interface.js'
 import { unwrapPreparedBufferToBuffer, type PreparedBuffer } from '../preparedBuffer.js'
 
 export type EncodeJPEGHelper = (buffer: Uint8Array, width: number, height: number) => Promise<Uint8Array>
@@ -217,6 +217,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		ps.push(this.#buttonsLcdService.clearPanel())
 
 		if (this.#lcdSegmentDisplayService) ps.push(this.#lcdSegmentDisplayService.clearAllLcdSegments())
+		if (this.#encoderLedService) ps.push(this.#encoderLedService.clearAll())
 
 		await Promise.all(ps)
 	}

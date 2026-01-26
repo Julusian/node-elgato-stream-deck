@@ -1,8 +1,9 @@
-import type { EncoderIndex } from '../id.js'
-import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../controlDefinition.js'
-import type { HIDDevice } from '../hid-device.js'
+import type { EncoderIndex } from '../../id.js'
+import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../../controlDefinition.js'
+import type { HIDDevice } from '../../hid-device.js'
+import type { EncoderLedService } from './interface.js'
 
-export class EncoderLedService {
+export class StudioEncoderLedService implements EncoderLedService {
 	readonly #device: HIDDevice
 	readonly #encoderControls: Readonly<StreamDeckEncoderControlDefinition[]>
 
