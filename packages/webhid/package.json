@@ -37,7 +37,7 @@
 	"dependencies": {
 		"@elgato-stream-deck/core": "7.4.0",
 		"@types/w3c-web-hid": "^1.0.6",
-		"eventemitter3": "^5.0.1",
+		"eventemitter3": "^5.0.4",
 		"p-queue": "^6.6.2",
 		"tslib": "^2.8.1"
 	},
