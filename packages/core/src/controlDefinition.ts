@@ -39,7 +39,7 @@ export interface StreamDeckEncoderControlDefinition extends StreamDeckControlDef
 	index: number
 	hidIndex: number
 
-	/** Whether the encoder has an led */
+	/** Whether the encoder has a central led */
 	hasLed: boolean
 
 	/** The number of steps in encoder led rings (if any) */
