@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.5.0](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.4.0...v7.5.0) (2026-01-26)
+
+
+### Features
+
+* support Corsair Galleon K100 SD ([ee2af69](https://github.com/Julusian/node-elgato-stream-deck/commit/ee2af69156117f02c7cfb43cabc09d31d4b47d55))
+* support multiple vendorIds ([df13768](https://github.com/Julusian/node-elgato-stream-deck/commit/df13768b94301d3b45e52f1abf81f71270000d1a))
+
 ## [7.4.0](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.3.4...v7.4.0) (2025-11-23)
 
 
