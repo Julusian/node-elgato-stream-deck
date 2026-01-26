@@ -55,7 +55,7 @@ k100Controls.push(
 const galleonK100Properties: StreamDeckGen2Properties = {
 	MODEL: DeviceModelId.GALLEON_K100,
 	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.GALLEON_K100],
-	SUPPORTS_RGB_KEY_FILL: true, // TODO - verify SUPPORTS_RGB_KEY_FILL
+	SUPPORTS_RGB_KEY_FILL: true,
 
 	CONTROLS: freezeDefinitions(k100Controls),
 
