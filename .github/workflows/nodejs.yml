@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: lint
@@ -141,8 +144,30 @@ jobs:
           yarn build
         env:
           CI: true
-      - name: Publish
-        uses: peaceiris/actions-gh-pages@v4
+
+      - name: Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v3 # or specific "vX.X.X" version tag for this action
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./packages/webhid-demo/dist
+          path: ./packages/webhid-demo/dist/
+
+  # Deployment job
+  publish-demo-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    # only run for main
+    if: github.ref == 'refs/heads/main'
+
+    needs: publish-demo
+
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
