@@ -2510,7 +2510,6 @@ exports.StreamdeckNeoLcdImageHeaderGenerator = StreamdeckNeoLcdImageHeaderGenera
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GalleonK100StreamDeck = void 0;
 exports.GalleonK100Factory = GalleonK100Factory;
 const base_js_1 = __webpack_require__(7067);
 const generic_gen2_js_1 = __webpack_require__(442);
@@ -2596,7 +2595,6 @@ class GalleonK100StreamDeck extends base_js_1.StreamDeckBase {
         clearInterval(this.#pingInterval);
     }
 }
-exports.GalleonK100StreamDeck = GalleonK100StreamDeck;
 //# sourceMappingURL=galleon-k100.js.map
 
 /***/ },
