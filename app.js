@@ -2553,7 +2553,7 @@ k100Controls.push({
 const galleonK100Properties = {
     MODEL: id_js_1.DeviceModelId.GALLEON_K100,
     PRODUCT_NAME: id_js_1.MODEL_NAMES[id_js_1.DeviceModelId.GALLEON_K100],
-    SUPPORTS_RGB_KEY_FILL: true, // TODO - verify SUPPORTS_RGB_KEY_FILL
+    SUPPORTS_RGB_KEY_FILL: true,
     CONTROLS: (0, controlsGenerator_js_1.freezeDefinitions)(k100Controls),
     KEY_SPACING_HORIZONTAL: 64,
     KEY_SPACING_VERTICAL: 64,
