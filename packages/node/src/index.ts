@@ -54,15 +54,15 @@ export async function listStreamDecks(): Promise<StreamDeckDeviceInfo[]> {
  */
 export function getStreamDeckDeviceInfo(dev: HID.Device): StreamDeckDeviceInfo | null {
 	const model = DEVICE_MODELS.find((m) => m.productIds.includes(dev.productId) && m.vendorId === dev.vendorId)
+	if (!model || !dev.path) return null
 
-	if (model && dev.path) {
-		return {
-			model: model.id,
-			path: dev.path,
-			serialNumber: dev.serialNumber,
-		}
-	} else {
-		return null
+	if (model.hidUsage !== undefined && dev.usage !== model.hidUsage) return null
+	if (model.hidInterface !== undefined && dev.interface !== model.hidInterface) return null
+
+	return {
+		model: model.id,
+		path: dev.path,
+		serialNumber: dev.serialNumber,
 	}
 }
 
@@ -105,7 +105,7 @@ export async function openStreamDeck(devicePath: string, userOptions?: OpenStrea
 			throw new Error('Stream Deck is of unexpected type.')
 		}
 
-		const rawSteamdeck = model.factory(device, options)
+		const rawSteamdeck = await Promise.resolve(model.factory(device, options))
 		return new StreamDeckNode(rawSteamdeck, userOptions?.resetToLogoOnClose ?? false)
 	} catch (e) {
 		if (device) await device.close().catch(() => null) // Suppress error
