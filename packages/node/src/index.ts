@@ -1,5 +1,5 @@
 import type { OpenStreamDeckOptions, StreamDeck } from '@elgato-stream-deck/core'
-import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'
+import { DEVICE_MODELS } from '@elgato-stream-deck/core'
 import * as HID from 'node-hid'
 import { NodeHIDDevice, StreamDeckDeviceInfo } from './hid-device.js'
 import { StreamDeckNode } from './wrapper.js'
@@ -7,6 +7,7 @@ import { encodeJPEG, JPEGEncodeOptions } from '@elgato-stream-deck/node-lib'
 
 export {
 	VENDOR_ID,
+	CORSAIR_VENDOR_ID,
 	DeviceModelId,
 	KeyIndex,
 	StreamDeck,
@@ -52,9 +53,9 @@ export async function listStreamDecks(): Promise<StreamDeckDeviceInfo[]> {
  * If the provided device is a streamdeck, get the info about it
  */
 export function getStreamDeckDeviceInfo(dev: HID.Device): StreamDeckDeviceInfo | null {
-	const model = DEVICE_MODELS.find((m) => m.productIds.includes(dev.productId))
+	const model = DEVICE_MODELS.find((m) => m.productIds.includes(dev.productId) && m.vendorId === dev.vendorId)
 
-	if (model && dev.vendorId === VENDOR_ID && dev.path) {
+	if (model && dev.path) {
 		return {
 			model: model.id,
 			path: dev.path,
@@ -98,7 +99,7 @@ export async function openStreamDeck(devicePath: string, userOptions?: OpenStrea
 		const deviceInfo = await device.getDeviceInfo()
 
 		const model = DEVICE_MODELS.find(
-			(m) => deviceInfo.vendorId === VENDOR_ID && m.productIds.includes(deviceInfo.productId),
+			(m) => deviceInfo.vendorId === m.vendorId && m.productIds.includes(deviceInfo.productId),
 		)
 		if (!model) {
 			throw new Error('Stream Deck is of unexpected type.')

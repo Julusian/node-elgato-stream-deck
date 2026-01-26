@@ -68,7 +68,7 @@ function convertService(service: BonjourService): StreamDeckTcpDefinition | null
 	if (isNaN(vendorId) || isNaN(productId)) return null
 
 	// Find the corresponding model
-	const model = DEVICE_MODELS.find((model) => VENDOR_ID === vendorId && model.productIds.includes(productId))
+	const model = DEVICE_MODELS.find((model) => model.vendorId === vendorId && model.productIds.includes(productId))
 	if (!model) return null
 
 	return {

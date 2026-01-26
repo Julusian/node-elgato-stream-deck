@@ -4,14 +4,14 @@
 import fs from 'node:fs/promises'
 
 import { UdevRuleGenerator } from 'udev-generator'
-import { DEVICE_MODELS2, VENDOR_ID } from '@elgato-stream-deck/core'
+import { DEVICE_MODELS2 } from '@elgato-stream-deck/core'
 
 const generator = new UdevRuleGenerator()
 
 for (const model of Object.values(DEVICE_MODELS2)) {
 	for (const productId of model.productIds) {
 		if (productId >= 0xfff0) continue // Skip reserved product IDs
-		generator.addDevice(VENDOR_ID, productId)
+		generator.addDevice(model.vendorId, productId)
 	}
 }
 

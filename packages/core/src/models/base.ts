@@ -15,7 +15,7 @@ import type { LcdSegmentDisplayService } from '../services/lcdSegmentDisplay/int
 import type { PropertiesService } from '../services/properties/interface.js'
 import type { CallbackHook } from '../services/callback-hook.js'
 import type { StreamDeckInputService } from '../services/input/interface.js'
-import { DEVICE_MODELS, VENDOR_ID } from '../index.js'
+import { DEVICE_MODELS } from '../index.js'
 import type { EncoderLedService } from '../services/encoderLed.js'
 import { unwrapPreparedBufferToBuffer, type PreparedBuffer } from '../preparedBuffer.js'
 
@@ -275,9 +275,9 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 
 	public async getChildDeviceInfo(): Promise<StreamDeckTcpChildDeviceInfo | null> {
 		const info = await this.device.getChildDeviceInfo()
-		if (!info || info.vendorId !== VENDOR_ID) return null
+		if (!info) return null
 
-		const model = DEVICE_MODELS.find((m) => m.productIds.includes(info.productId))
+		const model = DEVICE_MODELS.find((m) => m.productIds.includes(info.productId) && m.vendorId === info.vendorId)
 		if (!model) return null
 
 		return {

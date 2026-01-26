@@ -8,6 +8,7 @@ import { StreamDeckWeb } from './wrapper.js'
 
 export {
 	VENDOR_ID,
+	CORSAIR_VENDOR_ID,
 	DeviceModelId,
 	KeyIndex,
 	StreamDeck,
@@ -73,7 +74,7 @@ export async function openDevice(
 	userOptions?: OpenStreamDeckOptions,
 ): Promise<StreamDeckWeb> {
 	const model = DEVICE_MODELS.find(
-		(m) => browserDevice.vendorId === VENDOR_ID && m.productIds.includes(browserDevice.productId),
+		(m) => browserDevice.vendorId === m.vendorId && m.productIds.includes(browserDevice.productId),
 	)
 	if (!model) {
 		throw new Error('Stream Deck is of unexpected type.')
