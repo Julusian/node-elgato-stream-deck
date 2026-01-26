@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.5.1](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.5.0...v7.5.1) (2026-01-26)
+
+
+### Bug Fixes
+
+* remove npm token for publish ([3a79fe2](https://github.com/Julusian/node-elgato-stream-deck/commit/3a79fe275857a31f9c800ad9bb5abdb820a68d73))
+
 ## [7.5.0](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.4.0...v7.5.0) (2026-01-26)
 
 

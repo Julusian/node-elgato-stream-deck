@@ -1,6 +1,6 @@
 {
 	"name": "@elgato-stream-deck/node-lib",
-	"version": "7.5.0",
+	"version": "7.5.1",
 	"description": "Helpers for a npm module for interfacing with the Elgato Stream Deck",
 	"main": "dist/lib.js",
 	"typings": "dist/lib.d.ts",
