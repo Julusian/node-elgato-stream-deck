@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.5.2](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.5.1...v7.5.2) (2026-01-27)
+
+
+### Bug Fixes
+
+* support newer jpeg-turbo library ([3fb9115](https://github.com/Julusian/node-elgato-stream-deck/commit/3fb9115df8f411a331f80c67b1549dbd4bd0ba53))
+
 ## [7.5.1](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.5.0...v7.5.1) (2026-01-26)
 
 
