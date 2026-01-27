@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@companion-module/tools": "^2.5.0",
-    "@julusian/jpeg-turbo": "^3.0.1",
+    "@julusian/jpeg-turbo": "^2.3.0",
     "@tsconfig/node18": "^18.2.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^18.19.130",
