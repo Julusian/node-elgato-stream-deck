@@ -268,12 +268,17 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 			ackBuffer.writeUInt8(packet.payload[5], 2) // connection no
 
 			// Send an ACK
-			this.#sendCoraMessage({
-				flags: CoraMessageFlags.ACK_NAK,
-				hidOp: packet.hidOp,
-				messageId: packet.messageId,
-				payload: ackBuffer,
-			})
+			try {
+				this.#socket.cork()
+				this.#sendCoraMessage({
+					flags: CoraMessageFlags.ACK_NAK,
+					hidOp: packet.hidOp,
+					messageId: packet.messageId,
+					payload: ackBuffer,
+				})
+			} finally {
+				this.#socket.uncork()
+			}
 		} else {
 			try {
 				this.emit('dataCora', packet)
@@ -312,16 +317,26 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	sendLegacyWrites(buffers: Uint8Array[]): void {
 		if (this.#packetMode !== 'legacy') throw new Error('sendLegacyWrites can only be used in legacy mode')
 
-		for (const buffer of buffers) {
-			this.#socket.write(buffer)
+		try {
+			this.#socket.cork()
+			for (const buffer of buffers) {
+				this.#socket.write(buffer)
+			}
+		} finally {
+			this.#socket.uncork()
 		}
 	}
 
 	sendCoraWrites(messages: SocketCoraMessage[]): void {
 		if (this.#packetMode !== 'cora') throw new Error('sendCoraWrites can only be used in cora mode')
 
-		for (const message of messages) {
-			this.#sendCoraMessage(message)
+		try {
+			this.#socket.cork()
+			for (const message of messages) {
+				this.#sendCoraMessage(message)
+			}
+		} finally {
+			this.#socket.uncork()
 		}
 	}
 }
