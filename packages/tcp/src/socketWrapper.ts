@@ -56,6 +56,7 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 		super()
 
 		this.#socket = new Socket()
+		this.#socket.setNoDelay(true)
 		this.#socket.on('error', (e) => {
 			if (this.#connectionActive) {
 				this.emit('error', 'socket error', e)
@@ -296,17 +297,17 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	}
 
 	#sendCoraMessage(message: SocketCoraMessage): void {
-		const buffer = Buffer.alloc(16) //+ message.payload.length)
+		const buffer = Buffer.alloc(16 + message.payload.length)
 		CORA_MAGIC.copy(buffer, 0, 0, CORA_MAGIC.length)
 		buffer.writeUint16LE(message.flags, 4)
 		buffer.writeUint8(message.hidOp, 6)
 		buffer.writeUint32LE(message.messageId, 8)
 		buffer.writeUint32LE(message.payload.length, 12)
-		// buffer.set(message.payload, 16)
+		buffer.set(message.payload, 16)
 
 		// Avoid a copy by writing the payload directly to the socket
 		this.#socket.write(buffer)
-		this.#socket.write(message.payload)
+		// this.#socket.write(message.payload)
 	}
 
 	sendLegacyWrites(buffers: Uint8Array[]): void {
