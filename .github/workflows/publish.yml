@@ -4,10 +4,15 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+*'
+  workflow_dispatch:
 
 permissions:
   contents: read
   id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   release:
@@ -30,6 +35,24 @@ jobs:
         run: |
           if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
             echo "No Token"
+            exit 0
+          fi
+
+          # If this run was started manually, choose nightly for main and experimental otherwise.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+              echo "Publishing nightly"
+              echo "tag=nightly" >> $GITHUB_OUTPUT
+            else
+              echo "Publishing experimental"
+              echo "tag=experimental" >> $GITHUB_OUTPUT
+            fi
+
+            HASH=$(git rev-parse --short HEAD)
+            TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+            PRERELEASE_TAG=nightly-$(echo "${{ github.ref_name }}" | sed -r 's/[^a-z0-9]+/-/gi')
+            echo "prerelease=${PRERELEASE_TAG}-${TIMESTAMP}-${HASH}" >> $GITHUB_OUTPUT
+
           else
             PUBLISHED_VERSION=$(yarn npm info --json @elgato-stream-deck/node | jq -c '.version' -r)
             THIS_VERSION=$(node -p "require('./packages/node/package.json').version")
@@ -54,6 +77,13 @@ jobs:
         if: ${{ steps.do-publish.outputs.tag }}
         run: |
           yarn install
+
+          # Bump to prerelease version if needed
+          if [ "${{ steps.do-publish.outputs.prerelease }}" != "" ]; then
+            OLD_VERSION=$(node -p "require('./package.json').version")
+            yarn workspaces foreach --all -pt version ${OLD_VERSION}-${{ steps.do-publish.outputs.prerelease }}
+          fi
+
           yarn build
         env:
           CI: true
