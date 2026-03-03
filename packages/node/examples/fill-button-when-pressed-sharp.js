@@ -10,9 +10,10 @@ const { listStreamDecks, openStreamDeck } = require('../dist/index')
 	const streamDeck = await openStreamDeck(devices[0].path)
 	await streamDeck.clearPanel()
 
+	const firstButton = streamDeck.CONTROLS.find((control) => control.type === 'button')
 	const img = await sharp(path.resolve(__dirname, 'fixtures/github_logo.png'))
 		.flatten()
-		.resize(streamDeck.BUTTON_WIDTH_PX, streamDeck.BUTTON_HEIGHT_PX)
+		.resize(firstButton.pixelSize.width, firstButton.pixelSize.height)
 		.raw()
 		.toBuffer()
 

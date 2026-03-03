@@ -68,7 +68,7 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 
 		fakeHidDevice
 			.getDeviceInfo()
-			.then((info) => {
+			.then(async (info) => {
 				const model = DEVICE_MODELS.find((m) => m.productIds.includes(info.productId))
 				if (!model) {
 					// Note: leave the temporary error handler, to ensure it can't cause a crash
@@ -77,7 +77,9 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 				}
 
 				const propertiesService = fakeHidDevice.isPrimary ? new TcpPropertiesService(fakeHidDevice) : undefined
-				const streamdeckSocket = model.factory(fakeHidDevice, this.#openOptions, propertiesService)
+				const streamdeckSocket = await Promise.resolve(
+					model.factory(fakeHidDevice, this.#openOptions, propertiesService),
+				)
 				const streamDeckTcp = new StreamDeckTcpWrapper(socket, fakeHidDevice, streamdeckSocket)
 
 				fakeHidDevice.off('error', tmpErrorHandler)

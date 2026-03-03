@@ -1,5 +1,5 @@
 const { usb } = require('usb')
-const { listStreamDecks, openStreamDeck } = require('../dist/index')
+const { listStreamDecks, openStreamDeck, VENDOR_ID, CORSAIR_VENDOR_ID } = require('../dist/index')
 const streamDecks = {}
 
 async function addDevice(info) {
@@ -37,12 +37,12 @@ async function refresh() {
 refresh()
 
 usb.on('attach', function (e) {
-	if (e.deviceDescriptor.idVendor === 0x0fd9) {
+	if (e.deviceDescriptor.idVendor === VENDOR_ID || e.deviceDescriptor.idVendor === CORSAIR_VENDOR_ID) {
 		refresh()
 	}
 })
 usb.on('detach', function (e) {
-	if (e.deviceDescriptor.idVendor === 0x0fd9) {
+	if (e.deviceDescriptor.idVendor === VENDOR_ID || e.deviceDescriptor.idVendor === CORSAIR_VENDOR_ID) {
 		console.log(`${JSON.stringify(e.deviceDescriptor)} was removed`)
 		refresh()
 	}

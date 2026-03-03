@@ -7,6 +7,7 @@ export function generateButtonsGrid(
 	pixelSize: Dimension,
 	rtl = false,
 	columnOffset = 0,
+	rowOffset = 0,
 ): StreamDeckButtonControlDefinition[] {
 	const controls: StreamDeckButtonControlDefinition[] = []
 
@@ -17,7 +18,7 @@ export function generateButtonsGrid(
 
 			controls.push({
 				type: 'button',
-				row,
+				row: row + rowOffset,
 				column: column + columnOffset,
 				index,
 				hidIndex,

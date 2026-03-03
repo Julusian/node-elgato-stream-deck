@@ -1,8 +1,9 @@
-import type { EncoderIndex } from '../id.js'
-import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../controlDefinition.js'
-import type { HIDDevice } from '../hid-device.js'
+import type { EncoderIndex } from '../../id.js'
+import type { StreamDeckControlDefinition, StreamDeckEncoderControlDefinition } from '../../controlDefinition.js'
+import type { HIDDevice } from '../../hid-device.js'
+import type { EncoderLedService } from './interface.js'
 
-export class EncoderLedService {
+export class GalleonK100EncoderLedService implements EncoderLedService {
 	readonly #device: HIDDevice
 	readonly #encoderControls: Readonly<StreamDeckEncoderControlDefinition[]>
 
@@ -17,27 +18,17 @@ export class EncoderLedService {
 		const ps: Array<Promise<void>> = []
 
 		for (const control of this.#encoderControls) {
-			if (control.hasLed) ps.push(this.setEncoderColor(control.index, 0, 0, 0))
 			if (control.ledRingSteps > 0) ps.push(this.setEncoderRingSingleColor(control.index, 0, 0, 0))
 		}
 
 		await Promise.all(ps)
 	}
 
-	public async setEncoderColor(encoder: EncoderIndex, red: number, green: number, blue: number): Promise<void> {
+	public async setEncoderColor(encoder: EncoderIndex, _red: number, _green: number, _blue: number): Promise<void> {
 		const control = this.#encoderControls.find((c) => c.index === encoder)
 		if (!control) throw new Error(`Invalid encoder index ${encoder}`)
 
-		if (!control.hasLed) throw new Error('Encoder does not have an LED')
-
-		const buffer = new Uint8Array(1024)
-		buffer[0] = 0x02
-		buffer[1] = 0x10
-		buffer[2] = encoder
-		buffer[3] = red
-		buffer[4] = green
-		buffer[5] = blue
-		await this.#device.sendReports([buffer])
+		throw new Error('Encoder does not have an LED')
 	}
 
 	public async setEncoderRingSingleColor(
@@ -51,18 +42,14 @@ export class EncoderLedService {
 
 		if (control.ledRingSteps <= 0) throw new Error('Encoder does not have an LED ring')
 
-		const buffer = new Uint8Array(1024)
-		buffer[0] = 0x02
-		buffer[1] = 0x0f
-		buffer[2] = encoder
-		for (let i = 0; i < control.ledRingSteps; i++) {
-			const offset = 3 + i * 3
-			buffer[offset] = red
-			buffer[offset + 1] = green
-			buffer[offset + 2] = blue
-		}
+		// Assume them all the same number of steps
+		const offset = (1 - encoder) * control.ledRingSteps
 
-		await this.#device.sendReports([buffer])
+		const ps: Array<Promise<void>> = []
+		for (let i = 0; i < control.ledRingSteps; i++) {
+			ps.push(this.#sendEncoderPixelColor(offset + i, red, green, blue))
+		}
+		await Promise.all(ps)
 	}
 
 	public async setEncoderRingColors(encoder: EncoderIndex, colors: number[] | Uint8Array): Promise<void> {
@@ -73,23 +60,42 @@ export class EncoderLedService {
 
 		if (colors.length !== control.ledRingSteps * 3) throw new Error('Invalid colors length')
 
-		let colorsBuffer = colors instanceof Uint8Array ? colors : new Uint8Array(colors)
+		let colorsArray: number[] = colors instanceof Uint8Array ? Array.from(colors) : colors
 
 		// If there is an offset, repack the buffer to change the start point
 		if (control.lcdRingOffset) {
-			const oldColorsBuffer = colorsBuffer
-			colorsBuffer = new Uint8Array(oldColorsBuffer.length)
+			const oldColorsArray = colorsArray
+			colorsArray = []
 
-			colorsBuffer.set(oldColorsBuffer.slice(control.lcdRingOffset * 3), 0)
-			colorsBuffer.set(oldColorsBuffer.slice(0, control.lcdRingOffset * 3), control.lcdRingOffset * 3)
+			colorsArray.push(...oldColorsArray.slice(control.lcdRingOffset * 3))
+			colorsArray.push(...oldColorsArray.slice(0, control.lcdRingOffset * 3))
 		}
 
-		const buffer = new Uint8Array(1024)
-		buffer[0] = 0x02
-		buffer[1] = 0x0f
-		buffer[2] = encoder
-		buffer.set(colorsBuffer, 3)
+		// Assume them all the same number of steps
+		const offset = (1 - encoder) * control.ledRingSteps
 
-		await this.#device.sendReports([buffer])
+		const ps: Array<Promise<void>> = []
+		for (let i = 0; i < control.ledRingSteps; i++) {
+			ps.push(
+				this.#sendEncoderPixelColor(
+					offset + i,
+					colorsArray[i * 3],
+					colorsArray[i * 3 + 1],
+					colorsArray[i * 3 + 2],
+				),
+			)
+		}
+		await Promise.all(ps)
+	}
+
+	async #sendEncoderPixelColor(index: number, red: number, green: number, blue: number): Promise<void> {
+		const buffer = new Uint8Array(6)
+		buffer[0] = 0x03
+		buffer[1] = 0x24
+		buffer[2] = index
+		buffer[3] = red
+		buffer[4] = green
+		buffer[5] = blue
+		await this.#device.sendFeatureReport(buffer)
 	}
 }

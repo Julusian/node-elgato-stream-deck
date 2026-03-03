@@ -12,6 +12,7 @@ import { StreamDeckNeoFactory } from './models/neo.js'
 import { StreamDeckStudioFactory } from './models/studio.js'
 import type { PropertiesService } from './services/properties/interface.js'
 import { NetworkDockFactory } from './models/network-dock.js'
+import { GalleonK100Factory } from './models/galleon-k100.js'
 import { StreamDeckPlusXlFactory } from './models/plus-xl.js'
 
 export * from './types.js'
@@ -27,6 +28,8 @@ export { parseAllFirmwareVersionsHelper } from './services/properties/all-firmwa
 
 /** Elgato vendor id */
 export const VENDOR_ID = 0x0fd9
+/** Corsair vendor id */
+export const CORSAIR_VENDOR_ID = 0x1b1c
 
 export enum DeviceModelType {
 	STREAMDECK = 'streamdeck',
@@ -38,13 +41,22 @@ export interface DeviceModelSpec {
 	id: DeviceModelId
 	type: DeviceModelType
 	productIds: number[]
+	vendorId: number
 	productName: string
+	/**
+	 * If needing to filter by usage
+	 */
+	hidUsage?: number
+	/**
+	 * If needing to filter by interface number
+	 */
+	hidInterface?: number
 
 	factory: (
 		device: HIDDevice,
 		options: Required<OpenStreamDeckOptions>,
 		tcpPropertiesService?: PropertiesService,
-	) => StreamDeck
+	) => StreamDeck | Promise<StreamDeck>
 
 	hasNativeTcp: boolean
 }
@@ -54,6 +66,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.ORIGINAL]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0060],
+		vendorId: VENDOR_ID,
 		factory: StreamDeckOriginalFactory,
 
 		hasNativeTcp: false,
@@ -61,6 +74,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.MINI]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0063, 0x0090, 0x00b3],
+		vendorId: VENDOR_ID,
 		factory: (...args) => StreamDeck6KeyFactory(DeviceModelId.MINI, ...args),
 
 		hasNativeTcp: false,
@@ -68,6 +82,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.XL]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x006c, 0x008f],
+		vendorId: VENDOR_ID,
 		factory: (...args) => StreamDeck32KeyFactory(DeviceModelId.XL, ...args),
 
 		hasNativeTcp: false,
@@ -75,6 +90,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.ORIGINALV2]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x006d],
+		vendorId: VENDOR_ID,
 		factory: (...args) => StreamDeck15KeyFactory(DeviceModelId.ORIGINALV2, ...args),
 
 		hasNativeTcp: false,
@@ -82,6 +98,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.ORIGINALMK2]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0080],
+		vendorId: VENDOR_ID,
 		factory: (...args) => StreamDeck15KeyFactory(DeviceModelId.ORIGINALMK2, ...args),
 
 		hasNativeTcp: false,
@@ -89,6 +106,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.ORIGINALMK2SCISSOR]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x00a5],
+		vendorId: VENDOR_ID,
 		factory: (...args) => StreamDeck15KeyFactory(DeviceModelId.ORIGINALMK2SCISSOR, ...args),
 
 		hasNativeTcp: false,
@@ -96,6 +114,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.PLUS]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x0084],
+		vendorId: VENDOR_ID,
 		factory: StreamDeckPlusFactory,
 
 		hasNativeTcp: false,
@@ -103,6 +122,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.PEDAL]: {
 		type: DeviceModelType.PEDAL,
 		productIds: [0x0086],
+		vendorId: VENDOR_ID,
 		factory: StreamDeckPedalFactory,
 
 		hasNativeTcp: false,
@@ -110,6 +130,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.NEO]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x009a],
+		vendorId: VENDOR_ID,
 		factory: StreamDeckNeoFactory,
 
 		hasNativeTcp: false,
@@ -117,6 +138,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.STUDIO]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x00aa],
+		vendorId: VENDOR_ID,
 		factory: StreamDeckStudioFactory,
 
 		hasNativeTcp: true,
@@ -124,6 +146,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.MODULE6]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x00b8],
+		vendorId: VENDOR_ID,
 		factory: (...args) => StreamDeck6KeyFactory(DeviceModelId.MODULE6, ...args),
 
 		hasNativeTcp: false,
@@ -131,6 +154,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.MODULE15]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x00b9],
+		vendorId: VENDOR_ID,
 		factory: (...args) => StreamDeck15KeyFactory(DeviceModelId.MODULE15, ...args),
 
 		hasNativeTcp: false,
@@ -138,6 +162,7 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.MODULE32]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x00ba],
+		vendorId: VENDOR_ID,
 		factory: (...args) => StreamDeck32KeyFactory(DeviceModelId.MODULE32, ...args),
 
 		hasNativeTcp: false,
@@ -145,13 +170,26 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 	[DeviceModelId.NETWORK_DOCK]: {
 		type: DeviceModelType.NETWORK_DOCK,
 		productIds: [0xffff], // Note: This isn't a real product id, but matches what is reported when querying the device
+		vendorId: VENDOR_ID,
 		factory: NetworkDockFactory,
 
 		hasNativeTcp: true,
 	},
+	[DeviceModelId.GALLEON_K100]: {
+		type: DeviceModelType.STREAMDECK,
+		productIds: [0x2b18],
+		vendorId: CORSAIR_VENDOR_ID,
+		factory: GalleonK100Factory,
+
+		hidUsage: 0x01,
+		hidInterface: 0,
+
+		hasNativeTcp: false,
+	},
 	[DeviceModelId.PLUS_XL]: {
 		type: DeviceModelType.STREAMDECK,
 		productIds: [0x00c6],
+		vendorId: VENDOR_ID,
 		factory: StreamDeckPlusXlFactory,
 
 		hasNativeTcp: false,

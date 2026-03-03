@@ -6,7 +6,7 @@ import { createBaseGen2Properties } from './generic-gen2.js'
 import { DeviceModelId, MODEL_NAMES } from '../id.js'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 import type { StreamDeckControlDefinition, StreamDeckLcdSegmentControlDefinition } from '../controlDefinition.js'
-import { StreamDeckPlusLcdService } from '../services/lcdSegmentDisplay/plus.js'
+import { StreamdeckDefaultLcdService } from '../services/lcdSegmentDisplay/generic.js'
 
 const plusXlControls: StreamDeckControlDefinition[] = generateButtonsGrid(9, 4, { width: 112, height: 112 })
 plusXlControls.push(
@@ -111,7 +111,7 @@ export function StreamDeckPlusXlFactory(device: HIDDevice, options: Required<Ope
 		rotate: true,
 		yFlip: true,
 	})
-	services.lcdSegmentDisplay = new StreamDeckPlusLcdService(options.encodeJPEG, device, lcdSegmentControls, true)
+	services.lcdSegmentDisplay = new StreamdeckDefaultLcdService(options.encodeJPEG, device, lcdSegmentControls, true)
 
 	return new StreamDeckBase(device, options, services)
 }
