@@ -62,5 +62,5 @@
   "resolutions": {
     "@types/w3c-web-hid": "patch:@types/w3c-web-hid@npm%3A1.0.6#~/.yarn/patches/@types-w3c-web-hid-npm-1.0.6-ca95fc3332.patch"
   },
-  "packageManager": "yarn@4.12.0"
+  "packageManager": "yarn@4.13.0"
 }
