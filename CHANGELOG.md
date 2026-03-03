@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.6.0](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.5.2...v7.6.0) (2026-03-03)
+
+
+### Features
+
+* support stream deck + xl ([#146](https://github.com/Julusian/node-elgato-stream-deck/issues/146)) ([22825ee](https://github.com/Julusian/node-elgato-stream-deck/commit/22825eedc12b47653e310e00611341b924bdf93e))
+
 ## [7.5.2](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.5.1...v7.5.2) (2026-01-27)
 
 
