@@ -20,6 +20,7 @@ export enum DeviceModelId {
 	MODULE32 = '32-module',
 	NETWORK_DOCK = 'network-dock',
 	GALLEON_K100 = 'galleon-k100',
+	PLUS_XL = 'plus-xl',
 }
 
 export const MODEL_NAMES: { [key in DeviceModelId]: string } = {
@@ -38,4 +39,5 @@ export const MODEL_NAMES: { [key in DeviceModelId]: string } = {
 	[DeviceModelId.MODULE32]: 'Stream Deck 32 Module',
 	[DeviceModelId.NETWORK_DOCK]: 'Stream Deck Network Dock',
 	[DeviceModelId.GALLEON_K100]: 'Galleon K100 SD',
+	[DeviceModelId.PLUS_XL]: 'Stream Deck + XL',
 }

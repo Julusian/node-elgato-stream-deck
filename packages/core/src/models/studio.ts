@@ -59,7 +59,7 @@ export function StreamDeckStudioFactory(
 		options,
 		studioProperties,
 		propertiesService ?? new StudioPropertiesService(device),
-		true,
+		{ xFlip: false, yFlip: false },
 	)
 	services.encoderLed = new StudioEncoderLedService(device, studioControls)
 

@@ -17,17 +17,20 @@ export function transformImageBuffer(
 ): Uint8Array {
 	const imageBufferView = uint8ArrayToDataView(imageBuffer)
 
-	const byteBuffer = new Uint8Array(destPadding + imageWidth * imageHeight * targetOptions.colorMode.length)
+	const targetWidth = targetOptions.rotate ? imageHeight : imageWidth
+	const targetHeight = targetOptions.rotate ? imageWidth : imageHeight
+
+	const byteBuffer = new Uint8Array(destPadding + targetWidth * targetHeight * targetOptions.colorMode.length)
 	const byteBufferView = uint8ArrayToDataView(byteBuffer)
 
 	const flipColours = sourceOptions.format.substring(0, 3) !== targetOptions.colorMode.substring(0, 3)
 
-	for (let y = 0; y < imageHeight; y++) {
-		const rowOffset = destPadding + imageWidth * targetOptions.colorMode.length * y
-		for (let x = 0; x < imageWidth; x++) {
+	for (let y = 0; y < targetHeight; y++) {
+		const rowOffset = destPadding + targetWidth * targetOptions.colorMode.length * y
+		for (let x = 0; x < targetWidth; x++) {
 			// Apply x/y flips
-			let x2 = targetOptions.xFlip ? imageWidth - x - 1 : x
-			let y2 = targetOptions.yFlip ? imageHeight - y - 1 : y
+			let x2 = targetOptions.xFlip ? targetWidth - x - 1 : x
+			let y2 = targetOptions.yFlip ? targetHeight - y - 1 : y
 
 			if (targetOptions.rotate) {
 				// Swap x and y

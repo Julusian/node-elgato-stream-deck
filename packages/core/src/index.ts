@@ -13,6 +13,7 @@ import { StreamDeckStudioFactory } from './models/studio.js'
 import type { PropertiesService } from './services/properties/interface.js'
 import { NetworkDockFactory } from './models/network-dock.js'
 import { GalleonK100Factory } from './models/galleon-k100.js'
+import { StreamDeckPlusXlFactory } from './models/plus-xl.js'
 
 export * from './types.js'
 export * from './id.js'
@@ -182,6 +183,14 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 
 		hidUsage: 0x01,
 		hidInterface: 0,
+
+		hasNativeTcp: false,
+	},
+	[DeviceModelId.PLUS_XL]: {
+		type: DeviceModelType.STREAMDECK,
+		productIds: [0x00c6],
+		vendorId: VENDOR_ID,
+		factory: StreamDeckPlusXlFactory,
 
 		hasNativeTcp: false,
 	},

@@ -5,13 +5,13 @@ const { listStreamDecks, openStreamDeck, DeviceModelId } = require('../dist/inde
 
 ;(async () => {
 	const devices = await listStreamDecks()
-	const plusDevice = devices.find((dev) => dev.model === DeviceModelId.PLUS)
+	const plusDevice = devices.find((dev) => dev.model === DeviceModelId.PLUS_XL)
 	if (!plusDevice) throw new Error('No device found')
 
 	const streamDeck = await openStreamDeck(plusDevice.path)
 	await streamDeck.clearPanel()
 
-	if (streamDeck.MODEL !== DeviceModelId.PLUS) throw new Error('This demo only supports the plus')
+	if (streamDeck.MODEL !== DeviceModelId.PLUS_XL) throw new Error('This demo only supports the plus-xl')
 
 	const sampleButton = streamDeck.CONTROLS.find((c) => c.type === 'button' && c.feedbackType === 'lcd')
 	if (!sampleButton) throw new Error('No LCD button found')

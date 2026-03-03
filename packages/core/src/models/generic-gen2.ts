@@ -6,6 +6,7 @@ import { DefaultButtonsLcdService } from '../services/buttonsLcdDisplay/default.
 import { CallbackHook } from '../services/callback-hook.js'
 import type { StreamDeckEvents } from '../types.js'
 import { Gen2PropertiesService } from '../services/properties/gen2.js'
+import type { JpegPackerTransformOptions } from '../services/imagePacker/jpeg.js'
 import { JpegButtonLcdImagePacker } from '../services/imagePacker/jpeg.js'
 import { Gen2InputService } from '../services/input/gen2.js'
 import type { PropertiesService } from '../services/properties/interface.js'
@@ -24,7 +25,7 @@ export function createBaseGen2Properties(
 	options: Required<OpenStreamDeckOptions>,
 	properties: StreamDeckGen2Properties,
 	propertiesService: PropertiesService | null,
-	disableXYFlip?: boolean,
+	transform?: JpegPackerTransformOptions,
 ): StreamDeckServicesDefinition {
 	const fullProperties = extendDevicePropertiesForGen2(properties)
 
@@ -36,7 +37,7 @@ export function createBaseGen2Properties(
 		properties: propertiesService ?? new Gen2PropertiesService(device),
 		buttonsLcd: new DefaultButtonsLcdService(
 			new StreamdeckDefaultImageWriter(new StreamdeckGen2ImageHeaderGenerator()),
-			new JpegButtonLcdImagePacker(options.encodeJPEG, !disableXYFlip),
+			new JpegButtonLcdImagePacker(options.encodeJPEG, transform ?? { xFlip: true, yFlip: true }),
 			device,
 			fullProperties,
 		),

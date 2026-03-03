@@ -14,6 +14,7 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper
 	readonly #device: HIDDevice
 	readonly #lcdControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>
+	readonly #rotate: boolean
 
 	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter(new StreamdeckDefaultLcdImageHeaderGenerator())
 
@@ -21,10 +22,12 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 		encodeJPEG: EncodeJPEGHelper,
 		device: HIDDevice,
 		lcdControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>,
+		rotate: boolean,
 	) {
 		this.#encodeJPEG = encodeJPEG
 		this.#device = device
 		this.#lcdControls = lcdControls
+		this.#rotate = rotate
 	}
 
 	public async fillLcd(
@@ -135,12 +138,16 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
 			sourceOptions2,
-			{ colorMode: 'rgba' },
+			{ colorMode: 'rgba', rotate: this.#rotate, yFlip: this.#rotate },
 			0,
 			sourceOptions.width,
 			sourceOptions.height,
 		)
 
-		return this.#encodeJPEG(byteBuffer, sourceOptions.width, sourceOptions.height)
+		return this.#encodeJPEG(
+			byteBuffer,
+			this.#rotate ? sourceOptions.height : sourceOptions.width,
+			this.#rotate ? sourceOptions.width : sourceOptions.height,
+		)
 	}
 }

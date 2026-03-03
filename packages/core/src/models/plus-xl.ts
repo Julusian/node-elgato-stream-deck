@@ -8,19 +8,19 @@ import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 import type { StreamDeckControlDefinition, StreamDeckLcdSegmentControlDefinition } from '../controlDefinition.js'
 import { StreamdeckDefaultLcdService } from '../services/lcdSegmentDisplay/generic.js'
 
-const plusControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2, { width: 120, height: 120 })
-plusControls.push(
+const plusXlControls: StreamDeckControlDefinition[] = generateButtonsGrid(9, 4, { width: 112, height: 112 })
+plusXlControls.push(
 	{
 		type: 'lcd-segment',
-		row: 2,
+		row: 4,
 		column: 0,
-		columnSpan: 4,
+		columnSpan: 9,
 		rowSpan: 1,
 
 		id: 0,
 
 		pixelSize: Object.freeze({
-			width: 800,
+			width: 1200,
 			height: 100,
 		}),
 
@@ -28,7 +28,7 @@ plusControls.push(
 	},
 	{
 		type: 'encoder',
-		row: 3,
+		row: 5,
 		column: 0,
 		index: 0,
 		hidIndex: 0,
@@ -38,8 +38,8 @@ plusControls.push(
 	},
 	{
 		type: 'encoder',
-		row: 3,
-		column: 1,
+		row: 5,
+		column: 2,
 		index: 1,
 		hidIndex: 1,
 
@@ -48,8 +48,8 @@ plusControls.push(
 	},
 	{
 		type: 'encoder',
-		row: 3,
-		column: 2,
+		row: 5,
+		column: 3,
 		index: 2,
 		hidIndex: 2,
 
@@ -58,22 +58,42 @@ plusControls.push(
 	},
 	{
 		type: 'encoder',
-		row: 3,
-		column: 3,
+		row: 5,
+		column: 5,
 		index: 3,
 		hidIndex: 3,
 
 		hasLed: false,
 		ledRingSteps: 0,
 	},
+	{
+		type: 'encoder',
+		row: 5,
+		column: 6,
+		index: 4,
+		hidIndex: 4,
+
+		hasLed: false,
+		ledRingSteps: 0,
+	},
+	{
+		type: 'encoder',
+		row: 5,
+		column: 8,
+		index: 5,
+		hidIndex: 5,
+
+		hasLed: false,
+		ledRingSteps: 0,
+	},
 )
 
-const plusProperties: StreamDeckGen2Properties = {
-	MODEL: DeviceModelId.PLUS,
-	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.PLUS],
+const plusXlProperties: StreamDeckGen2Properties = {
+	MODEL: DeviceModelId.PLUS_XL,
+	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.PLUS_XL],
 	SUPPORTS_RGB_KEY_FILL: true,
 
-	CONTROLS: freezeDefinitions(plusControls),
+	CONTROLS: freezeDefinitions(plusXlControls),
 
 	KEY_SPACING_HORIZONTAL: 99,
 	KEY_SPACING_VERTICAL: 40,
@@ -82,13 +102,16 @@ const plusProperties: StreamDeckGen2Properties = {
 	HAS_NFC_READER: false,
 	SUPPORTS_CHILD_DEVICES: false,
 }
-const lcdSegmentControls = plusProperties.CONTROLS.filter(
+const lcdSegmentControls = plusXlProperties.CONTROLS.filter(
 	(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
 )
 
-export function StreamDeckPlusFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
-	const services = createBaseGen2Properties(device, options, plusProperties, null, { xFlip: false, yFlip: false })
-	services.lcdSegmentDisplay = new StreamdeckDefaultLcdService(options.encodeJPEG, device, lcdSegmentControls, false)
+export function StreamDeckPlusXlFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
+	const services = createBaseGen2Properties(device, options, plusXlProperties, null, {
+		rotate: true,
+		yFlip: true,
+	})
+	services.lcdSegmentDisplay = new StreamdeckDefaultLcdService(options.encodeJPEG, device, lcdSegmentControls, true)
 
 	return new StreamDeckBase(device, options, services)
 }

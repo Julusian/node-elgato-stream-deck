@@ -75,9 +75,12 @@ export async function GalleonK100Factory(
 	options: Required<OpenStreamDeckOptions>,
 	_tcpPropertiesService?: PropertiesService,
 ): Promise<StreamDeckBase> {
-	const services = createBaseGen2Properties(device, options, galleonK100Properties, null, true)
+	const services = createBaseGen2Properties(device, options, galleonK100Properties, null, {
+		xFlip: false,
+		yFlip: false,
+	})
 	services.encoderLed = new GalleonK100EncoderLedService(device, galleonK100Properties.CONTROLS)
-	services.lcdSegmentDisplay = new StreamdeckDefaultLcdService(options.encodeJPEG, device, lcdSegmentControls)
+	services.lcdSegmentDisplay = new StreamdeckDefaultLcdService(options.encodeJPEG, device, lcdSegmentControls, false)
 
 	const streamDeck = new GalleonK100StreamDeck(device, options, services)
 

@@ -1,15 +1,18 @@
 import type { ButtonLcdImagePacker, InternalFillImageOptions } from './interface.js'
+import type { FillImageTargetOptions } from '../../util.js'
 import { transformImageBuffer } from '../../util.js'
 import type { EncodeJPEGHelper } from '../../models/base.js'
 import type { Dimension } from '../../id.js'
 
+export type JpegPackerTransformOptions = Omit<FillImageTargetOptions, 'colorMode'>
+
 export class JpegButtonLcdImagePacker implements ButtonLcdImagePacker {
 	readonly #encodeJPEG: EncodeJPEGHelper
-	readonly #xyFlip: boolean
+	readonly #transform: JpegPackerTransformOptions
 
-	constructor(encodeJPEG: EncodeJPEGHelper, xyFlip: boolean) {
+	constructor(encodeJPEG: EncodeJPEGHelper, transform: JpegPackerTransformOptions) {
 		this.#encodeJPEG = encodeJPEG
-		this.#xyFlip = xyFlip
+		this.#transform = transform
 	}
 
 	public async convertPixelBuffer(
@@ -20,7 +23,7 @@ export class JpegButtonLcdImagePacker implements ButtonLcdImagePacker {
 		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
 			sourceOptions,
-			{ colorMode: 'rgba', xFlip: this.#xyFlip, yFlip: this.#xyFlip },
+			{ ...this.#transform, colorMode: 'rgba' },
 			0,
 			targetSize.width,
 			targetSize.height,
