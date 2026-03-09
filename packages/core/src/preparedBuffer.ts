@@ -17,7 +17,7 @@ interface PreparedButtonDrawInternal {
 	if_you_change_this_you_will_break_everything: string
 	modelId: DeviceModelId
 	type: string
-	do_not_touch: Uint8Array[] | string[]
+	do_not_touch: (Uint8Array | Uint8Array[])[] | (string | string[])[]
 }
 
 export function wrapBufferToPreparedBuffer(
@@ -30,11 +30,15 @@ export function wrapBufferToPreparedBuffer(
 
 	if (jsonSafe) {
 		// Use Base64 encoding for binary-safe string conversion
-		if (typeof Buffer !== 'undefined') {
-			encodedBuffers = buffers.map((b) => Buffer.from(b).toString('base64'))
-		} else {
-			encodedBuffers = buffers.map((b) => btoa(String.fromCharCode(...b)))
+		const encodeOne = (b: Uint8Array): string => {
+			if (typeof Buffer !== 'undefined') {
+				return Buffer.from(b).toString('base64')
+			} else {
+				return btoa(String.fromCharCode(...b))
+			}
 		}
+		const mapped: (string | string[])[] = buffers.map((b) => (Array.isArray(b) ? b.map(encodeOne) : encodeOne(b)))
+		encodedBuffers = mapped
 	}
 
 	return {
@@ -50,13 +54,13 @@ export function unwrapPreparedBufferToBuffer(
 	modelId: DeviceModelId,
 	// type: string,
 	prepared: PreparedBuffer,
-): Uint8Array[] {
+): (Uint8Array | Uint8Array[])[] {
 	const preparedInternal = prepared as any as PreparedButtonDrawInternal
 	if (preparedInternal.modelId !== modelId) throw new Error('Prepared buffer is for a different model!')
 
 	// if (preparedInternal.type !== type) throw new Error('Prepared buffer is for a different type!')
 
-	return preparedInternal.do_not_touch.map((b) => {
+	const decodeOne = (b: Uint8Array | string): Uint8Array => {
 		if (typeof b === 'string') {
 			// Decode from Base64 for binary-safe conversion
 			if (typeof Buffer !== 'undefined') {
@@ -74,6 +78,14 @@ export function unwrapPreparedBufferToBuffer(
 			return b
 		} else {
 			throw new Error('Prepared buffer is not a string or Uint8Array!')
+		}
+	}
+
+	return preparedInternal.do_not_touch.map((b) => {
+		if (Array.isArray(b)) {
+			return b.map(decodeOne)
+		} else {
+			return decodeOne(b)
 		}
 	})
 }
