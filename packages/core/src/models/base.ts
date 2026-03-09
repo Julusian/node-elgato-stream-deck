@@ -168,8 +168,12 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	}
 
 	public async sendPreparedBuffer(buffer: PreparedBuffer): Promise<void> {
-		const packets = unwrapPreparedBufferToBuffer(this.deviceProperties.MODEL, buffer)
-		await this.device.sendReports(packets)
+		const result = unwrapPreparedBufferToBuffer(this.deviceProperties.MODEL, buffer)
+		if (result.isNested) {
+			await Promise.allSettled(result.groups.map(async (packets) => this.device.sendReports(packets)))
+		} else {
+			await this.device.sendReports(result.buffers)
+		}
 	}
 
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {

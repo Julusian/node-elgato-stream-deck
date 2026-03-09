@@ -17,8 +17,14 @@ interface PreparedButtonDrawInternal {
 	if_you_change_this_you_will_break_everything: string
 	modelId: DeviceModelId
 	type: string
-	do_not_touch: (Uint8Array | Uint8Array[])[] | (string | string[])[]
+	do_not_touch:
+		| { isNested: false; data: Uint8Array[] | string[] }
+		| { isNested: true; data: Uint8Array[][] | string[][] }
 }
+
+export type UnwrappedPreparedBuffer =
+	| { isNested: false; buffers: Uint8Array[] }
+	| { isNested: true; groups: Uint8Array[][] }
 
 export function wrapBufferToPreparedBuffer(
 	modelId: DeviceModelId,
@@ -26,7 +32,9 @@ export function wrapBufferToPreparedBuffer(
 	buffers: Uint8Array[] | Uint8Array[][],
 	jsonSafe: boolean,
 ): PreparedBuffer {
-	let encodedBuffers: PreparedButtonDrawInternal['do_not_touch'] = buffers
+	const isNested = buffers.length > 0 && Array.isArray(buffers[0])
+
+	let doNotTouch: PreparedButtonDrawInternal['do_not_touch']
 
 	if (jsonSafe) {
 		// Use Base64 encoding for binary-safe string conversion
@@ -37,8 +45,17 @@ export function wrapBufferToPreparedBuffer(
 				return btoa(String.fromCharCode(...b))
 			}
 		}
-		const mapped: (string | string[])[] = buffers.map((b) => (Array.isArray(b) ? b.map(encodeOne) : encodeOne(b)))
-		encodedBuffers = mapped
+		if (isNested) {
+			doNotTouch = { isNested: true, data: (buffers as Uint8Array[][]).map((group) => group.map(encodeOne)) }
+		} else {
+			doNotTouch = { isNested: false, data: (buffers as Uint8Array[]).map(encodeOne) }
+		}
+	} else {
+		if (isNested) {
+			doNotTouch = { isNested: true, data: buffers as Uint8Array[][] }
+		} else {
+			doNotTouch = { isNested: false, data: buffers as Uint8Array[] }
+		}
 	}
 
 	return {
@@ -46,7 +63,7 @@ export function wrapBufferToPreparedBuffer(
 			'This is a encoded form of the buffer, exactly as the Stream Deck expects it. Do not touch this object, or you can crash your stream deck',
 		modelId,
 		type,
-		do_not_touch: encodedBuffers,
+		do_not_touch: doNotTouch,
 	} satisfies PreparedButtonDrawInternal as any
 }
 
@@ -54,7 +71,7 @@ export function unwrapPreparedBufferToBuffer(
 	modelId: DeviceModelId,
 	// type: string,
 	prepared: PreparedBuffer,
-): (Uint8Array | Uint8Array[])[] {
+): UnwrappedPreparedBuffer {
 	const preparedInternal = prepared as any as PreparedButtonDrawInternal
 	if (preparedInternal.modelId !== modelId) throw new Error('Prepared buffer is for a different model!')
 
@@ -81,11 +98,10 @@ export function unwrapPreparedBufferToBuffer(
 		}
 	}
 
-	return preparedInternal.do_not_touch.map((b) => {
-		if (Array.isArray(b)) {
-			return b.map(decodeOne)
-		} else {
-			return decodeOne(b)
-		}
-	})
+	const doNotTouch = preparedInternal.do_not_touch
+	if (doNotTouch.isNested) {
+		return { isNested: true, groups: doNotTouch.data.map((group) => group.map(decodeOne)) }
+	} else {
+		return { isNested: false, buffers: doNotTouch.data.map(decodeOne) }
+	}
 }
