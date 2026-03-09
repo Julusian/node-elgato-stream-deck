@@ -263,7 +263,7 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 				setImmediate(() => this.emit('connected', this))
 			}
 
-			const ackBuffer = Buffer.alloc(32)
+			const ackBuffer = Buffer.alloc(1024)
 			ackBuffer.writeUInt8(3, 0)
 			ackBuffer.writeUInt8(26, 1)
 			ackBuffer.writeUInt8(packet.payload[5], 2) // connection no
