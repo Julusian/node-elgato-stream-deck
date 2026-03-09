@@ -145,12 +145,16 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		// Cache once loaded. This is a bit of a race condition, but with minimal impact as we already run it before handling the class off anywhere
 		if (this.#loadedHidInfo) return this.#loadedHidInfo
 
-		const deviceInfo = await Promise.race([
-			// primary port
-			this.#executeSingletonCommand(0x80, true).then((data) => ({ data, isPrimary: true })),
-			// secondary port
-			this.#executeSingletonCommand(0x08, false).then((data) => ({ data, isPrimary: false })),
-		])
+		const deviceInfo = await (this.#socket.port < 20000
+			? this.#executeSingletonCommand(0x80, true).then((data) => ({ data, isPrimary: true }))
+			: this.#executeSingletonCommand(0x08, false).then((data) => ({ data, isPrimary: false })))
+
+		// const deviceInfo = await Promise.race([
+		// 	// primary port
+		// 	this.#executeSingletonCommand(0x80, true).then((data) => ({ data, isPrimary: true })),
+		// 	// secondary port
+		// 	this.#executeSingletonCommand(0x08, false).then((data) => ({ data, isPrimary: false })),
+		// ])
 		// Future: this internal mutation is a bit of a hack, but it avoids needing to duplicate the singleton logic
 		this.#isPrimary = deviceInfo.isPrimary
 
