@@ -15,6 +15,11 @@ export interface HIDDevice extends EventEmitter<HIDDeviceEvents> {
 	sendFeatureReport(data: Uint8Array): Promise<void>
 	getFeatureReport(reportId: number, reportLength: number): Promise<Uint8Array>
 
+	/**
+	 * Send multiple reports as a batch, to ensure they are sent together without other interleaving messages.
+	 * Note: This should be called as one operation, and should not have multiple 'operations' within it.
+	 * @param buffers
+	 */
 	sendReports(buffers: Uint8Array[]): Promise<void>
 
 	getDeviceInfo(): Promise<HIDDeviceInfo>

@@ -303,11 +303,10 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 		buffer.writeUint8(message.hidOp, 6)
 		buffer.writeUint32LE(message.messageId, 8)
 		buffer.writeUint32LE(message.payload.length, 12)
+		// This is not very efficient, but is necessary to avoid extra packetization
 		buffer.set(message.payload, 16)
 
-		// Avoid a copy by writing the payload directly to the socket
 		this.#socket.write(buffer)
-		// this.#socket.write(message.payload)
 	}
 
 	sendLegacyWrites(buffers: Uint8Array[]): void {

@@ -11,6 +11,8 @@ import { parseDevice2Info } from '../device2Info.js'
 import { QueuedCommand } from './util.js'
 import type { TcpHidDevice } from './api.js'
 
+const FIRST_STAN = 0x07b3 // This is what the elgato software uses, no idea why
+
 /**
  * A HIDDevice implementation for cora based TCP connections
  * This isn't really HID, but it fits the existing structure well enough
@@ -47,6 +49,15 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 				}
 			} else if (data.payload[0] === 0x01) {
 				this.emit('input', data.payload.subarray(1))
+			} else if (
+				data.messageId &&
+				(data.flags === CoraMessageFlags.ACK_NAK ||
+					data.flags === ((CoraMessageFlags.ACK_NAK | CoraMessageFlags.VERBATIM) as CoraMessageFlags))
+			) {
+				const ackCommand = this.#pendingAckCommands.get(data.messageId)
+				if (ackCommand) {
+					setImmediate(() => ackCommand.resolve(data.payload))
+				}
 			} else if (data.flags & CoraMessageFlags.VERBATIM) {
 				// Command for the Device 2 port
 				singletonCommand = this.#pendingSingletonCommands.get(data.payload[0])
@@ -72,6 +83,15 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 				}
 			}
 			this.#pendingSingletonCommands.clear()
+
+			for (const command of this.#pendingAckCommands.values()) {
+				try {
+					command.reject(new Error('Disconnected'))
+				} catch (_e) {
+					// Ignore
+				}
+			}
+			this.#pendingAckCommands.clear()
 		})
 	}
 
@@ -81,29 +101,50 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 	}
 
 	async sendFeatureReport(data: Uint8Array): Promise<void> {
+		const messageId = this.#getNextMessageId()
+
+		const command = new QueuedCommand(messageId)
+		this.#pendingAckCommands.set(messageId, command)
+
+		command.promise
+			.finally(() => {
+				this.#pendingAckCommands.delete(messageId)
+			})
+			.catch(() => null)
+
 		this.#socket.sendCoraWrites([
 			{
-				flags: CoraMessageFlags.VERBATIM,
+				flags: (CoraMessageFlags.VERBATIM | CoraMessageFlags.REQ_ACK) as CoraMessageFlags,
 				hidOp: CoraHidOp.SEND_REPORT,
-				messageId: 0,
+				messageId: messageId,
 				payload: Buffer.from(data),
 			},
 		])
+
+		await this.#executeWithTimeout(command, 5000)
 	}
 
 	async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
 		return this.#executeSingletonCommand(reportId, this.#isPrimary)
 	}
 
+	#nextMessageId = FIRST_STAN
+	#getNextMessageId(): number {
+		const id = this.#nextMessageId++
+		if (this.#nextMessageId > 0xffffffff) this.#nextMessageId = FIRST_STAN // Wrap around, avoiding the reserved range
+		return id
+	}
+
+	readonly #pendingAckCommands = new Map<number, QueuedCommand>()
 	readonly #pendingSingletonCommands = new Map<number, QueuedCommand>()
 	async #executeSingletonCommand(commandType: number, toHost: boolean): Promise<Uint8Array> {
 		// if (!this.connected) throw new Error('Not connected')
 
-		const messageId = Math.floor(Math.random() * 0xffffff) // Random message ID for Cora
+		// nocommit this should sometimes REQ_ACK
 		const msg: SocketCoraMessage = {
 			flags: toHost ? CoraMessageFlags.NONE : CoraMessageFlags.VERBATIM,
 			hidOp: CoraHidOp.GET_REPORT,
-			messageId: messageId,
+			messageId: this.#getNextMessageId(),
 			payload: toHost ? Buffer.from([0x03, commandType]) : Buffer.from([commandType]),
 		}
 
@@ -118,26 +159,49 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 
 		this.#socket.sendCoraWrites([msg])
 
+		return this.#executeWithTimeout(command, 5000)
+	}
+
+	async #executeWithTimeout(command: QueuedCommand, timeout: number): Promise<Buffer> {
 		// TODO - improve this timeout
 		const timeoutError = new Error('Timeout')
 		// eslint-disable-next-line no-self-assign
 		timeoutError.stack = timeoutError.stack // Ensure stack is captured here
-		setTimeout(() => {
+		const timeoutId = setTimeout(() => {
 			command.reject(timeoutError)
-		}, 5000)
+		}, timeout)
 
-		return command.promise
+		try {
+			return await command.promise
+		} finally {
+			clearTimeout(timeoutId)
+		}
 	}
 
 	async sendReports(buffers: Buffer[]): Promise<void> {
+		const lastMessageId = this.#getNextMessageId()
+
+		const command = new QueuedCommand(lastMessageId)
+		this.#pendingAckCommands.set(lastMessageId, command)
+
+		command.promise
+			.finally(() => {
+				this.#pendingAckCommands.delete(lastMessageId)
+			})
+			.catch(() => null)
+
 		this.#socket.sendCoraWrites(
-			buffers.map((buffer) => ({
-				flags: CoraMessageFlags.VERBATIM,
+			buffers.map((buffer, index) => ({
+				flags: (index === buffers.length - 1
+					? CoraMessageFlags.VERBATIM | CoraMessageFlags.REQ_ACK
+					: CoraMessageFlags.VERBATIM) as CoraMessageFlags,
 				hidOp: CoraHidOp.WRITE,
-				messageId: 0,
+				messageId: index === buffers.length - 1 ? lastMessageId : 0,
 				payload: buffer,
 			})),
 		)
+
+		await this.#executeWithTimeout(command, 5000)
 	}
 
 	#loadedHidInfo: HIDDeviceInfo | undefined

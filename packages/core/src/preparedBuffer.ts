@@ -23,7 +23,7 @@ interface PreparedButtonDrawInternal {
 export function wrapBufferToPreparedBuffer(
 	modelId: DeviceModelId,
 	type: string,
-	buffers: Uint8Array[],
+	buffers: Uint8Array[] | Uint8Array[][],
 	jsonSafe: boolean,
 ): PreparedBuffer {
 	let encodedBuffers: PreparedButtonDrawInternal['do_not_touch'] = buffers

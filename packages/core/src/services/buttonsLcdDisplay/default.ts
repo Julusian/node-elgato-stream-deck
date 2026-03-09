@@ -235,14 +235,14 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		imageBuffer: Uint8Array | Uint8ClampedArray,
 		options?: FillPanelOptions,
 	): Promise<void> {
-		const packets = await this.prepareFillPanelBufferInner(imageBuffer, options)
-		await this.#device.sendReports(packets)
+		const allPackets = await this.prepareFillPanelBufferInner(imageBuffer, options)
+		await Promise.allSettled(allPackets.map(async (keyPackets) => this.#device.sendReports(keyPackets)))
 	}
 
 	private async prepareFillPanelBufferInner(
 		imageBuffer: Uint8Array | Uint8ClampedArray,
 		options?: FillPanelOptions,
-	): Promise<Uint8Array[]> {
+	): Promise<Uint8Array[][]> {
 		const sourceFormat = options?.format ?? 'rgb'
 		this.checkSourceFormat(sourceFormat)
 
@@ -289,8 +289,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 			)
 		}
 
-		const packets = await Promise.all(ps)
-		return packets.flat()
+		return Promise.all(ps)
 	}
 
 	public async prepareFillPanelBuffer(
