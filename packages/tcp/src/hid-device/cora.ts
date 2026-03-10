@@ -54,7 +54,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 				(data.flags === CoraMessageFlags.ACK_NAK ||
 					data.flags === ((CoraMessageFlags.ACK_NAK | CoraMessageFlags.VERBATIM) as CoraMessageFlags))
 			) {
-				const ackCommand = this.#pendingAckCommands.get(data.messageId)
+				const ackCommand = this.#inFlightAckCommands.get(data.messageId)
 				if (ackCommand) {
 					setImmediate(() => ackCommand.resolve(data.payload))
 				}
@@ -84,14 +84,23 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 			}
 			this.#pendingSingletonCommands.clear()
 
-			for (const command of this.#pendingAckCommands.values()) {
+			for (const command of this.#inFlightAckCommands.values()) {
 				try {
 					command.reject(new Error('Disconnected'))
 				} catch (_e) {
 					// Ignore
 				}
 			}
-			this.#pendingAckCommands.clear()
+			this.#inFlightAckCommands.clear()
+
+			for (const { command } of this.#ackCommandQueue) {
+				try {
+					command.reject(new Error('Disconnected'))
+				} catch (_e) {
+					// Ignore
+				}
+			}
+			this.#ackCommandQueue.length = 0
 		})
 	}
 
@@ -100,28 +109,22 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		// await this.#socket.close()
 	}
 
-	async sendFeatureReport(data: Uint8Array): Promise<void> {
-		const messageId = this.#getNextMessageId()
+	async sendFeatureReport(payload: Uint8Array): Promise<void> {
+		// Prepare an error, to capture the stack trace
+		const timeoutError = new Error('Timeout')
+		// eslint-disable-next-line no-self-assign
+		timeoutError.stack = timeoutError.stack
 
-		const command = new QueuedCommand(messageId)
-		this.#pendingAckCommands.set(messageId, command)
-
-		command.promise
-			.finally(() => {
-				this.#pendingAckCommands.delete(messageId)
-			})
-			.catch(() => null)
-
-		this.#socket.sendCoraWrites([
-			{
-				flags: (CoraMessageFlags.VERBATIM | CoraMessageFlags.REQ_ACK) as CoraMessageFlags,
-				hidOp: CoraHidOp.SEND_REPORT,
-				messageId: messageId,
-				payload: Buffer.from(data),
-			},
-		])
-
-		await this.#executeWithTimeout(command, 5000)
+		await this.#enqueueAckCommand(timeoutError, (messageId) => {
+			this.#socket.sendCoraWrites([
+				{
+					flags: (CoraMessageFlags.VERBATIM | CoraMessageFlags.REQ_ACK) as CoraMessageFlags,
+					hidOp: CoraHidOp.SEND_REPORT,
+					messageId,
+					payload,
+				},
+			])
+		})
 	}
 
 	async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
@@ -135,7 +138,52 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		return id
 	}
 
-	readonly #pendingAckCommands = new Map<number, QueuedCommand>()
+	static readonly #MAX_ACK_IN_FLIGHT = 5
+	readonly #inFlightAckCommands = new Map<number, QueuedCommand>()
+	readonly #ackCommandQueue: Array<{
+		command: QueuedCommand
+		timeoutError: Error
+		send: (messageId: number) => void
+	}> = []
+
+	async #enqueueAckCommand(timeoutError: Error, send: (messageId: number) => void): Promise<Uint8Array> {
+		const command = new QueuedCommand(0) // Really just a manual promise for us
+
+		if (this.#inFlightAckCommands.size < TcpCoraHidDevice.#MAX_ACK_IN_FLIGHT) {
+			this.#dispatchAckCommand(command, timeoutError, send)
+		} else {
+			this.#ackCommandQueue.push({ command, timeoutError, send })
+		}
+
+		return command.promise
+	}
+
+	#dispatchAckCommand(command: QueuedCommand, timeoutError: Error, send: (messageId: number) => void): void {
+		const messageId = this.#getNextMessageId()
+		this.#inFlightAckCommands.set(messageId, command)
+
+		// Timeout starts here, when the packet is actually sent
+		const timeoutId = setTimeout(() => command.reject(timeoutError), 5000)
+
+		command.promise
+			.finally(() => {
+				clearTimeout(timeoutId)
+				this.#inFlightAckCommands.delete(messageId)
+				this.#processAckQueue()
+			})
+			.catch(() => null)
+
+		send(messageId)
+	}
+
+	#processAckQueue(): void {
+		if (this.#inFlightAckCommands.size >= TcpCoraHidDevice.#MAX_ACK_IN_FLIGHT) return
+
+		const next = this.#ackCommandQueue.shift()
+		if (!next) return
+
+		this.#dispatchAckCommand(next.command, next.timeoutError, next.send)
+	}
 	readonly #pendingSingletonCommands = new Map<number, QueuedCommand>()
 	async #executeSingletonCommand(commandType: number, toHost: boolean): Promise<Uint8Array> {
 		// if (!this.connected) throw new Error('Not connected')
@@ -162,7 +210,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		return this.#executeWithTimeout(command, 5000)
 	}
 
-	async #executeWithTimeout(command: QueuedCommand, timeout: number): Promise<Buffer> {
+	async #executeWithTimeout(command: QueuedCommand, timeout: number): Promise<Uint8Array> {
 		// TODO - improve this timeout
 		const timeoutError = new Error('Timeout')
 		// eslint-disable-next-line no-self-assign
@@ -179,29 +227,24 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 	}
 
 	async sendReports(buffers: Buffer[]): Promise<void> {
-		const lastMessageId = this.#getNextMessageId()
+		// Prepare an error, to capture the stack trace
+		const timeoutError = new Error('Timeout')
+		// eslint-disable-next-line no-self-assign
+		timeoutError.stack = timeoutError.stack
 
-		const command = new QueuedCommand(lastMessageId)
-		this.#pendingAckCommands.set(lastMessageId, command)
-
-		command.promise
-			.finally(() => {
-				this.#pendingAckCommands.delete(lastMessageId)
-			})
-			.catch(() => null)
-
-		this.#socket.sendCoraWrites(
-			buffers.map((buffer, index) => ({
-				flags: (index === buffers.length - 1
-					? CoraMessageFlags.VERBATIM | CoraMessageFlags.REQ_ACK
-					: CoraMessageFlags.VERBATIM) as CoraMessageFlags,
-				hidOp: CoraHidOp.WRITE,
-				messageId: index === buffers.length - 1 ? lastMessageId : 0,
-				payload: buffer,
-			})),
-		)
-
-		await this.#executeWithTimeout(command, 5000)
+		await this.#enqueueAckCommand(timeoutError, (lastMessageId) => {
+			this.#socket.sendCoraWrites(
+				buffers.map((buffer, index) => ({
+					// This should be a single 'command', so only req_ack the last packet.
+					flags: (index === buffers.length - 1
+						? CoraMessageFlags.VERBATIM | CoraMessageFlags.REQ_ACK
+						: CoraMessageFlags.VERBATIM) as CoraMessageFlags,
+					hidOp: CoraHidOp.WRITE,
+					messageId: index === buffers.length - 1 ? lastMessageId : 0,
+					payload: buffer,
+				})),
+			)
+		})
 	}
 
 	#loadedHidInfo: HIDDeviceInfo | undefined

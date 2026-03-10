@@ -14,7 +14,7 @@ export interface SocketCoraMessage {
 	flags: CoraMessageFlags
 	hidOp: CoraHidOp
 	messageId: number // aka STAN
-	payload: Buffer
+	payload: Uint8Array
 }
 
 export enum CoraHidOp {
