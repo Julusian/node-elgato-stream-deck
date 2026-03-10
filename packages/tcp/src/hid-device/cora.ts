@@ -127,8 +127,8 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		})
 	}
 
-	async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
-		return this.#executeSingletonCommand(reportId, this.#isPrimary)
+	async getFeatureReport(reportId: number, reportLength: number): Promise<Uint8Array> {
+		return this.#executeSingletonCommand(reportId, reportLength, this.#isPrimary)
 	}
 
 	#nextMessageId = FIRST_STAN
@@ -185,15 +185,25 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		this.#dispatchAckCommand(next.command, next.timeoutError, next.send)
 	}
 	readonly #pendingSingletonCommands = new Map<number, QueuedCommand>()
-	async #executeSingletonCommand(commandType: number, toHost: boolean): Promise<Uint8Array> {
+	async #executeSingletonCommand(commandType: number, reportLength: number, toHost: boolean): Promise<Uint8Array> {
 		// if (!this.connected) throw new Error('Not connected')
+
+		let payload: Buffer
+		if (toHost) {
+			payload = Buffer.alloc(Math.max(reportLength, 2))
+			payload.writeUint8(0x03, 0) // Report ID 3 is the "get" report for the primary port
+			payload.writeUint8(commandType, 1)
+		} else {
+			payload = Buffer.alloc(Math.max(reportLength, 1))
+			payload.writeUint8(commandType, 0)
+		}
 
 		// nocommit this should sometimes REQ_ACK
 		const msg: SocketCoraMessage = {
 			flags: toHost ? CoraMessageFlags.NONE : CoraMessageFlags.VERBATIM,
 			hidOp: CoraHidOp.GET_REPORT,
 			messageId: this.#getNextMessageId(),
-			payload: toHost ? Buffer.from([0x03, commandType]) : Buffer.from([commandType]),
+			payload: payload,
 		}
 
 		const command = new QueuedCommand(commandType)
@@ -253,8 +263,8 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		if (this.#loadedHidInfo) return this.#loadedHidInfo
 
 		const deviceInfo = await (this.#socket.port < 20000
-			? this.#executeSingletonCommand(0x80, true).then((data) => ({ data, isPrimary: true }))
-			: this.#executeSingletonCommand(0x08, false).then((data) => ({ data, isPrimary: false })))
+			? this.#executeSingletonCommand(0x80, 32, true).then((data) => ({ data, isPrimary: true }))
+			: this.#executeSingletonCommand(0x08, 32, false).then((data) => ({ data, isPrimary: false })))
 
 		// const deviceInfo = await Promise.race([
 		// 	// primary port
@@ -278,7 +288,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 				path: devicePath,
 			}
 		} else {
-			const rawDevice2Info = await this.#executeSingletonCommand(0x1c, true)
+			const rawDevice2Info = await this.#executeSingletonCommand(0x1c, 2, true)
 			const device2Info = parseDevice2Info(rawDevice2Info)
 			if (!device2Info) throw new Error('Failed to get Device info')
 
@@ -295,7 +305,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 	async getChildDeviceInfo(): Promise<ChildHIDDeviceInfo | null> {
 		if (!this.#isPrimary) return null
 
-		const device2Info = await this.#executeSingletonCommand(0x1c, true)
+		const device2Info = await this.#executeSingletonCommand(0x1c, 2, true)
 
 		return parseDevice2Info(device2Info)
 	}
