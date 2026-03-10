@@ -5,6 +5,7 @@ import {
 	type ChildHIDDeviceInfo,
 	type StreamDeckTcpChildDeviceInfo,
 	uint8ArrayToDataView,
+	VENDOR_ID,
 } from '@elgato-stream-deck/core'
 import { CoraHidOp, CoraMessageFlags, type SocketCoraMessage, type SocketWrapper } from '../socketWrapper.js'
 import { parseDevice2Info } from '../device2Info.js'
@@ -262,10 +263,6 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		// Cache once loaded. This is a bit of a race condition, but with minimal impact as we already run it before handling the class off anywhere
 		if (this.#loadedHidInfo) return this.#loadedHidInfo
 
-		const deviceInfo = await (this.#socket.port < 20000
-			? this.#executeSingletonCommand(0x80, 32, true).then((data) => ({ data, isPrimary: true }))
-			: this.#executeSingletonCommand(0x08, 32, false).then((data) => ({ data, isPrimary: false })))
-
 		// const deviceInfo = await Promise.race([
 		// 	// primary port
 		// 	this.#executeSingletonCommand(0x80, true).then((data) => ({ data, isPrimary: true })),
@@ -273,12 +270,14 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		// 	this.#executeSingletonCommand(0x08, false).then((data) => ({ data, isPrimary: false })),
 		// ])
 		// Future: this internal mutation is a bit of a hack, but it avoids needing to duplicate the singleton logic
-		this.#isPrimary = deviceInfo.isPrimary
+		this.#isPrimary = this.#socket.port < 20000
 
 		const devicePath = `tcp://${this.#socket.address}:${this.#socket.port}`
 
 		if (this.#isPrimary) {
-			const dataView = uint8ArrayToDataView(deviceInfo.data)
+			const deviceInfo = await this.#executeSingletonCommand(0x80, 32, true)
+
+			const dataView = uint8ArrayToDataView(deviceInfo)
 			const vendorId = dataView.getUint16(12, true)
 			const productId = dataView.getUint16(14, true)
 
@@ -288,13 +287,14 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 				path: devicePath,
 			}
 		} else {
-			const rawDevice2Info = await this.#executeSingletonCommand(0x1c, 2, true)
-			const device2Info = parseDevice2Info(rawDevice2Info)
-			if (!device2Info) throw new Error('Failed to get Device info')
+			// const rawDevice2Info = await this.#executeSingletonCommand(0x1c, 2, true)
+			// const device2Info = parseDevice2Info(rawDevice2Info)
+			// if (!device2Info) throw new Error('Failed to get Device info')
 
+			// HACK: force it to specific streamdeck
 			this.#loadedHidInfo = {
-				vendorId: device2Info.vendorId,
-				productId: device2Info.productId,
+				vendorId: VENDOR_ID, //device2Info.vendorId,
+				productId: 0x008f, // device2Info.productId,
 				path: devicePath,
 			}
 		}
