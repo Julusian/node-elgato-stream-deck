@@ -56,9 +56,10 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 	#onSocketConnected = (socket: SocketWrapper) => {
 		const connectionId = this.#getConnectionId(socket.address, socket.port)
 
-		const fakeHidDevice: TcpHidDevice = socket.isCora
-			? new TcpCoraHidDevice(socket)
-			: new TcpLegacyHidDevice(socket)
+		// const fakeHidDevice: TcpHidDevice = socket.isCora
+		// 	? new TcpCoraHidDevice(socket)
+		// 	: new TcpLegacyHidDevice(socket)
+		const fakeHidDevice: TcpHidDevice = new TcpCoraHidDevice(socket)
 
 		// Setup a temporary error handler, in case an error gets produced during the setup
 		const tmpErrorHandler = () => {

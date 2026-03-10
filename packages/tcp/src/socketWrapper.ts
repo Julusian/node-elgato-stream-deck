@@ -73,6 +73,16 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 			this._triggerRetryConnection()
 		})
 		this.#socket.on('data', (d) => this.#handleData(d))
+		this.#socket.on('connect', () => {
+			// Report as connected, if not already
+			if (!this.#connected) {
+				this.#connected = true
+
+				this.#packetMode = 'cora'
+
+				setImmediate(() => this.emit('connected', this))
+			}
+		})
 
 		this.#connectionActive = true
 
@@ -255,13 +265,6 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	#handleCoraDataPacket(packet: SocketCoraMessage) {
 		if (packet.payload.length > 4 && packet.payload[0] === 1 && packet.payload[1] === 10) {
 			// Handle keepalive packet
-
-			// Report as connected, if not already
-			if (!this.#connected) {
-				this.#connected = true
-
-				setImmediate(() => this.emit('connected', this))
-			}
 
 			const ackBuffer = Buffer.alloc(1024)
 			ackBuffer.writeUInt8(3, 0)
