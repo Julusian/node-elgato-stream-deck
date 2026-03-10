@@ -45,11 +45,6 @@ connectionManager.on('connected', async (streamDeck) => {
 	// 	})
 	// 	.catch((e) => console.log('all versions failed', e))
 
-	streamDeck
-		.getSerialNumber()
-		.then((serial) => console.log('serial', serial))
-		.catch((e) => console.log('serial failed', e))
-
 	// // streamDeck
 	// // 	.getFirmwareVersion()
 	// // 	.then((version) => console.log('firmware', version))
@@ -65,15 +60,31 @@ connectionManager.on('connected', async (streamDeck) => {
 	// 	.then((info) => console.log('hid info', info))
 	// 	.catch((e) => console.log('hid info failed', e))
 
-	streamDeck
-		.getChildDeviceInfo()
-		.then((info) => console.log('child info', info))
-		.catch((e) => console.log('child info failed', e))
-
 	if (streamDeck.CONTROLS.length === 0) {
 		// Network dock, skip the rest.
 		return
 	}
+
+	streamDeck
+		.getSerialNumber()
+		.then((serial) => console.log('serial', serial))
+		.catch((e) => console.log('serial failed', e))
+
+	// streamDeck
+	// 	.getChildDeviceInfo()
+	// 	.then((info) => console.log('child info', info))
+	// 	.catch((e) => console.log('child info failed', e))
+
+	const firstButton = streamDeck.CONTROLS.find((control) => control.type === 'button')
+	const img = await sharp(path.resolve('fixtures/github_logo.png'))
+		.flatten()
+		.resize(firstButton.pixelSize.width, firstButton.pixelSize.height)
+		.raw()
+		.toBuffer()
+
+	streamDeck.clearPanel().catch((e) => console.error('clear panel failed:', e))
+
+	streamDeck.setBrightness(80).catch((e) => console.log('brightness failed', e))
 
 	let brightness = 15
 	setInterval(() => {
@@ -85,8 +96,6 @@ connectionManager.on('connected', async (streamDeck) => {
 			})
 			.catch((e) => console.error('set brightness failed:', e))
 	}, 1000)
-
-	streamDeck.clearPanel().catch((e) => console.error('clear panel failed:', e))
 
 	// /** @type {import('@elgato-stream-deck/core').StreamDeckEncoderControlDefinition[]} */
 	// const encoders = streamDeck.CONTROLS.filter((control) => control.type === 'encoder')
@@ -112,12 +121,23 @@ connectionManager.on('connected', async (streamDeck) => {
 	// 	console.log('disconnected!')
 	// })
 
-	const firstButton = streamDeck.CONTROLS.find((control) => control.type === 'button')
-	const img = await sharp(path.resolve('fixtures/github_logo.png'))
-		.flatten()
-		.resize(firstButton.pixelSize.width, firstButton.pixelSize.height)
-		.raw()
-		.toBuffer()
+	let filled = false
+	const doFill = () => {
+		filled = !filled
+		console.log('fill', filled)
+
+		for (const control of streamDeck.CONTROLS) {
+			if (control.type === 'button' && control.feedbackType === 'lcd') {
+				if (filled) {
+					streamDeck.fillKeyBuffer(control.index, img).catch((e) => console.error('Fill failed:', e))
+				} else {
+					streamDeck.clearKey(control.index).catch((e) => console.error('Clear failed:', e))
+				}
+			}
+		}
+	}
+	// setInterval(doFill, 1000)
+	doFill()
 
 	streamDeck.on('down', (control) => {
 		if (control.type === 'button') {
