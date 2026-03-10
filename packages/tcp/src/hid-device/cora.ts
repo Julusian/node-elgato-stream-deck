@@ -138,7 +138,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		return id
 	}
 
-	static readonly #MAX_ACK_IN_FLIGHT = 5
+	static readonly #MAX_ACK_IN_FLIGHT = 1 // TODO - try and set this higher, but start with this to be safe
 	readonly #inFlightAckCommands = new Map<number, QueuedCommand>()
 	readonly #ackCommandQueue: Array<{
 		command: QueuedCommand
