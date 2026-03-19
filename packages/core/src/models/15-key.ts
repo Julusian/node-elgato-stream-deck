@@ -8,14 +8,14 @@ import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 import type { PropertiesService } from '../services/properties/interface.js'
 
 const base15KeyProperties: Omit<StreamDeckGen2Properties, 'MODEL' | 'PRODUCT_NAME'> = {
-	SUPPORTS_RGB_KEY_FILL: false, // TODO - verify SUPPORTS_RGB_KEY_FILL
+	SUPPORTS_RGB_KEY_FILL: true,
 
 	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3, { width: 72, height: 72 })),
 
 	KEY_SPACING_HORIZONTAL: 25,
 	KEY_SPACING_VERTICAL: 25,
 
-	FULLSCREEN_PANELS: 0,
+	FULLSCREEN_PANELS: 1,
 	HAS_NFC_READER: false,
 	SUPPORTS_CHILD_DEVICES: false,
 }
