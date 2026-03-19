@@ -48,16 +48,21 @@ export class WebHIDDevice extends EventEmitter<HIDDeviceEvents> implements CoreH
 		return this.device.forget()
 	}
 
-	public async sendFeatureReport(data: Uint8Array): Promise<void> {
-		// Ensure the buffer is as long as required for the feature report
-		const byteLength = this.reportByteLengths.get(data[0])
-		let dataFull = data.subarray(1)
-		if (byteLength && dataFull.length != byteLength) {
-			dataFull = new Uint8Array(byteLength)
-			dataFull.set(data.subarray(1, Math.min(data.length - 1, dataFull.length)))
-		}
+	public sendFeatureReport(data: Uint8Array): Promise<void> {
+		return this.reportQueue.add(async () => {
+			// Ensure the buffer is as long as required for the feature report
+			const byteLength = this.reportByteLengths.get(data[0])
+			let dataFull = data.subarray(1)
+			if (byteLength && dataFull.length != byteLength) {
+				dataFull = new Uint8Array(byteLength)
+				dataFull.set(data.subarray(1, Math.min(data.length - 1, dataFull.length)))
+			}
 
-		return this.device.sendFeatureReport(data[0], dataFull)
+			await this.device.sendFeatureReport(data[0], dataFull)
+
+			// Some streamdecks on windows get upset with too many reports in quick succession, so add some spacing
+			await new Promise((resolve) => setTimeout(resolve, 1))
+		})
 	}
 	public async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
 		const view = await this.device.receiveFeatureReport(reportId)
