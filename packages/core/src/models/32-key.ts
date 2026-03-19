@@ -8,7 +8,7 @@ import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 import type { PropertiesService } from '../services/properties/interface.js'
 
 const base32KeyProperties: Omit<StreamDeckGen2Properties, 'MODEL' | 'PRODUCT_NAME'> = {
-	SUPPORTS_RGB_KEY_FILL: true, // rev2 doesn't support it, even though rev1 does
+	SUPPORTS_RGB_KEY_FILL: true,
 
 	CONTROLS: freezeDefinitions(generateButtonsGrid(8, 4, { width: 96, height: 96 })),
 

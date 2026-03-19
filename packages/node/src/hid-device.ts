@@ -48,7 +48,7 @@ export class NodeHIDDevice extends EventEmitter<HIDDeviceEvents> implements HIDD
 		await this.device.close()
 	}
 
-	public sendFeatureReport(data: Uint8Array): Promise<void> {
+	public async sendFeatureReport(data: Uint8Array): Promise<void> {
 		return this.#writeQueue.add(async () => {
 			await this.device.sendFeatureReport(Buffer.from(data)) // Future: avoid re-wrap
 
@@ -59,7 +59,7 @@ export class NodeHIDDevice extends EventEmitter<HIDDeviceEvents> implements HIDD
 	public async getFeatureReport(reportId: number, reportLength: number): Promise<Uint8Array> {
 		return this.device.getFeatureReport(reportId, reportLength)
 	}
-	public sendReports(buffers: Uint8Array[]): Promise<void> {
+	public async sendReports(buffers: Uint8Array[]): Promise<void> {
 		return this.#writeQueue.add(async () => {
 			const ps: Promise<any>[] = []
 			for (const data of buffers) {

@@ -48,7 +48,7 @@ export class WebHIDDevice extends EventEmitter<HIDDeviceEvents> implements CoreH
 		return this.device.forget()
 	}
 
-	public sendFeatureReport(data: Uint8Array): Promise<void> {
+	public async sendFeatureReport(data: Uint8Array): Promise<void> {
 		return this.reportQueue.add(async () => {
 			// Ensure the buffer is as long as required for the feature report
 			const byteLength = this.reportByteLengths.get(data[0])
