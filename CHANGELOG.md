@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.6.1](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.0...v7.6.1) (2026-03-19)
+
+
+### Bug Fixes
+
+* avoid flooding streamdecks with too any feature reports in a short span ([f39a9ed](https://github.com/Julusian/node-elgato-stream-deck/commit/f39a9ed14aa204e802d514a02e6a8b7a3d00ba41))
+* avoid flooding streamdecks with too any feature reports in a short span ([1418069](https://github.com/Julusian/node-elgato-stream-deck/commit/1418069bdf9f26253c6a7f49b2b7a931f22d0e6c))
+* enable tcp noDelay, and reduce packet segmentation ([770927e](https://github.com/Julusian/node-elgato-stream-deck/commit/770927eb932c9f966ec1d9a9eb94120f4535ae7d))
+* optimise clear panel calls ([d9078e9](https://github.com/Julusian/node-elgato-stream-deck/commit/d9078e933a40c83e708201cf96f1a891dad8fda0))
+
 ## [7.6.0](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.5.2...v7.6.0) (2026-03-03)
 
 
