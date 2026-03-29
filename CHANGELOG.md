@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.6.2](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.1...v7.6.2) (2026-03-29)
+
+
+### Bug Fixes
+
+* EISCONN upon connection loss of network dock ([#152](https://github.com/Julusian/node-elgato-stream-deck/issues/152)) ([7432235](https://github.com/Julusian/node-elgato-stream-deck/commit/7432235cf8449e7aba0c2cf4aa52fe89f6e54454))
+
 ## [7.6.1](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.0...v7.6.1) (2026-03-19)
 
 
