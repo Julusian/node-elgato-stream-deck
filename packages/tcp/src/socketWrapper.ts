@@ -40,6 +40,7 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	#connected = false
 	#retryConnectTimeout: NodeJS.Timeout | null = null
 	#connectionActive = false // True when connected/connecting/reconnecting
+	#immediateReconnect = false // Set when a timeout-triggered destroy should reconnect without delay
 	#lastReceived = Date.now()
 	#receiveBuffer: Buffer | null = null
 
@@ -102,12 +103,20 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 			this.#connected = false
 			setImmediate(() => this.emit('disconnected', this))
 
-			this._retryConnection()
+			// Destroy the socket so it is fully closed before reconnecting.
+			// Calling socket.connect() while the socket is still TCP-connected
+			// would throw EISCONN. The 'close' event will reconnect immediately
+			// (no RECONNECT_INTERVAL delay) via the #immediateReconnect flag.
+			this.#immediateReconnect = true
+			this.#socket.destroy()
 		}
 	}
 
 	private _triggerRetryConnection() {
-		if (!this.#retryConnectTimeout) {
+		if (this.#immediateReconnect) {
+			this.#immediateReconnect = false
+			setImmediate(() => this._retryConnection())
+		} else if (!this.#retryConnectTimeout) {
 			this.#retryConnectTimeout = setTimeout(() => {
 				this._retryConnection()
 			}, RECONNECT_INTERVAL)
