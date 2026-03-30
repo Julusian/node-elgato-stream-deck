@@ -90,7 +90,7 @@ jobs:
           CI: true
       - name: Send coverage
         if: matrix.node-version == '18.x'
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
