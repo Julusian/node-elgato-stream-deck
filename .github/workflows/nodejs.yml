@@ -115,7 +115,7 @@ jobs:
           yarn build:root
           yarn build:udev
       - name: verify files are up to date
-        uses: infotroph/tree-is-clean@v1.0.6
+        uses: infotroph/tree-is-clean@v2.0.0
         with:
           check_untracked: false
 
