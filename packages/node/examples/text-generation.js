@@ -10,27 +10,30 @@ const { listStreamDecks, openStreamDeck } = require('../dist/index')
 	const streamDeck = await openStreamDeck(devices[0].path)
 	await streamDeck.clearPanel()
 
+	const firstButton = streamDeck.CONTROLS.find(
+		(control) => control.type === 'button' && control.feedbackType === 'lcd',
+	)
+	if (!firstButton) throw new Error('No LCD button found')
+	const buttonWidth = firstButton.pixelSize.width
+	const buttonHeight = firstButton.pixelSize.height
+
 	streamDeck.on('down', async (control) => {
 		if (control.type !== 'button') return
 
 		console.log('Filling button #%d', control.index)
 
 		try {
-			const finalBuffer = await sharp(
-				path.resolve(__dirname, `fixtures/github_logo_${streamDeck.BUTTON_WIDTH_PX}.jpg`),
-			)
+			const finalBuffer = await sharp(path.resolve(__dirname, `fixtures/github_logo_${buttonWidth}.jpg`))
 				.composite([
 					{
 						input: Buffer.from(
-							`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${streamDeck.BUTTON_WIDTH_PX} ${
-								streamDeck.BUTTON_HEIGHT_PX
-							}" version="1.1">
+							`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${buttonWidth} ${buttonHeight}" version="1.1">
                         <text
                             font-family="'sans-serif'"
                             font-size="14px"
-							font-weight="bold"
-                            x="${streamDeck.BUTTON_WIDTH_PX / 2}"
-                            y="${streamDeck.BUTTON_HEIGHT_PX - 10}"
+								font-weight="bold"
+                            x="${buttonWidth / 2}"
+                            y="${buttonHeight - 10}"
                             fill="#fff"
                             text-anchor="middle"
 							stroke="#666"

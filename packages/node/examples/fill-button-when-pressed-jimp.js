@@ -10,8 +10,13 @@ const { listStreamDecks, openStreamDeck } = require('../dist/index')
 	const streamDeck = await openStreamDeck(devices[0].path)
 	streamDeck.clearPanel()
 
+	const firstButton = streamDeck.CONTROLS.find(
+		(control) => control.type === 'button' && control.feedbackType === 'lcd',
+	)
+	if (!firstButton) throw new Error('No LCD button found')
+
 	const bmpImg = await Jimp.read(path.resolve(__dirname, 'fixtures/github_logo.png')).then((img) => {
-		return img.resize({ w: streamDeck.BUTTON_WIDTH_PX, h: streamDeck.BUTTON_HEIGHT_PX })
+		return img.resize({ w: firstButton.pixelSize.width, h: firstButton.pixelSize.height })
 	})
 
 	const img = bmpImg.bitmap.data

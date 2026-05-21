@@ -112,10 +112,6 @@ connectionManager.on('connected', async (streamDeck) => {
 	// 	streamDeck.resetToLogo()
 	// }, 2000)
 
-	streamDeck.on('disconnected', () => {
-		console.log('disconnected!')
-	})
-
 	streamDeck.on('down', (control) => {
 		if (control.type === 'button') {
 			// Fill the pressed key with an image of the GitHub logo.
