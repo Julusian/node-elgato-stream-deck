@@ -50,13 +50,19 @@ export class Gen1PropertiesService implements PropertiesService {
 	}
 
 	public async getSerialNumber(): Promise<string> {
-		let val: Uint8Array
 		try {
-			val = await this.#device.getFeatureReport(3, 32)
+			const val = await this.#device.getFeatureReport(3, 32)
+
+			// At some point the serials changed from 12 to 14 chars. Not sure if this
+			// aligned with a hardware revision or a firmware change.
+			// So while it is messy, we attempt to handle both cases here
+			let end = 5
+			while (end < val.length && val[end] >= 0x20 && val[end] <= 0x7e) end++
+			return new TextDecoder('ascii').decode(val.subarray(5, end))
 		} catch (_e) {
 			// In case some devices can't handle the different report length
-			val = await this.#device.getFeatureReport(3, 17)
+			const val = await this.#device.getFeatureReport(3, 17)
+			return new TextDecoder('ascii').decode(val.subarray(5, 17))
 		}
-		return new TextDecoder('ascii').decode(val.subarray(5, 17))
 	}
 }
