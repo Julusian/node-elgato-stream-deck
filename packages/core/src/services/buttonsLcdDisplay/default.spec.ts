@@ -201,6 +201,18 @@ describe('DefaultButtonsLcdService', () => {
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 1, 0, 0, 0]))
 		})
 
+		test('uses hidIndex (not keyIndex) in the feature report when they differ', async () => {
+			const props: Readonly<StreamDeckProperties> = {
+				...makeRgbProperties(),
+				CONTROLS: [{ type: 'button', index: 5, hidIndex: 12, feedbackType: 'rgb', row: 0, column: 0 }] as any,
+			}
+			const service = new DefaultButtonsLcdService(writer, packer, device as any, props)
+			await service.clearKey(5)
+
+			// Byte 2 must be hidIndex=12, not the logical keyIndex=5
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 12, 0, 0, 0]))
+		})
+
 		test('LCD key with SUPPORTS_RGB_KEY_FILL: uses sendFeatureReport', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device as any, makeLcdProperties(true))
 			await service.clearKey(0)
@@ -239,6 +251,18 @@ describe('DefaultButtonsLcdService', () => {
 			await service.fillKeyColor(0, 255, 128, 64)
 
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 0, 255, 128, 64]))
+		})
+
+		test('uses hidIndex (not keyIndex) in the feature report when they differ', async () => {
+			const props: Readonly<StreamDeckProperties> = {
+				...makeRgbProperties(),
+				CONTROLS: [{ type: 'button', index: 5, hidIndex: 12, feedbackType: 'rgb', row: 0, column: 0 }] as any,
+			}
+			const service = new DefaultButtonsLcdService(writer, packer, device as any, props)
+			await service.fillKeyColor(5, 255, 0, 0)
+
+			// Byte 2 must be hidIndex=12, not the logical keyIndex=5
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 12, 255, 0, 0]))
 		})
 
 		test('LCD key with SUPPORTS_RGB_KEY_FILL: uses sendFeatureReport', async () => {

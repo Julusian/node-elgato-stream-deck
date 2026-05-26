@@ -131,7 +131,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		if (!control || control.feedbackType === 'none') throw new TypeError(`Expected a valid keyIndex`)
 
 		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control.feedbackType === 'rgb') {
-			await this.sendKeyRgb(keyIndex, 0, 0, 0)
+			await this.sendKeyRgb(control.hidIndex, 0, 0, 0)
 		} else {
 			const pixels = new Uint8Array(control.pixelSize.width * control.pixelSize.height * 3)
 			// TODO - caching?
@@ -155,7 +155,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		if (!control || control.feedbackType === 'none') throw new TypeError(`Expected a valid keyIndex`)
 
 		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control.feedbackType === 'rgb') {
-			await this.sendKeyRgb(keyIndex, r, g, b)
+			await this.sendKeyRgb(control.hidIndex, r, g, b)
 		} else {
 			// rgba is excessive here, but it makes the fill easier as it can be done in a 32bit uint
 			const pixelCount = control.pixelSize.width * control.pixelSize.height
