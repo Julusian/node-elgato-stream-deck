@@ -206,7 +206,7 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 		socket.on('connected', () => this.#onSocketConnected(socket))
 		socket.on('disconnected', () => this.#onSocketDisconnected(socket))
 		socket.on('error', () => {
-			// TODO
+			// Ignore, this will be handled by the 'disconnected' event when the socket closes, and we don't want to emit multiple errors for the same issue
 		})
 	}
 
