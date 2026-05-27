@@ -31,7 +31,7 @@ export function wrapBufferToPreparedBuffer(
 	if (jsonSafe) {
 		// Use Base64 encoding for binary-safe string conversion
 		if (typeof Buffer !== 'undefined') {
-			encodedBuffers = buffers.map((b) => Buffer.from(b).toString('base64'))
+			encodedBuffers = buffers.map((b) => Buffer.from(b.buffer, b.byteOffset, b.byteLength).toString('base64'))
 		} else {
 			encodedBuffers = buffers.map((b) => btoa(String.fromCharCode(...b)))
 		}

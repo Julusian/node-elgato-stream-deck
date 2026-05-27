@@ -50,7 +50,7 @@ export class NodeHIDDevice extends EventEmitter<HIDDeviceEvents> implements HIDD
 
 	public async sendFeatureReport(data: Uint8Array): Promise<void> {
 		return this.#writeQueue.add(async () => {
-			await this.device.sendFeatureReport(Buffer.from(data)) // Future: avoid re-wrap
+			await this.device.sendFeatureReport(Buffer.from(data.buffer, data.byteOffset, data.byteLength))
 
 			// Some streamdecks on windows get upset with too many reports in quick succession, so add some spacing
 			await new Promise((resolve) => setTimeout(resolve, 1))
@@ -63,7 +63,7 @@ export class NodeHIDDevice extends EventEmitter<HIDDeviceEvents> implements HIDD
 		return this.#writeQueue.add(async () => {
 			const ps: Promise<any>[] = []
 			for (const data of buffers) {
-				ps.push(this.device.write(Buffer.from(data))) // Future: avoid re-wrap
+				ps.push(this.device.write(Buffer.from(data.buffer, data.byteOffset, data.byteLength)))
 			}
 			await Promise.all(ps)
 		})

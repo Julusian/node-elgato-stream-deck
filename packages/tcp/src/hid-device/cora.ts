@@ -86,7 +86,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 				flags: CoraMessageFlags.VERBATIM,
 				hidOp: CoraHidOp.SEND_REPORT,
 				messageId: 0,
-				payload: Buffer.from(data),
+				payload: Buffer.from(data.buffer, data.byteOffset, data.byteLength),
 			},
 		])
 	}
