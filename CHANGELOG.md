@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.6.3](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.2...v7.6.3) (2026-05-27)
+
+
+### Bug Fixes
+
+* incorrect modelId in some prepared buffers ([b754f04](https://github.com/Julusian/node-elgato-stream-deck/commit/b754f0483fefdae514400bcd86291b818631f764))
+* minimise buffer rewrapping ([c31faa7](https://github.com/Julusian/node-elgato-stream-deck/commit/c31faa7b5b775b85d174f71f2498c4d0c45e6bf5))
+* mixing keyIndex and hidIndex ([392484e](https://github.com/Julusian/node-elgato-stream-deck/commit/392484e80774f9ce1ef615182faa2b91a756b523))
+* truncated serial numbers for modern mini/6key ([8406fb0](https://github.com/Julusian/node-elgato-stream-deck/commit/8406fb0221909fd805e6d6711ad1cade5d33033f))
+
 ## [7.6.2](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.1...v7.6.2) (2026-03-29)
 
 
