@@ -2,13 +2,14 @@ import { StreamdeckDefaultLcdService } from './generic.js'
 import type { HIDDevice } from '../../hid-device.js'
 import type { EncodeJPEGHelper } from '../../models/base.js'
 import type { StreamDeckLcdSegmentControlDefinition } from '../../controlDefinition.js'
+import { DeviceModelId } from '../../id.js'
 
 function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendReports'>> {
 	return { sendReports: jest.fn().mockResolvedValue(undefined) } as any
 }
 
 function makeEncodeJpeg(): jest.MockedFunction<EncodeJPEGHelper> {
-	return jest.fn(async (buf) => buf) // passthrough
+	return jest.fn(async (buf, _w, _h) => buf) // passthrough
 }
 
 const plusLcdControl: StreamDeckLcdSegmentControlDefinition = {
@@ -30,7 +31,13 @@ describe('StreamdeckDefaultLcdService', () => {
 	beforeEach(() => {
 		device = makeMockDevice()
 		encodeJpeg = makeEncodeJpeg()
-		service = new StreamdeckDefaultLcdService(encodeJpeg, device as any, [plusLcdControl], false)
+		service = new StreamdeckDefaultLcdService(
+			encodeJpeg,
+			device as any,
+			[plusLcdControl],
+			false,
+			DeviceModelId.PLUS,
+		)
 	})
 
 	describe('fillLcd', () => {
@@ -57,7 +64,13 @@ describe('StreamdeckDefaultLcdService', () => {
 		})
 
 		test('rotate=true swaps width/height in encodeJPEG call', async () => {
-			const rotatedService = new StreamdeckDefaultLcdService(encodeJpeg, device as any, [plusLcdControl], true)
+			const rotatedService = new StreamdeckDefaultLcdService(
+				encodeJpeg,
+				device as any,
+				[plusLcdControl],
+				true,
+				DeviceModelId.PLUS_XL,
+			)
 			const buffer = new Uint8Array(800 * 100 * 3)
 			await rotatedService.fillLcd(0, buffer, { format: 'rgb' })
 
@@ -138,13 +151,19 @@ describe('StreamdeckDefaultLcdService', () => {
 				{ ...plusLcdControl, id: 0 },
 				// Note: id is always 0 per the type definition currently, but test the loop behaviour
 			]
-			const svc = new StreamdeckDefaultLcdService(encodeJpeg, device as any, multiControl, false)
+			const svc = new StreamdeckDefaultLcdService(
+				encodeJpeg,
+				device as any,
+				multiControl,
+				false,
+				DeviceModelId.PLUS,
+			)
 			await svc.clearAllLcdSegments()
 			expect(device.sendReports).toHaveBeenCalledTimes(1)
 		})
 
 		test('does nothing for empty control list', async () => {
-			const svc = new StreamdeckDefaultLcdService(encodeJpeg, device as any, [], false)
+			const svc = new StreamdeckDefaultLcdService(encodeJpeg, device as any, [], false, DeviceModelId.PLUS)
 			await svc.clearAllLcdSegments()
 			expect(device.sendReports).not.toHaveBeenCalled()
 		})

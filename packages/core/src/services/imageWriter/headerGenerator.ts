@@ -17,7 +17,7 @@ export class StreamdeckGen1ImageHeaderGenerator implements StreamdeckImageHeader
 
 		bufferView.setUint8(0, 0x02)
 		bufferView.setUint8(1, 0x01)
-		bufferView.setUint16(2, partIndex, true)
+		bufferView.setUint8(2, partIndex)
 		bufferView.setUint8(4, isLast ? 1 : 0)
 		bufferView.setUint8(5, props.keyIndex + 1)
 	}
@@ -42,7 +42,7 @@ export class StreamdeckGen2ImageHeaderGenerator implements StreamdeckImageHeader
 		bufferView.setUint8(2, props.keyIndex)
 		bufferView.setUint8(3, isLast ? 1 : 0)
 		bufferView.setUint16(4, bodyLength, true)
-		bufferView.setUint16(6, partIndex++, true)
+		bufferView.setUint16(6, partIndex, true)
 	}
 }
 

@@ -8,13 +8,14 @@ import type { FillImageOptions, FillLcdImageOptions } from '../../types.js'
 import { transformImageBuffer } from '../../util.js'
 import type { EncodeJPEGHelper } from '../../models/base.js'
 import { wrapBufferToPreparedBuffer, type PreparedBuffer } from '../../preparedBuffer.js'
-import { DeviceModelId } from '../../id.js'
+import type { DeviceModelId } from '../../id.js'
 
 export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper
 	readonly #device: HIDDevice
 	readonly #lcdControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>
 	readonly #rotate: boolean
+	readonly #modelId: DeviceModelId
 
 	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter(new StreamdeckDefaultLcdImageHeaderGenerator())
 
@@ -23,11 +24,13 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 		device: HIDDevice,
 		lcdControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>,
 		rotate: boolean,
+		modelId: DeviceModelId,
 	) {
 		this.#encodeJPEG = encodeJPEG
 		this.#device = device
 		this.#lcdControls = lcdControls
 		this.#rotate = rotate
+		this.#modelId = modelId
 	}
 
 	public async fillLcd(
@@ -72,7 +75,7 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
 		const packets = await this.prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions)
-		return wrapBufferToPreparedBuffer(DeviceModelId.PLUS, 'fill-lcd-region', packets, jsonSafe ?? false)
+		return wrapBufferToPreparedBuffer(this.#modelId, 'fill-lcd-region', packets, jsonSafe ?? false)
 	}
 
 	public async clearLcdSegment(index: number): Promise<void> {

@@ -80,7 +80,13 @@ export async function GalleonK100Factory(
 		yFlip: false,
 	})
 	services.encoderLed = new GalleonK100EncoderLedService(device, galleonK100Properties.CONTROLS)
-	services.lcdSegmentDisplay = new StreamdeckDefaultLcdService(options.encodeJPEG, device, lcdSegmentControls, false)
+	services.lcdSegmentDisplay = new StreamdeckDefaultLcdService(
+		options.encodeJPEG,
+		device,
+		lcdSegmentControls,
+		false,
+		DeviceModelId.GALLEON_K100,
+	)
 
 	const streamDeck = new GalleonK100StreamDeck(device, options, services)
 

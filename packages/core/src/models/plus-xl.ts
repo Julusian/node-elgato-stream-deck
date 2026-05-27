@@ -111,7 +111,13 @@ export function StreamDeckPlusXlFactory(device: HIDDevice, options: Required<Ope
 		rotate: true,
 		yFlip: true,
 	})
-	services.lcdSegmentDisplay = new StreamdeckDefaultLcdService(options.encodeJPEG, device, lcdSegmentControls, true)
+	services.lcdSegmentDisplay = new StreamdeckDefaultLcdService(
+		options.encodeJPEG,
+		device,
+		lcdSegmentControls,
+		true,
+		DeviceModelId.PLUS_XL,
+	)
 
 	return new StreamDeckBase(device, options, services)
 }
