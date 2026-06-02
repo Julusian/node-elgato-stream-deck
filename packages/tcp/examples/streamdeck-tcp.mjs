@@ -3,6 +3,23 @@ import path from 'path'
 import sharp from 'sharp'
 import { StreamDeckTcpConnectionManager } from '../dist/index.js'
 
+// Parse command line arguments
+const args = process.argv.slice(2)
+const ipAddress = args[0]
+
+if (!ipAddress) {
+	console.error('Error: IP address is required')
+	console.log('')
+	console.log('Usage: node streamdeck-tcp.mjs <ip-address>')
+	console.log('')
+	console.log('Examples:')
+	console.log('  node streamdeck-tcp.mjs 192.168.1.100')
+	console.log('')
+	console.log('Description:')
+	console.log('  Connects to an Elgato Stream Deck via TCP at the specified IP address.')
+	process.exit(1)
+}
+
 const connectionManager = new StreamDeckTcpConnectionManager()
 
 function generateEncoderColor(value, max) {
@@ -18,7 +35,7 @@ function generateEncoderColor(value, max) {
 	return colors
 }
 
-connectionManager.connectTo('10.42.13.166')
+connectionManager.connectTo(ipAddress)
 
 connectionManager.on('error', (err) => {
 	console.log('error', err)

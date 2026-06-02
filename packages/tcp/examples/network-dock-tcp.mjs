@@ -14,7 +14,6 @@ if (!ipAddress) {
 	console.log('')
 	console.log('Examples:')
 	console.log('  node network-dock-tcp.mjs 192.168.1.100')
-	console.log('  node network-dock-tcp.mjs 10.42.13.180')
 	console.log('')
 	console.log('Description:')
 	console.log('  Connects to an Elgato Stream Deck via TCP at the specified IP address.')

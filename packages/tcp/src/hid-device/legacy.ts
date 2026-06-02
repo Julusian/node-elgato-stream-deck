@@ -140,8 +140,10 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 		const deviceInfo = await Promise.race([
 			// primary port
 			this.#executeSingletonCommand(0x80, true).then((data) => ({ data, isPrimary: true })),
-			// secondary port
+			// secondary port (general protocol)
 			this.#executeSingletonCommand(0x08, false).then((data) => ({ data, isPrimary: false })),
+			// secondary port (Mini protocol: Get Firmware Version AP2 — Mini has no 0x08 command)
+			this.#executeSingletonCommand(0xa1, false).then((data) => ({ data, isPrimary: false })),
 		])
 		// Future: this internal mutation is a bit of a hack, but it avoids needing to duplicate the singleton logic
 		this.#isPrimary = deviceInfo.isPrimary
