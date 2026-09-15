@@ -26,8 +26,8 @@
 	},
 	"devDependencies": {
 		"copy-webpack-plugin": "^13.0.1",
-		"ts-loader": "^9.5.4",
-		"webpack": "^5.104.1",
+		"ts-loader": "^9.6.2",
+		"webpack": "^5.110.3",
 		"webpack-cli": "^6.0.1",
 		"webpack-dev-server": "^5.2.6"
 	}
