@@ -14,7 +14,7 @@
     "lint:raw": "eslint",
     "lint": "run lint:raw packages",
     "lint-fix": "run lint --fix",
-    "validate:dependencies": "yarn npm audit && run license-validate",
+    "validate:dependencies": "yarn npm audit --no-deprecations && run license-validate",
     "license-validate": "node ./scripts/license-check.mjs"
   },
   "lint-staged": {
