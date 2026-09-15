@@ -21,7 +21,7 @@ k100Controls.push(
 
 		hasLed: false,
 		ledRingSteps: 4,
-		lcdRingOffset: 3,
+		ledRingOffset: 3,
 	},
 	{
 		type: 'encoder',
@@ -32,7 +32,7 @@ k100Controls.push(
 
 		hasLed: false,
 		ledRingSteps: 4,
-		lcdRingOffset: 1,
+		ledRingOffset: 1,
 	},
 	{
 		type: 'lcd-segment',

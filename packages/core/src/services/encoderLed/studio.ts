@@ -77,12 +77,12 @@ export class StudioEncoderLedService implements EncoderLedService {
 		let colorsBuffer = colors instanceof Uint8Array ? colors : new Uint8Array(colors)
 
 		// If there is an offset, repack the buffer to change the start point
-		if (control.lcdRingOffset) {
+		if (control.ledRingOffset) {
 			const oldColorsBuffer = colorsBuffer
 			colorsBuffer = new Uint8Array(oldColorsBuffer.length)
 
-			colorsBuffer.set(oldColorsBuffer.slice(control.lcdRingOffset * 3), 0)
-			colorsBuffer.set(oldColorsBuffer.slice(0, control.lcdRingOffset * 3), control.lcdRingOffset * 3)
+			colorsBuffer.set(oldColorsBuffer.slice(control.ledRingOffset * 3), 0)
+			colorsBuffer.set(oldColorsBuffer.slice(0, control.ledRingOffset * 3), control.ledRingOffset * 3)
 		}
 
 		const buffer = new Uint8Array(1024)

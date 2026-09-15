@@ -63,12 +63,12 @@ export class GalleonK100EncoderLedService implements EncoderLedService {
 		let colorsArray: number[] = colors instanceof Uint8Array ? Array.from(colors) : colors
 
 		// If there is an offset, repack the buffer to change the start point
-		if (control.lcdRingOffset) {
+		if (control.ledRingOffset) {
 			const oldColorsArray = colorsArray
 			colorsArray = []
 
-			colorsArray.push(...oldColorsArray.slice(control.lcdRingOffset * 3))
-			colorsArray.push(...oldColorsArray.slice(0, control.lcdRingOffset * 3))
+			colorsArray.push(...oldColorsArray.slice(control.ledRingOffset * 3))
+			colorsArray.push(...oldColorsArray.slice(0, control.ledRingOffset * 3))
 		}
 
 		// Assume them all the same number of steps

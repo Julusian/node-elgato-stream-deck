@@ -50,13 +50,6 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	/** List of the controls on this streamdeck */
 	readonly CONTROLS: Readonly<StreamDeckControlDefinition[]>
 
-	// TODO: replace these with a definition on each button control which gives it a coordinate inside of the display
-	// These are removed temporarily until this is done, to avoid this being another breaking change if it does want to change
-	// /** The horizontal spacing in pixels between each button */
-	// readonly KEY_SPACING_HORIZONTAL: number
-	// /** The vertical spacing in pixels between each button */
-	// readonly KEY_SPACING_VERTICAL: number
-
 	/** The model of this device */
 	readonly MODEL: DeviceModelId
 	/** The name of the product/model */

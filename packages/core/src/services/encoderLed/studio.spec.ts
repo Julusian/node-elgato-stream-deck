@@ -10,7 +10,7 @@ function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendReports'>> {
 
 const twoEncoderControls: StreamDeckControlDefinition[] = [
 	{ type: 'encoder', index: 0, hidIndex: 0, row: 0, column: 0, hasLed: true, ledRingSteps: 24 },
-	{ type: 'encoder', index: 1, hidIndex: 1, row: 0, column: 1, hasLed: true, ledRingSteps: 24, lcdRingOffset: 12 },
+	{ type: 'encoder', index: 1, hidIndex: 1, row: 0, column: 1, hasLed: true, ledRingSteps: 24, ledRingOffset: 12 },
 ]
 
 describe('StudioEncoderLedService', () => {
@@ -115,7 +115,7 @@ describe('StudioEncoderLedService', () => {
 			await expect(service.setEncoderRingColors(0, new Uint8Array(5))).rejects.toThrow('Invalid colors length')
 		})
 
-		test('applies lcdRingOffset=12 rotation for encoder 1', async () => {
+		test('applies ledRingOffset=12 rotation for encoder 1', async () => {
 			const colors = new Uint8Array(24 * 3)
 			// pixel 12 in input becomes pixel 0 in output buffer
 			colors[12 * 3] = 77

@@ -9,10 +9,10 @@ function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendFeatureReport' | 'se
 	}
 }
 
-// Two encoders: index 0 (12 ring steps), index 1 (12 ring steps, lcdRingOffset=6)
+// Two encoders: index 0 (12 ring steps), index 1 (12 ring steps, ledRingOffset=6)
 const twoEncoderControls: StreamDeckControlDefinition[] = [
 	{ type: 'encoder', index: 0, hidIndex: 0, row: 0, column: 0, hasLed: false, ledRingSteps: 12 },
-	{ type: 'encoder', index: 1, hidIndex: 1, row: 0, column: 1, hasLed: false, ledRingSteps: 12, lcdRingOffset: 6 },
+	{ type: 'encoder', index: 1, hidIndex: 1, row: 0, column: 1, hasLed: false, ledRingSteps: 12, ledRingOffset: 6 },
 ]
 
 describe('GalleonK100EncoderLedService', () => {
@@ -110,8 +110,8 @@ describe('GalleonK100EncoderLedService', () => {
 			await expect(service.setEncoderRingColors(0, new Uint8Array(5))).rejects.toThrow('Invalid colors length')
 		})
 
-		test('applies lcdRingOffset rotation for encoder 1 (offset=6)', async () => {
-			// With lcdRingOffset=6, colors are rotated: send colors[6*3..] then colors[..6*3]
+		test('applies ledRingOffset rotation for encoder 1 (offset=6)', async () => {
+			// With ledRingOffset=6, colors are rotated: send colors[6*3..] then colors[..6*3]
 			const colors = new Uint8Array(12 * 3)
 			// pixel 6 in input → becomes pixel 0 in output
 			colors[6 * 3] = 99
