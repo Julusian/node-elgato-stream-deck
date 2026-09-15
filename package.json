@@ -42,7 +42,7 @@
     "lodash": "^4.18.1",
     "prettier": "^3.8.1",
     "rimraf": "^5.0.10",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.4",
     "snyk-nodejs-lockfile-parser": "^2.5.0",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
