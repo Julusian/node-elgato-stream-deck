@@ -64,6 +64,4 @@ export interface StreamDeckLcdSegmentControlDefinition extends StreamDeckControl
 }
 
 export type StreamDeckControlDefinition =
-	| StreamDeckButtonControlDefinition
-	| StreamDeckEncoderControlDefinition
-	| StreamDeckLcdSegmentControlDefinition
+	StreamDeckButtonControlDefinition | StreamDeckEncoderControlDefinition | StreamDeckLcdSegmentControlDefinition

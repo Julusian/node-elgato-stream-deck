@@ -137,7 +137,7 @@ describe('Gen2InputService', () => {
 			// Service with no lcd-segment controls
 			const noLcdProperties: Readonly<StreamDeckProperties> = {
 				...makeProperties(),
-				CONTROLS: makeProperties().CONTROLS.filter((c: any) => c.type !== 'lcd-segment') as any,
+				CONTROLS: makeProperties().CONTROLS.filter((c: any) => c.type !== 'lcd-segment'),
 			}
 			const hookNoLcd = new CallbackHook<StreamDeckEvents>()
 			const listenerNoLcd = jest.fn()

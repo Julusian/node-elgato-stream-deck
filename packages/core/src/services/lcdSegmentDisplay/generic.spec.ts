@@ -5,7 +5,7 @@ import type { StreamDeckLcdSegmentControlDefinition } from '../../controlDefinit
 import { DeviceModelId } from '../../id.js'
 
 function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendReports'>> {
-	return { sendReports: jest.fn().mockResolvedValue(undefined) } as any
+	return { sendReports: jest.fn().mockResolvedValue(undefined) }
 }
 
 function makeEncodeJpeg(): jest.MockedFunction<EncodeJPEGHelper> {

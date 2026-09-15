@@ -20,7 +20,7 @@ describe('StreamDeckNode — integration', () => {
 
 	beforeEach(() => {
 		mockHid = new DummyHID()
-		hidOpenMock.mockResolvedValue(mockHid as any)
+		hidOpenMock.mockResolvedValue(mockHid)
 
 		mockHid.getDeviceInfo.mockResolvedValue({
 			vendorId: VENDOR_ID,

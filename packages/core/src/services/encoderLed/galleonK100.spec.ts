@@ -6,7 +6,7 @@ function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendFeatureReport' | 'se
 	return {
 		sendFeatureReport: jest.fn().mockResolvedValue(undefined),
 		sendReports: jest.fn().mockResolvedValue(undefined),
-	} as any
+	}
 }
 
 // Two encoders: index 0 (12 ring steps), index 1 (12 ring steps, lcdRingOffset=6)

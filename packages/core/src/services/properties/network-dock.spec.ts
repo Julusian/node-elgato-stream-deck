@@ -5,7 +5,7 @@ function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendFeatureReport' | 'ge
 	return {
 		sendFeatureReport: jest.fn().mockResolvedValue(undefined),
 		getFeatureReport: jest.fn().mockResolvedValue(new Uint8Array(64)),
-	} as any
+	}
 }
 
 describe('NetworkDockPropertiesService', () => {

@@ -53,7 +53,7 @@ function makeMockButtonsLcd(): jest.Mocked<ButtonsLcdDisplayService> {
 		prepareFillKeyBuffer: jest.fn().mockResolvedValue({ data: new Uint8Array(0) }),
 		fillPanelBuffer: jest.fn().mockResolvedValue(undefined),
 		prepareFillPanelBuffer: jest.fn().mockResolvedValue({ data: new Uint8Array(0) }),
-	} as unknown as jest.Mocked<ButtonsLcdDisplayService>
+	}
 }
 
 function makeMockInputService(): jest.Mocked<StreamDeckInputService> {
@@ -67,7 +67,7 @@ function makeMockLcdSegment(): jest.Mocked<LcdSegmentDisplayService> {
 		prepareFillLcdRegion: jest.fn().mockResolvedValue({ data: new Uint8Array(0) }),
 		clearLcdSegment: jest.fn().mockResolvedValue(undefined),
 		clearAllLcdSegments: jest.fn().mockResolvedValue(undefined),
-	} as unknown as jest.Mocked<LcdSegmentDisplayService>
+	}
 }
 
 function makeMockEncoderLed(): jest.Mocked<EncoderLedService> {

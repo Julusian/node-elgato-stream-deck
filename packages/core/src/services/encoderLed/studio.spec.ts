@@ -5,7 +5,7 @@ import type { StreamDeckControlDefinition } from '../../controlDefinition.js'
 function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendReports'>> {
 	return {
 		sendReports: jest.fn().mockResolvedValue(undefined),
-	} as any
+	}
 }
 
 const twoEncoderControls: StreamDeckControlDefinition[] = [

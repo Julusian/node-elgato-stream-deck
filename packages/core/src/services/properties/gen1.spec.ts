@@ -5,7 +5,7 @@ function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendFeatureReport' | 'ge
 	return {
 		sendFeatureReport: jest.fn().mockResolvedValue(undefined),
 		getFeatureReport: jest.fn().mockResolvedValue(new Uint8Array(32)),
-	} as any
+	}
 }
 
 describe('Gen1PropertiesService', () => {

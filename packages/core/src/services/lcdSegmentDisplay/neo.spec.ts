@@ -4,7 +4,7 @@ import type { EncodeJPEGHelper } from '../../models/base.js'
 import type { StreamDeckLcdSegmentControlDefinition } from '../../controlDefinition.js'
 
 function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendReports'>> {
-	return { sendReports: jest.fn().mockResolvedValue(undefined) } as any
+	return { sendReports: jest.fn().mockResolvedValue(undefined) }
 }
 
 function makeEncodeJpeg(): jest.MockedFunction<EncodeJPEGHelper> {
