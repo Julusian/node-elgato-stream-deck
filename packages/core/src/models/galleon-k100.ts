@@ -13,6 +13,7 @@ import { StreamdeckDefaultLcdService } from '../services/lcdSegmentDisplay/gener
 const k100Controls: StreamDeckControlDefinition[] = generateButtonsGrid(3, 4, { width: 160, height: 160 }, false, 0, 2)
 k100Controls.push(
 	{
+		id: `encoder-0`,
 		type: 'encoder',
 		row: 0,
 		column: 0,
@@ -24,6 +25,7 @@ k100Controls.push(
 		ledRingOffset: 3,
 	},
 	{
+		id: `encoder-1`,
 		type: 'encoder',
 		row: 0,
 		column: 2,
@@ -35,13 +37,14 @@ k100Controls.push(
 		ledRingOffset: 1,
 	},
 	{
+		id: 0,
 		type: 'lcd-segment',
 		row: 1,
 		column: 0,
 		columnSpan: 3,
 		rowSpan: 1,
 
-		id: 0,
+		index: 0,
 
 		pixelSize: Object.freeze({
 			width: 720,

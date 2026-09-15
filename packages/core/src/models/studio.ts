@@ -10,6 +10,7 @@ import { StudioEncoderLedService } from '../services/encoderLed/studio.js'
 
 const studioControls: StreamDeckControlDefinition[] = [
 	{
+		id: 'encoder-l',
 		type: 'encoder',
 		row: 0,
 		column: 0,
@@ -21,6 +22,7 @@ const studioControls: StreamDeckControlDefinition[] = [
 	},
 	...generateButtonsGrid(16, 2, { width: 144, height: 112 }, false, 1),
 	{
+		id: 'encoder-r',
 		type: 'encoder',
 		row: 0,
 		column: 17,

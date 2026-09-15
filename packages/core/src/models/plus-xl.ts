@@ -11,13 +11,14 @@ import { StreamdeckDefaultLcdService } from '../services/lcdSegmentDisplay/gener
 const plusXlControls: StreamDeckControlDefinition[] = generateButtonsGrid(9, 4, { width: 112, height: 112 })
 plusXlControls.push(
 	{
+		id: 0,
 		type: 'lcd-segment',
 		row: 4,
 		column: 0,
 		columnSpan: 9,
 		rowSpan: 1,
 
-		id: 0,
+		index: 0,
 
 		pixelSize: Object.freeze({
 			width: 1200,
@@ -27,6 +28,7 @@ plusXlControls.push(
 		drawRegions: true,
 	},
 	{
+		id: 'encoder-0',
 		type: 'encoder',
 		row: 5,
 		column: 0,
@@ -37,6 +39,7 @@ plusXlControls.push(
 		ledRingSteps: 0,
 	},
 	{
+		id: 'encoder-1',
 		type: 'encoder',
 		row: 5,
 		column: 2,
@@ -47,6 +50,7 @@ plusXlControls.push(
 		ledRingSteps: 0,
 	},
 	{
+		id: 'encoder-2',
 		type: 'encoder',
 		row: 5,
 		column: 3,
@@ -57,6 +61,7 @@ plusXlControls.push(
 		ledRingSteps: 0,
 	},
 	{
+		id: 'encoder-3',
 		type: 'encoder',
 		row: 5,
 		column: 5,
@@ -67,6 +72,7 @@ plusXlControls.push(
 		ledRingSteps: 0,
 	},
 	{
+		id: 'encoder-4',
 		type: 'encoder',
 		row: 5,
 		column: 6,
@@ -77,6 +83,7 @@ plusXlControls.push(
 		ledRingSteps: 0,
 	},
 	{
+		id: 'encoder-5',
 		type: 'encoder',
 		row: 5,
 		column: 8,

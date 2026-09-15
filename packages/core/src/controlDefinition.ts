@@ -1,6 +1,7 @@
 import type { Dimension } from './id.js'
 
 export interface StreamDeckControlDefinitionBase {
+	id: string | number
 	type: 'button' | 'encoder' | 'lcd-segment'
 
 	row: number
@@ -11,6 +12,7 @@ export interface StreamDeckButtonControlDefinitionBase extends StreamDeckControl
 	type: 'button'
 
 	index: number
+	/** @internal on wire HID index of this button */
 	hidIndex: number
 
 	feedbackType: 'none' | 'rgb' | 'lcd'
@@ -37,6 +39,7 @@ export interface StreamDeckEncoderControlDefinition extends StreamDeckControlDef
 	type: 'encoder'
 
 	index: number
+	/** @internal on wire HID index of this button */
 	hidIndex: number
 
 	/** Whether the encoder has a central led */
@@ -50,7 +53,9 @@ export interface StreamDeckEncoderControlDefinition extends StreamDeckControlDef
 
 export interface StreamDeckLcdSegmentControlDefinition extends StreamDeckControlDefinitionBase {
 	type: 'lcd-segment'
-	id: 0 // Future: Maybe there will be more than one LCD segment
+	index: 0 // Future: Maybe there will be more than one LCD segment
+
+	id: 0 // Future: this will change to a string in the next major
 
 	columnSpan: number
 	rowSpan: number

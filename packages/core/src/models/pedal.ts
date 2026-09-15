@@ -12,6 +12,7 @@ import { ButtonOnlyInputService } from '../services/input/gen1.js'
 
 const pedalControls: StreamDeckControlDefinition[] = [
 	{
+		id: 'button-0',
 		type: 'button',
 		row: 0,
 		column: 0,
@@ -20,6 +21,7 @@ const pedalControls: StreamDeckControlDefinition[] = [
 		feedbackType: 'none',
 	},
 	{
+		id: 'button-1',
 		type: 'button',
 		row: 0,
 		column: 1,
@@ -28,6 +30,7 @@ const pedalControls: StreamDeckControlDefinition[] = [
 		feedbackType: 'none',
 	},
 	{
+		id: 'button-2',
 		type: 'button',
 		row: 0,
 		column: 2,

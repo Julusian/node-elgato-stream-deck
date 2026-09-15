@@ -11,6 +11,7 @@ import { StreamDeckNeoLcdService } from '../services/lcdSegmentDisplay/neo.js'
 const neoControls: StreamDeckControlDefinition[] = generateButtonsGrid(4, 2, { width: 96, height: 96 })
 neoControls.push(
 	{
+		id: 'page-l',
 		type: 'button',
 		row: 2,
 		column: 0,
@@ -19,13 +20,14 @@ neoControls.push(
 		feedbackType: 'rgb',
 	},
 	{
+		id: 0,
 		type: 'lcd-segment',
 		row: 2,
 		column: 1,
 		columnSpan: 2,
 		rowSpan: 1,
 
-		id: 0,
+		index: 0,
 
 		pixelSize: {
 			width: 248,
@@ -35,6 +37,7 @@ neoControls.push(
 		drawRegions: false,
 	},
 	{
+		id: 'page-r',
 		type: 'button',
 		row: 2,
 		column: 3,

@@ -17,6 +17,7 @@ export function generateButtonsGrid(
 			const hidIndex = rtl ? flipKeyIndex(width, index) : index
 
 			controls.push({
+				id: `button-${index}`,
 				type: 'button',
 				row: row + rowOffset,
 				column: column + columnOffset,
