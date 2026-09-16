@@ -28,11 +28,11 @@ function makeMockWriter(): jest.Mocked<StreamdeckImageWriter> {
 // 2x2 grid of 72x72 LCD buttons, no RGB key fill
 function makeLcdProperties(supportsRgbKeyFill = false, fullscreenPanels = 0): Readonly<StreamDeckProperties> {
 	return {
-		MODEL: DeviceModelId.ORIGINAL,
-		PRODUCT_NAME: 'Test',
-		KEY_DATA_OFFSET: 0,
-		SUPPORTS_RGB_KEY_FILL: supportsRgbKeyFill,
-		CONTROLS: [
+		model: DeviceModelId.ORIGINAL,
+		productName: 'Test',
+		keyDataOffset: 0,
+		supportsRgbKeyFill: supportsRgbKeyFill,
+		controls: [
 			{
 				type: 'button',
 				index: 0,
@@ -70,31 +70,31 @@ function makeLcdProperties(supportsRgbKeyFill = false, fullscreenPanels = 0): Re
 				pixelSize: { width: 72, height: 72 },
 			},
 		] as any,
-		KEY_SPACING_HORIZONTAL: 0,
-		KEY_SPACING_VERTICAL: 0,
-		FULLSCREEN_PANELS: fullscreenPanels,
-		HAS_NFC_READER: false,
-		SUPPORTS_CHILD_DEVICES: false,
+		keySpacingHorizontal: 0,
+		keySpacingVertical: 0,
+		fullscreenPanels: fullscreenPanels,
+		hasNfcReader: false,
+		supportsChildDevices: false,
 	}
 }
 
 // 3-key RGB device
 function makeRgbProperties(): Readonly<StreamDeckProperties> {
 	return {
-		MODEL: DeviceModelId.ORIGINAL,
-		PRODUCT_NAME: 'Test RGB',
-		KEY_DATA_OFFSET: 0,
-		SUPPORTS_RGB_KEY_FILL: true,
-		CONTROLS: [
+		model: DeviceModelId.ORIGINAL,
+		productName: 'Test RGB',
+		keyDataOffset: 0,
+		supportsRgbKeyFill: true,
+		controls: [
 			{ type: 'button', index: 0, hidIndex: 0, feedbackType: 'rgb', row: 0, column: 0 },
 			{ type: 'button', index: 1, hidIndex: 1, feedbackType: 'rgb', row: 0, column: 1 },
 			{ type: 'button', index: 2, hidIndex: 2, feedbackType: 'rgb', row: 0, column: 2 },
 		] as any,
-		KEY_SPACING_HORIZONTAL: 0,
-		KEY_SPACING_VERTICAL: 0,
-		FULLSCREEN_PANELS: 0,
-		HAS_NFC_READER: false,
-		SUPPORTS_CHILD_DEVICES: false,
+		keySpacingHorizontal: 0,
+		keySpacingVertical: 0,
+		fullscreenPanels: 0,
+		hasNfcReader: false,
+		supportsChildDevices: false,
 	}
 }
 
@@ -125,7 +125,7 @@ describe('DefaultButtonsLcdService', () => {
 		test('returns correct dimensions for a single LCD button', () => {
 			const props: Readonly<StreamDeckProperties> = {
 				...makeLcdProperties(),
-				CONTROLS: [
+				controls: [
 					{
 						type: 'button',
 						index: 0,
@@ -143,7 +143,7 @@ describe('DefaultButtonsLcdService', () => {
 	})
 
 	describe('clearPanel', () => {
-		test('FULLSCREEN_PANELS > 0: sends sendFeatureReport per panel with index', async () => {
+		test('fullscreenPanels > 0: sends sendFeatureReport per panel with index', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(false, 2))
 			await service.clearPanel()
 
@@ -183,7 +183,7 @@ describe('DefaultButtonsLcdService', () => {
 		test('none-feedback buttons are skipped', async () => {
 			const props: Readonly<StreamDeckProperties> = {
 				...makeLcdProperties(),
-				CONTROLS: [{ type: 'button', index: 0, hidIndex: 0, feedbackType: 'none', row: 0, column: 0 }] as any,
+				controls: [{ type: 'button', index: 0, hidIndex: 0, feedbackType: 'none', row: 0, column: 0 }] as any,
 			}
 			const service = new DefaultButtonsLcdService(writer, packer, device, props)
 			await service.clearPanel()
@@ -204,7 +204,7 @@ describe('DefaultButtonsLcdService', () => {
 		test('uses hidIndex (not keyIndex) in the feature report when they differ', async () => {
 			const props: Readonly<StreamDeckProperties> = {
 				...makeRgbProperties(),
-				CONTROLS: [{ type: 'button', index: 5, hidIndex: 12, feedbackType: 'rgb', row: 0, column: 0 }] as any,
+				controls: [{ type: 'button', index: 5, hidIndex: 12, feedbackType: 'rgb', row: 0, column: 0 }] as any,
 			}
 			const service = new DefaultButtonsLcdService(writer, packer, device, props)
 			await service.clearKey(5)
@@ -213,7 +213,7 @@ describe('DefaultButtonsLcdService', () => {
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 12, 0, 0, 0]))
 		})
 
-		test('LCD key with SUPPORTS_RGB_KEY_FILL: uses sendFeatureReport', async () => {
+		test('LCD key with supportsRgbKeyFill: uses sendFeatureReport', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(true))
 			await service.clearKey(0)
 
@@ -221,7 +221,7 @@ describe('DefaultButtonsLcdService', () => {
 			expect(packer.convertPixelBuffer).not.toHaveBeenCalled()
 		})
 
-		test('LCD key without SUPPORTS_RGB_KEY_FILL: uses image fill', async () => {
+		test('LCD key without supportsRgbKeyFill: uses image fill', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(false))
 			await service.clearKey(0)
 
@@ -238,7 +238,7 @@ describe('DefaultButtonsLcdService', () => {
 		test('throws for none-feedback key', async () => {
 			const props: Readonly<StreamDeckProperties> = {
 				...makeLcdProperties(),
-				CONTROLS: [{ type: 'button', index: 0, hidIndex: 0, feedbackType: 'none', row: 0, column: 0 }] as any,
+				controls: [{ type: 'button', index: 0, hidIndex: 0, feedbackType: 'none', row: 0, column: 0 }] as any,
 			}
 			const service = new DefaultButtonsLcdService(writer, packer, device, props)
 			await expect(service.clearKey(0)).rejects.toThrow(TypeError)
@@ -256,7 +256,7 @@ describe('DefaultButtonsLcdService', () => {
 		test('uses hidIndex (not keyIndex) in the feature report when they differ', async () => {
 			const props: Readonly<StreamDeckProperties> = {
 				...makeRgbProperties(),
-				CONTROLS: [{ type: 'button', index: 5, hidIndex: 12, feedbackType: 'rgb', row: 0, column: 0 }] as any,
+				controls: [{ type: 'button', index: 5, hidIndex: 12, feedbackType: 'rgb', row: 0, column: 0 }] as any,
 			}
 			const service = new DefaultButtonsLcdService(writer, packer, device, props)
 			await service.fillKeyColor(5, 255, 0, 0)
@@ -265,14 +265,14 @@ describe('DefaultButtonsLcdService', () => {
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 12, 255, 0, 0]))
 		})
 
-		test('LCD key with SUPPORTS_RGB_KEY_FILL: uses sendFeatureReport', async () => {
+		test('LCD key with supportsRgbKeyFill: uses sendFeatureReport', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(true))
 			await service.fillKeyColor(1, 10, 20, 30)
 
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 1, 10, 20, 30]))
 		})
 
-		test('LCD key without SUPPORTS_RGB_KEY_FILL: renders solid color via image fill', async () => {
+		test('LCD key without supportsRgbKeyFill: renders solid color via image fill', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(false))
 			await service.fillKeyColor(0, 100, 150, 200)
 
@@ -300,7 +300,7 @@ describe('DefaultButtonsLcdService', () => {
 		test('throws for none-feedback key', async () => {
 			const props: Readonly<StreamDeckProperties> = {
 				...makeLcdProperties(),
-				CONTROLS: [{ type: 'button', index: 0, hidIndex: 0, feedbackType: 'none', row: 0, column: 0 }] as any,
+				controls: [{ type: 'button', index: 0, hidIndex: 0, feedbackType: 'none', row: 0, column: 0 }] as any,
 			}
 			const service = new DefaultButtonsLcdService(writer, packer, device, props)
 			await expect(service.fillKeyColor(0, 0, 0, 0)).rejects.toThrow(TypeError)

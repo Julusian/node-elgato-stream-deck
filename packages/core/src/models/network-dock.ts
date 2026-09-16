@@ -11,20 +11,20 @@ import { FakeInputService } from '../services/input/fake.js'
 import { NetworkDockPropertiesService } from '../services/properties/network-dock.js'
 
 const networkDockProperties: StreamDeckProperties = {
-	MODEL: DeviceModelId.NETWORK_DOCK,
-	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.NETWORK_DOCK],
-	KEY_DATA_OFFSET: 0,
+	model: DeviceModelId.NETWORK_DOCK,
+	productName: MODEL_NAMES[DeviceModelId.NETWORK_DOCK],
+	keyDataOffset: 0,
 
-	SUPPORTS_RGB_KEY_FILL: false,
+	supportsRgbKeyFill: false,
 
-	CONTROLS: freezeDefinitions([]),
+	controls: freezeDefinitions([]),
 
-	KEY_SPACING_HORIZONTAL: 0,
-	KEY_SPACING_VERTICAL: 0,
+	keySpacingHorizontal: 0,
+	keySpacingVertical: 0,
 
-	FULLSCREEN_PANELS: 0,
-	HAS_NFC_READER: false,
-	SUPPORTS_CHILD_DEVICES: true,
+	fullscreenPanels: 0,
+	hasNfcReader: false,
+	supportsChildDevices: true,
 }
 
 export function NetworkDockFactory(

@@ -30,7 +30,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	}
 
 	private getLcdButtonControls(): StreamDeckButtonControlDefinitionLcdFeedback[] {
-		return this.#deviceProperties.CONTROLS.filter(
+		return this.#deviceProperties.controls.filter(
 			(control): control is StreamDeckButtonControlDefinitionLcdFeedback =>
 				control.type === 'button' && control.feedbackType === 'lcd',
 		)
@@ -83,14 +83,14 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	public async clearPanel(): Promise<void> {
 		const ps: Promise<void>[] = []
 
-		if (this.#deviceProperties.FULLSCREEN_PANELS > 0) {
+		if (this.#deviceProperties.fullscreenPanels > 0) {
 			// TODO - should this be a separate property?
-			for (let screenIndex = 0; screenIndex < this.#deviceProperties.FULLSCREEN_PANELS; screenIndex++) {
+			for (let screenIndex = 0; screenIndex < this.#deviceProperties.fullscreenPanels; screenIndex++) {
 				ps.push(this.#device.sendFeatureReport(new Uint8Array([0x03, 0x05, screenIndex, 0, 0, 0])))
 			}
 			// TODO - clear rgb?
 		} else {
-			for (const control of this.#deviceProperties.CONTROLS) {
+			for (const control of this.#deviceProperties.controls) {
 				if (control.type !== 'button') continue
 
 				switch (control.feedbackType) {
@@ -98,7 +98,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 						ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0))
 						break
 					case 'lcd':
-						if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL) {
+						if (this.#deviceProperties.supportsRgbKeyFill) {
 							ps.push(this.sendKeyRgb(control.hidIndex, 0, 0, 0))
 						} else {
 							const pixels = new Uint8Array(control.pixelSize.width * control.pixelSize.height * 3)
@@ -124,13 +124,13 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	}
 
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
-		const control = this.#deviceProperties.CONTROLS.find(
+		const control = this.#deviceProperties.controls.find(
 			(control): control is StreamDeckButtonControlDefinition =>
 				control.type === 'button' && control.index === keyIndex,
 		)
 		if (!control || control.feedbackType === 'none') throw new TypeError(`Expected a valid keyIndex`)
 
-		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control.feedbackType === 'rgb') {
+		if (this.#deviceProperties.supportsRgbKeyFill || control.feedbackType === 'rgb') {
 			await this.sendKeyRgb(control.hidIndex, 0, 0, 0)
 		} else {
 			const pixels = new Uint8Array(control.pixelSize.width * control.pixelSize.height * 3)
@@ -148,13 +148,13 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		this.checkRGBValue(g)
 		this.checkRGBValue(b)
 
-		const control = this.#deviceProperties.CONTROLS.find(
+		const control = this.#deviceProperties.controls.find(
 			(control): control is StreamDeckButtonControlDefinition =>
 				control.type === 'button' && control.index === keyIndex,
 		)
 		if (!control || control.feedbackType === 'none') throw new TypeError(`Expected a valid keyIndex`)
 
-		if (this.#deviceProperties.SUPPORTS_RGB_KEY_FILL || control.feedbackType === 'rgb') {
+		if (this.#deviceProperties.supportsRgbKeyFill || control.feedbackType === 'rgb') {
 			await this.sendKeyRgb(control.hidIndex, r, g, b)
 		} else {
 			// rgba is excessive here, but it makes the fill easier as it can be done in a 32bit uint
@@ -200,7 +200,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		const sourceFormat = options?.format ?? 'rgb'
 		this.checkSourceFormat(sourceFormat)
 
-		const control = this.#deviceProperties.CONTROLS.find(
+		const control = this.#deviceProperties.controls.find(
 			(control): control is StreamDeckButtonControlDefinition =>
 				control.type === 'button' && control.index === keyIndex,
 		)
@@ -228,7 +228,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		jsonSafe: boolean | undefined,
 	): Promise<PreparedBuffer> {
 		const packets = await this.prepareFillKeyBufferInner(keyIndex, imageBuffer, options)
-		return wrapBufferToPreparedBuffer(this.#deviceProperties.MODEL, 'fill-key', packets, jsonSafe ?? false)
+		return wrapBufferToPreparedBuffer(this.#deviceProperties.model, 'fill-key', packets, jsonSafe ?? false)
 	}
 
 	public async fillPanelBuffer(
@@ -299,7 +299,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		jsonSafe: boolean | undefined,
 	): Promise<PreparedBuffer> {
 		const packets = await this.prepareFillPanelBufferInner(imageBuffer, options)
-		return wrapBufferToPreparedBuffer(this.#deviceProperties.MODEL, 'fill-panel', packets, jsonSafe ?? false)
+		return wrapBufferToPreparedBuffer(this.#deviceProperties.model, 'fill-panel', packets, jsonSafe ?? false)
 	}
 
 	private async sendKeyRgb(keyIndex: number, red: number, green: number, blue: number): Promise<void> {

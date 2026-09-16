@@ -41,19 +41,19 @@ const pedalControls: StreamDeckControlDefinition[] = [
 ]
 
 const pedalProperties: StreamDeckProperties = {
-	MODEL: DeviceModelId.PEDAL,
-	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.PEDAL],
-	KEY_DATA_OFFSET: 3,
-	SUPPORTS_RGB_KEY_FILL: false,
+	model: DeviceModelId.PEDAL,
+	productName: MODEL_NAMES[DeviceModelId.PEDAL],
+	keyDataOffset: 3,
+	supportsRgbKeyFill: false,
 
-	CONTROLS: freezeDefinitions(pedalControls),
+	controls: freezeDefinitions(pedalControls),
 
-	KEY_SPACING_HORIZONTAL: 0,
-	KEY_SPACING_VERTICAL: 0,
+	keySpacingHorizontal: 0,
+	keySpacingVertical: 0,
 
-	FULLSCREEN_PANELS: 0,
-	HAS_NFC_READER: false,
-	SUPPORTS_CHILD_DEVICES: false,
+	fullscreenPanels: 0,
+	hasNfcReader: false,
+	supportsChildDevices: false,
 }
 
 export function StreamDeckPedalFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {

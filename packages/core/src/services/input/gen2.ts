@@ -18,13 +18,13 @@ export class Gen2InputService extends ButtonOnlyInputService {
 		super(deviceProperties, eventSource)
 
 		this.#eventSource = eventSource
-		this.#encoderControls = deviceProperties.CONTROLS.filter(
+		this.#encoderControls = deviceProperties.controls.filter(
 			(control): control is StreamDeckEncoderControlDefinition => control.type === 'encoder',
 		)
 		const maxIndex = Math.max(-1, ...this.#encoderControls.map((control) => control.index))
 		this.#encoderState = new Array<boolean>(maxIndex + 1).fill(false)
 
-		this.#lcdSegmentControls = deviceProperties.CONTROLS.filter(
+		this.#lcdSegmentControls = deviceProperties.controls.filter(
 			(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
 		)
 	}
@@ -106,7 +106,7 @@ export class Gen2InputService extends ButtonOnlyInputService {
 	}
 
 	#handleNfcRead(data: Uint8Array): void {
-		if (!this.deviceProperties.HAS_NFC_READER) return
+		if (!this.deviceProperties.hasNfcReader) return
 
 		const length = data[1] + data[2] * 256
 		const id = new TextDecoder('ascii').decode(data.subarray(3, 3 + length))

@@ -13,16 +13,16 @@ export class ButtonOnlyInputService implements StreamDeckInputService {
 		this.deviceProperties = deviceProperties
 		this.#eventSource = eventSource
 
-		const maxButtonIndex = this.deviceProperties.CONTROLS.filter(
-			(control): control is StreamDeckButtonControlDefinition => control.type === 'button',
-		).map((control) => control.index)
+		const maxButtonIndex = this.deviceProperties.controls
+			.filter((control): control is StreamDeckButtonControlDefinition => control.type === 'button')
+			.map((control) => control.index)
 		this.#keyState = new Array<boolean>(Math.max(-1, ...maxButtonIndex) + 1).fill(false)
 	}
 
 	handleInput(data: Uint8Array): void {
-		const dataOffset = this.deviceProperties.KEY_DATA_OFFSET || 0
+		const dataOffset = this.deviceProperties.keyDataOffset || 0
 
-		for (const control of this.deviceProperties.CONTROLS) {
+		for (const control of this.deviceProperties.controls) {
 			if (control.type !== 'button') continue
 
 			const keyPressed = Boolean(data[dataOffset + control.hidIndex])

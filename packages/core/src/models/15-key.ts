@@ -7,17 +7,17 @@ import { type DeviceModelId, MODEL_NAMES } from '../id.js'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 import type { PropertiesService } from '../services/properties/interface.js'
 
-const base15KeyProperties: Omit<StreamDeckGen2Properties, 'MODEL' | 'PRODUCT_NAME'> = {
-	SUPPORTS_RGB_KEY_FILL: true,
+const base15KeyProperties: Omit<StreamDeckGen2Properties, 'model' | 'productName'> = {
+	supportsRgbKeyFill: true,
 
-	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3, { width: 72, height: 72 })),
+	controls: freezeDefinitions(generateButtonsGrid(5, 3, { width: 72, height: 72 })),
 
-	KEY_SPACING_HORIZONTAL: 25,
-	KEY_SPACING_VERTICAL: 25,
+	keySpacingHorizontal: 25,
+	keySpacingVertical: 25,
 
-	FULLSCREEN_PANELS: 1,
-	HAS_NFC_READER: false,
-	SUPPORTS_CHILD_DEVICES: false,
+	fullscreenPanels: 1,
+	hasNfcReader: false,
+	supportsChildDevices: false,
 }
 
 export function StreamDeck15KeyFactory(
@@ -28,8 +28,8 @@ export function StreamDeck15KeyFactory(
 ): StreamDeckBase {
 	const properties: StreamDeckGen2Properties = {
 		...base15KeyProperties,
-		MODEL: model,
-		PRODUCT_NAME: MODEL_NAMES[model],
+		model: model,
+		productName: MODEL_NAMES[model],
 	}
 
 	const services = createBaseGen2Properties(device, options, properties, null)

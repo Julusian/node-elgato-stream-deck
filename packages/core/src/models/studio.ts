@@ -36,19 +36,19 @@ const studioControls: StreamDeckControlDefinition[] = [
 ]
 
 export const studioProperties: StreamDeckGen2Properties = {
-	MODEL: DeviceModelId.STUDIO,
-	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.STUDIO],
-	SUPPORTS_RGB_KEY_FILL: true,
+	model: DeviceModelId.STUDIO,
+	productName: MODEL_NAMES[DeviceModelId.STUDIO],
+	supportsRgbKeyFill: true,
 
-	CONTROLS: freezeDefinitions(studioControls),
+	controls: freezeDefinitions(studioControls),
 
-	KEY_SPACING_HORIZONTAL: 0, // TODO
-	KEY_SPACING_VERTICAL: 0, // TODO
+	keySpacingHorizontal: 0, // TODO
+	keySpacingVertical: 0, // TODO
 
-	FULLSCREEN_PANELS: 2,
+	fullscreenPanels: 2,
 
-	HAS_NFC_READER: true,
-	SUPPORTS_CHILD_DEVICES: true,
+	hasNfcReader: true,
+	supportsChildDevices: true,
 }
 
 export function StreamDeckStudioFactory(

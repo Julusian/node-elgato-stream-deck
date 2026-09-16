@@ -14,11 +14,11 @@ import type { PropertiesService } from '../services/properties/interface.js'
 function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): StreamDeckProperties {
 	return {
 		...rawProps,
-		KEY_DATA_OFFSET: 3,
+		keyDataOffset: 3,
 	}
 }
 
-export type StreamDeckGen2Properties = Omit<StreamDeckProperties, 'KEY_DATA_OFFSET'>
+export type StreamDeckGen2Properties = Omit<StreamDeckProperties, 'keyDataOffset'>
 
 export function createBaseGen2Properties(
 	device: HIDDevice,

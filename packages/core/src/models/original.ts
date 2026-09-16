@@ -7,16 +7,16 @@ import { StreamdeckOriginalImageWriter } from '../services/imageWriter/imageWrit
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 
 const originalProperties: StreamDeckGen1Properties = {
-	MODEL: DeviceModelId.ORIGINAL,
-	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.ORIGINAL],
-	SUPPORTS_RGB_KEY_FILL: false,
+	model: DeviceModelId.ORIGINAL,
+	productName: MODEL_NAMES[DeviceModelId.ORIGINAL],
+	supportsRgbKeyFill: false,
 
-	CONTROLS: freezeDefinitions(generateButtonsGrid(5, 3, { width: 72, height: 72 }, true)),
+	controls: freezeDefinitions(generateButtonsGrid(5, 3, { width: 72, height: 72 }, true)),
 
-	KEY_SPACING_HORIZONTAL: 25,
-	KEY_SPACING_VERTICAL: 25,
+	keySpacingHorizontal: 25,
+	keySpacingVertical: 25,
 
-	FULLSCREEN_PANELS: 0,
+	fullscreenPanels: 0,
 }
 
 export function StreamDeckOriginalFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {

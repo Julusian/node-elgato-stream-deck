@@ -13,15 +13,15 @@ import { ButtonOnlyInputService } from '../services/input/gen1.js'
 function extendDevicePropertiesForGen1(rawProps: StreamDeckGen1Properties): StreamDeckProperties {
 	return {
 		...rawProps,
-		KEY_DATA_OFFSET: 0,
-		HAS_NFC_READER: false,
-		SUPPORTS_CHILD_DEVICES: false,
+		keyDataOffset: 0,
+		hasNfcReader: false,
+		supportsChildDevices: false,
 	}
 }
 
 export type StreamDeckGen1Properties = Omit<
 	StreamDeckProperties,
-	'KEY_DATA_OFFSET' | 'HAS_NFC_READER' | 'SUPPORTS_CHILD_DEVICES'
+	'keyDataOffset' | 'hasNfcReader' | 'supportsChildDevices'
 >
 
 export function StreamDeckGen1Factory(

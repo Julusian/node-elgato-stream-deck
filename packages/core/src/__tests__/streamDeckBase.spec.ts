@@ -80,11 +80,11 @@ function makeMockEncoderLed(): jest.Mocked<EncoderLedService> {
 }
 
 const minimalButtonProperties: Readonly<StreamDeckProperties> = {
-	MODEL: DeviceModelId.ORIGINAL,
-	PRODUCT_NAME: 'Test Device',
-	KEY_DATA_OFFSET: 0,
-	SUPPORTS_RGB_KEY_FILL: false,
-	CONTROLS: [
+	model: DeviceModelId.ORIGINAL,
+	productName: 'Test Device',
+	keyDataOffset: 0,
+	supportsRgbKeyFill: false,
+	controls: [
 		{
 			type: 'button',
 			index: 0,
@@ -113,11 +113,11 @@ const minimalButtonProperties: Readonly<StreamDeckProperties> = {
 			pixelSize: { width: 72, height: 72 },
 		},
 	] as any,
-	KEY_SPACING_HORIZONTAL: 0,
-	KEY_SPACING_VERTICAL: 0,
-	FULLSCREEN_PANELS: 0,
-	HAS_NFC_READER: false,
-	SUPPORTS_CHILD_DEVICES: false,
+	keySpacingHorizontal: 0,
+	keySpacingVertical: 0,
+	fullscreenPanels: 0,
+	hasNfcReader: false,
+	supportsChildDevices: false,
 }
 
 function makeServices(overrides?: Partial<StreamDeckServicesDefinition>): StreamDeckServicesDefinition {
@@ -376,7 +376,7 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 		test('services.events are forwarded to streamDeck events', () => {
 			const downSpy = jest.fn()
 			streamDeck.on('down', downSpy)
-			const control = minimalButtonProperties.CONTROLS[0] as any
+			const control = minimalButtonProperties.controls[0] as any
 			services.events.emit('down', control)
 			expect(downSpy).toHaveBeenCalledWith(control)
 		})

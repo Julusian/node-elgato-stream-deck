@@ -8,15 +8,15 @@ import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWrite
 import { StreamdeckGen1ImageHeaderGenerator } from '../services/imageWriter/headerGenerator.js'
 import type { PropertiesService } from '../services/properties/interface.js'
 
-const base6KeyProperties: Omit<StreamDeckGen1Properties, 'MODEL' | 'PRODUCT_NAME'> = {
-	SUPPORTS_RGB_KEY_FILL: false, // TODO - verify this
+const base6KeyProperties: Omit<StreamDeckGen1Properties, 'model' | 'productName'> = {
+	supportsRgbKeyFill: false, // TODO - verify this
 
-	CONTROLS: freezeDefinitions(generateButtonsGrid(3, 2, { width: 80, height: 80 })),
+	controls: freezeDefinitions(generateButtonsGrid(3, 2, { width: 80, height: 80 })),
 
-	KEY_SPACING_HORIZONTAL: 28,
-	KEY_SPACING_VERTICAL: 28,
+	keySpacingHorizontal: 28,
+	keySpacingVertical: 28,
 
-	FULLSCREEN_PANELS: 0,
+	fullscreenPanels: 0,
 }
 
 export function StreamDeck6KeyFactory(
@@ -27,8 +27,8 @@ export function StreamDeck6KeyFactory(
 ): StreamDeckBase {
 	const properties: StreamDeckGen1Properties = {
 		...base6KeyProperties,
-		MODEL: model,
-		PRODUCT_NAME: MODEL_NAMES[model],
+		model: model,
+		productName: MODEL_NAMES[model],
 	}
 
 	return StreamDeckGen1Factory(

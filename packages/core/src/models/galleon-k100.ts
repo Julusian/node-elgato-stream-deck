@@ -56,20 +56,20 @@ k100Controls.push(
 )
 
 const galleonK100Properties: StreamDeckGen2Properties = {
-	MODEL: DeviceModelId.GALLEON_K100,
-	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.GALLEON_K100],
-	SUPPORTS_RGB_KEY_FILL: true,
+	model: DeviceModelId.GALLEON_K100,
+	productName: MODEL_NAMES[DeviceModelId.GALLEON_K100],
+	supportsRgbKeyFill: true,
 
-	CONTROLS: freezeDefinitions(k100Controls),
+	controls: freezeDefinitions(k100Controls),
 
-	KEY_SPACING_HORIZONTAL: 64,
-	KEY_SPACING_VERTICAL: 64,
+	keySpacingHorizontal: 64,
+	keySpacingVertical: 64,
 
-	FULLSCREEN_PANELS: 0,
-	HAS_NFC_READER: false,
-	SUPPORTS_CHILD_DEVICES: false,
+	fullscreenPanels: 0,
+	hasNfcReader: false,
+	supportsChildDevices: false,
 }
-const lcdSegmentControls = galleonK100Properties.CONTROLS.filter(
+const lcdSegmentControls = galleonK100Properties.controls.filter(
 	(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
 )
 
@@ -82,7 +82,7 @@ export async function GalleonK100Factory(
 		xFlip: false,
 		yFlip: false,
 	})
-	services.encoderLed = new GalleonK100EncoderLedService(device, galleonK100Properties.CONTROLS)
+	services.encoderLed = new GalleonK100EncoderLedService(device, galleonK100Properties.controls)
 	services.lcdSegmentDisplay = new StreamdeckDefaultLcdService(
 		options.encodeJPEG,
 		device,

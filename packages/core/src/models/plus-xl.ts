@@ -96,20 +96,20 @@ plusXlControls.push(
 )
 
 const plusXlProperties: StreamDeckGen2Properties = {
-	MODEL: DeviceModelId.PLUS_XL,
-	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.PLUS_XL],
-	SUPPORTS_RGB_KEY_FILL: true,
+	model: DeviceModelId.PLUS_XL,
+	productName: MODEL_NAMES[DeviceModelId.PLUS_XL],
+	supportsRgbKeyFill: true,
 
-	CONTROLS: freezeDefinitions(plusXlControls),
+	controls: freezeDefinitions(plusXlControls),
 
-	KEY_SPACING_HORIZONTAL: 99,
-	KEY_SPACING_VERTICAL: 40,
+	keySpacingHorizontal: 99,
+	keySpacingVertical: 40,
 
-	FULLSCREEN_PANELS: 1,
-	HAS_NFC_READER: false,
-	SUPPORTS_CHILD_DEVICES: false,
+	fullscreenPanels: 1,
+	hasNfcReader: false,
+	supportsChildDevices: false,
 }
-const lcdSegmentControls = plusXlProperties.CONTROLS.filter(
+const lcdSegmentControls = plusXlProperties.controls.filter(
 	(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
 )
 

@@ -6,20 +6,20 @@ import { DeviceModelId } from '../../id.js'
 
 function makeProperties(keyDataOffset = 0): Readonly<StreamDeckProperties> {
 	return {
-		MODEL: DeviceModelId.ORIGINAL,
-		PRODUCT_NAME: 'Test',
-		KEY_DATA_OFFSET: keyDataOffset,
-		SUPPORTS_RGB_KEY_FILL: false,
-		CONTROLS: [
+		model: DeviceModelId.ORIGINAL,
+		productName: 'Test',
+		keyDataOffset: keyDataOffset,
+		supportsRgbKeyFill: false,
+		controls: [
 			{ type: 'button', index: 0, hidIndex: 0, feedbackType: 'none', row: 0, column: 0 },
 			{ type: 'button', index: 1, hidIndex: 1, feedbackType: 'none', row: 0, column: 1 },
 			{ type: 'button', index: 2, hidIndex: 2, feedbackType: 'none', row: 1, column: 0 },
 		] as any,
-		KEY_SPACING_HORIZONTAL: 0,
-		KEY_SPACING_VERTICAL: 0,
-		FULLSCREEN_PANELS: 0,
-		HAS_NFC_READER: false,
-		SUPPORTS_CHILD_DEVICES: false,
+		keySpacingHorizontal: 0,
+		keySpacingVertical: 0,
+		fullscreenPanels: 0,
+		hasNfcReader: false,
+		supportsChildDevices: false,
 	}
 }
 
@@ -98,7 +98,7 @@ describe('ButtonOnlyInputService', () => {
 		expect(control).toMatchObject({ type: 'button', index: 1, hidIndex: 1, feedbackType: 'none' })
 	})
 
-	test('respects KEY_DATA_OFFSET when reading key state', () => {
+	test('respects keyDataOffset when reading key state', () => {
 		const service2 = new ButtonOnlyInputService(makeProperties(2), hook)
 
 		// With offset=2, key 0 state is at data[2+0]=data[2]

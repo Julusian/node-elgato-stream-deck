@@ -26,29 +26,29 @@ export interface OpenStreamDeckOptions {
 }
 
 export type StreamDeckProperties = Readonly<{
-	MODEL: DeviceModelId
-	PRODUCT_NAME: string
-	KEY_DATA_OFFSET: number
-	SUPPORTS_RGB_KEY_FILL: boolean
+	model: DeviceModelId
+	productName: string
+	keyDataOffset: number
+	supportsRgbKeyFill: boolean
 
-	CONTROLS: Readonly<StreamDeckControlDefinition[]>
+	controls: Readonly<StreamDeckControlDefinition[]>
 
 	/**
 	 * TODO - rework this
 	 * @deprecated
 	 */
-	KEY_SPACING_HORIZONTAL: number
+	keySpacingHorizontal: number
 	/**
 	 * TODO - rework this
 	 * @deprecated
 	 */
-	KEY_SPACING_VERTICAL: number
-	FULLSCREEN_PANELS: number
+	keySpacingVertical: number
+	fullscreenPanels: number
 
-	HAS_NFC_READER: boolean
+	hasNfcReader: boolean
 
 	/** Whether this device supports child devices */
-	SUPPORTS_CHILD_DEVICES: boolean
+	supportsChildDevices: boolean
 }>
 
 export interface StreamDeckServicesDefinition {
@@ -63,25 +63,25 @@ export interface StreamDeckServicesDefinition {
 
 export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
 	get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
-		return this.deviceProperties.CONTROLS
+		return this.deviceProperties.controls
 	}
 
 	// get KEY_SPACING_HORIZONTAL(): number {
-	// 	return this.deviceProperties.KEY_SPACING_HORIZONTAL
+	// 	return this.deviceProperties.keySpacingHorizontal
 	// }
 	// get KEY_SPACING_VERTICAL(): number {
-	// 	return this.deviceProperties.KEY_SPACING_VERTICAL
+	// 	return this.deviceProperties.keySpacingVertical
 	// }
 
 	get MODEL(): DeviceModelId {
-		return this.deviceProperties.MODEL
+		return this.deviceProperties.model
 	}
 	get PRODUCT_NAME(): string {
-		return this.deviceProperties.PRODUCT_NAME
+		return this.deviceProperties.productName
 	}
 
 	get HAS_NFC_READER(): boolean {
-		return this.deviceProperties.HAS_NFC_READER
+		return this.deviceProperties.hasNfcReader
 	}
 
 	protected readonly device: HIDDevice
@@ -123,7 +123,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		keyIndex: KeyIndex,
 		feedbackType: StreamDeckButtonControlDefinition['feedbackType'] | null,
 	): void {
-		const buttonControl = this.deviceProperties.CONTROLS.find(
+		const buttonControl = this.deviceProperties.controls.find(
 			(control): control is StreamDeckButtonControlDefinition =>
 				control.type === 'button' && control.index === keyIndex,
 		)
@@ -168,7 +168,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	}
 
 	public async sendPreparedBuffer(buffer: PreparedBuffer): Promise<void> {
-		const packets = unwrapPreparedBufferToBuffer(this.deviceProperties.MODEL, buffer)
+		const packets = unwrapPreparedBufferToBuffer(this.deviceProperties.model, buffer)
 		await this.device.sendReports(packets)
 	}
 

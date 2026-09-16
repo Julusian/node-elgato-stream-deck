@@ -48,20 +48,20 @@ neoControls.push(
 )
 
 const neoProperties: StreamDeckGen2Properties = {
-	MODEL: DeviceModelId.NEO,
-	PRODUCT_NAME: MODEL_NAMES[DeviceModelId.NEO],
+	model: DeviceModelId.NEO,
+	productName: MODEL_NAMES[DeviceModelId.NEO],
 
-	CONTROLS: freezeDefinitions(neoControls),
+	controls: freezeDefinitions(neoControls),
 
-	KEY_SPACING_HORIZONTAL: 30,
-	KEY_SPACING_VERTICAL: 30,
+	keySpacingHorizontal: 30,
+	keySpacingVertical: 30,
 
-	FULLSCREEN_PANELS: 1,
-	HAS_NFC_READER: false,
-	SUPPORTS_CHILD_DEVICES: false,
-	SUPPORTS_RGB_KEY_FILL: true,
+	fullscreenPanels: 1,
+	hasNfcReader: false,
+	supportsChildDevices: false,
+	supportsRgbKeyFill: true,
 }
-const lcdSegmentControls = neoProperties.CONTROLS.filter(
+const lcdSegmentControls = neoProperties.controls.filter(
 	(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
 )
 

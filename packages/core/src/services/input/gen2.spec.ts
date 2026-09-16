@@ -6,11 +6,11 @@ import { DeviceModelId } from '../../id.js'
 
 function makeProperties(hasNfc = false): Readonly<StreamDeckProperties> {
 	return {
-		MODEL: DeviceModelId.PLUS,
-		PRODUCT_NAME: 'Test Plus',
-		KEY_DATA_OFFSET: 1, // gen2 button data starts at offset 1 (after the type byte)
-		SUPPORTS_RGB_KEY_FILL: true,
-		CONTROLS: [
+		model: DeviceModelId.PLUS,
+		productName: 'Test Plus',
+		keyDataOffset: 1, // gen2 button data starts at offset 1 (after the type byte)
+		supportsRgbKeyFill: true,
+		controls: [
 			{
 				type: 'button',
 				index: 0,
@@ -42,11 +42,11 @@ function makeProperties(hasNfc = false): Readonly<StreamDeckProperties> {
 			{ type: 'encoder', index: 0, hidIndex: 0, row: 3, column: 0, hasLed: false, ledRingSteps: 0 },
 			{ type: 'encoder', index: 1, hidIndex: 1, row: 3, column: 1, hasLed: false, ledRingSteps: 0 },
 		] as any,
-		KEY_SPACING_HORIZONTAL: 0,
-		KEY_SPACING_VERTICAL: 0,
-		FULLSCREEN_PANELS: 0,
-		HAS_NFC_READER: hasNfc,
-		SUPPORTS_CHILD_DEVICES: false,
+		keySpacingHorizontal: 0,
+		keySpacingVertical: 0,
+		fullscreenPanels: 0,
+		hasNfcReader: hasNfc,
+		supportsChildDevices: false,
 	}
 }
 
@@ -67,7 +67,7 @@ describe('Gen2InputService', () => {
 			// Button packet: [0x00, key0pressed, key1pressed, ...]
 			const data = new Uint8Array(8)
 			data[0] = 0x00
-			data[1] = 1 // key 0 (KEY_DATA_OFFSET=1, hidIndex=0 → data[1+0])
+			data[1] = 1 // key 0 (keyDataOffset=1, hidIndex=0 → data[1+0])
 
 			service.handleInput(data)
 
@@ -137,7 +137,7 @@ describe('Gen2InputService', () => {
 			// Service with no lcd-segment controls
 			const noLcdProperties: Readonly<StreamDeckProperties> = {
 				...makeProperties(),
-				CONTROLS: makeProperties().CONTROLS.filter((c: any) => c.type !== 'lcd-segment'),
+				controls: makeProperties().controls.filter((c: any) => c.type !== 'lcd-segment'),
 			}
 			const hookNoLcd = new CallbackHook<StreamDeckEvents>()
 			const listenerNoLcd = jest.fn()
@@ -243,7 +243,7 @@ describe('Gen2InputService', () => {
 	})
 
 	describe('NFC input (type 0x04)', () => {
-		test('emits nfcRead with decoded id string when HAS_NFC_READER is true', () => {
+		test('emits nfcRead with decoded id string when hasNfcReader is true', () => {
 			const serviceNfc = new Gen2InputService(makeProperties(true), hook)
 
 			const id = 'NFC-TAG-001'
@@ -258,7 +258,7 @@ describe('Gen2InputService', () => {
 			expect(listener).toHaveBeenCalledWith('nfcRead', id)
 		})
 
-		test('does not emit nfcRead when HAS_NFC_READER is false', () => {
+		test('does not emit nfcRead when hasNfcReader is false', () => {
 			const id = 'NFC-TAG-001'
 			const data = new Uint8Array(3 + id.length)
 			data[0] = 0x04
