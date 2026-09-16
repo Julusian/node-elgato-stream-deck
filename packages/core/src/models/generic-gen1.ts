@@ -1,7 +1,7 @@
 import type { HIDDevice } from '../hid-device.js'
-import type { OpenStreamDeckOptions, StreamDeckProperties, StreamDeckStaticProperties } from './base.js'
-import { applyModelIdentity, StreamDeckBase } from './base.js'
-import type { StreamDeckModelInfo } from '../modelInfo.js'
+import type { OpenStreamDeckOptions } from './base.js'
+import { StreamDeckBase } from './base.js'
+import type { StreamDeckModelDefinition } from '../modelInfo.js'
 import type { StreamdeckImageWriter } from '../services/imageWriter/types.js'
 import type { FillImageTargetOptions } from '../util.js'
 import { Gen1PropertiesService } from '../services/properties/gen1.js'
@@ -11,38 +11,20 @@ import { CallbackHook } from '../services/callback-hook.js'
 import type { StreamDeckEvents } from '../types.js'
 import { ButtonOnlyInputService } from '../services/input/gen1.js'
 
-function extendDevicePropertiesForGen1(
-	info: StreamDeckModelInfo,
-	rawProps: StreamDeckGen1Properties,
-): StreamDeckProperties {
-	return applyModelIdentity(info, {
-		...rawProps,
-		keyDataOffset: 0,
-		hasNfcReader: false,
-		supportsChildDevices: false,
-	})
-}
-
-export type StreamDeckGen1Properties = Omit<
-	StreamDeckStaticProperties,
-	'keyDataOffset' | 'hasNfcReader' | 'supportsChildDevices'
->
-
 export function StreamDeckGen1Factory(
-	info: StreamDeckModelInfo,
+	definition: StreamDeckModelDefinition,
 	device: HIDDevice,
 	options: Required<OpenStreamDeckOptions>,
-	properties: StreamDeckGen1Properties,
 	imageWriter: StreamdeckImageWriter,
 	targetOptions: FillImageTargetOptions,
 	bmpImagePPM: number,
 ): StreamDeckBase {
-	const fullProperties = extendDevicePropertiesForGen1(info, properties)
+	const fullProperties = definition.properties
 
 	const events = new CallbackHook<StreamDeckEvents>()
 
 	return new StreamDeckBase(device, options, {
-		modelInfo: info,
+		modelInfo: definition.info,
 		deviceProperties: fullProperties,
 		events,
 		properties: new Gen1PropertiesService(device),

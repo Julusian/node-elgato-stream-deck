@@ -82,8 +82,8 @@ export async function openDevice(
 	userOptions?: OpenStreamDeckOptions,
 ): Promise<StreamDeckWeb> {
 	const model = findModelByUsb(browserDevice.vendorId, browserDevice.productId)
-	const factory = model && getDriver(model.id)
-	if (!factory) {
+	const driver = model && getDriver(model.id)
+	if (!driver) {
 		throw new Error('Stream Deck is of unexpected type.')
 	}
 
@@ -96,7 +96,7 @@ export async function openDevice(
 		}
 
 		const browserHid = new WebHIDDevice(browserDevice)
-		const device: StreamDeck = await Promise.resolve(factory(model, browserHid, options || {}))
+		const device: StreamDeck = await Promise.resolve(driver(browserHid, options || {}))
 		return new StreamDeckWeb(device, browserHid)
 	} catch (e) {
 		await browserDevice.close().catch(() => null) // Suppress error

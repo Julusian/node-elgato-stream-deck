@@ -1,8 +1,6 @@
 import type { StreamDeckControlDefinition } from '../controlDefinition.js'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
 import type { StreamDeckStaticProperties } from './base.js'
-import type { StreamDeckGen1Properties } from './generic-gen1.js'
-import type { StreamDeckGen2Properties } from './generic-gen2.js'
 
 /**
  * The static properties of each model.
@@ -11,7 +9,10 @@ import type { StreamDeckGen2Properties } from './generic-gen2.js'
  * so that `DEVICE_MODEL_INFO` can be consumed without them.
  */
 
-export const originalProperties: StreamDeckGen1Properties = {
+export const originalProperties: StreamDeckStaticProperties = {
+	keyDataOffset: 0,
+	hasNfcReader: false,
+	supportsChildDevices: false,
 	supportsRgbKeyFill: false,
 
 	controls: freezeDefinitions(generateButtonsGrid(5, 3, { width: 72, height: 72 }, true)),
@@ -22,7 +23,10 @@ export const originalProperties: StreamDeckGen1Properties = {
 	fullscreenPanels: 0,
 }
 
-export const sixKeyProperties: StreamDeckGen1Properties = {
+export const sixKeyProperties: StreamDeckStaticProperties = {
+	keyDataOffset: 0,
+	hasNfcReader: false,
+	supportsChildDevices: false,
 	supportsRgbKeyFill: false, // TODO - verify this
 
 	controls: freezeDefinitions(generateButtonsGrid(3, 2, { width: 80, height: 80 })),
@@ -33,7 +37,8 @@ export const sixKeyProperties: StreamDeckGen1Properties = {
 	fullscreenPanels: 0,
 }
 
-export const fifteenKeyProperties: StreamDeckGen2Properties = {
+export const fifteenKeyProperties: StreamDeckStaticProperties = {
+	keyDataOffset: 3,
 	supportsRgbKeyFill: true,
 
 	controls: freezeDefinitions(generateButtonsGrid(5, 3, { width: 72, height: 72 })),
@@ -46,7 +51,8 @@ export const fifteenKeyProperties: StreamDeckGen2Properties = {
 	supportsChildDevices: false,
 }
 
-export const thirtyTwoKeyProperties: StreamDeckGen2Properties = {
+export const thirtyTwoKeyProperties: StreamDeckStaticProperties = {
+	keyDataOffset: 3,
 	supportsRgbKeyFill: true,
 
 	controls: freezeDefinitions(generateButtonsGrid(8, 4, { width: 96, height: 96 })),
@@ -124,7 +130,8 @@ plusControls.push(
 	},
 )
 
-export const plusProperties: StreamDeckGen2Properties = {
+export const plusProperties: StreamDeckStaticProperties = {
+	keyDataOffset: 3,
 	supportsRgbKeyFill: true,
 
 	controls: freezeDefinitions(plusControls),
@@ -224,7 +231,8 @@ plusXlControls.push(
 	},
 )
 
-export const plusXlProperties: StreamDeckGen2Properties = {
+export const plusXlProperties: StreamDeckStaticProperties = {
+	keyDataOffset: 3,
 	supportsRgbKeyFill: true,
 
 	controls: freezeDefinitions(plusXlControls),
@@ -276,7 +284,8 @@ neoControls.push(
 	},
 )
 
-export const neoProperties: StreamDeckGen2Properties = {
+export const neoProperties: StreamDeckStaticProperties = {
+	keyDataOffset: 3,
 	controls: freezeDefinitions(neoControls),
 
 	keySpacingHorizontal: 30,
@@ -359,7 +368,8 @@ const studioControls: StreamDeckControlDefinition[] = [
 	},
 ]
 
-export const studioProperties: StreamDeckGen2Properties = {
+export const studioProperties: StreamDeckStaticProperties = {
+	keyDataOffset: 3,
 	supportsRgbKeyFill: true,
 
 	controls: freezeDefinitions(studioControls),
@@ -433,7 +443,8 @@ k100Controls.push(
 	},
 )
 
-export const galleonK100Properties: StreamDeckGen2Properties = {
+export const galleonK100Properties: StreamDeckStaticProperties = {
+	keyDataOffset: 3,
 	supportsRgbKeyFill: true,
 
 	controls: freezeDefinitions(k100Controls),

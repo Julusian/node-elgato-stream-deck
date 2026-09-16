@@ -2,35 +2,31 @@ import type { HIDDevice } from '../hid-device.js'
 import type { OpenStreamDeckOptions, StreamDeckServicesDefinition } from './base.js'
 import { StreamDeckBase } from './base.js'
 import { createBaseGen2Properties } from './generic-gen2.js'
-import { DeviceModelId } from '../id.js'
 import type { PropertiesService } from '../services/properties/interface.js'
 import type { StreamDeckLcdSegmentControlDefinition } from '../controlDefinition.js'
 import { GalleonK100EncoderLedService } from '../services/encoderLed/galleonK100.js'
 import { StreamdeckDefaultLcdService } from '../services/lcdSegmentDisplay/generic.js'
-import type { StreamDeckModelInfo } from '../modelInfo.js'
-import { galleonK100Properties } from './definitions.js'
-
-const lcdSegmentControls = galleonK100Properties.controls.filter(
-	(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
-)
+import type { StreamDeckModelDefinition } from '../modelInfo.js'
 
 export async function GalleonK100Factory(
-	info: StreamDeckModelInfo,
+	definition: StreamDeckModelDefinition,
 	device: HIDDevice,
 	options: Required<OpenStreamDeckOptions>,
 	_tcpPropertiesService?: PropertiesService,
 ): Promise<StreamDeckBase> {
-	const services = createBaseGen2Properties(info, device, options, galleonK100Properties, null, {
+	const services = createBaseGen2Properties(definition, device, options, null, {
 		xFlip: false,
 		yFlip: false,
 	})
-	services.encoderLed = new GalleonK100EncoderLedService(device, galleonK100Properties.controls)
+	services.encoderLed = new GalleonK100EncoderLedService(device, definition.properties.controls)
 	services.lcdSegmentDisplay = new StreamdeckDefaultLcdService(
 		options.encodeJPEG,
 		device,
-		lcdSegmentControls,
+		definition.properties.controls.filter(
+			(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
+		),
 		false,
-		DeviceModelId.GALLEON_K100,
+		definition.info.id,
 	)
 
 	const streamDeck = new GalleonK100StreamDeck(device, options, services)

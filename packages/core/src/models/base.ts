@@ -54,21 +54,9 @@ export type StreamDeckProperties = Readonly<{
 
 /**
  * The properties of a model which are known without a device present.
- * The identity of the model is applied by the factory, from its `StreamDeckModelInfo`
+ * The identity of the model is applied when its `StreamDeckModelDefinition` is built
  */
 export type StreamDeckStaticProperties = Omit<StreamDeckProperties, 'model' | 'productName'>
-
-/** Combine the static properties of a model with its identity */
-export function applyModelIdentity(
-	info: StreamDeckModelInfo,
-	properties: StreamDeckStaticProperties,
-): StreamDeckProperties {
-	return {
-		...properties,
-		model: info.id,
-		productName: info.name,
-	}
-}
 
 export interface StreamDeckServicesDefinition {
 	modelInfo: StreamDeckModelInfo

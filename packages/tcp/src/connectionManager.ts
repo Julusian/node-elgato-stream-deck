@@ -80,8 +80,8 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 					info.productId === NETWORK_DOCK_TCP_PRODUCT_ID
 						? getModelInfo(DeviceModelId.NETWORK_DOCK)
 						: findModelByUsb(info.vendorId, info.productId)
-				const factory = model && getDriver(model.id)
-				if (!factory) {
+				const driver = model && getDriver(model.id)
+				if (!driver) {
 					// Note: leave the temporary error handler, to ensure it can't cause a crash
 					this.emit('error', `Found StreamDeck with unknown productId: ${info.productId.toString(16)}`)
 					return
@@ -89,7 +89,7 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 
 				const propertiesService = fakeHidDevice.isPrimary ? new TcpPropertiesService(fakeHidDevice) : undefined
 				const streamdeckSocket = await Promise.resolve(
-					factory(model, fakeHidDevice, this.#openOptions, propertiesService),
+					driver(fakeHidDevice, this.#openOptions, propertiesService),
 				)
 				const streamDeckTcp = new StreamDeckTcpWrapper(socket, fakeHidDevice, streamdeckSocket)
 

@@ -3,8 +3,8 @@ import { DeviceModelId } from './id.js'
 import type { StreamDeck } from './types.js'
 import type { OpenStreamDeckOptions } from './models/base.js'
 import type { PropertiesService } from './services/properties/interface.js'
-import type { DeviceModelType, StreamDeckModelInfo } from './modelInfo.js'
-import { DEVICE_MODEL_INFO, VENDOR_ID } from './modelInfo.js'
+import type { DeviceModelType, StreamDeckModelDefinition, StreamDeckModelInfo } from './modelInfo.js'
+import { DEVICE_MODEL_DEFINITIONS, DEVICE_MODEL_INFO, VENDOR_ID } from './modelInfo.js'
 import { StreamDeckOriginalFactory } from './models/original.js'
 import { StreamDeck6KeyFactory } from './models/6-key.js'
 import { StreamDeck32KeyFactory } from './models/32-key.js'
@@ -17,9 +17,19 @@ import { NetworkDockFactory } from './models/network-dock.js'
 import { GalleonK100Factory } from './models/galleon-k100.js'
 import { StreamDeckPlusXlFactory } from './models/plus-xl.js'
 
-/** The factory to construct a StreamDeck for a model */
-export type StreamDeckFactory = (
-	info: StreamDeckModelInfo,
+/**
+ * Constructs a StreamDeck for a model, from its definition.
+ * Internal: the definition carries the properties, which are not public.
+ */
+type StreamDeckModelFactory = (
+	definition: StreamDeckModelDefinition,
+	device: HIDDevice,
+	options: Required<OpenStreamDeckOptions>,
+	tcpPropertiesService?: PropertiesService,
+) => StreamDeck | Promise<StreamDeck>
+
+/** Opens a device of a known model. Already bound to the model it was looked up by */
+export type StreamDeckDriver = (
 	device: HIDDevice,
 	options: Required<OpenStreamDeckOptions>,
 	tcpPropertiesService?: PropertiesService,
@@ -49,7 +59,7 @@ export interface DeviceModelSpec {
 	hasNativeTcp: boolean
 }
 
-const DEVICE_MODEL_DRIVERS: { [id in DeviceModelId]: StreamDeckFactory } = {
+const DEVICE_MODEL_FACTORIES: { [id in DeviceModelId]: StreamDeckModelFactory } = {
 	[DeviceModelId.ORIGINAL]: StreamDeckOriginalFactory,
 	[DeviceModelId.MINI]: StreamDeck6KeyFactory,
 	[DeviceModelId.XL]: StreamDeck32KeyFactory,
@@ -67,6 +77,20 @@ const DEVICE_MODEL_DRIVERS: { [id in DeviceModelId]: StreamDeckFactory } = {
 	[DeviceModelId.GALLEON_K100]: GalleonK100Factory,
 	[DeviceModelId.PLUS_XL]: StreamDeckPlusXlFactory,
 }
+
+/**
+ * Each factory bound to its own model definition, so a caller can never pair a
+ * driver with a model it was not built for.
+ */
+const DEVICE_MODEL_DRIVERS: { [id in DeviceModelId]: StreamDeckDriver } = Object.freeze(
+	Object.fromEntries(
+		Object.values(DEVICE_MODEL_DEFINITIONS).map((definition): [DeviceModelId, StreamDeckDriver] => [
+			definition.info.id,
+			async (device, options, tcpPropertiesService) =>
+				DEVICE_MODEL_FACTORIES[definition.info.id](definition, device, options, tcpPropertiesService),
+		]),
+	),
+) as { [id in DeviceModelId]: StreamDeckDriver }
 
 /**
  * The usb identifiers to report for models which are not usb devices.
@@ -87,8 +111,7 @@ function createLegacySpec(info: StreamDeckModelInfo): Omit<DeviceModelSpec, 'id'
 		hidUsage: info.usb[0]?.hidUsage,
 		hidInterface: info.usb[0]?.hidInterface,
 
-		factory: (device, options, tcpPropertiesService): StreamDeck | Promise<StreamDeck> =>
-			DEVICE_MODEL_DRIVERS[info.id](info, device, options, tcpPropertiesService),
+		factory: DEVICE_MODEL_DRIVERS[info.id],
 
 		hasNativeTcp: info.transports.includes('tcp'),
 	}
@@ -115,6 +138,6 @@ export const DEVICE_MODELS: DeviceModelSpec[] = Object.entries<Omit<DeviceModelS
  * Get the factory to open a device of a model
  * @internal
  */
-export function getDriver(id: DeviceModelId): StreamDeckFactory | undefined {
+export function getDriver(id: DeviceModelId): StreamDeckDriver | undefined {
 	return DEVICE_MODEL_DRIVERS[id]
 }

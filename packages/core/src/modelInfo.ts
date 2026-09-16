@@ -1,6 +1,6 @@
 import type { StreamDeckControlDefinition } from './controlDefinition.js'
 import { DeviceModelId } from './id.js'
-import type { StreamDeckProperties } from './models/base.js'
+import type { StreamDeckProperties, StreamDeckStaticProperties } from './models/base.js'
 import {
 	fifteenKeyProperties,
 	sixKeyProperties,
@@ -74,11 +74,17 @@ export interface StreamDeckModelInfo {
 }
 
 /**
- * The static properties of a model, as defined in `models/definitions.ts`.
- * The gen1 models omit the properties which are always false for them.
+ * A model's public info, paired with the properties needed to drive it.
+ *
+ * The two are built together from a single source, so they cannot describe
+ * different models. The properties are internal and are never exported from
+ * the package index.
+ * @internal
  */
-type StaticModelProperties = Pick<StreamDeckProperties, 'controls'> &
-	Partial<Pick<StreamDeckProperties, 'hasNfcReader' | 'supportsChildDevices'>>
+export interface StreamDeckModelDefinition {
+	readonly info: StreamDeckModelInfo
+	readonly properties: StreamDeckProperties
+}
 
 interface ModelInfoOptions {
 	/** Defaults to `DeviceModelType.STREAMDECK` */
@@ -90,17 +96,17 @@ interface ModelInfoOptions {
 	nativeTcp?: boolean
 }
 
-function createModelInfo(
+function createModelDefinition(
 	id: DeviceModelId,
 	name: string,
-	properties: StaticModelProperties,
+	properties: StreamDeckStaticProperties,
 	options: ModelInfoOptions,
-): StreamDeckModelInfo {
+): StreamDeckModelDefinition {
 	const transports: StreamDeckTransport[] = []
 	if (options.usb.length > 0) transports.push('usb')
 	if (options.nativeTcp) transports.push('tcp')
 
-	return Object.freeze({
+	const info: StreamDeckModelInfo = Object.freeze({
 		id,
 		name,
 		manufacturer: options.manufacturer ?? MANUFACTURER_ELGATO,
@@ -111,40 +117,50 @@ function createModelInfo(
 
 		controls: properties.controls,
 		features: Object.freeze({
-			nfcReader: properties.hasNfcReader ?? false,
-			childDevices: properties.supportsChildDevices ?? false,
+			nfcReader: properties.hasNfcReader,
+			childDevices: properties.supportsChildDevices,
 		}),
+	})
+
+	return Object.freeze({
+		info,
+		properties: Object.freeze({ ...properties, model: id, productName: name }),
 	})
 }
 
 /**
- * Static information about every known model.
- * @experimental Will become DEVICE_MODELS in v8
+ * Every known model, as its public info paired with the properties to drive it.
+ * @internal
  */
-export const DEVICE_MODEL_INFO: Readonly<{ [id in DeviceModelId]: StreamDeckModelInfo }> = Object.freeze({
-	[DeviceModelId.ORIGINAL]: createModelInfo(DeviceModelId.ORIGINAL, 'Stream Deck', originalProperties, {
+export const DEVICE_MODEL_DEFINITIONS: Readonly<{ [id in DeviceModelId]: StreamDeckModelDefinition }> = Object.freeze({
+	[DeviceModelId.ORIGINAL]: createModelDefinition(DeviceModelId.ORIGINAL, 'Stream Deck', originalProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x0060 }],
 	}),
-	[DeviceModelId.MINI]: createModelInfo(DeviceModelId.MINI, 'Stream Deck Mini', sixKeyProperties, {
+	[DeviceModelId.MINI]: createModelDefinition(DeviceModelId.MINI, 'Stream Deck Mini', sixKeyProperties, {
 		usb: [
 			{ vendorId: VENDOR_ID, productId: 0x0063 },
 			{ vendorId: VENDOR_ID, productId: 0x0090 },
 			{ vendorId: VENDOR_ID, productId: 0x00b3 },
 		],
 	}),
-	[DeviceModelId.XL]: createModelInfo(DeviceModelId.XL, 'Stream Deck XL', thirtyTwoKeyProperties, {
+	[DeviceModelId.XL]: createModelDefinition(DeviceModelId.XL, 'Stream Deck XL', thirtyTwoKeyProperties, {
 		usb: [
 			{ vendorId: VENDOR_ID, productId: 0x006c },
 			{ vendorId: VENDOR_ID, productId: 0x008f },
 		],
 	}),
-	[DeviceModelId.ORIGINALV2]: createModelInfo(DeviceModelId.ORIGINALV2, 'Stream Deck', fifteenKeyProperties, {
+	[DeviceModelId.ORIGINALV2]: createModelDefinition(DeviceModelId.ORIGINALV2, 'Stream Deck', fifteenKeyProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x006d }],
 	}),
-	[DeviceModelId.ORIGINALMK2]: createModelInfo(DeviceModelId.ORIGINALMK2, 'Stream Deck MK.2', fifteenKeyProperties, {
-		usb: [{ vendorId: VENDOR_ID, productId: 0x0080 }],
-	}),
-	[DeviceModelId.ORIGINALMK2SCISSOR]: createModelInfo(
+	[DeviceModelId.ORIGINALMK2]: createModelDefinition(
+		DeviceModelId.ORIGINALMK2,
+		'Stream Deck MK.2',
+		fifteenKeyProperties,
+		{
+			usb: [{ vendorId: VENDOR_ID, productId: 0x0080 }],
+		},
+	),
+	[DeviceModelId.ORIGINALMK2SCISSOR]: createModelDefinition(
 		DeviceModelId.ORIGINALMK2SCISSOR,
 		'Stream Deck MK.2 (Scissor)',
 		fifteenKeyProperties,
@@ -152,30 +168,40 @@ export const DEVICE_MODEL_INFO: Readonly<{ [id in DeviceModelId]: StreamDeckMode
 			usb: [{ vendorId: VENDOR_ID, productId: 0x00a5 }],
 		},
 	),
-	[DeviceModelId.PLUS]: createModelInfo(DeviceModelId.PLUS, 'Stream Deck +', plusProperties, {
+	[DeviceModelId.PLUS]: createModelDefinition(DeviceModelId.PLUS, 'Stream Deck +', plusProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x0084 }],
 	}),
-	[DeviceModelId.PEDAL]: createModelInfo(DeviceModelId.PEDAL, 'Stream Deck Pedal', pedalProperties, {
+	[DeviceModelId.PEDAL]: createModelDefinition(DeviceModelId.PEDAL, 'Stream Deck Pedal', pedalProperties, {
 		category: DeviceModelType.PEDAL,
 		usb: [{ vendorId: VENDOR_ID, productId: 0x0086 }],
 	}),
-	[DeviceModelId.NEO]: createModelInfo(DeviceModelId.NEO, 'Stream Deck Neo', neoProperties, {
+	[DeviceModelId.NEO]: createModelDefinition(DeviceModelId.NEO, 'Stream Deck Neo', neoProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x009a }],
 	}),
-	[DeviceModelId.STUDIO]: createModelInfo(DeviceModelId.STUDIO, 'Stream Deck Studio', studioProperties, {
+	[DeviceModelId.STUDIO]: createModelDefinition(DeviceModelId.STUDIO, 'Stream Deck Studio', studioProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x00aa }],
 		nativeTcp: true,
 	}),
-	[DeviceModelId.MODULE6]: createModelInfo(DeviceModelId.MODULE6, 'Stream Deck 6 Module', sixKeyProperties, {
+	[DeviceModelId.MODULE6]: createModelDefinition(DeviceModelId.MODULE6, 'Stream Deck 6 Module', sixKeyProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x00b8 }],
 	}),
-	[DeviceModelId.MODULE15]: createModelInfo(DeviceModelId.MODULE15, 'Stream Deck 15 Module', fifteenKeyProperties, {
-		usb: [{ vendorId: VENDOR_ID, productId: 0x00b9 }],
-	}),
-	[DeviceModelId.MODULE32]: createModelInfo(DeviceModelId.MODULE32, 'Stream Deck 32 Module', thirtyTwoKeyProperties, {
-		usb: [{ vendorId: VENDOR_ID, productId: 0x00ba }],
-	}),
-	[DeviceModelId.NETWORK_DOCK]: createModelInfo(
+	[DeviceModelId.MODULE15]: createModelDefinition(
+		DeviceModelId.MODULE15,
+		'Stream Deck 15 Module',
+		fifteenKeyProperties,
+		{
+			usb: [{ vendorId: VENDOR_ID, productId: 0x00b9 }],
+		},
+	),
+	[DeviceModelId.MODULE32]: createModelDefinition(
+		DeviceModelId.MODULE32,
+		'Stream Deck 32 Module',
+		thirtyTwoKeyProperties,
+		{
+			usb: [{ vendorId: VENDOR_ID, productId: 0x00ba }],
+		},
+	),
+	[DeviceModelId.NETWORK_DOCK]: createModelDefinition(
 		DeviceModelId.NETWORK_DOCK,
 		'Stream Deck Network Dock',
 		networkDockProperties,
@@ -185,7 +211,7 @@ export const DEVICE_MODEL_INFO: Readonly<{ [id in DeviceModelId]: StreamDeckMode
 			nativeTcp: true,
 		},
 	),
-	[DeviceModelId.GALLEON_K100]: createModelInfo(
+	[DeviceModelId.GALLEON_K100]: createModelDefinition(
 		DeviceModelId.GALLEON_K100,
 		'Galleon K100 SD',
 		galleonK100Properties,
@@ -194,10 +220,20 @@ export const DEVICE_MODEL_INFO: Readonly<{ [id in DeviceModelId]: StreamDeckMode
 			usb: [{ vendorId: CORSAIR_VENDOR_ID, productId: 0x2b18, hidUsage: 0x01, hidInterface: 0 }],
 		},
 	),
-	[DeviceModelId.PLUS_XL]: createModelInfo(DeviceModelId.PLUS_XL, 'Stream Deck + XL', plusXlProperties, {
+	[DeviceModelId.PLUS_XL]: createModelDefinition(DeviceModelId.PLUS_XL, 'Stream Deck + XL', plusXlProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x00c6 }],
 	}),
 })
+
+/**
+ * Static information about every known model.
+ * @experimental Will become DEVICE_MODELS in v8
+ */
+export const DEVICE_MODEL_INFO: Readonly<{ [id in DeviceModelId]: StreamDeckModelInfo }> = Object.freeze(
+	Object.fromEntries(
+		Object.values(DEVICE_MODEL_DEFINITIONS).map((definition) => [definition.info.id, definition.info]),
+	),
+) as Readonly<{ [id in DeviceModelId]: StreamDeckModelInfo }>
 
 const ALL_MODEL_INFO: readonly StreamDeckModelInfo[] = Object.freeze(Object.values(DEVICE_MODEL_INFO))
 

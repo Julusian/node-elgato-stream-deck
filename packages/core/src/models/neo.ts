@@ -4,20 +4,21 @@ import { StreamDeckBase } from './base.js'
 import { createBaseGen2Properties } from './generic-gen2.js'
 import type { StreamDeckLcdSegmentControlDefinition } from '../controlDefinition.js'
 import { StreamDeckNeoLcdService } from '../services/lcdSegmentDisplay/neo.js'
-import type { StreamDeckModelInfo } from '../modelInfo.js'
-import { neoProperties } from './definitions.js'
-
-const lcdSegmentControls = neoProperties.controls.filter(
-	(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
-)
+import type { StreamDeckModelDefinition } from '../modelInfo.js'
 
 export function StreamDeckNeoFactory(
-	info: StreamDeckModelInfo,
+	definition: StreamDeckModelDefinition,
 	device: HIDDevice,
 	options: Required<OpenStreamDeckOptions>,
 ): StreamDeckBase {
-	const services = createBaseGen2Properties(info, device, options, neoProperties, null)
-	services.lcdSegmentDisplay = new StreamDeckNeoLcdService(options.encodeJPEG, device, lcdSegmentControls)
+	const services = createBaseGen2Properties(definition, device, options, null)
+	services.lcdSegmentDisplay = new StreamDeckNeoLcdService(
+		options.encodeJPEG,
+		device,
+		definition.properties.controls.filter(
+			(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
+		),
+	)
 
 	return new StreamDeckBase(device, options, services)
 }

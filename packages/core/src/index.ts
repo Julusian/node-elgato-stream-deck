@@ -24,7 +24,7 @@ export {
 export type { StreamDeckModelInfo, StreamDeckModelFeatures, StreamDeckTransport, UsbMatch } from './modelInfo.js'
 
 export { DEVICE_MODELS, DEVICE_MODELS2, getDriver } from './registry.js'
-export type { DeviceModelSpec, StreamDeckFactory } from './registry.js'
+export type { DeviceModelSpec, StreamDeckDriver } from './registry.js'
 
 /**
  * @deprecated Use `getModelInfo(id)?.name` instead
