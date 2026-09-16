@@ -3,6 +3,7 @@ import type { JPEGEncodeOptions } from '@elgato-stream-deck/node-lib'
 export {
 	VENDOR_ID,
 	DeviceModelId,
+	DeviceModelType,
 	KeyIndex,
 	StreamDeck,
 	StreamDeckProxy,
@@ -19,6 +20,13 @@ export {
 	StreamDeckTcpChildDeviceInfo,
 	OpenStreamDeckOptions,
 	PreparedBuffer,
+	StreamDeckModelInfo,
+	StreamDeckModelFeatures,
+	StreamDeckTransport,
+	UsbMatch,
+	DEVICE_MODEL_INFO,
+	getModelInfo,
+	findModelByUsb,
 } from '@elgato-stream-deck/core'
 
 export * from './types.js'

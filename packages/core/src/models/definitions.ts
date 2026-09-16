@@ -9,7 +9,7 @@ import type { StreamDeckGen2Properties } from './generic-gen2.js'
  * The static properties of each model.
  *
  * Note: this module must not import anything which pulls in the services used to drive a device,
- * so that the data can be consumed without them.
+ * so that `DEVICE_MODEL_INFO` can be consumed without them.
  */
 
 export const originalProperties: StreamDeckGen1Properties = {

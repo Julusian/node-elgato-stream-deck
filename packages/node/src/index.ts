@@ -9,6 +9,7 @@ export {
 	VENDOR_ID,
 	CORSAIR_VENDOR_ID,
 	DeviceModelId,
+	DeviceModelType,
 	KeyIndex,
 	StreamDeck,
 	StreamDeckProxy,
@@ -25,6 +26,13 @@ export {
 	StreamDeckTcpChildDeviceInfo,
 	OpenStreamDeckOptions,
 	PreparedBuffer,
+	StreamDeckModelInfo,
+	StreamDeckModelFeatures,
+	StreamDeckTransport,
+	UsbMatch,
+	DEVICE_MODEL_INFO,
+	getModelInfo,
+	findModelByUsb,
 	getStreamDeckModelName,
 } from '@elgato-stream-deck/core'
 
