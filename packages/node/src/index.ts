@@ -65,6 +65,7 @@ export function getStreamDeckDeviceInfo(dev: HID.Device): StreamDeckDeviceInfo |
 	if (!model || !dev.path) return null
 
 	return {
+		modelInfo: model,
 		model: model.id,
 		path: dev.path,
 		serialNumber: dev.serialNumber,

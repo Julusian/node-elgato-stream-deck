@@ -11,7 +11,7 @@ HIDAsync.open = hidOpenMock as any
 
 // Must be required after we register a mock for `node-hid`.
 import { getStreamDeckInfo, listStreamDecks, openStreamDeck } from '../index.js'
-import { VENDOR_ID } from '@elgato-stream-deck/core'
+import { DEVICE_MODEL_INFO, DeviceModelId, VENDOR_ID } from '@elgato-stream-deck/core'
 
 describe('StreamDeck Devices', () => {
 	test('no devices', async () => {
@@ -62,16 +62,19 @@ describe('StreamDeck Devices', () => {
 
 		await expect(listStreamDecks()).resolves.toEqual([
 			{
+				modelInfo: DEVICE_MODEL_INFO[DeviceModelId.ORIGINAL],
 				model: 'original',
 				path: 'path-original',
 				serialNumber: 'some-number',
 			},
 			{
+				modelInfo: DEVICE_MODEL_INFO[DeviceModelId.ORIGINAL],
 				model: 'original',
 				path: 'path-original2',
 				serialNumber: 'some-number-again',
 			},
 			{
+				modelInfo: DEVICE_MODEL_INFO[DeviceModelId.MINI],
 				model: 'mini',
 				path: 'path-mini',
 				serialNumber: undefined,
@@ -125,6 +128,7 @@ describe('StreamDeck Devices', () => {
 
 		const info2 = await getStreamDeckInfo('path-original2')
 		expect(info2).toEqual({
+			modelInfo: DEVICE_MODEL_INFO[DeviceModelId.ORIGINAL],
 			model: 'original',
 			path: 'path-original2',
 			serialNumber: 'some-number-again',

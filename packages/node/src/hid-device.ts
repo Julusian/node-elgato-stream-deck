@@ -1,4 +1,10 @@
-import type { DeviceModelId, HIDDevice, HIDDeviceEvents, HIDDeviceInfo } from '@elgato-stream-deck/core'
+import type {
+	StreamDeckModelInfo,
+	DeviceModelId,
+	HIDDevice,
+	HIDDeviceEvents,
+	HIDDeviceInfo,
+} from '@elgato-stream-deck/core'
 import type { ChildHIDDeviceInfo } from '@elgato-stream-deck/core/dist/hid-device'
 import { EventEmitter } from 'eventemitter3'
 import type { HIDAsync, Device as NodeHIDDeviceInfo } from 'node-hid'
@@ -8,7 +14,12 @@ import Queue from 'p-queue'
  * Information about a found streamdeck
  */
 export interface StreamDeckDeviceInfo {
-	/** The model of the device */
+	/** Information about the model of the device */
+	modelInfo: StreamDeckModelInfo
+	/**
+	 * The model of the device
+	 * @deprecated Use `modelInfo.id` instead
+	 */
 	model: DeviceModelId
 	/** The connected path of the device in the usb tree */
 	path: string
