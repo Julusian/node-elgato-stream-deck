@@ -1,5 +1,12 @@
 import type { HIDDevice } from '../hid-device.js'
-import type { OpenStreamDeckOptions, StreamDeckProperties, StreamDeckServicesDefinition } from './base.js'
+import type {
+	OpenStreamDeckOptions,
+	StreamDeckProperties,
+	StreamDeckServicesDefinition,
+	StreamDeckStaticProperties,
+} from './base.js'
+import { applyModelIdentity } from './base.js'
+import type { StreamDeckModelInfo } from '../modelInfo.js'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter.js'
 import { StreamdeckGen2ImageHeaderGenerator } from '../services/imageWriter/headerGenerator.js'
 import { DefaultButtonsLcdService } from '../services/buttonsLcdDisplay/default.js'
@@ -11,23 +18,27 @@ import { JpegButtonLcdImagePacker } from '../services/imagePacker/jpeg.js'
 import { Gen2InputService } from '../services/input/gen2.js'
 import type { PropertiesService } from '../services/properties/interface.js'
 
-function extendDevicePropertiesForGen2(rawProps: StreamDeckGen2Properties): StreamDeckProperties {
-	return {
+function extendDevicePropertiesForGen2(
+	info: StreamDeckModelInfo,
+	rawProps: StreamDeckGen2Properties,
+): StreamDeckProperties {
+	return applyModelIdentity(info, {
 		...rawProps,
 		keyDataOffset: 3,
-	}
+	})
 }
 
-export type StreamDeckGen2Properties = Omit<StreamDeckProperties, 'keyDataOffset'>
+export type StreamDeckGen2Properties = Omit<StreamDeckStaticProperties, 'keyDataOffset'>
 
 export function createBaseGen2Properties(
+	info: StreamDeckModelInfo,
 	device: HIDDevice,
 	options: Required<OpenStreamDeckOptions>,
 	properties: StreamDeckGen2Properties,
 	propertiesService: PropertiesService | null,
 	transform?: JpegPackerTransformOptions,
 ): StreamDeckServicesDefinition {
-	const fullProperties = extendDevicePropertiesForGen2(properties)
+	const fullProperties = extendDevicePropertiesForGen2(info, properties)
 
 	const events = new CallbackHook<StreamDeckEvents>()
 

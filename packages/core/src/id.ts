@@ -22,22 +22,3 @@ export enum DeviceModelId {
 	GALLEON_K100 = 'galleon-k100',
 	PLUS_XL = 'plus-xl',
 }
-
-export const MODEL_NAMES: { [key in DeviceModelId]: string } = {
-	[DeviceModelId.ORIGINAL]: 'Stream Deck',
-	[DeviceModelId.MINI]: 'Stream Deck Mini',
-	[DeviceModelId.XL]: 'Stream Deck XL',
-	[DeviceModelId.ORIGINALV2]: 'Stream Deck',
-	[DeviceModelId.ORIGINALMK2]: 'Stream Deck MK.2',
-	[DeviceModelId.ORIGINALMK2SCISSOR]: 'Stream Deck MK.2 (Scissor)',
-	[DeviceModelId.PLUS]: 'Stream Deck +',
-	[DeviceModelId.PEDAL]: 'Stream Deck Pedal',
-	[DeviceModelId.NEO]: 'Stream Deck Neo',
-	[DeviceModelId.STUDIO]: 'Stream Deck Studio',
-	[DeviceModelId.MODULE6]: 'Stream Deck 6 Module',
-	[DeviceModelId.MODULE15]: 'Stream Deck 15 Module',
-	[DeviceModelId.MODULE32]: 'Stream Deck 32 Module',
-	[DeviceModelId.NETWORK_DOCK]: 'Stream Deck Network Dock',
-	[DeviceModelId.GALLEON_K100]: 'Galleon K100 SD',
-	[DeviceModelId.PLUS_XL]: 'Stream Deck + XL',
-}

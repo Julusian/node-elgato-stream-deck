@@ -89,7 +89,7 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 
 				const propertiesService = fakeHidDevice.isPrimary ? new TcpPropertiesService(fakeHidDevice) : undefined
 				const streamdeckSocket = await Promise.resolve(
-					factory(fakeHidDevice, this.#openOptions, propertiesService),
+					factory(model, fakeHidDevice, this.#openOptions, propertiesService),
 				)
 				const streamDeckTcp = new StreamDeckTcpWrapper(socket, fakeHidDevice, streamdeckSocket)
 

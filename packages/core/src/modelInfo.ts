@@ -1,10 +1,10 @@
 import type { StreamDeckControlDefinition } from './controlDefinition.js'
-import { DeviceModelId, MODEL_NAMES } from './id.js'
+import { DeviceModelId } from './id.js'
 import type { StreamDeckProperties } from './models/base.js'
 import {
-	base15KeyProperties,
-	base32KeyProperties,
-	base6KeyProperties,
+	fifteenKeyProperties,
+	sixKeyProperties,
+	thirtyTwoKeyProperties,
 	galleonK100Properties,
 	networkDockProperties,
 	neoProperties,
@@ -92,6 +92,7 @@ interface ModelInfoOptions {
 
 function createModelInfo(
 	id: DeviceModelId,
+	name: string,
 	properties: StaticModelProperties,
 	options: ModelInfoOptions,
 ): StreamDeckModelInfo {
@@ -101,7 +102,7 @@ function createModelInfo(
 
 	return Object.freeze({
 		id,
-		name: MODEL_NAMES[id],
+		name,
 		manufacturer: options.manufacturer ?? MANUFACTURER_ELGATO,
 		category: options.category ?? DeviceModelType.STREAMDECK,
 
@@ -121,64 +122,79 @@ function createModelInfo(
  * @experimental Will become DEVICE_MODELS in v8
  */
 export const DEVICE_MODEL_INFO: Readonly<{ [id in DeviceModelId]: StreamDeckModelInfo }> = Object.freeze({
-	[DeviceModelId.ORIGINAL]: createModelInfo(DeviceModelId.ORIGINAL, originalProperties, {
+	[DeviceModelId.ORIGINAL]: createModelInfo(DeviceModelId.ORIGINAL, 'Stream Deck', originalProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x0060 }],
 	}),
-	[DeviceModelId.MINI]: createModelInfo(DeviceModelId.MINI, base6KeyProperties, {
+	[DeviceModelId.MINI]: createModelInfo(DeviceModelId.MINI, 'Stream Deck Mini', sixKeyProperties, {
 		usb: [
 			{ vendorId: VENDOR_ID, productId: 0x0063 },
 			{ vendorId: VENDOR_ID, productId: 0x0090 },
 			{ vendorId: VENDOR_ID, productId: 0x00b3 },
 		],
 	}),
-	[DeviceModelId.XL]: createModelInfo(DeviceModelId.XL, base32KeyProperties, {
+	[DeviceModelId.XL]: createModelInfo(DeviceModelId.XL, 'Stream Deck XL', thirtyTwoKeyProperties, {
 		usb: [
 			{ vendorId: VENDOR_ID, productId: 0x006c },
 			{ vendorId: VENDOR_ID, productId: 0x008f },
 		],
 	}),
-	[DeviceModelId.ORIGINALV2]: createModelInfo(DeviceModelId.ORIGINALV2, base15KeyProperties, {
+	[DeviceModelId.ORIGINALV2]: createModelInfo(DeviceModelId.ORIGINALV2, 'Stream Deck', fifteenKeyProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x006d }],
 	}),
-	[DeviceModelId.ORIGINALMK2]: createModelInfo(DeviceModelId.ORIGINALMK2, base15KeyProperties, {
+	[DeviceModelId.ORIGINALMK2]: createModelInfo(DeviceModelId.ORIGINALMK2, 'Stream Deck MK.2', fifteenKeyProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x0080 }],
 	}),
-	[DeviceModelId.ORIGINALMK2SCISSOR]: createModelInfo(DeviceModelId.ORIGINALMK2SCISSOR, base15KeyProperties, {
-		usb: [{ vendorId: VENDOR_ID, productId: 0x00a5 }],
-	}),
-	[DeviceModelId.PLUS]: createModelInfo(DeviceModelId.PLUS, plusProperties, {
+	[DeviceModelId.ORIGINALMK2SCISSOR]: createModelInfo(
+		DeviceModelId.ORIGINALMK2SCISSOR,
+		'Stream Deck MK.2 (Scissor)',
+		fifteenKeyProperties,
+		{
+			usb: [{ vendorId: VENDOR_ID, productId: 0x00a5 }],
+		},
+	),
+	[DeviceModelId.PLUS]: createModelInfo(DeviceModelId.PLUS, 'Stream Deck +', plusProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x0084 }],
 	}),
-	[DeviceModelId.PEDAL]: createModelInfo(DeviceModelId.PEDAL, pedalProperties, {
+	[DeviceModelId.PEDAL]: createModelInfo(DeviceModelId.PEDAL, 'Stream Deck Pedal', pedalProperties, {
 		category: DeviceModelType.PEDAL,
 		usb: [{ vendorId: VENDOR_ID, productId: 0x0086 }],
 	}),
-	[DeviceModelId.NEO]: createModelInfo(DeviceModelId.NEO, neoProperties, {
+	[DeviceModelId.NEO]: createModelInfo(DeviceModelId.NEO, 'Stream Deck Neo', neoProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x009a }],
 	}),
-	[DeviceModelId.STUDIO]: createModelInfo(DeviceModelId.STUDIO, studioProperties, {
+	[DeviceModelId.STUDIO]: createModelInfo(DeviceModelId.STUDIO, 'Stream Deck Studio', studioProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x00aa }],
 		nativeTcp: true,
 	}),
-	[DeviceModelId.MODULE6]: createModelInfo(DeviceModelId.MODULE6, base6KeyProperties, {
+	[DeviceModelId.MODULE6]: createModelInfo(DeviceModelId.MODULE6, 'Stream Deck 6 Module', sixKeyProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x00b8 }],
 	}),
-	[DeviceModelId.MODULE15]: createModelInfo(DeviceModelId.MODULE15, base15KeyProperties, {
+	[DeviceModelId.MODULE15]: createModelInfo(DeviceModelId.MODULE15, 'Stream Deck 15 Module', fifteenKeyProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x00b9 }],
 	}),
-	[DeviceModelId.MODULE32]: createModelInfo(DeviceModelId.MODULE32, base32KeyProperties, {
+	[DeviceModelId.MODULE32]: createModelInfo(DeviceModelId.MODULE32, 'Stream Deck 32 Module', thirtyTwoKeyProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x00ba }],
 	}),
-	[DeviceModelId.NETWORK_DOCK]: createModelInfo(DeviceModelId.NETWORK_DOCK, networkDockProperties, {
-		category: DeviceModelType.NETWORK_DOCK,
-		usb: [], // This is not a usb device
-		nativeTcp: true,
-	}),
-	[DeviceModelId.GALLEON_K100]: createModelInfo(DeviceModelId.GALLEON_K100, galleonK100Properties, {
-		manufacturer: MANUFACTURER_CORSAIR,
-		usb: [{ vendorId: CORSAIR_VENDOR_ID, productId: 0x2b18, hidUsage: 0x01, hidInterface: 0 }],
-	}),
-	[DeviceModelId.PLUS_XL]: createModelInfo(DeviceModelId.PLUS_XL, plusXlProperties, {
+	[DeviceModelId.NETWORK_DOCK]: createModelInfo(
+		DeviceModelId.NETWORK_DOCK,
+		'Stream Deck Network Dock',
+		networkDockProperties,
+		{
+			category: DeviceModelType.NETWORK_DOCK,
+			usb: [], // This is not a usb device
+			nativeTcp: true,
+		},
+	),
+	[DeviceModelId.GALLEON_K100]: createModelInfo(
+		DeviceModelId.GALLEON_K100,
+		'Galleon K100 SD',
+		galleonK100Properties,
+		{
+			manufacturer: MANUFACTURER_CORSAIR,
+			usb: [{ vendorId: CORSAIR_VENDOR_ID, productId: 0x2b18, hidUsage: 0x01, hidInterface: 0 }],
+		},
+	),
+	[DeviceModelId.PLUS_XL]: createModelInfo(DeviceModelId.PLUS_XL, 'Stream Deck + XL', plusXlProperties, {
 		usb: [{ vendorId: VENDOR_ID, productId: 0x00c6 }],
 	}),
 })
@@ -215,3 +231,10 @@ export function findModelByUsb(
 
 	return undefined
 }
+
+/**
+ * @deprecated Use `DEVICE_MODEL_INFO[id].name` instead
+ */
+export const MODEL_NAMES: { [key in DeviceModelId]: string } = Object.freeze(
+	Object.fromEntries(ALL_MODEL_INFO.map((info) => [info.id, info.name])),
+) as { [key in DeviceModelId]: string }

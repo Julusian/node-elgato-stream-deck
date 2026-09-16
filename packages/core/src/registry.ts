@@ -1,5 +1,5 @@
 import type { HIDDevice } from './hid-device.js'
-import { DeviceModelId, MODEL_NAMES } from './id.js'
+import { DeviceModelId } from './id.js'
 import type { StreamDeck } from './types.js'
 import type { OpenStreamDeckOptions } from './models/base.js'
 import type { PropertiesService } from './services/properties/interface.js'
@@ -19,6 +19,7 @@ import { StreamDeckPlusXlFactory } from './models/plus-xl.js'
 
 /** The factory to construct a StreamDeck for a model */
 export type StreamDeckFactory = (
+	info: StreamDeckModelInfo,
 	device: HIDDevice,
 	options: Required<OpenStreamDeckOptions>,
 	tcpPropertiesService?: PropertiesService,
@@ -39,25 +40,29 @@ export interface DeviceModelSpec {
 	 */
 	hidInterface?: number
 
-	factory: StreamDeckFactory
+	factory: (
+		device: HIDDevice,
+		options: Required<OpenStreamDeckOptions>,
+		tcpPropertiesService?: PropertiesService,
+	) => StreamDeck | Promise<StreamDeck>
 
 	hasNativeTcp: boolean
 }
 
-const DEVICE_MODEL_FACTORIES: { [id in DeviceModelId]: StreamDeckFactory } = {
+const DEVICE_MODEL_DRIVERS: { [id in DeviceModelId]: StreamDeckFactory } = {
 	[DeviceModelId.ORIGINAL]: StreamDeckOriginalFactory,
-	[DeviceModelId.MINI]: (...args) => StreamDeck6KeyFactory(DeviceModelId.MINI, ...args),
-	[DeviceModelId.XL]: (...args) => StreamDeck32KeyFactory(DeviceModelId.XL, ...args),
-	[DeviceModelId.ORIGINALV2]: (...args) => StreamDeck15KeyFactory(DeviceModelId.ORIGINALV2, ...args),
-	[DeviceModelId.ORIGINALMK2]: (...args) => StreamDeck15KeyFactory(DeviceModelId.ORIGINALMK2, ...args),
-	[DeviceModelId.ORIGINALMK2SCISSOR]: (...args) => StreamDeck15KeyFactory(DeviceModelId.ORIGINALMK2SCISSOR, ...args),
+	[DeviceModelId.MINI]: StreamDeck6KeyFactory,
+	[DeviceModelId.XL]: StreamDeck32KeyFactory,
+	[DeviceModelId.ORIGINALV2]: StreamDeck15KeyFactory,
+	[DeviceModelId.ORIGINALMK2]: StreamDeck15KeyFactory,
+	[DeviceModelId.ORIGINALMK2SCISSOR]: StreamDeck15KeyFactory,
 	[DeviceModelId.PLUS]: StreamDeckPlusFactory,
 	[DeviceModelId.PEDAL]: StreamDeckPedalFactory,
 	[DeviceModelId.NEO]: StreamDeckNeoFactory,
 	[DeviceModelId.STUDIO]: StreamDeckStudioFactory,
-	[DeviceModelId.MODULE6]: (...args) => StreamDeck6KeyFactory(DeviceModelId.MODULE6, ...args),
-	[DeviceModelId.MODULE15]: (...args) => StreamDeck15KeyFactory(DeviceModelId.MODULE15, ...args),
-	[DeviceModelId.MODULE32]: (...args) => StreamDeck32KeyFactory(DeviceModelId.MODULE32, ...args),
+	[DeviceModelId.MODULE6]: StreamDeck6KeyFactory,
+	[DeviceModelId.MODULE15]: StreamDeck15KeyFactory,
+	[DeviceModelId.MODULE32]: StreamDeck32KeyFactory,
 	[DeviceModelId.NETWORK_DOCK]: NetworkDockFactory,
 	[DeviceModelId.GALLEON_K100]: GalleonK100Factory,
 	[DeviceModelId.PLUS_XL]: StreamDeckPlusXlFactory,
@@ -82,7 +87,8 @@ function createLegacySpec(info: StreamDeckModelInfo): Omit<DeviceModelSpec, 'id'
 		hidUsage: info.usb[0]?.hidUsage,
 		hidInterface: info.usb[0]?.hidInterface,
 
-		factory: DEVICE_MODEL_FACTORIES[info.id],
+		factory: (device, options, tcpPropertiesService): StreamDeck | Promise<StreamDeck> =>
+			DEVICE_MODEL_DRIVERS[info.id](info, device, options, tcpPropertiesService),
 
 		hasNativeTcp: info.transports.includes('tcp'),
 	}
@@ -102,7 +108,7 @@ export const DEVICE_MODELS: DeviceModelSpec[] = Object.entries<Omit<DeviceModelS
 	DEVICE_MODELS2,
 ).map(([id, spec]) => {
 	const modelId = id as any as DeviceModelId
-	return { id: modelId, productName: MODEL_NAMES[modelId], ...spec }
+	return { id: modelId, productName: DEVICE_MODEL_INFO[modelId].name, ...spec }
 })
 
 /**
@@ -110,5 +116,5 @@ export const DEVICE_MODELS: DeviceModelSpec[] = Object.entries<Omit<DeviceModelS
  * @internal
  */
 export function getDriver(id: DeviceModelId): StreamDeckFactory | undefined {
-	return DEVICE_MODEL_FACTORIES[id]
+	return DEVICE_MODEL_DRIVERS[id]
 }

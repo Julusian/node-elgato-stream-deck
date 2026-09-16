@@ -4,14 +4,17 @@ import { createBaseGen2Properties } from './generic-gen2.js'
 import type { PropertiesService } from '../services/properties/interface.js'
 import { StudioPropertiesService } from '../services/properties/studio.js'
 import { StudioEncoderLedService } from '../services/encoderLed/studio.js'
+import type { StreamDeckModelInfo } from '../modelInfo.js'
 import { studioProperties } from './definitions.js'
 
 export function StreamDeckStudioFactory(
+	info: StreamDeckModelInfo,
 	device: HIDDevice,
 	options: Required<OpenStreamDeckOptions>,
 	propertiesService?: PropertiesService,
 ): StreamDeckBase {
 	const services = createBaseGen2Properties(
+		info,
 		device,
 		options,
 		studioProperties,

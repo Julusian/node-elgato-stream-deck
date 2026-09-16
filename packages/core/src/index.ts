@@ -1,4 +1,5 @@
-import { MODEL_NAMES, type DeviceModelId } from './id.js'
+import type { DeviceModelId } from './id.js'
+import { DEVICE_MODEL_INFO } from './modelInfo.js'
 
 export * from './types.js'
 export * from './id.js'
@@ -16,6 +17,7 @@ export {
 	CORSAIR_VENDOR_ID,
 	DeviceModelType,
 	DEVICE_MODEL_INFO,
+	MODEL_NAMES,
 	getModelInfo,
 	findModelByUsb,
 } from './modelInfo.js'
@@ -24,6 +26,9 @@ export type { StreamDeckModelInfo, StreamDeckModelFeatures, StreamDeckTransport,
 export { DEVICE_MODELS, DEVICE_MODELS2, getDriver } from './registry.js'
 export type { DeviceModelSpec, StreamDeckFactory } from './registry.js'
 
+/**
+ * @deprecated Use `getModelInfo(id)?.name` instead
+ */
 export function getStreamDeckModelName(modelId: DeviceModelId): string {
-	return MODEL_NAMES[modelId] || 'Unknown Stream Deck'
+	return DEVICE_MODEL_INFO[modelId]?.name || 'Unknown Stream Deck'
 }

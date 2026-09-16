@@ -16,6 +16,7 @@ import type { PropertiesService } from '../services/properties/interface.js'
 import type { CallbackHook } from '../services/callback-hook.js'
 import type { StreamDeckInputService } from '../services/input/interface.js'
 import { findModelByUsb } from '../modelInfo.js'
+import type { StreamDeckModelInfo } from '../modelInfo.js'
 import type { EncoderLedService } from '../services/encoderLed/interface.js'
 import { unwrapPreparedBufferToBuffer, type PreparedBuffer } from '../preparedBuffer.js'
 
@@ -50,6 +51,24 @@ export type StreamDeckProperties = Readonly<{
 	/** Whether this device supports child devices */
 	supportsChildDevices: boolean
 }>
+
+/**
+ * The properties of a model which are known without a device present.
+ * The identity of the model is applied by the factory, from its `StreamDeckModelInfo`
+ */
+export type StreamDeckStaticProperties = Omit<StreamDeckProperties, 'model' | 'productName'>
+
+/** Combine the static properties of a model with its identity */
+export function applyModelIdentity(
+	info: StreamDeckModelInfo,
+	properties: StreamDeckStaticProperties,
+): StreamDeckProperties {
+	return {
+		...properties,
+		model: info.id,
+		productName: info.name,
+	}
+}
 
 export interface StreamDeckServicesDefinition {
 	deviceProperties: StreamDeckProperties

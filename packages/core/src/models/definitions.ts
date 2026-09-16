@@ -1,7 +1,6 @@
 import type { StreamDeckControlDefinition } from '../controlDefinition.js'
-import { DeviceModelId, MODEL_NAMES } from '../id.js'
 import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
-import type { StreamDeckProperties } from './base.js'
+import type { StreamDeckStaticProperties } from './base.js'
 import type { StreamDeckGen1Properties } from './generic-gen1.js'
 import type { StreamDeckGen2Properties } from './generic-gen2.js'
 
@@ -13,8 +12,6 @@ import type { StreamDeckGen2Properties } from './generic-gen2.js'
  */
 
 export const originalProperties: StreamDeckGen1Properties = {
-	model: DeviceModelId.ORIGINAL,
-	productName: MODEL_NAMES[DeviceModelId.ORIGINAL],
 	supportsRgbKeyFill: false,
 
 	controls: freezeDefinitions(generateButtonsGrid(5, 3, { width: 72, height: 72 }, true)),
@@ -25,7 +22,7 @@ export const originalProperties: StreamDeckGen1Properties = {
 	fullscreenPanels: 0,
 }
 
-export const base6KeyProperties: Omit<StreamDeckGen1Properties, 'model' | 'productName'> = {
+export const sixKeyProperties: StreamDeckGen1Properties = {
 	supportsRgbKeyFill: false, // TODO - verify this
 
 	controls: freezeDefinitions(generateButtonsGrid(3, 2, { width: 80, height: 80 })),
@@ -36,7 +33,7 @@ export const base6KeyProperties: Omit<StreamDeckGen1Properties, 'model' | 'produ
 	fullscreenPanels: 0,
 }
 
-export const base15KeyProperties: Omit<StreamDeckGen2Properties, 'model' | 'productName'> = {
+export const fifteenKeyProperties: StreamDeckGen2Properties = {
 	supportsRgbKeyFill: true,
 
 	controls: freezeDefinitions(generateButtonsGrid(5, 3, { width: 72, height: 72 })),
@@ -49,7 +46,7 @@ export const base15KeyProperties: Omit<StreamDeckGen2Properties, 'model' | 'prod
 	supportsChildDevices: false,
 }
 
-export const base32KeyProperties: Omit<StreamDeckGen2Properties, 'model' | 'productName'> = {
+export const thirtyTwoKeyProperties: StreamDeckGen2Properties = {
 	supportsRgbKeyFill: true,
 
 	controls: freezeDefinitions(generateButtonsGrid(8, 4, { width: 96, height: 96 })),
@@ -128,8 +125,6 @@ plusControls.push(
 )
 
 export const plusProperties: StreamDeckGen2Properties = {
-	model: DeviceModelId.PLUS,
-	productName: MODEL_NAMES[DeviceModelId.PLUS],
 	supportsRgbKeyFill: true,
 
 	controls: freezeDefinitions(plusControls),
@@ -230,8 +225,6 @@ plusXlControls.push(
 )
 
 export const plusXlProperties: StreamDeckGen2Properties = {
-	model: DeviceModelId.PLUS_XL,
-	productName: MODEL_NAMES[DeviceModelId.PLUS_XL],
 	supportsRgbKeyFill: true,
 
 	controls: freezeDefinitions(plusXlControls),
@@ -284,8 +277,6 @@ neoControls.push(
 )
 
 export const neoProperties: StreamDeckGen2Properties = {
-	model: DeviceModelId.NEO,
-	productName: MODEL_NAMES[DeviceModelId.NEO],
 	controls: freezeDefinitions(neoControls),
 
 	keySpacingHorizontal: 30,
@@ -327,9 +318,7 @@ const pedalControls: StreamDeckControlDefinition[] = [
 	},
 ]
 
-export const pedalProperties: StreamDeckProperties = {
-	model: DeviceModelId.PEDAL,
-	productName: MODEL_NAMES[DeviceModelId.PEDAL],
+export const pedalProperties: StreamDeckStaticProperties = {
 	keyDataOffset: 3,
 	supportsRgbKeyFill: false,
 
@@ -371,8 +360,6 @@ const studioControls: StreamDeckControlDefinition[] = [
 ]
 
 export const studioProperties: StreamDeckGen2Properties = {
-	model: DeviceModelId.STUDIO,
-	productName: MODEL_NAMES[DeviceModelId.STUDIO],
 	supportsRgbKeyFill: true,
 
 	controls: freezeDefinitions(studioControls),
@@ -386,9 +373,7 @@ export const studioProperties: StreamDeckGen2Properties = {
 	supportsChildDevices: true,
 }
 
-export const networkDockProperties: StreamDeckProperties = {
-	model: DeviceModelId.NETWORK_DOCK,
-	productName: MODEL_NAMES[DeviceModelId.NETWORK_DOCK],
+export const networkDockProperties: StreamDeckStaticProperties = {
 	keyDataOffset: 0,
 
 	supportsRgbKeyFill: false,
@@ -449,8 +434,6 @@ k100Controls.push(
 )
 
 export const galleonK100Properties: StreamDeckGen2Properties = {
-	model: DeviceModelId.GALLEON_K100,
-	productName: MODEL_NAMES[DeviceModelId.GALLEON_K100],
 	supportsRgbKeyFill: true,
 
 	controls: freezeDefinitions(k100Controls),
