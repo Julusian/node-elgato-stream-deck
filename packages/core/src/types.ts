@@ -1,3 +1,4 @@
+import type { StreamDeckModelInfo } from './modelInfo.js'
 import type { EventEmitter } from 'eventemitter3'
 import type { DeviceModelId, Dimension, EncoderIndex, KeyIndex } from './id.js'
 import type { HIDDeviceInfo } from './hid-device.js'
@@ -47,15 +48,30 @@ export type StreamDeckEvents = {
 }
 
 export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
-	/** List of the controls on this streamdeck */
+	/** Information about the model of this device */
+	readonly modelInfo: StreamDeckModelInfo
+
+	/**
+	 * List of the controls on this streamdeck
+	 * @deprecated Use `modelInfo.controls` instead
+	 */
 	readonly CONTROLS: Readonly<StreamDeckControlDefinition[]>
 
-	/** The model of this device */
+	/**
+	 * The model of this device
+	 * @deprecated Use `modelInfo.id` instead
+	 */
 	readonly MODEL: DeviceModelId
-	/** The name of the product/model */
+	/**
+	 * The name of the product/model
+	 * @deprecated Use `modelInfo.name` instead
+	 */
 	readonly PRODUCT_NAME: string
 
-	/** Whether this device has a nfc reader */
+	/**
+	 * Whether this device has a nfc reader
+	 * @deprecated Use `modelInfo.features.nfcReader` instead
+	 */
 	readonly HAS_NFC_READER: boolean
 
 	/**

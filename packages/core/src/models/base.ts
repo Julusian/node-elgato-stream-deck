@@ -71,6 +71,7 @@ export function applyModelIdentity(
 }
 
 export interface StreamDeckServicesDefinition {
+	modelInfo: StreamDeckModelInfo
 	deviceProperties: StreamDeckProperties
 	events: CallbackHook<StreamDeckEvents>
 	properties: PropertiesService
@@ -81,6 +82,10 @@ export interface StreamDeckServicesDefinition {
 }
 
 export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements StreamDeck {
+	get modelInfo(): StreamDeckModelInfo {
+		return this.#modelInfo
+	}
+
 	get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
 		return this.deviceProperties.controls
 	}
@@ -105,6 +110,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 
 	protected readonly device: HIDDevice
 	protected readonly deviceProperties: Readonly<StreamDeckProperties>
+	readonly #modelInfo: StreamDeckModelInfo
 	// readonly #options: Readonly<Required<OpenStreamDeckOptions>>
 	readonly #propertiesService: PropertiesService
 	readonly #buttonsLcdService: ButtonsLcdDisplayService
@@ -120,6 +126,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 		super()
 
 		this.device = device
+		this.#modelInfo = services.modelInfo
 		this.deviceProperties = services.deviceProperties
 		// this.#options = options
 		this.#propertiesService = services.properties

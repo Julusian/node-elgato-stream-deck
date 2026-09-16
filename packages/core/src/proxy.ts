@@ -2,6 +2,7 @@ import type { EventEmitter } from 'eventemitter3'
 import type { DeviceModelId } from './id.js'
 import type { StreamDeck, StreamDeckEvents } from './types.js'
 import type { StreamDeckControlDefinition } from './controlDefinition.js'
+import type { StreamDeckModelInfo } from './modelInfo.js'
 
 /**
  * A minimal proxy around a StreamDeck instance.
@@ -13,6 +14,10 @@ export class StreamDeckProxy implements StreamDeck {
 
 	constructor(device: StreamDeck) {
 		this.device = device
+	}
+
+	public get modelInfo(): StreamDeckModelInfo {
+		return this.device.modelInfo
 	}
 
 	public get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {

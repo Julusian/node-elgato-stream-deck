@@ -11,6 +11,7 @@ import { CallbackHook } from '../services/callback-hook.js'
 import type { StreamDeckEvents } from '../types.js'
 import { DummyHID } from './hid.js'
 import { DeviceModelId } from '../id.js'
+import { DEVICE_MODEL_INFO } from '../modelInfo.js'
 
 // --- helpers ---
 
@@ -116,6 +117,7 @@ const minimalButtonProperties: Readonly<StreamDeckProperties> = {
 function makeServices(overrides?: Partial<StreamDeckServicesDefinition>): StreamDeckServicesDefinition {
 	const events = new CallbackHook<StreamDeckEvents>()
 	return {
+		modelInfo: DEVICE_MODEL_INFO[DeviceModelId.ORIGINAL],
 		deviceProperties: minimalButtonProperties,
 		events,
 		properties: makeMockProperties(),

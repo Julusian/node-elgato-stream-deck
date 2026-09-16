@@ -20,6 +20,7 @@ export function NetworkDockFactory(
 	const events = new CallbackHook<StreamDeckEvents>()
 
 	return new StreamDeckBase(device, options, {
+		modelInfo: info,
 		deviceProperties: properties,
 		events,
 		properties: new NetworkDockPropertiesService(device),

@@ -18,6 +18,7 @@ export function StreamDeckPedalFactory(
 	const events = new CallbackHook<StreamDeckEvents>()
 
 	return new StreamDeckBase(device, options, {
+		modelInfo: info,
 		deviceProperties: properties,
 		events,
 		properties: new PedalPropertiesService(device),

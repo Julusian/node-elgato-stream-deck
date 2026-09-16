@@ -43,6 +43,7 @@ export function createBaseGen2Properties(
 	const events = new CallbackHook<StreamDeckEvents>()
 
 	return {
+		modelInfo: info,
 		deviceProperties: fullProperties,
 		events,
 		properties: propertiesService ?? new Gen2PropertiesService(device),

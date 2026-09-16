@@ -42,6 +42,7 @@ export function StreamDeckGen1Factory(
 	const events = new CallbackHook<StreamDeckEvents>()
 
 	return new StreamDeckBase(device, options, {
+		modelInfo: info,
 		deviceProperties: fullProperties,
 		events,
 		properties: new Gen1PropertiesService(device),
