@@ -7,8 +7,7 @@ import type { DeviceModelType, StreamDeckModelDefinition, StreamDeckModelInfo } 
 import { DEVICE_MODEL_DEFINITIONS, DEVICE_MODEL_INFO, VENDOR_ID } from './modelInfo.js'
 import { StreamDeckOriginalFactory } from './models/original.js'
 import { StreamDeck6KeyFactory } from './models/6-key.js'
-import { StreamDeck32KeyFactory } from './models/32-key.js'
-import { StreamDeck15KeyFactory } from './models/15-key.js'
+import { StreamDeckGen2Factory } from './models/generic-gen2.js'
 import { StreamDeckPlusFactory } from './models/plus.js'
 import { StreamDeckPedalFactory } from './models/pedal.js'
 import { StreamDeckNeoFactory } from './models/neo.js'
@@ -62,17 +61,17 @@ export interface DeviceModelSpec {
 const DEVICE_MODEL_FACTORIES: { [id in DeviceModelId]: StreamDeckModelFactory } = {
 	[DeviceModelId.ORIGINAL]: StreamDeckOriginalFactory,
 	[DeviceModelId.MINI]: StreamDeck6KeyFactory,
-	[DeviceModelId.XL]: StreamDeck32KeyFactory,
-	[DeviceModelId.ORIGINALV2]: StreamDeck15KeyFactory,
-	[DeviceModelId.ORIGINALMK2]: StreamDeck15KeyFactory,
-	[DeviceModelId.ORIGINALMK2SCISSOR]: StreamDeck15KeyFactory,
+	[DeviceModelId.XL]: StreamDeckGen2Factory,
+	[DeviceModelId.ORIGINALV2]: StreamDeckGen2Factory,
+	[DeviceModelId.ORIGINALMK2]: StreamDeckGen2Factory,
+	[DeviceModelId.ORIGINALMK2SCISSOR]: StreamDeckGen2Factory,
 	[DeviceModelId.PLUS]: StreamDeckPlusFactory,
 	[DeviceModelId.PEDAL]: StreamDeckPedalFactory,
 	[DeviceModelId.NEO]: StreamDeckNeoFactory,
 	[DeviceModelId.STUDIO]: StreamDeckStudioFactory,
 	[DeviceModelId.MODULE6]: StreamDeck6KeyFactory,
-	[DeviceModelId.MODULE15]: StreamDeck15KeyFactory,
-	[DeviceModelId.MODULE32]: StreamDeck32KeyFactory,
+	[DeviceModelId.MODULE15]: StreamDeckGen2Factory,
+	[DeviceModelId.MODULE32]: StreamDeckGen2Factory,
 	[DeviceModelId.NETWORK_DOCK]: NetworkDockFactory,
 	[DeviceModelId.GALLEON_K100]: GalleonK100Factory,
 	[DeviceModelId.PLUS_XL]: StreamDeckPlusXlFactory,

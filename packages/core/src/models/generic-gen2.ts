@@ -1,5 +1,6 @@
 import type { HIDDevice } from '../hid-device.js'
 import type { OpenStreamDeckOptions, StreamDeckServicesDefinition } from './base.js'
+import { StreamDeckBase } from './base.js'
 import type { StreamDeckModelDefinition } from '../modelInfo.js'
 import { StreamdeckDefaultImageWriter } from '../services/imageWriter/imageWriter.js'
 import { StreamdeckGen2ImageHeaderGenerator } from '../services/imageWriter/headerGenerator.js'
@@ -38,4 +39,19 @@ export function createBaseGen2Properties(
 		inputService: new Gen2InputService(fullProperties, events),
 		encoderLed: null,
 	}
+}
+
+/**
+ * A gen2 device with no lcd segment or encoder leds.
+ * Used by every plain button grid gen2 model.
+ */
+export function StreamDeckGen2Factory(
+	definition: StreamDeckModelDefinition,
+	device: HIDDevice,
+	options: Required<OpenStreamDeckOptions>,
+	_tcpPropertiesService?: PropertiesService,
+): StreamDeckBase {
+	const services = createBaseGen2Properties(definition, device, options, null)
+
+	return new StreamDeckBase(device, options, services)
 }
