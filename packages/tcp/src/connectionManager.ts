@@ -1,10 +1,16 @@
 import { EventEmitter } from 'events'
 import type { OpenStreamDeckOptionsTcp, StreamDeckTcp } from './types.js'
-import { DEFAULT_TCP_PORT } from './constants.js'
+import { DEFAULT_TCP_PORT, NETWORK_DOCK_TCP_PRODUCT_ID } from './constants.js'
 import { SocketWrapper } from './socketWrapper.js'
 import { type JPEGEncodeOptions, encodeJPEG } from '@elgato-stream-deck/node-lib'
 import type { HIDDevice, OpenStreamDeckOptions, ChildHIDDeviceInfo, PropertiesService } from '@elgato-stream-deck/core'
-import { DEVICE_MODELS, parseAllFirmwareVersionsHelper } from '@elgato-stream-deck/core'
+import {
+	DeviceModelId,
+	findModelByUsb,
+	getDriver,
+	getModelInfo,
+	parseAllFirmwareVersionsHelper,
+} from '@elgato-stream-deck/core'
 import { StreamDeckTcpWrapper } from './tcpWrapper.js'
 import { TcpLegacyHidDevice } from './hid-device/legacy.js'
 import { TcpCoraHidDevice } from './hid-device/cora.js'
@@ -69,8 +75,13 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 		fakeHidDevice
 			.getDeviceInfo()
 			.then(async (info) => {
-				const model = DEVICE_MODELS.find((m) => m.productIds.includes(info.productId))
-				if (!model) {
+				// The network dock is not a usb device, it identifies itself with a fake product id
+				const model =
+					info.productId === NETWORK_DOCK_TCP_PRODUCT_ID
+						? getModelInfo(DeviceModelId.NETWORK_DOCK)
+						: findModelByUsb(info.vendorId, info.productId)
+				const factory = model && getDriver(model.id)
+				if (!factory) {
 					// Note: leave the temporary error handler, to ensure it can't cause a crash
 					this.emit('error', `Found StreamDeck with unknown productId: ${info.productId.toString(16)}`)
 					return
@@ -78,7 +89,7 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 
 				const propertiesService = fakeHidDevice.isPrimary ? new TcpPropertiesService(fakeHidDevice) : undefined
 				const streamdeckSocket = await Promise.resolve(
-					model.factory(fakeHidDevice, this.#openOptions, propertiesService),
+					factory(fakeHidDevice, this.#openOptions, propertiesService),
 				)
 				const streamDeckTcp = new StreamDeckTcpWrapper(socket, fakeHidDevice, streamdeckSocket)
 

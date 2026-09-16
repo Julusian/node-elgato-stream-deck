@@ -1,9 +1,9 @@
 import type { Browser, DiscoveredService as BonjourService } from '@julusian/bonjour-service'
 import { Bonjour } from '@julusian/bonjour-service'
 import { EventEmitter } from 'events'
-import { DEFAULT_MDNS_QUERY_INTERVAL } from './constants.js'
-import { DeviceModelId, DeviceModelType, MODEL_NAMES } from '@elgato-stream-deck/core'
-import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'
+import { DEFAULT_MDNS_QUERY_INTERVAL, NETWORK_DOCK_TCP_PRODUCT_ID } from './constants.js'
+import { DeviceModelId, DeviceModelType } from '@elgato-stream-deck/core'
+import { DEVICE_MODEL_INFO, findModelByUsb, VENDOR_ID } from '@elgato-stream-deck/core'
 
 export interface StreamDeckTcpDiscoveryServiceOptions {
 	/**
@@ -50,13 +50,13 @@ function convertService(service: BonjourService): StreamDeckTcpDefinition | null
 			name: service.name,
 
 			vendorId: VENDOR_ID,
-			productId: 0xffff, // This doesn't have a product id, but we need to set it to something
+			productId: NETWORK_DOCK_TCP_PRODUCT_ID, // This doesn't have a product id, but we need to set it to something
 
 			serialNumber: service.txt.sn,
 
 			modelType: DeviceModelType.NETWORK_DOCK,
 			modelId: DeviceModelId.NETWORK_DOCK,
-			modelName: MODEL_NAMES[DeviceModelId.NETWORK_DOCK],
+			modelName: DEVICE_MODEL_INFO[DeviceModelId.NETWORK_DOCK].name,
 
 			isPrimary: true,
 		}
@@ -68,7 +68,7 @@ function convertService(service: BonjourService): StreamDeckTcpDefinition | null
 	if (isNaN(vendorId) || isNaN(productId)) return null
 
 	// Find the corresponding model
-	const model = DEVICE_MODELS.find((model) => model.vendorId === vendorId && model.productIds.includes(productId))
+	const model = findModelByUsb(vendorId, productId)
 	if (!model) return null
 
 	return {
@@ -81,11 +81,11 @@ function convertService(service: BonjourService): StreamDeckTcpDefinition | null
 
 		serialNumber: service.txt.sn,
 
-		modelType: model.type,
+		modelType: model.category,
 		modelId: model.id,
-		modelName: model.productName,
+		modelName: model.name,
 
-		isPrimary: model.hasNativeTcp,
+		isPrimary: model.transports.includes('tcp'),
 	}
 }
 

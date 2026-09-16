@@ -1,12 +1,5 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 
-// Mock the index to break the circular dependency that occurs when importing
-// models/base.ts directly (base.ts imports DEVICE_MODELS from index.ts which
-// re-imports all models including galleon-k100.ts which extends StreamDeckBase).
-jest.mock('../index.js', () => ({
-	DEVICE_MODELS: [],
-}))
-
 import { StreamDeckBase } from '../models/base.js'
 import type { StreamDeckServicesDefinition, StreamDeckProperties, OpenStreamDeckOptions } from '../models/base.js'
 import type { PropertiesService } from '../services/properties/interface.js'

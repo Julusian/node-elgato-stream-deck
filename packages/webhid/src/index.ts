@@ -1,7 +1,7 @@
 /* eslint-disable n/no-unsupported-features/node-builtins */
 
 import type { OpenStreamDeckOptions, StreamDeck } from '@elgato-stream-deck/core'
-import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'
+import { findModelByUsb, getDriver, VENDOR_ID } from '@elgato-stream-deck/core'
 import { WebHIDDevice } from './hid-device.js'
 import { encodeJPEG } from './jpeg.js'
 import { StreamDeckWeb } from './wrapper.js'
@@ -81,10 +81,9 @@ export async function openDevice(
 	browserDevice: HIDDevice,
 	userOptions?: OpenStreamDeckOptions,
 ): Promise<StreamDeckWeb> {
-	const model = DEVICE_MODELS.find(
-		(m) => browserDevice.vendorId === m.vendorId && m.productIds.includes(browserDevice.productId),
-	)
-	if (!model) {
+	const model = findModelByUsb(browserDevice.vendorId, browserDevice.productId)
+	const factory = model && getDriver(model.id)
+	if (!factory) {
 		throw new Error('Stream Deck is of unexpected type.')
 	}
 
@@ -97,7 +96,7 @@ export async function openDevice(
 		}
 
 		const browserHid = new WebHIDDevice(browserDevice)
-		const device: StreamDeck = await Promise.resolve(model.factory(browserHid, options || {}))
+		const device: StreamDeck = await Promise.resolve(factory(browserHid, options || {}))
 		return new StreamDeckWeb(device, browserHid)
 	} catch (e) {
 		await browserDevice.close().catch(() => null) // Suppress error

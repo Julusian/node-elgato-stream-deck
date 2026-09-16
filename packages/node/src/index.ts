@@ -1,5 +1,5 @@
 import type { OpenStreamDeckOptions, StreamDeck } from '@elgato-stream-deck/core'
-import { DEVICE_MODELS } from '@elgato-stream-deck/core'
+import { findModelByUsb, getDriver } from '@elgato-stream-deck/core'
 import * as HID from 'node-hid'
 import { NodeHIDDevice, StreamDeckDeviceInfo } from './hid-device.js'
 import { StreamDeckNode } from './wrapper.js'
@@ -61,11 +61,8 @@ export async function listStreamDecks(): Promise<StreamDeckDeviceInfo[]> {
  * If the provided device is a streamdeck, get the info about it
  */
 export function getStreamDeckDeviceInfo(dev: HID.Device): StreamDeckDeviceInfo | null {
-	const model = DEVICE_MODELS.find((m) => m.productIds.includes(dev.productId) && m.vendorId === dev.vendorId)
+	const model = findModelByUsb(dev.vendorId, dev.productId, dev.usage, dev.interface)
 	if (!model || !dev.path) return null
-
-	if (model.hidUsage !== undefined && dev.usage !== model.hidUsage) return null
-	if (model.hidInterface !== undefined && dev.interface !== model.hidInterface) return null
 
 	return {
 		model: model.id,
@@ -106,14 +103,13 @@ export async function openStreamDeck(devicePath: string, userOptions?: OpenStrea
 
 		const deviceInfo = await device.getDeviceInfo()
 
-		const model = DEVICE_MODELS.find(
-			(m) => deviceInfo.vendorId === m.vendorId && m.productIds.includes(deviceInfo.productId),
-		)
-		if (!model) {
+		const model = findModelByUsb(deviceInfo.vendorId, deviceInfo.productId)
+		const factory = model && getDriver(model.id)
+		if (!factory) {
 			throw new Error('Stream Deck is of unexpected type.')
 		}
 
-		const rawSteamdeck = await Promise.resolve(model.factory(device, options))
+		const rawSteamdeck = await Promise.resolve(factory(device, options))
 		return new StreamDeckNode(rawSteamdeck, userOptions?.resetToLogoOnClose ?? false)
 	} catch (e) {
 		if (device) await device.close().catch(() => null) // Suppress error
