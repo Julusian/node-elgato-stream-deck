@@ -1,60 +1,12 @@
 import type { HIDDevice } from '../hid-device.js'
-import type { OpenStreamDeckOptions, StreamDeckProperties } from './base.js'
+import type { OpenStreamDeckOptions } from './base.js'
 import { StreamDeckBase } from './base.js'
-import { DeviceModelId, MODEL_NAMES } from '../id.js'
-import type { StreamDeckControlDefinition } from '../controlDefinition.js'
-import { freezeDefinitions } from '../controlsGenerator.js'
 import { PedalPropertiesService } from '../services/properties/pedal.js'
 import { FakeLcdService } from '../services/buttonsLcdDisplay/fake.js'
 import type { StreamDeckEvents } from '../types.js'
 import { CallbackHook } from '../services/callback-hook.js'
 import { ButtonOnlyInputService } from '../services/input/gen1.js'
-
-const pedalControls: StreamDeckControlDefinition[] = [
-	{
-		id: 'button-0',
-		type: 'button',
-		row: 0,
-		column: 0,
-		index: 0,
-		hidIndex: 0,
-		feedbackType: 'none',
-	},
-	{
-		id: 'button-1',
-		type: 'button',
-		row: 0,
-		column: 1,
-		index: 1,
-		hidIndex: 1,
-		feedbackType: 'none',
-	},
-	{
-		id: 'button-2',
-		type: 'button',
-		row: 0,
-		column: 2,
-		index: 2,
-		hidIndex: 2,
-		feedbackType: 'none',
-	},
-]
-
-const pedalProperties: StreamDeckProperties = {
-	model: DeviceModelId.PEDAL,
-	productName: MODEL_NAMES[DeviceModelId.PEDAL],
-	keyDataOffset: 3,
-	supportsRgbKeyFill: false,
-
-	controls: freezeDefinitions(pedalControls),
-
-	keySpacingHorizontal: 0,
-	keySpacingVertical: 0,
-
-	fullscreenPanels: 0,
-	hasNfcReader: false,
-	supportsChildDevices: false,
-}
+import { pedalProperties } from './definitions.js'
 
 export function StreamDeckPedalFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
 	const events = new CallbackHook<StreamDeckEvents>()

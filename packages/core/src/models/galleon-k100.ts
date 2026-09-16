@@ -1,74 +1,14 @@
 import type { HIDDevice } from '../hid-device.js'
 import type { OpenStreamDeckOptions, StreamDeckServicesDefinition } from './base.js'
 import { StreamDeckBase } from './base.js'
-import type { StreamDeckGen2Properties } from './generic-gen2.js'
 import { createBaseGen2Properties } from './generic-gen2.js'
-import { DeviceModelId, MODEL_NAMES } from '../id.js'
-import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
+import { DeviceModelId } from '../id.js'
 import type { PropertiesService } from '../services/properties/interface.js'
-import type { StreamDeckControlDefinition, StreamDeckLcdSegmentControlDefinition } from '../controlDefinition.js'
+import type { StreamDeckLcdSegmentControlDefinition } from '../controlDefinition.js'
 import { GalleonK100EncoderLedService } from '../services/encoderLed/galleonK100.js'
 import { StreamdeckDefaultLcdService } from '../services/lcdSegmentDisplay/generic.js'
+import { galleonK100Properties } from './definitions.js'
 
-const k100Controls: StreamDeckControlDefinition[] = generateButtonsGrid(3, 4, { width: 160, height: 160 }, false, 0, 2)
-k100Controls.push(
-	{
-		id: `encoder-0`,
-		type: 'encoder',
-		row: 0,
-		column: 0,
-		index: 0,
-		hidIndex: 0,
-
-		hasLed: false,
-		ledRingSteps: 4,
-		ledRingOffset: 3,
-	},
-	{
-		id: `encoder-1`,
-		type: 'encoder',
-		row: 0,
-		column: 2,
-		index: 1,
-		hidIndex: 1,
-
-		hasLed: false,
-		ledRingSteps: 4,
-		ledRingOffset: 1,
-	},
-	{
-		id: 0,
-		type: 'lcd-segment',
-		row: 1,
-		column: 0,
-		columnSpan: 3,
-		rowSpan: 1,
-
-		index: 0,
-
-		pixelSize: Object.freeze({
-			width: 720,
-			height: 384,
-		}),
-
-		drawRegions: true,
-	},
-)
-
-const galleonK100Properties: StreamDeckGen2Properties = {
-	model: DeviceModelId.GALLEON_K100,
-	productName: MODEL_NAMES[DeviceModelId.GALLEON_K100],
-	supportsRgbKeyFill: true,
-
-	controls: freezeDefinitions(k100Controls),
-
-	keySpacingHorizontal: 64,
-	keySpacingVertical: 64,
-
-	fullscreenPanels: 0,
-	hasNfcReader: false,
-	supportsChildDevices: false,
-}
 const lcdSegmentControls = galleonK100Properties.controls.filter(
 	(control): control is StreamDeckLcdSegmentControlDefinition => control.type === 'lcd-segment',
 )

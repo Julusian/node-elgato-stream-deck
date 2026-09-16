@@ -1,23 +1,8 @@
 import type { HIDDevice } from '../hid-device.js'
 import type { OpenStreamDeckOptions, StreamDeckBase } from './base.js'
-import type { StreamDeckGen1Properties } from './generic-gen1.js'
 import { StreamDeckGen1Factory } from './generic-gen1.js'
-import { DeviceModelId, MODEL_NAMES } from '../id.js'
 import { StreamdeckOriginalImageWriter } from '../services/imageWriter/imageWriter.js'
-import { freezeDefinitions, generateButtonsGrid } from '../controlsGenerator.js'
-
-const originalProperties: StreamDeckGen1Properties = {
-	model: DeviceModelId.ORIGINAL,
-	productName: MODEL_NAMES[DeviceModelId.ORIGINAL],
-	supportsRgbKeyFill: false,
-
-	controls: freezeDefinitions(generateButtonsGrid(5, 3, { width: 72, height: 72 }, true)),
-
-	keySpacingHorizontal: 25,
-	keySpacingVertical: 25,
-
-	fullscreenPanels: 0,
-}
+import { originalProperties } from './definitions.js'
 
 export function StreamDeckOriginalFactory(device: HIDDevice, options: Required<OpenStreamDeckOptions>): StreamDeckBase {
 	return StreamDeckGen1Factory(
