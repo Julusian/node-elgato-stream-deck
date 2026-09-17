@@ -1,11 +1,26 @@
 import type { Dimension } from './id.js'
 
+/**
+ * A rectangle on the face of a device, with the origin at its top left and `y` increasing downwards.
+ * Distances are in the units of `StreamDeckModelInfo.faceSize`; for models with a fullscreen panel
+ * those are panel pixels, so these bounds are also the region the control occupies in a fullscreen image.
+ */
+export interface StreamDeckControlBounds {
+	x: number
+	y: number
+	width: number
+	height: number
+}
+
 export interface StreamDeckControlDefinitionBase {
 	id: string | number
 	type: 'button' | 'encoder' | 'lcd-segment'
 
 	row: number
 	column: number
+
+	/** Where this control sits on the face, within `StreamDeckModelInfo.faceSize` */
+	bounds: StreamDeckControlBounds
 }
 
 export interface StreamDeckButtonControlDefinitionBase extends StreamDeckControlDefinitionBase {

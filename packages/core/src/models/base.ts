@@ -34,16 +34,9 @@ export type StreamDeckProperties = Readonly<{
 
 	controls: Readonly<StreamDeckControlDefinition[]>
 
-	/**
-	 * TODO - rework this
-	 * @deprecated
-	 */
-	keySpacingHorizontal: number
-	/**
-	 * TODO - rework this
-	 * @deprecated
-	 */
-	keySpacingVertical: number
+	/** The extent of the face, which every control's `bounds` is within */
+	faceSize: Dimension
+
 	fullscreenPanels: number
 
 	hasNfcReader: boolean
@@ -77,13 +70,6 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	get CONTROLS(): Readonly<StreamDeckControlDefinition[]> {
 		return this.deviceProperties.controls
 	}
-
-	// get KEY_SPACING_HORIZONTAL(): number {
-	// 	return this.deviceProperties.keySpacingHorizontal
-	// }
-	// get KEY_SPACING_VERTICAL(): number {
-	// 	return this.deviceProperties.keySpacingVertical
-	// }
 
 	get MODEL(): DeviceModelId {
 		return this.deviceProperties.model

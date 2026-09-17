@@ -1,5 +1,6 @@
 import type { StreamDeckControlDefinition } from './controlDefinition.js'
 import { DeviceModelId } from './id.js'
+import type { Dimension } from './id.js'
 import type { StreamDeckProperties, StreamDeckStaticProperties } from './models/base.js'
 import {
 	fifteenKeyProperties,
@@ -70,6 +71,10 @@ export interface StreamDeckModelInfo {
 	transports: readonly StreamDeckTransport[]
 
 	controls: Readonly<StreamDeckControlDefinition[]>
+
+	/** The extent of the face, which every control's `bounds` is within */
+	faceSize: Dimension
+
 	features: StreamDeckModelFeatures
 }
 
@@ -116,6 +121,8 @@ function createModelDefinition(
 		transports: Object.freeze(transports),
 
 		controls: properties.controls,
+		faceSize: Object.freeze({ ...properties.faceSize }),
+
 		features: Object.freeze({
 			nfcReader: properties.hasNfcReader,
 			childDevices: properties.supportsChildDevices,
