@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.7.0](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.3...v7.7.0) (2026-09-17)
+
+
+### Features
+
+* add draw layout/dimensions to the model infos ([cad863e](https://github.com/Julusian/node-elgato-stream-deck/commit/cad863e57f40bdbe78aea42ce77002afcd390e19))
+* **core:** add pure-data DEVICE_MODEL_INFO registry and lookups ([a5d649b](https://github.com/Julusian/node-elgato-stream-deck/commit/a5d649b4d87226d68db237fea3b19a7e860f648c))
+* **core:** expose modelInfo on StreamDeck ([6ee60bb](https://github.com/Julusian/node-elgato-stream-deck/commit/6ee60bbe576c40ccb3b6776920072879a8ef0072))
+* **node:** carry modelInfo on StreamDeckDeviceInfo ([f5c3636](https://github.com/Julusian/node-elgato-stream-deck/commit/f5c3636e0c5ac450b6a6aad931edf668a9a15b97))
+
+
+### Bug Fixes
+
+* add id to control definitions ([53de701](https://github.com/Julusian/node-elgato-stream-deck/commit/53de7012f5173421c857e7311846d4b005a2361b))
+* typo in ledRingOffset ([c4dfa76](https://github.com/Julusian/node-elgato-stream-deck/commit/c4dfa7636a48d10f481203e939efd5e7200a989e))
+
 ## [7.6.3](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.2...v7.6.3) (2026-06-02)
 
 
