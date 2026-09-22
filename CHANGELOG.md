@@ -3,13 +3,6 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [7.7.0](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.3...v7.7.0) (2026-09-22)
-
-
-### Features
-
-* **core:** add support for 15 key scissor module ([#208](https://github.com/Julusian/node-elgato-stream-deck/issues/208)) ([6b400ac](https://github.com/Julusian/node-elgato-stream-deck/commit/6b400acd795b680b1b898ff25942c79f0b2a69d4))
-
 ## [7.6.3](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.2...v7.6.3) (2026-06-02)
 
 
