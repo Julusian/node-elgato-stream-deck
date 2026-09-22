@@ -167,6 +167,14 @@ export const DEVICE_MODELS2: { [key in DeviceModelId]: Omit<DeviceModelSpec, 'id
 
 		hasNativeTcp: false,
 	},
+	[DeviceModelId.MODULE15SCISSOR]: {
+		type: DeviceModelType.STREAMDECK,
+		productIds: [0x00e4],
+		vendorId: VENDOR_ID,
+		factory: (...args) => StreamDeck15KeyFactory(DeviceModelId.MODULE15SCISSOR, ...args),
+
+		hasNativeTcp: false,
+	},
 	[DeviceModelId.NETWORK_DOCK]: {
 		type: DeviceModelType.NETWORK_DOCK,
 		productIds: [0xffff], // Note: This isn't a real product id, but matches what is reported when querying the device
