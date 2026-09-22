@@ -18,6 +18,7 @@ export enum DeviceModelId {
 	MODULE6 = '6-module',
 	MODULE15 = '15-module',
 	MODULE32 = '32-module',
+	MODULE15SCISSOR = '15-module-scissor',
 	NETWORK_DOCK = 'network-dock',
 	GALLEON_K100 = 'galleon-k100',
 	PLUS_XL = 'plus-xl',
