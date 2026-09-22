@@ -111,10 +111,12 @@ export const thirtyTwoKeyProperties: StreamDeckStaticProperties = {
 /**
  * Stream Deck +, whose panel is 800x480. The encoders sit below the panel, making the face taller.
  * Their geometry is not published, so it is estimated: as wide as the button column each sits under,
- * and as far below the panel as the buttons are above the touch strip.
+ * and as far below the touch strip as the buttons are above it.
  */
 const plusEncoderSize = 120
-const plusEncoderY = 480 + 88
+/** The touch strip reaches the bottom of the panel */
+const plusLcdBottom = 380 + 100
+const plusEncoderY = plusLcdBottom + 88
 const plusControls: StreamDeckControlDefinition[] = generateButtonsGrid(
 	4,
 	2,
@@ -187,7 +189,9 @@ export const plusProperties: StreamDeckStaticProperties = {
  * up with the columns; they are spread evenly, and their `column` is that spacing rounded.
  */
 const plusXlEncoderSize = 112
-const plusXlEncoderY = 800 + 100
+/** Unlike the Stream Deck +, the touch strip stops short of the bottom of the panel */
+const plusXlLcdBottom = 674 + 100
+const plusXlEncoderY = plusXlLcdBottom + 100
 const plusXlControls: StreamDeckControlDefinition[] = generateButtonsGrid(
 	9,
 	4,
