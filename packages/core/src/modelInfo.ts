@@ -200,6 +200,14 @@ export const DEVICE_MODEL_DEFINITIONS: Readonly<{ [id in DeviceModelId]: StreamD
 			usb: [{ vendorId: VENDOR_ID, productId: 0x00b9 }],
 		},
 	),
+	[DeviceModelId.MODULE15SCISSOR]: createModelDefinition(
+		DeviceModelId.MODULE15SCISSOR,
+		'Stream Deck 15 Module (Scissor)',
+		fifteenKeyProperties,
+		{
+			usb: [{ vendorId: VENDOR_ID, productId: 0x00e4 }],
+		},
+	),
 	[DeviceModelId.MODULE32]: createModelDefinition(
 		DeviceModelId.MODULE32,
 		'Stream Deck 32 Module',

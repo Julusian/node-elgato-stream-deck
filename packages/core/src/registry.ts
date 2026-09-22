@@ -71,6 +71,7 @@ const DEVICE_MODEL_FACTORIES: { [id in DeviceModelId]: StreamDeckModelFactory } 
 	[DeviceModelId.STUDIO]: StreamDeckStudioFactory,
 	[DeviceModelId.MODULE6]: StreamDeck6KeyFactory,
 	[DeviceModelId.MODULE15]: StreamDeckGen2Factory,
+	[DeviceModelId.MODULE15SCISSOR]: StreamDeckGen2Factory,
 	[DeviceModelId.MODULE32]: StreamDeckGen2Factory,
 	[DeviceModelId.NETWORK_DOCK]: NetworkDockFactory,
 	[DeviceModelId.GALLEON_K100]: GalleonK100Factory,
