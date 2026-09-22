@@ -20,6 +20,7 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: .github/release-please-config.json
+          target-branch: ${{ github.ref_name }}
 
       - name: PR info
         if: steps.rp.outputs.prs_created == 'true'
