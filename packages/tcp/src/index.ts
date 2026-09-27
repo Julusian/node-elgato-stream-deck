@@ -24,6 +24,8 @@ export {
 export * from './types.js'
 export * from './connectionManager.js'
 export * from './discoveryService.js'
-export { DEFAULT_TCP_PORT } from './constants.js'
+export { DEFAULT_TCP_PORT, CORA_MAGIC, NETWORK_DOCK_TCP_PRODUCT_ID } from './constants.js'
+export { CoraHidOp, CoraMessageFlags, type SocketCoraMessage } from './socketWrapper.js'
+export { parseDevice2Info } from './device2Info.js'
 
 export { JPEGEncodeOptions }

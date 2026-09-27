@@ -113,6 +113,9 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	}
 
 	private _triggerRetryConnection() {
+		// Once closed, the socket must not schedule a reconnect, or the timer keeps the process alive
+		if (!this.#connectionActive) return
+
 		if (this.#immediateReconnect) {
 			this.#immediateReconnect = false
 			setImmediate(() => this._retryConnection())

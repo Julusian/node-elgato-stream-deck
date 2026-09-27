@@ -244,6 +244,8 @@ export class StreamDeckTcpConnectionManager extends EventEmitter<StreamDeckTcpCo
 		}
 
 		this.#connections.clear()
+
+		this.#stopTimeoutInterval()
 	}
 
 	getStreamdeckFor(address: string, port: number = DEFAULT_TCP_PORT): StreamDeckTcp | undefined {
