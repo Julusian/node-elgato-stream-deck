@@ -116,8 +116,11 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	}
 
 	#handleTimeout(): void {
-		this.#connected = false
-		setImmediate(() => this.emit('disconnected', this))
+		// The timeout also acts as a connect timeout, which must not be reported as a disconnect
+		if (this.#connected) {
+			this.#connected = false
+			setImmediate(() => this.emit('disconnected', this))
+		}
 
 		// Destroy the socket so it is fully closed before reconnecting.
 		// Calling socket.connect() while the socket is still TCP-connected
@@ -150,8 +153,9 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 			// Avoid timeouts while reconnecting
 			this.#lastReceived = Date.now()
 
-			// Reset the packet mode, just in case
+			// Reset the packet mode and discard any partial packet from the previous connection
 			this.#packetMode = 'unknown'
+			this.#receiveBuffer = null
 
 			try {
 				this.#socket.connect(this.#port, this.#address)
@@ -167,24 +171,28 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	#handleData(data: Buffer) {
 		this.#lastReceived = Date.now()
 
-		// If this is the first packet, check for the packet type
-		if (this.#packetMode === 'unknown') {
-			if (data.indexOf(CORA_MAGIC) === 0) {
-				this.#packetMode = 'cora'
-			} else if (data[0] === 1 && data[1] === 10) {
-				// Check for SDS packet
-				this.#packetMode = 'legacy'
-			} else {
-				this.emit('error', 'Unknown packet type', new Error())
-				return
-			}
-		}
-
 		// Append data to buffer
 		if (!this.#receiveBuffer || this.#receiveBuffer.length === 0) {
 			this.#receiveBuffer = data
 		} else {
 			this.#receiveBuffer = Buffer.concat([this.#receiveBuffer, data])
+		}
+
+		// If this is the first packet, check for the packet type
+		if (this.#packetMode === 'unknown') {
+			// Wait until there is enough data to identify the packet type
+			if (this.#receiveBuffer.length < CORA_MAGIC.length) return
+
+			if (this.#receiveBuffer.indexOf(CORA_MAGIC) === 0) {
+				this.#packetMode = 'cora'
+			} else if (this.#receiveBuffer[0] === 1 && this.#receiveBuffer[1] === 10) {
+				// Check for SDS packet
+				this.#packetMode = 'legacy'
+			} else {
+				this.#receiveBuffer = null
+				this.emit('error', 'Unknown packet type', new Error())
+				return
+			}
 		}
 
 		switch (this.#packetMode) {
