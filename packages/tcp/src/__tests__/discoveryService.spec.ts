@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events'
-import { DEVICE_MODEL_INFO, DeviceModelId, DeviceModelType } from '@elgato-stream-deck/core'
+import { DEVICE_MODELS2, DeviceModelId, DeviceModelType, MODEL_NAMES } from '@elgato-stream-deck/core'
 import { Bonjour } from '@julusian/bonjour-service'
 import { StreamDeckTcpDiscoveryService } from '../discoveryService.js'
 
@@ -13,8 +13,13 @@ class FakeBrowser extends EventEmitter {
 	readonly expire = jest.fn()
 }
 
-const STUDIO_USB = DEVICE_MODEL_INFO[DeviceModelId.STUDIO].usb[0]
-const XL_USB = DEVICE_MODEL_INFO[DeviceModelId.XL].usb[0]
+function getUsbIds(modelId: DeviceModelId): { vendorId: number; productId: number } {
+	const model = DEVICE_MODELS2[modelId]
+	return { vendorId: model.vendorId, productId: model.productIds[0] }
+}
+
+const STUDIO_USB = getUsbIds(DeviceModelId.STUDIO)
+const XL_USB = getUsbIds(DeviceModelId.XL)
 
 function createService(txt: Record<string, string>, overrides: Record<string, unknown> = {}): any {
 	return {
@@ -80,9 +85,9 @@ describe('StreamDeckTcpDiscoveryService', () => {
 				vendorId: STUDIO_USB.vendorId,
 				productId: STUDIO_USB.productId,
 				serialNumber: 'STUDIO1',
-				modelType: DEVICE_MODEL_INFO[DeviceModelId.STUDIO].category,
+				modelType: DEVICE_MODELS2[DeviceModelId.STUDIO].type,
 				modelId: DeviceModelId.STUDIO,
-				modelName: DEVICE_MODEL_INFO[DeviceModelId.STUDIO].name,
+				modelName: MODEL_NAMES[DeviceModelId.STUDIO],
 				isPrimary: true,
 			})
 		})
@@ -113,7 +118,7 @@ describe('StreamDeckTcpDiscoveryService', () => {
 				serialNumber: 'DOCK1',
 				modelType: DeviceModelType.NETWORK_DOCK,
 				modelId: DeviceModelId.NETWORK_DOCK,
-				modelName: DEVICE_MODEL_INFO[DeviceModelId.NETWORK_DOCK].name,
+				modelName: MODEL_NAMES[DeviceModelId.NETWORK_DOCK],
 				isPrimary: true,
 			})
 		})

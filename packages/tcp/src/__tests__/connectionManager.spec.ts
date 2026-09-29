@@ -1,4 +1,4 @@
-import { DEVICE_MODEL_INFO, DeviceModelId } from '@elgato-stream-deck/core'
+import { DEVICE_MODELS2, DeviceModelId } from '@elgato-stream-deck/core'
 import { StreamDeckTcpConnectionManager } from '../connectionManager.js'
 import { CoraHidOp, CoraMessageFlags, SocketWrapper, type SocketCoraMessage } from '../socketWrapper.js'
 import type { StreamDeckTcp } from '../types.js'
@@ -9,8 +9,13 @@ jest.mock('../socketWrapper.js', () => ({
 	SocketWrapper: jest.fn(),
 }))
 
-const STUDIO_USB = DEVICE_MODEL_INFO[DeviceModelId.STUDIO].usb[0]
-const XL_USB = DEVICE_MODEL_INFO[DeviceModelId.XL].usb[0]
+function getUsbIds(modelId: DeviceModelId): { vendorId: number; productId: number } {
+	const model = DEVICE_MODELS2[modelId]
+	return { vendorId: model.vendorId, productId: model.productIds[0] }
+}
+
+const STUDIO_USB = getUsbIds(DeviceModelId.STUDIO)
+const XL_USB = getUsbIds(DeviceModelId.XL)
 
 type SimulatedDevice =
 	| {
