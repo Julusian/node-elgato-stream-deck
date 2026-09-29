@@ -14,8 +14,8 @@ export function readFixtureJSON(fileName: string): Buffer {
  */
 export class FakeSocket extends EventEmitter<SocketWrapperEvents> {
 	connected = true
-	readonly address = '10.0.0.1'
-	readonly port = 5343
+	readonly address: string = '10.0.0.1'
+	readonly port: number = 5343
 
 	readonly sentCora: SocketCoraMessage[] = []
 	readonly sentLegacy: Uint8Array[] = []
