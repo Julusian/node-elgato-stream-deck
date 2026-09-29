@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.7.1](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.7.0...v7.7.1) (2026-09-29)
+
+
+### Bug Fixes
+
+* **tcp:** define NETWORK_DOCK_TCP_PRODUCT_ID on 7.x ([440290f](https://github.com/Julusian/node-elgato-stream-deck/commit/440290ff593c8aa01041af43688fa19841758449))
+* **tcp:** disable discovery polling when queryInterval is 0 ([1fd884b](https://github.com/Julusian/node-elgato-stream-deck/commit/1fd884bccdfb5fa6f4f581a431d1bf61b9b78ac7))
+* **tcp:** don't report a false timeout after the event loop stalls ([990babb](https://github.com/Julusian/node-elgato-stream-deck/commit/990babb8de9ad7d24878f48948d44222c128abe9))
+* **tcp:** export cora protocol constants and clear timers on disconnect ([0d6bdf9](https://github.com/Julusian/node-elgato-stream-deck/commit/0d6bdf9527723dadcbe50e30aea55aaab8ffbccb))
+* **tcp:** reject sending messages while socket is disconnected ([d91edf9](https://github.com/Julusian/node-elgato-stream-deck/commit/d91edf98fd989c991df3c3158a116b9a5a5ed2ef))
+* **tcp:** reset receive state on reconnect and harden protocol detection ([0714c7d](https://github.com/Julusian/node-elgato-stream-deck/commit/0714c7d4a6dc8e43d6d2a0fecbfbfb9740d87340))
+* **tcp:** share concurrent cora queries and clear command timeouts ([0b36447](https://github.com/Julusian/node-elgato-stream-deck/commit/0b3644721623ca0c3a7dbcbf47bccd0f96bb9669))
+
 ## [7.7.0](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.3...v7.7.0) (2026-09-22)
 
 
