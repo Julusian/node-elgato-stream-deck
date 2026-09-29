@@ -767,19 +767,22 @@ describe('SocketWrapper', () => {
 		})
 
 		test('does not disconnect when keepalives are buffered while the event loop is stalled', async () => {
-			const { wrapper } = await connectLegacy()
-			server.startKeepAlives(() => createLegacyKeepAlive())
+			const { wrapper, connection } = await connectLegacy()
 			startTimeoutChecks(wrapper)
 
 			const onDisconnected = jest.fn()
 			wrapper.on('disconnected', onDisconnected)
 
-			// Stall inside a timer, so that the next loop iteration runs the timeout check before reading the socket
+			// Stall in the check phase, so that the next loop iteration runs the timeout check (timers phase) before
+			// reading the socket (poll phase). The server is in this process so can't send while stalled, so the
+			// keepalive is written just before stalling, leaving it waiting in the socket buffer as a real dock's
+			// keepalives would be
 			await new Promise<void>((resolve) =>
-				setTimeout(() => {
+				setImmediate(() => {
+					connection.socket.write(createLegacyKeepAlive())
 					busyWait(TIMEOUT_DURATION * 3)
 					resolve()
-				}, 0),
+				}),
 			)
 
 			await sleep(100)
