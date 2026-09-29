@@ -113,6 +113,10 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 	async #executeSingletonCommand(commandType: number, toHost: boolean): Promise<Uint8Array> {
 		this.#assertConnected()
 
+		// Responses are matched by command type, so a concurrent query for the same type must share the pending one
+		const existingCommand = this.#pendingSingletonCommands.get(commandType)
+		if (existingCommand) return existingCommand.promise
+
 		const messageId = Math.floor(Math.random() * 0xffffff) // Random message ID for Cora
 		const msg: SocketCoraMessage = {
 			flags: toHost ? CoraMessageFlags.NONE : CoraMessageFlags.VERBATIM,
@@ -124,21 +128,26 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		const command = new QueuedCommand(commandType)
 		this.#pendingSingletonCommands.set(commandType, command)
 
-		command.promise
-			.finally(() => {
-				this.#pendingSingletonCommands.delete(commandType)
-			})
-			.catch(() => null)
-
-		this.#socket.sendCoraWrites([msg])
-
 		// TODO - improve this timeout
 		const timeoutError = new Error('Timeout')
 		// eslint-disable-next-line no-self-assign
 		timeoutError.stack = timeoutError.stack // Ensure stack is captured here
-		setTimeout(() => {
+		const timeout = setTimeout(() => {
 			command.reject(timeoutError)
 		}, 5000)
+
+		command.promise
+			.finally(() => {
+				clearTimeout(timeout)
+				this.#pendingSingletonCommands.delete(commandType)
+			})
+			.catch(() => null)
+
+		try {
+			this.#socket.sendCoraWrites([msg])
+		} catch (e) {
+			command.reject(e)
+		}
 
 		return command.promise
 	}

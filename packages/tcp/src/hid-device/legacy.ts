@@ -119,8 +119,14 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 		const command = new QueuedCommand(commandType)
 		this.#pendingSingletonCommands.set(commandType, command)
 
+		// TODO - improve this timeout
+		const timeout = setTimeout(() => {
+			command.reject(new Error('Timeout'))
+		}, 5000)
+
 		command.promise
 			.finally(() => {
+				clearTimeout(timeout)
 				this.#pendingSingletonCommands.delete(commandType)
 			})
 			.catch(() => null)
@@ -132,12 +138,11 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 		} else {
 			b.writeUint8(commandType, 0)
 		}
-		this.#socket.sendLegacyWrites([b])
-
-		// TODO - improve this timeout
-		setTimeout(() => {
-			command.reject(new Error('Timeout'))
-		}, 5000)
+		try {
+			this.#socket.sendLegacyWrites([b])
+		} catch (e) {
+			command.reject(e)
+		}
 
 		return command.promise
 	}
