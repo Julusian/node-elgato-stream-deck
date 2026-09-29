@@ -42,6 +42,7 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	#connectionActive = false // True when connected/connecting/reconnecting
 	#immediateReconnect = false // Set when a timeout-triggered destroy should reconnect without delay
 	#lastReceived = Date.now()
+	#timeoutRecheckPending = false
 	#receiveBuffer: Buffer | null = null
 
 	#packetMode: 'cora' | 'legacy' | 'unknown' = 'unknown'
@@ -95,21 +96,35 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	}
 
 	public checkForTimeout(): void {
-		if (!this.#connectionActive) return
+		if (this.#timeoutRecheckPending || !this.#isTimedOut()) return
 
-		if (this.#retryConnectTimeout) return
+		// Timers run before pending socket reads in the event loop, so after the process has been
+		// stalled (eg suspended) the keepalives may be sitting unread in the socket buffer.
+		// Defer the decision until after the poll phase, so that any buffered data is read first.
+		this.#timeoutRecheckPending = true
+		setImmediate(() => {
+			this.#timeoutRecheckPending = false
+			if (this.#isTimedOut()) this.#handleTimeout()
+		})
+	}
 
-		if (this.#lastReceived + TIMEOUT_DURATION < Date.now()) {
-			this.#connected = false
-			setImmediate(() => this.emit('disconnected', this))
+	#isTimedOut(): boolean {
+		if (!this.#connectionActive) return false
+		if (this.#retryConnectTimeout) return false
 
-			// Destroy the socket so it is fully closed before reconnecting.
-			// Calling socket.connect() while the socket is still TCP-connected
-			// would throw EISCONN. The 'close' event will reconnect immediately
-			// (no RECONNECT_INTERVAL delay) via the #immediateReconnect flag.
-			this.#immediateReconnect = true
-			this.#socket.destroy()
-		}
+		return this.#lastReceived + TIMEOUT_DURATION < Date.now()
+	}
+
+	#handleTimeout(): void {
+		this.#connected = false
+		setImmediate(() => this.emit('disconnected', this))
+
+		// Destroy the socket so it is fully closed before reconnecting.
+		// Calling socket.connect() while the socket is still TCP-connected
+		// would throw EISCONN. The 'close' event will reconnect immediately
+		// (no RECONNECT_INTERVAL delay) via the #immediateReconnect flag.
+		this.#immediateReconnect = true
+		this.#socket.destroy()
 	}
 
 	private _triggerRetryConnection() {
