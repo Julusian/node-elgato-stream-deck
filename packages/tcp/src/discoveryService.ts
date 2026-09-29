@@ -1,7 +1,7 @@
 import type { Browser, DiscoveredService as BonjourService } from '@julusian/bonjour-service'
 import { Bonjour } from '@julusian/bonjour-service'
 import { EventEmitter } from 'events'
-import { DEFAULT_MDNS_QUERY_INTERVAL } from './constants.js'
+import { DEFAULT_MDNS_QUERY_INTERVAL, NETWORK_DOCK_TCP_PRODUCT_ID } from './constants.js'
 import { DeviceModelId, DeviceModelType, MODEL_NAMES } from '@elgato-stream-deck/core'
 import { DEVICE_MODELS, VENDOR_ID } from '@elgato-stream-deck/core'
 
@@ -50,7 +50,7 @@ function convertService(service: BonjourService): StreamDeckTcpDefinition | null
 			name: service.name,
 
 			vendorId: VENDOR_ID,
-			productId: 0xffff, // This doesn't have a product id, but we need to set it to something
+			productId: NETWORK_DOCK_TCP_PRODUCT_ID, // This doesn't have a product id, but we need to set it to something
 
 			serialNumber: service.txt.sn,
 
