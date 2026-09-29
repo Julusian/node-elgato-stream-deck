@@ -118,7 +118,7 @@ export class StreamDeckTcpDiscoveryService extends EventEmitter<StreamDeckTcpDis
 		})
 
 		const queryInterval = options?.queryInterval ?? DEFAULT_MDNS_QUERY_INTERVAL
-		if (queryInterval >= 0) {
+		if (queryInterval > 0) {
 			this.#queryInterval = setInterval(() => this.query(), queryInterval)
 		}
 	}
