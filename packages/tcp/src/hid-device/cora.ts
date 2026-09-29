@@ -19,6 +19,11 @@ import type { TcpHidDevice } from './api.js'
 export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements TcpHidDevice {
 	readonly #socket: SocketWrapper
 	#isPrimary = true
+	/**
+	 * The socket is reused when reconnecting, so once this connection has been lost this device must stop writing to it.
+	 * Otherwise it could write to a newer connection which belongs to another device instance
+	 */
+	#disconnected = false
 	#onChildInfoChange: ((info: Omit<StreamDeckTcpChildDeviceInfo, 'model'> | null) => void) | null = null
 
 	get isPrimary(): boolean {
@@ -33,6 +38,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		super()
 
 		this.#socket = socket
+		this.#disconnected = !socket.connected
 
 		this.#socket.on('dataCora', (data) => {
 			let singletonCommand: QueuedCommand | undefined
@@ -64,6 +70,8 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 			this.emit('error', `Socket error: ${message} (${err?.message ?? err})`),
 		)
 		this.#socket.on('disconnected', () => {
+			this.#disconnected = true
+
 			for (const command of this.#pendingSingletonCommands.values()) {
 				try {
 					command.reject(new Error('Disconnected'))
@@ -80,7 +88,13 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		// await this.#socket.close()
 	}
 
+	#assertConnected(): void {
+		if (this.#disconnected) throw new Error('Disconnected')
+	}
+
 	async sendFeatureReport(data: Uint8Array): Promise<void> {
+		this.#assertConnected()
+
 		this.#socket.sendCoraWrites([
 			{
 				flags: CoraMessageFlags.VERBATIM,
@@ -97,7 +111,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 
 	readonly #pendingSingletonCommands = new Map<number, QueuedCommand>()
 	async #executeSingletonCommand(commandType: number, toHost: boolean): Promise<Uint8Array> {
-		// if (!this.connected) throw new Error('Not connected')
+		this.#assertConnected()
 
 		const messageId = Math.floor(Math.random() * 0xffffff) // Random message ID for Cora
 		const msg: SocketCoraMessage = {
@@ -130,6 +144,8 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 	}
 
 	async sendReports(buffers: Buffer[]): Promise<void> {
+		this.#assertConnected()
+
 		this.#socket.sendCoraWrites(
 			buffers.map((buffer) => ({
 				flags: CoraMessageFlags.VERBATIM,

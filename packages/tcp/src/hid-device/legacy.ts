@@ -19,6 +19,11 @@ import type { TcpHidDevice } from './api.js'
 export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements TcpHidDevice {
 	readonly #socket: SocketWrapper
 	#isPrimary = true
+	/**
+	 * The socket is reused when reconnecting, so once this connection has been lost this device must stop writing to it.
+	 * Otherwise it could write to a newer connection which belongs to another device instance
+	 */
+	#disconnected = false
 	#onChildInfoChange: ((info: Omit<StreamDeckTcpChildDeviceInfo, 'model'> | null) => void) | null = null
 
 	get isPrimary(): boolean {
@@ -33,6 +38,7 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 		super()
 
 		this.#socket = socket
+		this.#disconnected = !socket.connected
 
 		this.#socket.on('dataLegacy', (data) => {
 			let singletonCommand: QueuedCommand | undefined
@@ -64,6 +70,8 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 			this.emit('error', `Socket error: ${message} (${err?.message ?? err})`),
 		)
 		this.#socket.on('disconnected', () => {
+			this.#disconnected = true
+
 			for (const command of this.#pendingSingletonCommands.values()) {
 				try {
 					command.reject(new Error('Disconnected'))
@@ -80,7 +88,13 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 		// await this.#socket.close()
 	}
 
+	#assertConnected(): void {
+		if (this.#disconnected) throw new Error('Disconnected')
+	}
+
 	async sendFeatureReport(data: Uint8Array): Promise<void> {
+		this.#assertConnected()
+
 		// Ensure the buffer is 1024 bytes long
 		let dataFull = data
 		if (data.length != 1024) {
@@ -97,7 +111,7 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 
 	readonly #pendingSingletonCommands = new Map<number, QueuedCommand>()
 	async #executeSingletonCommand(commandType: number, isPrimary: boolean): Promise<Uint8Array> {
-		// if (!this.connected) throw new Error('Not connected')
+		this.#assertConnected()
 
 		const existingCommand = this.#pendingSingletonCommands.get(commandType)
 		if (existingCommand) return existingCommand.promise
@@ -129,6 +143,8 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 	}
 
 	async sendReports(buffers: Buffer[]): Promise<void> {
+		this.#assertConnected()
+
 		this.#socket.sendLegacyWrites(buffers)
 	}
 
