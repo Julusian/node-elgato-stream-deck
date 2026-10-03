@@ -31,6 +31,8 @@ export async function encodeJPEG(
 				width,
 				height,
 				quality: DEFAULT_QUALITY,
+				// The default 4:2:0 visibly smears saturated colours at button sizes
+				subsampling: jpegTurbo.SAMP_444,
 				...options,
 			}
 			if (buffer.length === width * height * 4) {
