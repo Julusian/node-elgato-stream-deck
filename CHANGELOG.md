@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.8.0](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.3...v7.8.0) (2026-10-03)
+
+
+### Features
+
+* add draw layout/dimensions to the model infos ([cad863e](https://github.com/Julusian/node-elgato-stream-deck/commit/cad863e57f40bdbe78aea42ce77002afcd390e19))
+* **core:** add pure-data DEVICE_MODEL_INFO registry and lookups ([a5d649b](https://github.com/Julusian/node-elgato-stream-deck/commit/a5d649b4d87226d68db237fea3b19a7e860f648c))
+* **core:** add support for 15 key scissor module ([#208](https://github.com/Julusian/node-elgato-stream-deck/issues/208)) ([6b400ac](https://github.com/Julusian/node-elgato-stream-deck/commit/6b400acd795b680b1b898ff25942c79f0b2a69d4))
+* **core:** add support for 15 key scissor module ([#208](https://github.com/Julusian/node-elgato-stream-deck/issues/208)) ([eaa8a76](https://github.com/Julusian/node-elgato-stream-deck/commit/eaa8a76d8ee1b12b1e169cf35217bf9f7ced20d0))
+* **core:** expose modelInfo on StreamDeck ([6ee60bb](https://github.com/Julusian/node-elgato-stream-deck/commit/6ee60bbe576c40ccb3b6776920072879a8ef0072))
+* default to 444 jpeg encoding ([46612e1](https://github.com/Julusian/node-elgato-stream-deck/commit/46612e15712c3e57fa04ede344e03add45ca376f))
+* **node:** carry modelInfo on StreamDeckDeviceInfo ([f5c3636](https://github.com/Julusian/node-elgato-stream-deck/commit/f5c3636e0c5ac450b6a6aad931edf668a9a15b97))
+* **tcp:** export cora protocol constants and clear timers on disconnect ([3b3789f](https://github.com/Julusian/node-elgato-stream-deck/commit/3b3789fa5935da07ff5d548fecc882d983e93b23))
+
+
+### Bug Fixes
+
+* add id to control definitions ([53de701](https://github.com/Julusian/node-elgato-stream-deck/commit/53de7012f5173421c857e7311846d4b005a2361b))
+* plus lcd strip position ([1f43edb](https://github.com/Julusian/node-elgato-stream-deck/commit/1f43edbdc0e737def67c8cbf1b8de1e320ce270a))
+* **tcp:** disable discovery polling when queryInterval is 0 ([f634a99](https://github.com/Julusian/node-elgato-stream-deck/commit/f634a997d1fc321c40f5d60b59097bc4c9211cd4))
+* **tcp:** don't report a false timeout after the event loop stalls ([d891228](https://github.com/Julusian/node-elgato-stream-deck/commit/d891228d398fe7a615119cf9acf542e46c329947))
+* **tcp:** reject sending messages while socket is disconnected ([8e8597f](https://github.com/Julusian/node-elgato-stream-deck/commit/8e8597fa11c939830e8efc87b2c2c5e641fd1529))
+* **tcp:** reset receive state on reconnect and harden protocol detection ([615aeb7](https://github.com/Julusian/node-elgato-stream-deck/commit/615aeb767588c95850c49768f9a3889927e0eea2))
+* **tcp:** share concurrent cora queries and clear command timeouts ([3f2909e](https://github.com/Julusian/node-elgato-stream-deck/commit/3f2909e8b8810b96ec653342eb6aeaf36bc7869c))
+* typo in ledRingOffset ([c4dfa76](https://github.com/Julusian/node-elgato-stream-deck/commit/c4dfa7636a48d10f481203e939efd5e7200a989e))
+
+
+### Miscellaneous Chores
+
+* restore main's release-please state after the 7.x merge ([0367482](https://github.com/Julusian/node-elgato-stream-deck/commit/0367482f2897f47b80cfa6d4ee417202f191496f))
+
 ## [7.6.3](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.2...v7.6.3) (2026-06-02)
 
 
