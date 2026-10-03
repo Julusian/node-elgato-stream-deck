@@ -110,13 +110,14 @@ export const thirtyTwoKeyProperties: StreamDeckStaticProperties = {
 
 /**
  * Stream Deck +, whose panel is 800x480. The encoders sit below the panel, making the face taller.
- * Their geometry is not published, so it is estimated: as wide as the button column each sits under,
- * and as far below the touch strip as the buttons are above it.
+ * Their geometry is not published, so it is measured from the device bezel in Elgato's
+ * streamdeck-kit-ipad simulator, registered to the panel by its key holes: each is centred under a
+ * button column, and their centres are 222px below the bottom of the touch strip.
  */
 const plusEncoderSize = 120
 /** The touch strip reaches the bottom of the panel */
 const plusLcdBottom = 380 + 100
-const plusEncoderY = plusLcdBottom + 88
+const plusEncoderY = plusLcdBottom + 222 - plusEncoderSize / 2
 const plusControls: StreamDeckControlDefinition[] = generateButtonsGrid(
 	4,
 	2,
@@ -185,13 +186,15 @@ export const plusProperties: StreamDeckStaticProperties = {
 
 /**
  * Stream Deck + XL, whose panel is 1280x800. As on the Stream Deck +, the encoders sit below the
- * panel and their geometry is estimated. There are 6 of them across 9 columns, so they cannot line
- * up with the columns; they are spread evenly, and their `column` is that spacing rounded.
+ * panel and their geometry is measured from Elgato's simulator bezel: their centres are 251px below
+ * the bottom of the touch strip, and 216px apart about the middle of the panel. There are 6 of them
+ * across 9 columns, so they cannot line up with the columns; their `column` is that spacing rounded.
  */
 const plusXlEncoderSize = 112
 /** Unlike the Stream Deck +, the touch strip stops short of the bottom of the panel */
 const plusXlLcdBottom = 674 + 100
-const plusXlEncoderY = plusXlLcdBottom + 100
+const plusXlEncoderY = plusXlLcdBottom + 251 - plusXlEncoderSize / 2
+const plusXlEncoderPitch = 216
 const plusXlControls: StreamDeckControlDefinition[] = generateButtonsGrid(
 	9,
 	4,
@@ -226,9 +229,7 @@ plusXlControls.push(
 		drawRegions: true,
 	},
 	...[0, 2, 3, 5, 6, 8].map((column, index): StreamDeckControlDefinition => {
-		const gridLeft = 11
-		const gridWidth = 9 * 112 + 31 * 4 + 32 * 4
-		const centre = gridLeft + ((index + 0.5) * gridWidth) / 6
+		const centre = 1280 / 2 + (index - 2.5) * plusXlEncoderPitch
 
 		return {
 			id: `encoder-${index}`,
@@ -337,8 +338,9 @@ export const neoProperties: StreamDeckStaticProperties = {
 }
 
 /**
- * Stream Deck Pedal. It has no panel, and no drawing is published, so the whole layout is ESTIMATED
- * from the proportions of the product: three pedals side by side, the middle one the widest.
+ * Stream Deck Pedal. It has no panel and no drawing is published, so the face is the front of the
+ * whole device, scaled to be 500 wide, and each pedal is the extent of its tread. Measured from the
+ * device bezel in Elgato's streamdeck-kit-ipad simulator.
  */
 const pedalControls: StreamDeckControlDefinition[] = [
 	{
@@ -350,7 +352,7 @@ const pedalControls: StreamDeckControlDefinition[] = [
 		hidIndex: 0,
 		feedbackType: 'none',
 
-		bounds: { x: 20, y: 20, width: 130, height: 354 },
+		bounds: { x: 19, y: 54, width: 83, height: 272 },
 	},
 	{
 		id: 'button-1',
@@ -361,7 +363,7 @@ const pedalControls: StreamDeckControlDefinition[] = [
 		hidIndex: 1,
 		feedbackType: 'none',
 
-		bounds: { x: 160, y: 20, width: 180, height: 354 },
+		bounds: { x: 110, y: 34, width: 280, height: 292 },
 	},
 	{
 		id: 'button-2',
@@ -372,7 +374,7 @@ const pedalControls: StreamDeckControlDefinition[] = [
 		hidIndex: 2,
 		feedbackType: 'none',
 
-		bounds: { x: 350, y: 20, width: 130, height: 354 },
+		bounds: { x: 398, y: 54, width: 83, height: 272 },
 	},
 ]
 
@@ -382,7 +384,7 @@ export const pedalProperties: StreamDeckStaticProperties = {
 
 	controls: freezeDefinitions(pedalControls),
 
-	faceSize: { width: 500, height: 394 },
+	faceSize: { width: 500, height: 355 },
 
 	fullscreenPanels: 0,
 	hasNfcReader: false,
@@ -390,11 +392,21 @@ export const pedalProperties: StreamDeckStaticProperties = {
 }
 
 /**
- * Stream Deck Studio, a 1U rack unit. No drawing is published, so its layout is ESTIMATED: the
- * buttons tiled between an encoder at each end, scaled so the face is the 10.9:1 of a 19" 1U panel.
+ * Stream Deck Studio, a 1U rack unit. No drawing is published, so its layout is ESTIMATED from the
+ * product photos, scaled so the face is the 10.9:1 of a 19" 1U panel. The space at each end is
+ * wider than its encoder, to leave the room the hardware has for the NFC reader on the left and the
+ * USB-C port on the right.
  */
 const studioEncoderSize = 112
-const studioFaceSize = { width: 2928, height: 270 }
+const studioEncoderMargin = 32
+/** Room beside each encoder, for the NFC reader on the left and the USB-C port on the right */
+const studioEncoderSideGap = 104
+/** 16 buttons of 144, with 15 gaps of 16 */
+const studioButtonsWidth = 16 * 144 + 15 * 16
+const studioButtonsLeft = studioEncoderMargin + studioEncoderSize + studioEncoderSideGap
+const studioFaceSize = { width: studioButtonsLeft * 2 + studioButtonsWidth, height: 280 }
+/** Centred in the face, which is taller than either the buttons or the encoders */
+const studioEncoderY = (studioFaceSize.height - studioEncoderSize) / 2
 const studioControls: StreamDeckControlDefinition[] = [
 	{
 		id: 'encoder-l',
@@ -404,7 +416,7 @@ const studioControls: StreamDeckControlDefinition[] = [
 		index: 0,
 		hidIndex: 0,
 
-		bounds: { x: 40, y: 79, width: studioEncoderSize, height: studioEncoderSize },
+		bounds: { x: studioEncoderMargin, y: studioEncoderY, width: studioEncoderSize, height: studioEncoderSize },
 
 		hasLed: true,
 		ledRingSteps: 24,
@@ -416,8 +428,8 @@ const studioControls: StreamDeckControlDefinition[] = [
 		{
 			columnOffset: 1,
 			bounds: {
-				left: 192,
-				top: 15,
+				left: studioButtonsLeft,
+				top: 20,
 				columnGaps: 16,
 				rowGaps: 16,
 			},
@@ -432,8 +444,8 @@ const studioControls: StreamDeckControlDefinition[] = [
 		hidIndex: 1,
 
 		bounds: {
-			x: studioFaceSize.width - 40 - studioEncoderSize,
-			y: 79,
+			x: studioFaceSize.width - studioEncoderMargin - studioEncoderSize,
+			y: studioEncoderY,
 			width: studioEncoderSize,
 			height: studioEncoderSize,
 		},
