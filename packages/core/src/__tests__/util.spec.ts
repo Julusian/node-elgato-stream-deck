@@ -17,6 +17,7 @@ describe('imageToByteArray', () => {
 			5,
 			2,
 			2,
+			undefined,
 		)
 		expect(res).toMatchSnapshot()
 	})
@@ -29,6 +30,7 @@ describe('imageToByteArray', () => {
 			4,
 			2,
 			2,
+			undefined,
 		)
 		expect(res).toMatchSnapshot()
 	})
@@ -41,6 +43,7 @@ describe('imageToByteArray', () => {
 			4,
 			2,
 			2,
+			undefined,
 		)
 		expect(res).toMatchSnapshot()
 	})
@@ -53,6 +56,7 @@ describe('imageToByteArray', () => {
 			4,
 			2,
 			2,
+			undefined,
 		)
 		expect(res).toMatchSnapshot()
 	})
@@ -66,6 +70,7 @@ describe('imageToByteArray', () => {
 			4,
 			3,
 			3,
+			undefined,
 		)
 		expect(res).toMatchSnapshot()
 	})
@@ -79,6 +84,7 @@ describe('imageToByteArray', () => {
 			4,
 			3,
 			3,
+			undefined,
 		)
 		expect(res).toMatchSnapshot()
 	})
@@ -92,6 +98,7 @@ describe('imageToByteArray', () => {
 			4,
 			4,
 			1,
+			undefined,
 		)
 		expect(res).toMatchSnapshot()
 	})
@@ -105,7 +112,59 @@ describe('imageToByteArray', () => {
 			4,
 			4,
 			1,
+			undefined,
 		)
 		expect(res).toMatchSnapshot()
+	})
+
+	describe('padding', () => {
+		const padding = { left: 1, top: 1, right: 2, bottom: 0 }
+
+		test('places the image inside a black border', () => {
+			const res = transformImageBuffer(
+				new Uint8Array([1, 1, 1, 2, 2, 2]),
+				{ format: 'bgr', offset: 0, stride: 2 * 3 },
+				{ colorMode: 'bgr' },
+				0,
+				2,
+				1,
+				padding,
+			)
+			// prettier-ignore
+			expect(res).toEqual(new Uint8Array([
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 1, 1, 1, 2, 2, 2, 0, 0, 0, 0, 0, 0,
+			]))
+		})
+
+		test('applies flips to the padded image', () => {
+			const res = transformImageBuffer(
+				new Uint8Array([1, 1, 1, 2, 2, 2]),
+				{ format: 'bgr', offset: 0, stride: 2 * 3 },
+				{ colorMode: 'bgr', xFlip: true, yFlip: true },
+				0,
+				2,
+				1,
+				padding,
+			)
+			// prettier-ignore
+			expect(res).toEqual(new Uint8Array([
+				0, 0, 0, 0, 0, 0, 2, 2, 2, 1, 1, 1, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			]))
+		})
+
+		test('padding is opaque for rgba', () => {
+			const res = transformImageBuffer(
+				new Uint8Array([9, 9, 9]),
+				{ format: 'rgb', offset: 0, stride: 3 },
+				{ colorMode: 'rgba' },
+				0,
+				1,
+				1,
+				{ left: 1, top: 0, right: 0, bottom: 0 },
+			)
+			expect(res).toEqual(new Uint8Array([0, 0, 0, 255, 9, 9, 9, 255]))
+		})
 	})
 })

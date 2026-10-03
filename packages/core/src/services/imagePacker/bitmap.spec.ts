@@ -31,7 +31,7 @@ describe('BitmapButtonLcdImagePacker', () => {
 			const packer = makePacker()
 			const { buffer, sourceOptions } = makeRgbSourceBuffer(TARGET_SIZE.width, TARGET_SIZE.height)
 
-			const result = await packer.convertPixelBuffer(buffer, sourceOptions, TARGET_SIZE)
+			const result = await packer.convertPixelBuffer(buffer, sourceOptions, TARGET_SIZE, undefined)
 
 			expect(result.length).toBe(BMP_HEADER_LENGTH + TARGET_SIZE.width * TARGET_SIZE.height * 3)
 		})
@@ -40,7 +40,7 @@ describe('BitmapButtonLcdImagePacker', () => {
 			const packer = makePacker()
 			const { buffer, sourceOptions } = makeRgbSourceBuffer(TARGET_SIZE.width, TARGET_SIZE.height)
 
-			const result = await packer.convertPixelBuffer(buffer, sourceOptions, TARGET_SIZE)
+			const result = await packer.convertPixelBuffer(buffer, sourceOptions, TARGET_SIZE, undefined)
 
 			expect(result[0]).toBe(0x42) // 'B'
 			expect(result[1]).toBe(0x4d) // 'M'
@@ -50,7 +50,7 @@ describe('BitmapButtonLcdImagePacker', () => {
 			const packer = makePacker()
 			const { buffer, sourceOptions } = makeRgbSourceBuffer(TARGET_SIZE.width, TARGET_SIZE.height)
 
-			const result = await packer.convertPixelBuffer(buffer, sourceOptions, TARGET_SIZE)
+			const result = await packer.convertPixelBuffer(buffer, sourceOptions, TARGET_SIZE, undefined)
 
 			const view = new DataView(result.buffer, result.byteOffset)
 			const fileSize = view.getUint32(2, true)
@@ -61,7 +61,7 @@ describe('BitmapButtonLcdImagePacker', () => {
 			const packer = makePacker()
 			const { buffer, sourceOptions } = makeRgbSourceBuffer(TARGET_SIZE.width, TARGET_SIZE.height)
 
-			const result = await packer.convertPixelBuffer(buffer, sourceOptions, TARGET_SIZE)
+			const result = await packer.convertPixelBuffer(buffer, sourceOptions, TARGET_SIZE, undefined)
 
 			const view = new DataView(result.buffer, result.byteOffset)
 			const pixelOffset = view.getUint32(10, true)
@@ -73,7 +73,7 @@ describe('BitmapButtonLcdImagePacker', () => {
 			const packer = new BitmapButtonLcdImagePacker({ colorMode: 'bgr' }, ppm)
 			const { buffer, sourceOptions } = makeRgbSourceBuffer(TARGET_SIZE.width, TARGET_SIZE.height)
 
-			const result = await packer.convertPixelBuffer(buffer, sourceOptions, TARGET_SIZE)
+			const result = await packer.convertPixelBuffer(buffer, sourceOptions, TARGET_SIZE, undefined)
 
 			const view = new DataView(result.buffer, result.byteOffset)
 			expect(view.getInt32(38, true)).toBe(ppm) // horizontal resolution
@@ -89,7 +89,7 @@ describe('BitmapButtonLcdImagePacker', () => {
 			const sourceBuffer = new Uint8Array([100, 150, 200]) // rgb
 			const sourceOptions = { format: 'rgb', offset: 0, stride: 3 }
 
-			const result = await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, size)
+			const result = await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, size, undefined)
 
 			// Pixel at offset BMP_HEADER_LENGTH: should be BGR = [200, 150, 100]
 			expect(result[BMP_HEADER_LENGTH]).toBe(200) // b
@@ -107,7 +107,7 @@ describe('BitmapButtonLcdImagePacker', () => {
 			const sourceBuffer = new Uint8Array([10, 0, 0, 20, 0, 0, 30, 0, 0, 40, 0, 0])
 			const sourceOptions = { format: 'rgb', offset: 0, stride: 6 }
 
-			const result = await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, size)
+			const result = await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, size, undefined)
 
 			// After yFlip, row 0 of output = row 1 of input → first pixel of output should be 30 (or 0 in bgr)
 			// Since colorMode='bgr' and source is rgb with b=0, first byte at pixel offset = 0 (b from r=30 → b)
