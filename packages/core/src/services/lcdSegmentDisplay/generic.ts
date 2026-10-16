@@ -145,6 +145,7 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 			0,
 			sourceOptions.width,
 			sourceOptions.height,
+			undefined,
 		)
 
 		return this.#encodeJPEG(

@@ -102,6 +102,7 @@ export class StreamDeckNeoLcdService implements LcdSegmentDisplayService {
 			0,
 			size.width,
 			size.height,
+			undefined,
 		)
 
 		return this.#encodeJPEG(byteBuffer, size.width, size.height)
