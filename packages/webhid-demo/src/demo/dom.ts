@@ -20,7 +20,7 @@ function getRandomColor() {
 export class DomImageDemo implements Demo {
 	private element: HTMLElement | undefined
 	private run = false
-	private running: Promise<void> | undefined
+	private running: Promise<boolean> | undefined
 
 	public async start(device: StreamDeckWeb): Promise<void> {
 		this.element = document.querySelector<HTMLElement>('#image-source') || undefined

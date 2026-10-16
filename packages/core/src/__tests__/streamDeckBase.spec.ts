@@ -144,8 +144,17 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 	// ---- Properties delegation ----
 	describe('properties delegation', () => {
 		test('setBrightness delegates to propertiesService', async () => {
-			await streamDeck.setBrightness(50)
+			await expect(streamDeck.setBrightness(50)).resolves.toBe(true)
 			expect((services.properties as jest.Mocked<PropertiesService>).setBrightness).toHaveBeenCalledWith(50, null)
+		})
+
+		test('setBrightness forwards the signal', async () => {
+			const controller = new AbortController()
+			await streamDeck.setBrightness(50, { signal: controller.signal })
+			expect((services.properties as jest.Mocked<PropertiesService>).setBrightness).toHaveBeenCalledWith(
+				50,
+				controller.signal,
+			)
 		})
 
 		test('resetToLogo delegates to propertiesService', async () => {
@@ -349,7 +358,7 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 				makeOptions(),
 				makeServices({ buttonsLcd: buttonsLcdMock, lcdSegmentDisplay: lcdMock, encoderLed: encoderMock }),
 			)
-			await sd.clearPanel()
+			await expect(sd.clearPanel()).resolves.toBe(true)
 			expect(buttonsLcdMock.clearPanel).toHaveBeenCalledTimes(1)
 			expect(lcdMock.clearAllLcdSegments).toHaveBeenCalledTimes(1)
 			expect(encoderMock.clearAll).toHaveBeenCalledTimes(1)

@@ -1,4 +1,4 @@
-import type { KeyIndex, StreamDeck, StreamDeckButtonControlDefinition } from '@elgato-stream-deck/core'
+import type { KeyIndex, StreamDeck, StreamDeckButtonControlDefinition, WriteOptions } from '@elgato-stream-deck/core'
 import { StreamDeckProxy } from '@elgato-stream-deck/core'
 import type { WebHIDDevice } from './hid-device.js'
 
@@ -21,7 +21,15 @@ export class StreamDeckWeb extends StreamDeckProxy {
 		await this.hid.forget()
 	}
 
-	public async fillKeyCanvas(keyIndex: KeyIndex, canvas: HTMLCanvasElement): Promise<void> {
+	/**
+	 * Fills the given key with the contents of a canvas
+	 * @returns `true` once it was sent to the device, `false` if it was skipped. See `fillKeyBuffer`
+	 */
+	public async fillKeyCanvas(
+		keyIndex: KeyIndex,
+		canvas: HTMLCanvasElement,
+		options?: WriteOptions,
+	): Promise<boolean> {
 		// this.checkValidKeyIndex(keyIndex)
 
 		const ctx = canvas.getContext('2d')
@@ -37,10 +45,14 @@ export class StreamDeckWeb extends StreamDeckProxy {
 			throw new TypeError(`keyIndex ${control.index} does not support lcd feedback`)
 
 		const data = ctx.getImageData(0, 0, control.pixelSize.width, control.pixelSize.height)
-		return this.device.fillKeyBuffer(keyIndex, data.data, { format: 'rgba' })
+		return this.device.fillKeyBuffer(keyIndex, data.data, { format: 'rgba', signal: options?.signal })
 	}
 
-	public async fillPanelCanvas(canvas: HTMLCanvasElement): Promise<void> {
+	/**
+	 * Fills the whole panel with the contents of a canvas
+	 * @returns `true` once it was sent to the device, `false` if it was skipped. See `fillPanelBuffer`
+	 */
+	public async fillPanelCanvas(canvas: HTMLCanvasElement, options?: WriteOptions): Promise<boolean> {
 		const ctx = canvas.getContext('2d')
 		if (!ctx) throw new Error('Failed to get canvas context')
 
@@ -48,6 +60,6 @@ export class StreamDeckWeb extends StreamDeckProxy {
 		if (!dimensions) throw new Error('Panel does not support filling')
 
 		const data = ctx.getImageData(0, 0, dimensions.width, dimensions.height)
-		return this.device.fillPanelBuffer(data.data, { format: 'rgba' })
+		return this.device.fillPanelBuffer(data.data, { format: 'rgba', signal: options?.signal })
 	}
 }

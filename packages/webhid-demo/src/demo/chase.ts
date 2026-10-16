@@ -13,7 +13,7 @@ export class ChaseDemo implements Demo {
 	private running: Promise<void> | undefined
 
 	private async drawButtons(device: StreamDeck, controls: ControlAndCanvas[], c: number): Promise<void> {
-		const ps: Array<Promise<void>> = []
+		const ps: Array<Promise<boolean>> = []
 
 		for (const { control, canvas } of controls) {
 			// We probably should reuse this instead of creating it each time.

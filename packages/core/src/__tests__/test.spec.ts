@@ -144,7 +144,7 @@ describe('StreamDeck Mini', () => {
 			async () => true,
 		))
 		expect(writeFn).toHaveBeenCalledTimes(0)
-		await streamDeck.fillKeyBuffer(0, readFixtureJSON('fillImage-sample-icon-80.json'))
+		await expect(streamDeck.fillKeyBuffer(0, readFixtureJSON('fillImage-sample-icon-80.json'))).resolves.toBe(true)
 
 		expect(writeFn).toHaveBeenCalledWith(expect.any(Array), null)
 		expect(writeFn.mock.calls.map(([packets]) => [packets])).toMatchSnapshot()

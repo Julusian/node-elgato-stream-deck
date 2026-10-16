@@ -19,6 +19,19 @@ export interface StreamDeckTcpChildDeviceInfo extends HIDDeviceInfo {
 export interface FillImageOptions {
 	format: 'rgb' | 'rgba' | 'bgr' | 'bgra'
 }
+
+/**
+ * Options for any method which writes to the device.
+ * Writes to the same target (eg a key) are always sent to the device in the order they were made, even if an earlier one takes longer to prepare.
+ */
+export interface WriteOptions {
+	/**
+	 * Signal to abort the write.
+	 * The write is only skipped if it has not started being sent to the device yet, a write is never interrupted partway through.
+	 * When skipped, the method resolves `false`.
+	 */
+	signal?: AbortSignal
+}
 export interface FillPanelOptions extends FillImageOptions, FillPanelDimensionsOptions {}
 
 export interface FillPanelDimensionsOptions {
@@ -95,8 +108,10 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * Send a prepared buffer operation
 	 *
 	 * @param {PreparedBuffer} buffer The prepared buffer to draw
+	 * @param {Object} options Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if `options.signal` was aborted before it was sent. Never `false` once the data has been sent
 	 */
-	sendPreparedBuffer(buffer: PreparedBuffer): Promise<void>
+	sendPreparedBuffer(buffer: PreparedBuffer, options?: WriteOptions): Promise<boolean>
 
 	/**
 	 * Fills the given key with a solid color.
@@ -105,8 +120,10 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {number} r The color's red value. 0 - 255
 	 * @param {number} g The color's green value. 0 - 255
 	 * @param {number} b The color's blue value. 0 -255
+	 * @param {Object} options Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if it was skipped because `options.signal` was aborted before it was sent. Never `false` once the data has been sent
 	 */
-	fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
+	fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number, options?: WriteOptions): Promise<boolean>
 
 	/**
 	 * Fills the given key with an image in a Buffer.
@@ -114,12 +131,13 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {number} keyIndex The key to fill
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} options Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if it was skipped because `options.signal` was aborted before it was sent. Never `false` once the data has been sent
 	 */
 	fillKeyBuffer(
 		keyIndex: KeyIndex,
 		imageBuffer: Uint8Array | Uint8ClampedArray,
-		options?: FillImageOptions,
-	): Promise<void>
+		options?: FillImageOptions & WriteOptions,
+	): Promise<boolean>
 
 	/**
 	 * Prepare to fill the given key with an image in a Buffer.
@@ -142,8 +160,12 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 *
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} options Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if it was skipped because `options.signal` was aborted before it was sent. Never `false` once the data has been sent
 	 */
-	fillPanelBuffer(imageBuffer: Uint8Array | Uint8ClampedArray, options?: FillPanelOptions): Promise<void>
+	fillPanelBuffer(
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		options?: FillPanelOptions & WriteOptions,
+	): Promise<boolean>
 
 	/**
 	 * Prepare to fill the whole panel with an image in a Buffer.
@@ -164,12 +186,13 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {number} lcdIndex The id of the lcd segment to draw to
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if it was skipped because `options.signal` was aborted before it was sent. Never `false` once the data has been sent
 	 */
 	fillLcd(
 		lcdIndex: number,
 		imageBuffer: Uint8Array | Uint8ClampedArray,
-		sourceOptions: FillImageOptions,
-	): Promise<void>
+		sourceOptions: FillImageOptions & WriteOptions,
+	): Promise<boolean>
 
 	/**
 	 * Fills the primary led of an encoder
@@ -177,8 +200,10 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {number} r The color's red value. 0 - 255
 	 * @param {number} g The color's green value. 0 - 255
 	 * @param {number} b The color's blue value. 0 -255
+	 * @param {Object} options Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if it was skipped because `options.signal` was aborted before it was sent. Never `false` once the data has been sent
 	 */
-	setEncoderColor(index: EncoderIndex, r: number, g: number, b: number): Promise<void>
+	setEncoderColor(index: EncoderIndex, r: number, g: number, b: number, options?: WriteOptions): Promise<boolean>
 
 	/**
 	 * Fills the led ring of an encoder with a single color
@@ -186,15 +211,26 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {number} r The color's red value. 0 - 255
 	 * @param {number} g The color's green value. 0 - 255
 	 * @param {number} b The color's blue value. 0 -255
+	 * @param {Object} options Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if it was skipped because `options.signal` was aborted before it was sent. Never `false` once the data has been sent
 	 */
-	setEncoderRingSingleColor(index: EncoderIndex, r: number, g: number, b: number): Promise<void>
+	setEncoderRingSingleColor(
+		index: EncoderIndex,
+		r: number,
+		g: number,
+		b: number,
+		options?: WriteOptions,
+	): Promise<boolean>
 
 	/**
 	 * Fill the led ring of an encoder
 	 * @param index The encoder to fill
 	 * @param colors rgb packed pixel values for the encoder ring
+	 * @param {Object} options Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if it was skipped because `options.signal` was aborted before it was sent. Never `false` once the data has been sent
+	 * Note: on some models each led of the ring is written separately, so a `false` result may mean the ring was only partially written
 	 */
-	setEncoderRingColors(index: EncoderIndex, colors: number[] | Uint8Array): Promise<void>
+	setEncoderRingColors(index: EncoderIndex, colors: number[] | Uint8Array, options?: WriteOptions): Promise<boolean>
 
 	/**
 	 * Fill a region of the lcd segment, ignoring the boundaries of the encoders
@@ -203,14 +239,15 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	 * @param {number} y The y position to draw to
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if it was skipped because `sourceOptions.signal` was aborted before it was sent. Never `false` once the data has been sent
 	 */
 	fillLcdRegion(
 		lcdIndex: number,
 		x: number,
 		y: number,
 		imageBuffer: Uint8Array,
-		sourceOptions: FillLcdImageOptions,
-	): Promise<void>
+		sourceOptions: FillLcdImageOptions & WriteOptions,
+	): Promise<boolean>
 
 	/**
 	 * Prepare to fill region of the lcd with an image in a Buffer.
@@ -235,27 +272,35 @@ export interface StreamDeck extends EventEmitter<StreamDeckEvents> {
 	/**
 	 * Clear the lcd segment to black
 	 * @param {number} lcdIndex The id of the lcd segment to clear
+	 * @param {Object} options Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if it was skipped because `options.signal` was aborted before it was sent. Never `false` once the data has been sent
 	 */
-	clearLcdSegment(lcdIndex: number): Promise<void>
+	clearLcdSegment(lcdIndex: number, options?: WriteOptions): Promise<boolean>
 
 	/**
 	 * Clears the given key.
 	 *
 	 * @param {number} keyIndex The key to clear
+	 * @param {Object} options Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if it was skipped because `options.signal` was aborted before it was sent. Never `false` once the data has been sent
 	 */
-	clearKey(keyIndex: KeyIndex): Promise<void>
+	clearKey(keyIndex: KeyIndex, options?: WriteOptions): Promise<boolean>
 
 	/**
-	 * Clears all keys.
+	 * Clears all keys, lcd segments and encoder leds.
+	 * @param {Object} options Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if any part of it was skipped because `options.signal` was aborted before it was sent. As this writes to multiple targets, `false` may mean that only some of them were written
 	 */
-	clearPanel(): Promise<void>
+	clearPanel(options?: WriteOptions): Promise<boolean>
 
 	/**
 	 * Sets the brightness of the keys on the Stream Deck
 	 *
 	 * @param {number} percentage The percentage brightness
+	 * @param {Object} options Options to control the write
+	 * @returns `true` once everything was sent to the device. `false` if it was skipped because `options.signal` was aborted before it was sent. Never `false` once the data has been sent
 	 */
-	setBrightness(percentage: number): Promise<void>
+	setBrightness(percentage: number, options?: WriteOptions): Promise<boolean>
 
 	/**
 	 * Resets the display to the startup logo

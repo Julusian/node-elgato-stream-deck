@@ -26,6 +26,7 @@ export {
 	StreamDeckControlDefinition,
 	StreamDeckTcpChildDeviceInfo,
 	OpenStreamDeckOptions,
+	WriteOptions,
 	PreparedBuffer,
 	StreamDeckModelInfo,
 	StreamDeckModelFeatures,

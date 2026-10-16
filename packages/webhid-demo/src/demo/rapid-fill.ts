@@ -9,7 +9,7 @@ function getRandomIntInclusive(min: number, max: number) {
 
 export class RapidFillDemo implements Demo {
 	private interval: number | undefined
-	private running: Promise<void[]> | undefined
+	private running: Promise<boolean[]> | undefined
 
 	public async start(device: StreamDeck): Promise<void> {
 		if (!this.interval) {
@@ -20,7 +20,7 @@ export class RapidFillDemo implements Demo {
 					const b = getRandomIntInclusive(0, 255)
 					console.log('Filling with rgb(%d, %d, %d)', r, g, b)
 
-					const ps: Array<Promise<void>> = []
+					const ps: Array<Promise<boolean>> = []
 					for (const control of device.CONTROLS) {
 						if (control.type === 'button') {
 							ps.push(device.fillKeyColor(control.index, r, g, b))
