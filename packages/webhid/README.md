@@ -30,18 +30,18 @@ Unplug and replug the device and it should be usable
 
 ## Features
 
--   Support for every StreamDeck model (Original, Mini & XL)
--   Key `down` and key `up` events
--   Fill keys with canvas, images or solid RGB colors
--   Fill the entire panel with a single image, spread across all keys
--   Set the Stream Deck brightness
--   TypeScript support
+- Support for every StreamDeck model (Original, Mini & XL)
+- Key `down` and key `up` events
+- Fill keys with canvas, images or solid RGB colors
+- Fill the entire panel with a single image, spread across all keys
+- Set the Stream Deck brightness
+- TypeScript support
 
 ### Known limitations
 
--   Only works with Chromium v89+ based browsers
--   The original model of the 15key is not supported on linux
--   When having a hid device open, you will still be subject to background tab throttling which affects the draw rate
+- Only works with Chromium v89+ based browsers
+- The original model of the 15key is not supported on linux
+- When having a hid device open, you will still be subject to background tab throttling which affects the draw rate
 
 ## API
 
@@ -70,6 +70,10 @@ export async function openDevice(browserDevice: HIDDevice, userOptions?: OpenStr
 ```
 
 The StreamDeck type can be found [here](/packages/core/src/models/types.ts#L15)
+
+### Draw results and aborting writes
+
+Every method that writes to the device resolves `true` once the write has been sent, or `false` if it was skipped before being sent because the provided `signal` was aborted. Writes to the same target are always sent in the order they were called. See the [node readme](/packages/node/README.md#draw-results-and-aborting-writes) for the full details.
 
 ## Example
 

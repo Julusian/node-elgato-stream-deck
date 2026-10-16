@@ -29,24 +29,25 @@ However, in the event that installation _does_ fail (**or if you are on a platfo
 
 <details>
 	<summary>Compiling dependencies from source</summary>
-	
-* Windows
-  * Install [`windows-build-tools`](https://github.com/felixrieseberg/windows-build-tools):
-  ```bash
-  npm install --global windows-build-tools
-  ```
-* MacOS
-  * Install the Xcode Command Line Tools:
-  ```bash
-  xcode-select --install
-  ```
-* Linux (**including Raspberry Pi**)
-  * Follow the instructions for Linux in the ["Compiling from source"](https://github.com/node-hid/node-hid#compiling-from-source) steps for 
-  * Try installing `@elgato-stream-deck/node`
-  * If you still have issues, ensure everything is updated and try again:
-	```bash
-	sudo apt-get update && sudo apt-get upgrade
-	```
+
+- Windows
+    - Install [`windows-build-tools`](https://github.com/felixrieseberg/windows-build-tools):
+    ```bash
+    npm install --global windows-build-tools
+    ```
+- MacOS
+    - Install the Xcode Command Line Tools:
+    ```bash
+    xcode-select --install
+    ```
+- Linux (**including Raspberry Pi**)
+    - Follow the instructions for Linux in the ["Compiling from source"](https://github.com/node-hid/node-hid#compiling-from-source) steps for
+    - Try installing `@elgato-stream-deck/node`
+    - If you still have issues, ensure everything is updated and try again:
+        ```bash
+        sudo apt-get update && sudo apt-get upgrade
+        ```
+
 </details>
 
 ## Linux
@@ -54,20 +55,20 @@ However, in the event that installation _does_ fail (**or if you are on a platfo
 On linux, the udev subsystem blocks access to the StreamDeck without some special configuration.
 Copy one of the following files into `/etc/udev/rules.d/` and reload the rules with `sudo udevadm control --reload-rules`
 
--   Use the [headless server](./udev/50-elgato-stream-deck-headless.rules) version when your software will be running as a system service, and is not related to a logged in user
--   Use the [desktop user](./udev/50-elgato-stream-deck-user.rules) version when your software is run by a user session on a distribution using systemd
+- Use the [headless server](./udev/50-elgato-stream-deck-headless.rules) version when your software will be running as a system service, and is not related to a logged in user
+- Use the [desktop user](./udev/50-elgato-stream-deck-user.rules) version when your software is run by a user session on a distribution using systemd
 
 Unplug and replug the device and it should be usable
 
 ## Features
 
--   Multiplatform support: Windows 7-10, MacOS, Linux, and even Raspberry Pi!
--   Support for every StreamDeck model (Original, Mini & XL)
--   Key `down` and key `up` events
--   Fill keys with images or solid RGB colors
--   Fill the entire panel with a single image, spread across all keys
--   Set the Stream Deck brightness
--   TypeScript support
+- Multiplatform support: Windows 7-10, MacOS, Linux, and even Raspberry Pi!
+- Support for every StreamDeck model (Original, Mini & XL)
+- Key `down` and key `up` events
+- Fill keys with images or solid RGB colors
+- Fill the entire panel with a single image, spread across all keys
+- Set the Stream Deck brightness
+- TypeScript support
 
 ## API
 
@@ -93,6 +94,38 @@ export function openStreamDeck(devicePath: string, userOptions?: OpenStreamDeckO
 ```
 
 The `StreamDeck` type can be found [here](/packages/core/src/types.ts#L48).
+
+### Draw results and aborting writes
+
+Every method that writes to the device (`fillKeyBuffer`, `fillKeyColor`, `clearKey`, `fillPanelBuffer`, `clearPanel`, `fillLcd`, `fillLcdRegion`, `clearLcdSegment`, `setEncoderColor`, `setEncoderRingSingleColor`, `setEncoderRingColors`, `setBrightness` and `sendPreparedBuffer`) resolves with a boolean:
+
+- `true`: everything the call was asked to write has been sent to the device.
+- `false`: the write was skipped before it was sent, because the `signal` you provided was aborted.
+
+You can rely on this to know when something was actually drawn:
+
+- A write is either sent in full or not at all. It is never interrupted partway through.
+- Once the data has been sent, the result is always `true`, even if the signal is aborted afterwards.
+- Methods that write to multiple targets (`clearPanel`) only resolve `true` if every target was written.
+- On some models each led of an encoder ring is written separately, so `setEncoderRingColors`/`setEncoderRingSingleColor` resolving `false` can mean the ring was partially written.
+
+Errors (eg invalid arguments, or the device being disconnected) still reject as before.
+
+Each of these methods accepts an `AbortSignal`, either as `signal` in its existing options object (`fillKeyBuffer`, `fillPanelBuffer`, `fillLcd`, `fillLcdRegion`) or as a trailing `{ signal }` options argument for the others. If the signal is aborted before the write has started being sent to the device, including while it is waiting in the write queue, the write is skipped and the method resolves `false`.
+
+```typescript
+const controller = new AbortController()
+const drawn = myStreamDeck.fillKeyBuffer(0, image, { format: 'rgb', signal: controller.signal })
+
+// Changed our mind before it was sent
+controller.abort()
+
+console.log(await drawn) // false, unless it had already been sent
+```
+
+Writes to the same target (eg a key or an lcd segment) are always sent in the order they were called, even when an older write takes longer to prepare (eg a slow jpeg encode). A panel fill is ordered with every key.
+
+If you update keys faster than the device can be written to, avoid queueing up draws that will be immediately replaced: keep at most one draw in flight per key, and when it completes draw the latest state for that key, skipping any intermediate states.
 
 ## Example
 
