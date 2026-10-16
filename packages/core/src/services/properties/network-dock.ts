@@ -9,8 +9,9 @@ export class NetworkDockPropertiesService implements PropertiesService {
 		this.#device = device
 	}
 
-	public async setBrightness(_percentage: number): Promise<void> {
+	public async setBrightness(_percentage: number, _signal: AbortSignal | null): Promise<boolean> {
 		// Noop
+		return true
 	}
 
 	public async resetToLogo(): Promise<void> {

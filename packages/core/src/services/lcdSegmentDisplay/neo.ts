@@ -9,11 +9,13 @@ import type { FillLcdImageOptions, FillImageOptions } from '../../types.js'
 import { transformImageBuffer } from '../../util.js'
 import type { EncodeJPEGHelper } from '../../models/base.js'
 import type { PreparedBuffer } from '../../preparedBuffer.js'
+import { PendingWriteTracker } from '../pendingWrites.js'
 
 export class StreamDeckNeoLcdService implements LcdSegmentDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper
 	readonly #device: HIDDevice
 	readonly #lcdControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>
+	readonly #pendingWrites = new PendingWriteTracker()
 
 	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter<null>(new StreamdeckNeoLcdImageHeaderGenerator())
 
@@ -33,7 +35,8 @@ export class StreamDeckNeoLcdService implements LcdSegmentDisplayService {
 		_y: number,
 		_imageBuffer: Uint8Array,
 		_sourceOptions: FillLcdImageOptions,
-	): Promise<void> {
+		_signal: AbortSignal | null,
+	): Promise<boolean> {
 		throw new Error('Not supported for this model')
 	}
 
@@ -48,7 +51,12 @@ export class StreamDeckNeoLcdService implements LcdSegmentDisplayService {
 		throw new Error('Not supported for this model')
 	}
 
-	public async fillLcd(index: number, imageBuffer: Uint8Array, sourceOptions: FillImageOptions): Promise<void> {
+	public async fillLcd(
+		index: number,
+		imageBuffer: Uint8Array,
+		sourceOptions: FillImageOptions,
+		signal: AbortSignal | null,
+	): Promise<boolean> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
 		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
@@ -57,31 +65,42 @@ export class StreamDeckNeoLcdService implements LcdSegmentDisplayService {
 			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
 		}
 
-		// A lot of this drawing code is heavily based on the normal button
-		const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, lcdControl.pixelSize, sourceOptions)
+		return this.#pendingWrites.run(`lcd:${lcdControl.id}`, signal, async (ctx) => {
+			// Avoid encoding an image which will not be sent
+			if (ctx.signal?.aborted) return false
 
-		const packets = this.#lcdImageWriter.generateFillImageWrites(null, byteBuffer)
-		await this.#device.sendReports(packets, null)
+			// A lot of this drawing code is heavily based on the normal button
+			const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, lcdControl.pixelSize, sourceOptions)
+
+			const packets = this.#lcdImageWriter.generateFillImageWrites(null, byteBuffer)
+			return ctx.commit(async (writeSignal) => this.#device.sendReports(packets, writeSignal))
+		})
 	}
 
-	public async clearLcdSegment(index: number): Promise<void> {
+	public async clearLcdSegment(index: number, signal: AbortSignal | null): Promise<boolean> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
 		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
 		const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4)
 
-		await this.fillLcd(index, buffer, {
-			format: 'rgba',
-		})
+		return this.fillLcd(
+			index,
+			buffer,
+			{
+				format: 'rgba',
+			},
+			signal,
+		)
 	}
 
-	public async clearAllLcdSegments(): Promise<void> {
-		const ps: Array<Promise<void>> = []
+	public async clearAllLcdSegments(signal: AbortSignal | null): Promise<boolean> {
+		const ps: Array<Promise<boolean>> = []
 		for (const control of this.#lcdControls) {
-			ps.push(this.clearLcdSegment(control.id))
+			ps.push(this.clearLcdSegment(control.id, signal))
 		}
 
-		await Promise.all(ps)
+		const results = await Promise.all(ps)
+		return results.every(Boolean)
 	}
 
 	private async convertFillLcdBuffer(

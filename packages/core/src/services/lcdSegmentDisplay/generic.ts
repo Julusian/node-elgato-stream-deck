@@ -9,6 +9,7 @@ import { transformImageBuffer } from '../../util.js'
 import type { EncodeJPEGHelper } from '../../models/base.js'
 import { wrapBufferToPreparedBuffer, type PreparedBuffer } from '../../preparedBuffer.js'
 import type { DeviceModelId } from '../../id.js'
+import { PendingWriteTracker } from '../pendingWrites.js'
 
 export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 	readonly #encodeJPEG: EncodeJPEGHelper
@@ -16,6 +17,7 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 	readonly #lcdControls: Readonly<StreamDeckLcdSegmentControlDefinition[]>
 	readonly #rotate: boolean
 	readonly #modelId: DeviceModelId
+	readonly #pendingWrites = new PendingWriteTracker()
 
 	readonly #lcdImageWriter = new StreamdeckDefaultImageWriter(new StreamdeckDefaultLcdImageHeaderGenerator())
 
@@ -37,16 +39,23 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 		index: number,
 		buffer: Uint8Array | Uint8ClampedArray,
 		sourceOptions: FillImageOptions,
-	): Promise<void> {
+		signal: AbortSignal | null,
+	): Promise<boolean> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
 		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
-		const packets = await this.prepareFillControlRegion(lcdControl, 0, 0, buffer, {
-			format: sourceOptions.format,
-			width: lcdControl.pixelSize.width,
-			height: lcdControl.pixelSize.height,
-		})
-		await this.#device.sendReports(packets, null)
+		return this.#fillControlRegion(
+			lcdControl,
+			0,
+			0,
+			buffer,
+			{
+				format: sourceOptions.format,
+				width: lcdControl.pixelSize.width,
+				height: lcdControl.pixelSize.height,
+			},
+			signal,
+		)
 	}
 
 	public async fillLcdRegion(
@@ -55,12 +64,31 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 		y: number,
 		imageBuffer: Uint8Array,
 		sourceOptions: FillLcdImageOptions,
-	): Promise<void> {
+		signal: AbortSignal | null,
+	): Promise<boolean> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
 		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
-		const packets = await this.prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions)
-		await this.#device.sendReports(packets, null)
+		return this.#fillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions, signal)
+	}
+
+	async #fillControlRegion(
+		lcdControl: StreamDeckLcdSegmentControlDefinition,
+		x: number,
+		y: number,
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		sourceOptions: FillLcdImageOptions,
+		signal: AbortSignal | null,
+	): Promise<boolean> {
+		this.checkFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions)
+
+		return this.#pendingWrites.run(`lcd:${lcdControl.id}`, signal, async (ctx) => {
+			// Avoid encoding an image which will not be sent
+			if (ctx.signal?.aborted) return false
+
+			const packets = await this.encodeFillControlRegion(x, y, imageBuffer, sourceOptions)
+			return ctx.commit(async (writeSignal) => this.#device.sendReports(packets, writeSignal))
+		})
 	}
 
 	public async prepareFillLcdRegion(
@@ -78,27 +106,34 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 		return wrapBufferToPreparedBuffer(this.#modelId, 'fill-lcd-region', packets, jsonSafe ?? false)
 	}
 
-	public async clearLcdSegment(index: number): Promise<void> {
+	public async clearLcdSegment(index: number, signal: AbortSignal | null): Promise<boolean> {
 		const lcdControl = this.#lcdControls.find((control) => control.id === index)
 		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
 		const buffer = new Uint8Array(lcdControl.pixelSize.width * lcdControl.pixelSize.height * 4)
 
-		const packets = await this.prepareFillControlRegion(lcdControl, 0, 0, buffer, {
-			format: 'rgba',
-			width: lcdControl.pixelSize.width,
-			height: lcdControl.pixelSize.height,
-		})
-		await this.#device.sendReports(packets, null)
+		return this.#fillControlRegion(
+			lcdControl,
+			0,
+			0,
+			buffer,
+			{
+				format: 'rgba',
+				width: lcdControl.pixelSize.width,
+				height: lcdControl.pixelSize.height,
+			},
+			signal,
+		)
 	}
 
-	public async clearAllLcdSegments(): Promise<void> {
-		const ps: Array<Promise<void>> = []
+	public async clearAllLcdSegments(signal: AbortSignal | null): Promise<boolean> {
+		const ps: Array<Promise<boolean>> = []
 		for (const control of this.#lcdControls) {
-			ps.push(this.clearLcdSegment(control.id))
+			ps.push(this.clearLcdSegment(control.id, signal))
 		}
 
-		await Promise.all(ps)
+		const results = await Promise.all(ps)
+		return results.every(Boolean)
 	}
 
 	private async prepareFillControlRegion(
@@ -108,6 +143,18 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 		imageBuffer: Uint8Array | Uint8ClampedArray,
 		sourceOptions: FillLcdImageOptions,
 	): Promise<Uint8Array[]> {
+		this.checkFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions)
+
+		return this.encodeFillControlRegion(x, y, imageBuffer, sourceOptions)
+	}
+
+	private checkFillControlRegion(
+		lcdControl: StreamDeckLcdSegmentControlDefinition,
+		x: number,
+		y: number,
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		sourceOptions: FillLcdImageOptions,
+	): void {
 		// Basic bounds checking
 		const maxSize = lcdControl.pixelSize
 		if (x < 0 || x + sourceOptions.width > maxSize.width) {
@@ -121,7 +168,14 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 		if (imageBuffer.length !== imageSize) {
 			throw new RangeError(`Expected image buffer of length ${imageSize}, got length ${imageBuffer.length}`)
 		}
+	}
 
+	private async encodeFillControlRegion(
+		x: number,
+		y: number,
+		imageBuffer: Uint8Array | Uint8ClampedArray,
+		sourceOptions: FillLcdImageOptions,
+	): Promise<Uint8Array[]> {
 		// A lot of this drawing code is heavily based on the normal button
 		const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, sourceOptions)
 

@@ -3,7 +3,7 @@ import type { HIDDevice } from '../../hid-device.js'
 
 function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendFeatureReport' | 'getFeatureReport'>> {
 	return {
-		sendFeatureReport: jest.fn().mockResolvedValue(undefined),
+		sendFeatureReport: jest.fn().mockResolvedValue(true),
 		getFeatureReport: jest.fn().mockResolvedValue(new Uint8Array(64)),
 	}
 }
@@ -19,7 +19,7 @@ describe('NetworkDockPropertiesService', () => {
 
 	describe('setBrightness', () => {
 		test('is a no-op — never calls sendFeatureReport', async () => {
-			await service.setBrightness(100)
+			await service.setBrightness(100, null)
 			expect(device.sendFeatureReport).not.toHaveBeenCalled()
 		})
 	})

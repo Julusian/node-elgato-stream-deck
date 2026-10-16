@@ -7,12 +7,14 @@ export interface LcdSegmentDisplayService {
 	 * @param {number} lcdIndex The id of the lcd segment to draw to
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
+	 * @param signal Signal to abort the write
 	 */
 	fillLcd(
 		lcdIndex: number,
 		imageBuffer: Uint8Array | Uint8ClampedArray,
 		sourceOptions: FillImageOptions,
-	): Promise<void>
+		signal: AbortSignal | null,
+	): Promise<boolean>
 
 	/**
 	 * Fill a region of the lcd segment, ignoring the boundaries of the encoders
@@ -21,6 +23,7 @@ export interface LcdSegmentDisplayService {
 	 * @param {number} y The y position to draw to
 	 * @param {Buffer} imageBuffer The image to write
 	 * @param {Object} sourceOptions Options to control the write
+	 * @param signal Signal to abort the write
 	 */
 	fillLcdRegion(
 		lcdIndex: number,
@@ -28,7 +31,8 @@ export interface LcdSegmentDisplayService {
 		y: number,
 		imageBuffer: Uint8Array | Uint8ClampedArray,
 		sourceOptions: FillLcdImageOptions,
-	): Promise<void>
+		signal: AbortSignal | null,
+	): Promise<boolean>
 
 	/**
 	 * Prepare to fill region of the lcd with an image in a Buffer.
@@ -52,11 +56,13 @@ export interface LcdSegmentDisplayService {
 	/**
 	 * Clear the lcd segment to black
 	 * @param {number} lcdIndex The id of the lcd segment to clear
+	 * @param signal Signal to abort the write
 	 */
-	clearLcdSegment(lcdIndex: number): Promise<void>
+	clearLcdSegment(lcdIndex: number, signal: AbortSignal | null): Promise<boolean>
 
 	/**
 	 * Clear all lcd segment to black
+	 * @param signal Signal to abort the write
 	 */
-	clearAllLcdSegments(): Promise<void>
+	clearAllLcdSegments(signal: AbortSignal | null): Promise<boolean>
 }

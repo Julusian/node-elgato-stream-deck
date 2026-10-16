@@ -1,5 +1,5 @@
 export interface PropertiesService {
-	setBrightness(percentage: number): Promise<void>
+	setBrightness(percentage: number, signal: AbortSignal | null): Promise<boolean>
 
 	resetToLogo(): Promise<void>
 

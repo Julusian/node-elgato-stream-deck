@@ -5,7 +5,7 @@ import type { StreamDeckLcdSegmentControlDefinition } from '../../controlDefinit
 import { DeviceModelId } from '../../id.js'
 
 function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendReports'>> {
-	return { sendReports: jest.fn().mockResolvedValue(undefined) }
+	return { sendReports: jest.fn().mockResolvedValue(true) }
 }
 
 function makeEncodeJpeg(): jest.MockedFunction<EncodeJPEGHelper> {
@@ -43,23 +43,25 @@ describe('StreamdeckDefaultLcdService', () => {
 	describe('fillLcd', () => {
 		test('calls sendReports for valid full-size rgb buffer', async () => {
 			const buffer = new Uint8Array(800 * 100 * 3)
-			await service.fillLcd(0, buffer, { format: 'rgb' })
+			await service.fillLcd(0, buffer, { format: 'rgb' }, null)
 			expect(device.sendReports).toHaveBeenCalledTimes(1)
 		})
 
 		test('throws for invalid index', async () => {
 			const buffer = new Uint8Array(800 * 100 * 3)
-			await expect(service.fillLcd(99, buffer, { format: 'rgb' })).rejects.toThrow('Invalid lcd segment index')
+			await expect(service.fillLcd(99, buffer, { format: 'rgb' }, null)).rejects.toThrow(
+				'Invalid lcd segment index',
+			)
 		})
 
 		test('throws when buffer size does not match pixel dimensions', async () => {
 			const wrongBuffer = new Uint8Array(100)
-			await expect(service.fillLcd(0, wrongBuffer, { format: 'rgb' })).rejects.toThrow(RangeError)
+			await expect(service.fillLcd(0, wrongBuffer, { format: 'rgb' }, null)).rejects.toThrow(RangeError)
 		})
 
 		test('calls encodeJPEG with the transformed buffer', async () => {
 			const buffer = new Uint8Array(800 * 100 * 3)
-			await service.fillLcd(0, buffer, { format: 'rgb' })
+			await service.fillLcd(0, buffer, { format: 'rgb' }, null)
 			expect(encodeJpeg).toHaveBeenCalledTimes(1)
 		})
 
@@ -72,7 +74,7 @@ describe('StreamdeckDefaultLcdService', () => {
 				DeviceModelId.PLUS_XL,
 			)
 			const buffer = new Uint8Array(800 * 100 * 3)
-			await rotatedService.fillLcd(0, buffer, { format: 'rgb' })
+			await rotatedService.fillLcd(0, buffer, { format: 'rgb' }, null)
 
 			const [, w, h] = encodeJpeg.mock.calls[0]
 			// With rotate=true, width and height are swapped
@@ -84,14 +86,14 @@ describe('StreamdeckDefaultLcdService', () => {
 	describe('fillLcdRegion', () => {
 		test('calls sendReports for a valid sub-region', async () => {
 			const regionBuffer = new Uint8Array(100 * 50 * 3)
-			await service.fillLcdRegion(0, 0, 0, regionBuffer, { format: 'rgb', width: 100, height: 50 })
+			await service.fillLcdRegion(0, 0, 0, regionBuffer, { format: 'rgb', width: 100, height: 50 }, null)
 			expect(device.sendReports).toHaveBeenCalledTimes(1)
 		})
 
 		test('throws for invalid index', async () => {
 			const buffer = new Uint8Array(100 * 50 * 3)
 			await expect(
-				service.fillLcdRegion(99, 0, 0, buffer, { format: 'rgb', width: 100, height: 50 }),
+				service.fillLcdRegion(99, 0, 0, buffer, { format: 'rgb', width: 100, height: 50 }, null),
 			).rejects.toThrow('Invalid lcd segment index')
 		})
 
@@ -99,7 +101,7 @@ describe('StreamdeckDefaultLcdService', () => {
 			// x=700 + width=200 > 800
 			const buffer = new Uint8Array(200 * 50 * 3)
 			await expect(
-				service.fillLcdRegion(0, 700, 0, buffer, { format: 'rgb', width: 200, height: 50 }),
+				service.fillLcdRegion(0, 700, 0, buffer, { format: 'rgb', width: 200, height: 50 }, null),
 			).rejects.toThrow(TypeError)
 		})
 
@@ -107,37 +109,37 @@ describe('StreamdeckDefaultLcdService', () => {
 			// y=80 + height=50 > 100
 			const buffer = new Uint8Array(100 * 50 * 3)
 			await expect(
-				service.fillLcdRegion(0, 0, 80, buffer, { format: 'rgb', width: 100, height: 50 }),
+				service.fillLcdRegion(0, 0, 80, buffer, { format: 'rgb', width: 100, height: 50 }, null),
 			).rejects.toThrow(TypeError)
 		})
 
 		test('throws when buffer size does not match width*height*format.length', async () => {
 			const wrongBuffer = new Uint8Array(10)
 			await expect(
-				service.fillLcdRegion(0, 0, 0, wrongBuffer, { format: 'rgb', width: 100, height: 50 }),
+				service.fillLcdRegion(0, 0, 0, wrongBuffer, { format: 'rgb', width: 100, height: 50 }, null),
 			).rejects.toThrow(RangeError)
 		})
 
 		test('throws for negative x position', async () => {
 			const buffer = new Uint8Array(100 * 50 * 3)
 			await expect(
-				service.fillLcdRegion(0, -1, 0, buffer, { format: 'rgb', width: 100, height: 50 }),
+				service.fillLcdRegion(0, -1, 0, buffer, { format: 'rgb', width: 100, height: 50 }, null),
 			).rejects.toThrow(TypeError)
 		})
 	})
 
 	describe('clearLcdSegment', () => {
 		test('calls sendReports with black buffer for valid index', async () => {
-			await service.clearLcdSegment(0)
+			await service.clearLcdSegment(0, null)
 			expect(device.sendReports).toHaveBeenCalledTimes(1)
 		})
 
 		test('throws for invalid index', async () => {
-			await expect(service.clearLcdSegment(99)).rejects.toThrow('Invalid lcd segment index')
+			await expect(service.clearLcdSegment(99, null)).rejects.toThrow('Invalid lcd segment index')
 		})
 
 		test('encodes a fully-zeroed rgba buffer to JPEG', async () => {
-			await service.clearLcdSegment(0)
+			await service.clearLcdSegment(0, null)
 			const passedBuffer = encodeJpeg.mock.calls[0][0]
 			// clearLcdSegment passes a zero-filled rgba buffer (800*100*4)
 			expect(passedBuffer.length).toBe(800 * 100 * 4)
@@ -158,13 +160,13 @@ describe('StreamdeckDefaultLcdService', () => {
 				false,
 				DeviceModelId.PLUS,
 			)
-			await svc.clearAllLcdSegments()
+			await svc.clearAllLcdSegments(null)
 			expect(device.sendReports).toHaveBeenCalledTimes(1)
 		})
 
 		test('does nothing for empty control list', async () => {
 			const svc = new StreamdeckDefaultLcdService(encodeJpeg, device as any, [], false, DeviceModelId.PLUS)
-			await svc.clearAllLcdSegments()
+			await svc.clearAllLcdSegments(null)
 			expect(device.sendReports).not.toHaveBeenCalled()
 		})
 	})

@@ -14,18 +14,25 @@ export class StudioEncoderLedService implements EncoderLedService {
 		)
 	}
 
-	public async clearAll(): Promise<void> {
-		const ps: Array<Promise<void>> = []
+	public async clearAll(signal: AbortSignal | null): Promise<boolean> {
+		const ps: Array<Promise<boolean>> = []
 
 		for (const control of this.#encoderControls) {
-			if (control.hasLed) ps.push(this.setEncoderColor(control.index, 0, 0, 0))
-			if (control.ledRingSteps > 0) ps.push(this.setEncoderRingSingleColor(control.index, 0, 0, 0))
+			if (control.hasLed) ps.push(this.setEncoderColor(control.index, 0, 0, 0, signal))
+			if (control.ledRingSteps > 0) ps.push(this.setEncoderRingSingleColor(control.index, 0, 0, 0, signal))
 		}
 
-		await Promise.all(ps)
+		const results = await Promise.all(ps)
+		return results.every(Boolean)
 	}
 
-	public async setEncoderColor(encoder: EncoderIndex, red: number, green: number, blue: number): Promise<void> {
+	public async setEncoderColor(
+		encoder: EncoderIndex,
+		red: number,
+		green: number,
+		blue: number,
+		signal: AbortSignal | null,
+	): Promise<boolean> {
 		const control = this.#encoderControls.find((c) => c.index === encoder)
 		if (!control) throw new Error(`Invalid encoder index ${encoder}`)
 
@@ -38,7 +45,8 @@ export class StudioEncoderLedService implements EncoderLedService {
 		buffer[3] = red
 		buffer[4] = green
 		buffer[5] = blue
-		await this.#device.sendReports([buffer], null)
+
+		return this.#device.sendReports([buffer], signal)
 	}
 
 	public async setEncoderRingSingleColor(
@@ -46,7 +54,8 @@ export class StudioEncoderLedService implements EncoderLedService {
 		red: number,
 		green: number,
 		blue: number,
-	): Promise<void> {
+		signal: AbortSignal | null,
+	): Promise<boolean> {
 		const control = this.#encoderControls.find((c) => c.index === encoder)
 		if (!control) throw new Error(`Invalid encoder index ${encoder}`)
 
@@ -63,10 +72,14 @@ export class StudioEncoderLedService implements EncoderLedService {
 			buffer[offset + 2] = blue
 		}
 
-		await this.#device.sendReports([buffer], null)
+		return this.#device.sendReports([buffer], signal)
 	}
 
-	public async setEncoderRingColors(encoder: EncoderIndex, colors: number[] | Uint8Array): Promise<void> {
+	public async setEncoderRingColors(
+		encoder: EncoderIndex,
+		colors: number[] | Uint8Array,
+		signal: AbortSignal | null,
+	): Promise<boolean> {
 		const control = this.#encoderControls.find((c) => c.index === encoder)
 		if (!control) throw new Error(`Invalid encoder index ${encoder}`)
 
@@ -91,6 +104,6 @@ export class StudioEncoderLedService implements EncoderLedService {
 		buffer[2] = encoder
 		buffer.set(colorsBuffer, 3)
 
-		await this.#device.sendReports([buffer], null)
+		return this.#device.sendReports([buffer], signal)
 	}
 }

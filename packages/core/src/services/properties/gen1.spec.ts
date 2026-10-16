@@ -3,7 +3,7 @@ import type { HIDDevice } from '../../hid-device.js'
 
 function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendFeatureReport' | 'getFeatureReport'>> {
 	return {
-		sendFeatureReport: jest.fn().mockResolvedValue(undefined),
+		sendFeatureReport: jest.fn().mockResolvedValue(true),
 		getFeatureReport: jest.fn().mockResolvedValue(new Uint8Array(32)),
 	}
 }
@@ -19,30 +19,30 @@ describe('Gen1PropertiesService', () => {
 
 	describe('setBrightness', () => {
 		test('sends correct 17-byte buffer at 100%', async () => {
-			await service.setBrightness(100)
+			await service.setBrightness(100, null)
 			// prettier-ignore
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x05, 0x55, 0xaa, 0xd1, 0x01, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), null)
 		})
 
 		test('sends correct buffer at 0%', async () => {
-			await service.setBrightness(0)
+			await service.setBrightness(0, null)
 			// prettier-ignore
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x05, 0x55, 0xaa, 0xd1, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), null)
 		})
 
 		test('sends correct buffer at 50%', async () => {
-			await service.setBrightness(50)
+			await service.setBrightness(50, null)
 			// prettier-ignore
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x05, 0x55, 0xaa, 0xd1, 0x01, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), null)
 		})
 
 		test('throws RangeError on value > 100', async () => {
-			await expect(service.setBrightness(101)).rejects.toThrow(RangeError)
+			await expect(service.setBrightness(101, null)).rejects.toThrow(RangeError)
 			expect(device.sendFeatureReport).not.toHaveBeenCalled()
 		})
 
 		test('throws RangeError on negative value', async () => {
-			await expect(service.setBrightness(-1)).rejects.toThrow(RangeError)
+			await expect(service.setBrightness(-1, null)).rejects.toThrow(RangeError)
 			expect(device.sendFeatureReport).not.toHaveBeenCalled()
 		})
 	})

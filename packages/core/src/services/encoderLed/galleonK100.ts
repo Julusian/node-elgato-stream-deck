@@ -14,17 +14,24 @@ export class GalleonK100EncoderLedService implements EncoderLedService {
 		)
 	}
 
-	public async clearAll(): Promise<void> {
-		const ps: Array<Promise<void>> = []
+	public async clearAll(signal: AbortSignal | null): Promise<boolean> {
+		const ps: Array<Promise<boolean>> = []
 
 		for (const control of this.#encoderControls) {
-			if (control.ledRingSteps > 0) ps.push(this.setEncoderRingSingleColor(control.index, 0, 0, 0))
+			if (control.ledRingSteps > 0) ps.push(this.setEncoderRingSingleColor(control.index, 0, 0, 0, signal))
 		}
 
-		await Promise.all(ps)
+		const results = await Promise.all(ps)
+		return results.every(Boolean)
 	}
 
-	public async setEncoderColor(encoder: EncoderIndex, _red: number, _green: number, _blue: number): Promise<void> {
+	public async setEncoderColor(
+		encoder: EncoderIndex,
+		_red: number,
+		_green: number,
+		_blue: number,
+		_signal: AbortSignal | null,
+	): Promise<boolean> {
 		const control = this.#encoderControls.find((c) => c.index === encoder)
 		if (!control) throw new Error(`Invalid encoder index ${encoder}`)
 
@@ -36,7 +43,8 @@ export class GalleonK100EncoderLedService implements EncoderLedService {
 		red: number,
 		green: number,
 		blue: number,
-	): Promise<void> {
+		signal: AbortSignal | null,
+	): Promise<boolean> {
 		const control = this.#encoderControls.find((c) => c.index === encoder)
 		if (!control) throw new Error(`Invalid encoder index ${encoder}`)
 
@@ -45,14 +53,19 @@ export class GalleonK100EncoderLedService implements EncoderLedService {
 		// Assume them all the same number of steps
 		const offset = (1 - encoder) * control.ledRingSteps
 
-		const ps: Array<Promise<void>> = []
+		const buffers: Uint8Array[] = []
 		for (let i = 0; i < control.ledRingSteps; i++) {
-			ps.push(this.#sendEncoderPixelColor(offset + i, red, green, blue))
+			buffers.push(this.#encoderPixelColorBuffer(offset + i, red, green, blue))
 		}
-		await Promise.all(ps)
+
+		return this.#sendRing(buffers, signal)
 	}
 
-	public async setEncoderRingColors(encoder: EncoderIndex, colors: number[] | Uint8Array): Promise<void> {
+	public async setEncoderRingColors(
+		encoder: EncoderIndex,
+		colors: number[] | Uint8Array,
+		signal: AbortSignal | null,
+	): Promise<boolean> {
 		const control = this.#encoderControls.find((c) => c.index === encoder)
 		if (!control) throw new Error(`Invalid encoder index ${encoder}`)
 
@@ -74,10 +87,10 @@ export class GalleonK100EncoderLedService implements EncoderLedService {
 		// Assume them all the same number of steps
 		const offset = (1 - encoder) * control.ledRingSteps
 
-		const ps: Array<Promise<void>> = []
+		const buffers: Uint8Array[] = []
 		for (let i = 0; i < control.ledRingSteps; i++) {
-			ps.push(
-				this.#sendEncoderPixelColor(
+			buffers.push(
+				this.#encoderPixelColorBuffer(
 					offset + i,
 					colorsArray[i * 3],
 					colorsArray[i * 3 + 1],
@@ -85,10 +98,20 @@ export class GalleonK100EncoderLedService implements EncoderLedService {
 				),
 			)
 		}
-		await Promise.all(ps)
+
+		return this.#sendRing(buffers, signal)
 	}
 
-	async #sendEncoderPixelColor(index: number, red: number, green: number, blue: number): Promise<void> {
+	/**
+	 * Each led of the ring is a separate feature report, so if aborted partway through the ring may be partially written.
+	 * In that case this resolves false, as the ring was not fully written
+	 */
+	async #sendRing(buffers: Uint8Array[], signal: AbortSignal | null): Promise<boolean> {
+		const results = await Promise.all(buffers.map(async (buffer) => this.#device.sendFeatureReport(buffer, signal)))
+		return results.every(Boolean)
+	}
+
+	#encoderPixelColorBuffer(index: number, red: number, green: number, blue: number): Uint8Array {
 		const buffer = new Uint8Array(6)
 		buffer[0] = 0x03
 		buffer[1] = 0x24
@@ -96,6 +119,6 @@ export class GalleonK100EncoderLedService implements EncoderLedService {
 		buffer[3] = red
 		buffer[4] = green
 		buffer[5] = blue
-		await this.#device.sendFeatureReport(buffer, null)
+		return buffer
 	}
 }

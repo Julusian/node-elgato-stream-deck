@@ -150,7 +150,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	}
 
 	public async setBrightness(percentage: number): Promise<void> {
-		return this.#propertiesService.setBrightness(percentage)
+		await this.#propertiesService.setBrightness(percentage, null)
 	}
 
 	public async resetToLogo(): Promise<void> {
@@ -175,13 +175,13 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	public async fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void> {
 		this.checkValidKeyIndex(keyIndex, null)
 
-		await this.#buttonsLcdService.fillKeyColor(keyIndex, r, g, b)
+		await this.#buttonsLcdService.fillKeyColor(keyIndex, r, g, b, null)
 	}
 
 	public async fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Uint8Array, options?: FillImageOptions): Promise<void> {
 		this.checkValidKeyIndex(keyIndex, 'lcd')
 
-		await this.#buttonsLcdService.fillKeyBuffer(keyIndex, imageBuffer, options)
+		await this.#buttonsLcdService.fillKeyBuffer(keyIndex, imageBuffer, options, null)
 	}
 
 	public async prepareFillKeyBuffer(
@@ -194,7 +194,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	}
 
 	public async fillPanelBuffer(imageBuffer: Uint8Array, options?: FillPanelOptions): Promise<void> {
-		await this.#buttonsLcdService.fillPanelBuffer(imageBuffer, options)
+		await this.#buttonsLcdService.fillPanelBuffer(imageBuffer, options, null)
 	}
 
 	public async prepareFillPanelBuffer(
@@ -208,16 +208,16 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	public async clearKey(keyIndex: KeyIndex): Promise<void> {
 		this.checkValidKeyIndex(keyIndex, null)
 
-		await this.#buttonsLcdService.clearKey(keyIndex)
+		await this.#buttonsLcdService.clearKey(keyIndex, null)
 	}
 
 	public async clearPanel(): Promise<void> {
-		const ps: Array<Promise<void>> = []
+		const ps: Array<Promise<boolean>> = []
 
-		ps.push(this.#buttonsLcdService.clearPanel())
+		ps.push(this.#buttonsLcdService.clearPanel(null))
 
-		if (this.#lcdSegmentDisplayService) ps.push(this.#lcdSegmentDisplayService.clearAllLcdSegments())
-		if (this.#encoderLedService) ps.push(this.#encoderLedService.clearAll())
+		if (this.#lcdSegmentDisplayService) ps.push(this.#lcdSegmentDisplayService.clearAllLcdSegments(null))
+		if (this.#encoderLedService) ps.push(this.#encoderLedService.clearAll(null))
 
 		await Promise.all(ps)
 	}
@@ -225,7 +225,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	public async fillLcd(...args: Parameters<StreamDeck['fillLcd']>): ReturnType<StreamDeck['fillLcd']> {
 		if (!this.#lcdSegmentDisplayService) throw new Error('Not supported for this model')
 
-		return this.#lcdSegmentDisplayService.fillLcd(...args)
+		await this.#lcdSegmentDisplayService.fillLcd(...args, null)
 	}
 
 	public async fillLcdRegion(
@@ -233,7 +233,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	): ReturnType<StreamDeck['fillLcdRegion']> {
 		if (!this.#lcdSegmentDisplayService) throw new Error('Not supported for this model')
 
-		return this.#lcdSegmentDisplayService.fillLcdRegion(...args)
+		await this.#lcdSegmentDisplayService.fillLcdRegion(...args, null)
 	}
 
 	public async prepareFillLcdRegion(
@@ -249,7 +249,7 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	): ReturnType<StreamDeck['clearLcdSegment']> {
 		if (!this.#lcdSegmentDisplayService) throw new Error('Not supported for this model')
 
-		return this.#lcdSegmentDisplayService.clearLcdSegment(...args)
+		await this.#lcdSegmentDisplayService.clearLcdSegment(...args, null)
 	}
 
 	public async setEncoderColor(
@@ -257,21 +257,21 @@ export class StreamDeckBase extends EventEmitter<StreamDeckEvents> implements St
 	): ReturnType<StreamDeck['setEncoderColor']> {
 		if (!this.#encoderLedService) throw new Error('Not supported for this model')
 
-		return this.#encoderLedService.setEncoderColor(...args)
+		await this.#encoderLedService.setEncoderColor(...args, null)
 	}
 	public async setEncoderRingSingleColor(
 		...args: Parameters<StreamDeck['setEncoderRingSingleColor']>
 	): ReturnType<StreamDeck['setEncoderRingSingleColor']> {
 		if (!this.#encoderLedService) throw new Error('Not supported for this model')
 
-		return this.#encoderLedService.setEncoderRingSingleColor(...args)
+		await this.#encoderLedService.setEncoderRingSingleColor(...args, null)
 	}
 	public async setEncoderRingColors(
 		...args: Parameters<StreamDeck['setEncoderRingColors']>
 	): ReturnType<StreamDeck['setEncoderRingColors']> {
 		if (!this.#encoderLedService) throw new Error('Not supported for this model')
 
-		return this.#encoderLedService.setEncoderRingColors(...args)
+		await this.#encoderLedService.setEncoderRingColors(...args, null)
 	}
 
 	public async getChildDeviceInfo(): Promise<StreamDeckTcpChildDeviceInfo | null> {

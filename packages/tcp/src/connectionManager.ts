@@ -271,7 +271,7 @@ class TcpPropertiesService implements PropertiesService {
 		this.#device = device
 	}
 
-	public async setBrightness(percentage: number): Promise<void> {
+	public async setBrightness(percentage: number, signal: AbortSignal | null): Promise<boolean> {
 		if (percentage < 0 || percentage > 100) {
 			throw new RangeError('Expected brightness percentage to be between 0 and 100')
 		}
@@ -281,7 +281,7 @@ class TcpPropertiesService implements PropertiesService {
 		buffer.writeUint8(0x08, 1)
 		buffer.writeUint8(percentage, 2)
 
-		await this.#device.sendFeatureReport(buffer, null)
+		return this.#device.sendFeatureReport(buffer, signal)
 	}
 
 	public async resetToLogo(): Promise<void> {

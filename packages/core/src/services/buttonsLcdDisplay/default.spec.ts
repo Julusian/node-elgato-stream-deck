@@ -8,8 +8,8 @@ import { DeviceModelId } from '../../id.js'
 
 function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendFeatureReport' | 'sendReports'>> {
 	return {
-		sendFeatureReport: jest.fn().mockResolvedValue(undefined),
-		sendReports: jest.fn().mockResolvedValue(undefined),
+		sendFeatureReport: jest.fn().mockResolvedValue(true),
+		sendReports: jest.fn().mockResolvedValue(true),
 	}
 }
 
@@ -143,7 +143,7 @@ describe('DefaultButtonsLcdService', () => {
 	describe('clearPanel', () => {
 		test('fullscreenPanels > 0: sends sendFeatureReport per panel with index', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(false, 2))
-			await service.clearPanel()
+			await service.clearPanel(null)
 
 			expect(device.sendFeatureReport).toHaveBeenCalledTimes(2)
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x05, 0, 0, 0, 0]), null)
@@ -152,7 +152,7 @@ describe('DefaultButtonsLcdService', () => {
 
 		test('RGB buttons: calls sendFeatureReport([0x03,0x06,hidIndex,0,0,0]) for each', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeRgbProperties())
-			await service.clearPanel()
+			await service.clearPanel(null)
 
 			expect(device.sendFeatureReport).toHaveBeenCalledTimes(3)
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 0, 0, 0, 0]), null)
@@ -162,7 +162,7 @@ describe('DefaultButtonsLcdService', () => {
 
 		test('LCD buttons with RGB key fill: uses sendFeatureReport, not image fill', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(true))
-			await service.clearPanel()
+			await service.clearPanel(null)
 
 			expect(device.sendFeatureReport).toHaveBeenCalledTimes(4)
 			expect(packer.convertPixelBuffer).not.toHaveBeenCalled()
@@ -170,7 +170,7 @@ describe('DefaultButtonsLcdService', () => {
 
 		test('LCD buttons without RGB key fill: fills each with black image via packer+writer', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(false))
-			await service.clearPanel()
+			await service.clearPanel(null)
 
 			// 4 LCD buttons, each needs packer+writer
 			expect(packer.convertPixelBuffer).toHaveBeenCalledTimes(4)
@@ -184,7 +184,7 @@ describe('DefaultButtonsLcdService', () => {
 				controls: [{ type: 'button', index: 0, hidIndex: 0, feedbackType: 'none', row: 0, column: 0 }] as any,
 			}
 			const service = new DefaultButtonsLcdService(writer, packer, device, props)
-			await service.clearPanel()
+			await service.clearPanel(null)
 
 			expect(device.sendFeatureReport).not.toHaveBeenCalled()
 			expect(packer.convertPixelBuffer).not.toHaveBeenCalled()
@@ -194,7 +194,7 @@ describe('DefaultButtonsLcdService', () => {
 	describe('clearKey', () => {
 		test('RGB key: sends sendFeatureReport([0x03,0x06,hidIndex,0,0,0])', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeRgbProperties())
-			await service.clearKey(1)
+			await service.clearKey(1, null)
 
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 1, 0, 0, 0]), null)
 		})
@@ -205,7 +205,7 @@ describe('DefaultButtonsLcdService', () => {
 				controls: [{ type: 'button', index: 5, hidIndex: 12, feedbackType: 'rgb', row: 0, column: 0 }] as any,
 			}
 			const service = new DefaultButtonsLcdService(writer, packer, device, props)
-			await service.clearKey(5)
+			await service.clearKey(5, null)
 
 			// Byte 2 must be hidIndex=12, not the logical keyIndex=5
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 12, 0, 0, 0]), null)
@@ -213,7 +213,7 @@ describe('DefaultButtonsLcdService', () => {
 
 		test('LCD key with supportsRgbKeyFill: uses sendFeatureReport', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(true))
-			await service.clearKey(0)
+			await service.clearKey(0, null)
 
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 0, 0, 0, 0]), null)
 			expect(packer.convertPixelBuffer).not.toHaveBeenCalled()
@@ -221,7 +221,7 @@ describe('DefaultButtonsLcdService', () => {
 
 		test('LCD key without supportsRgbKeyFill: uses image fill', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(false))
-			await service.clearKey(0)
+			await service.clearKey(0, null)
 
 			expect(packer.convertPixelBuffer).toHaveBeenCalledTimes(1)
 			expect(writer.generateFillImageWrites).toHaveBeenCalledTimes(1)
@@ -230,7 +230,7 @@ describe('DefaultButtonsLcdService', () => {
 
 		test('throws for invalid key index', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties())
-			await expect(service.clearKey(99)).rejects.toThrow(TypeError)
+			await expect(service.clearKey(99, null)).rejects.toThrow(TypeError)
 		})
 
 		test('throws for none-feedback key', async () => {
@@ -239,14 +239,14 @@ describe('DefaultButtonsLcdService', () => {
 				controls: [{ type: 'button', index: 0, hidIndex: 0, feedbackType: 'none', row: 0, column: 0 }] as any,
 			}
 			const service = new DefaultButtonsLcdService(writer, packer, device, props)
-			await expect(service.clearKey(0)).rejects.toThrow(TypeError)
+			await expect(service.clearKey(0, null)).rejects.toThrow(TypeError)
 		})
 	})
 
 	describe('fillKeyColor', () => {
 		test('RGB key: sends sendFeatureReport with correct color bytes', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeRgbProperties())
-			await service.fillKeyColor(0, 255, 128, 64)
+			await expect(service.fillKeyColor(0, 255, 128, 64, null)).resolves.toBe(true)
 
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 0, 255, 128, 64]), null)
 		})
@@ -257,7 +257,7 @@ describe('DefaultButtonsLcdService', () => {
 				controls: [{ type: 'button', index: 5, hidIndex: 12, feedbackType: 'rgb', row: 0, column: 0 }] as any,
 			}
 			const service = new DefaultButtonsLcdService(writer, packer, device, props)
-			await service.fillKeyColor(5, 255, 0, 0)
+			await service.fillKeyColor(5, 255, 0, 0, null)
 
 			// Byte 2 must be hidIndex=12, not the logical keyIndex=5
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 12, 255, 0, 0]), null)
@@ -265,14 +265,14 @@ describe('DefaultButtonsLcdService', () => {
 
 		test('LCD key with supportsRgbKeyFill: uses sendFeatureReport', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(true))
-			await service.fillKeyColor(1, 10, 20, 30)
+			await service.fillKeyColor(1, 10, 20, 30, null)
 
 			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 1, 10, 20, 30]), null)
 		})
 
 		test('LCD key without supportsRgbKeyFill: renders solid color via image fill', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(false))
-			await service.fillKeyColor(0, 100, 150, 200)
+			await service.fillKeyColor(0, 100, 150, 200, null)
 
 			expect(packer.convertPixelBuffer).toHaveBeenCalledTimes(1)
 			expect(writer.generateFillImageWrites).toHaveBeenCalledTimes(1)
@@ -281,18 +281,18 @@ describe('DefaultButtonsLcdService', () => {
 
 		test('throws TypeError when r is out of 0-255 range', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeRgbProperties())
-			await expect(service.fillKeyColor(0, 256, 0, 0)).rejects.toThrow(TypeError)
-			await expect(service.fillKeyColor(0, -1, 0, 0)).rejects.toThrow(TypeError)
+			await expect(service.fillKeyColor(0, 256, 0, 0, null)).rejects.toThrow(TypeError)
+			await expect(service.fillKeyColor(0, -1, 0, 0, null)).rejects.toThrow(TypeError)
 		})
 
 		test('throws TypeError when g is out of range', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeRgbProperties())
-			await expect(service.fillKeyColor(0, 0, 256, 0)).rejects.toThrow(TypeError)
+			await expect(service.fillKeyColor(0, 0, 256, 0, null)).rejects.toThrow(TypeError)
 		})
 
 		test('throws TypeError when b is out of range', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeRgbProperties())
-			await expect(service.fillKeyColor(0, 0, 0, 256)).rejects.toThrow(TypeError)
+			await expect(service.fillKeyColor(0, 0, 0, 256, null)).rejects.toThrow(TypeError)
 		})
 
 		test('throws for none-feedback key', async () => {
@@ -301,7 +301,7 @@ describe('DefaultButtonsLcdService', () => {
 				controls: [{ type: 'button', index: 0, hidIndex: 0, feedbackType: 'none', row: 0, column: 0 }] as any,
 			}
 			const service = new DefaultButtonsLcdService(writer, packer, device, props)
-			await expect(service.fillKeyColor(0, 0, 0, 0)).rejects.toThrow(TypeError)
+			await expect(service.fillKeyColor(0, 0, 0, 0, null)).rejects.toThrow(TypeError)
 		})
 	})
 
@@ -311,7 +311,7 @@ describe('DefaultButtonsLcdService', () => {
 			const size = 72 * 72 * 3
 			const buffer = new Uint8Array(size)
 
-			await service.fillKeyBuffer(0, buffer)
+			await expect(service.fillKeyBuffer(0, buffer, undefined, null)).resolves.toBe(true)
 
 			expect(packer.convertPixelBuffer).toHaveBeenCalledTimes(1)
 			expect(packer.convertPixelBuffer).toHaveBeenCalledWith(buffer, expect.objectContaining({ format: 'rgb' }), {
@@ -325,26 +325,26 @@ describe('DefaultButtonsLcdService', () => {
 		test('throws RangeError when buffer size does not match expected', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties())
 			const wrongSize = new Uint8Array(10)
-			await expect(service.fillKeyBuffer(0, wrongSize)).rejects.toThrow(RangeError)
+			await expect(service.fillKeyBuffer(0, wrongSize, undefined, null)).rejects.toThrow(RangeError)
 		})
 
 		test('throws TypeError for key with non-lcd feedbackType', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeRgbProperties())
 			const buffer = new Uint8Array(100)
-			await expect(service.fillKeyBuffer(0, buffer)).rejects.toThrow(TypeError)
+			await expect(service.fillKeyBuffer(0, buffer, undefined, null)).rejects.toThrow(TypeError)
 		})
 
 		test('throws TypeError for invalid key index', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties())
 			const buffer = new Uint8Array(100)
-			await expect(service.fillKeyBuffer(99, buffer)).rejects.toThrow(TypeError)
+			await expect(service.fillKeyBuffer(99, buffer, undefined, null)).rejects.toThrow(TypeError)
 		})
 
 		test('respects format option (rgba buffer = 72*72*4)', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties())
 			const rgbaBuffer = new Uint8Array(72 * 72 * 4)
 
-			await service.fillKeyBuffer(0, rgbaBuffer, { format: 'rgba' })
+			await service.fillKeyBuffer(0, rgbaBuffer, { format: 'rgba' }, null)
 
 			expect(packer.convertPixelBuffer).toHaveBeenCalledWith(
 				rgbaBuffer,
@@ -360,7 +360,7 @@ describe('DefaultButtonsLcdService', () => {
 			// 2x2 panel = 144x144 pixels, rgb = 144*144*3
 			const buffer = new Uint8Array(144 * 144 * 3)
 
-			await service.fillPanelBuffer(buffer)
+			await service.fillPanelBuffer(buffer, undefined, null)
 
 			expect(packer.convertPixelBuffer).toHaveBeenCalledTimes(4)
 			expect(writer.generateFillImageWrites).toHaveBeenCalledTimes(4)
@@ -369,13 +369,13 @@ describe('DefaultButtonsLcdService', () => {
 		test('throws RangeError when buffer does not match panel dimensions', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties())
 			const wrongBuffer = new Uint8Array(100)
-			await expect(service.fillPanelBuffer(wrongBuffer)).rejects.toThrow(RangeError)
+			await expect(service.fillPanelBuffer(wrongBuffer, undefined, null)).rejects.toThrow(RangeError)
 		})
 
 		test('throws when device has no LCD buttons', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeRgbProperties())
 			const buffer = new Uint8Array(100)
-			await expect(service.fillPanelBuffer(buffer)).rejects.toThrow()
+			await expect(service.fillPanelBuffer(buffer, undefined, null)).rejects.toThrow()
 		})
 	})
 
@@ -390,14 +390,14 @@ describe('DefaultButtonsLcdService', () => {
 				['bgra', 4],
 			] as const) {
 				const buffer = new Uint8Array(size * stride)
-				await expect(service.fillKeyBuffer(0, buffer, { format })).resolves.not.toThrow()
+				await expect(service.fillKeyBuffer(0, buffer, { format }, null)).resolves.not.toThrow()
 			}
 		})
 
 		test('throws TypeError for unknown format', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties())
 			const buffer = new Uint8Array(72 * 72 * 3)
-			await expect(service.fillKeyBuffer(0, buffer, { format: 'xyz' as any })).rejects.toThrow(TypeError)
+			await expect(service.fillKeyBuffer(0, buffer, { format: 'xyz' as any }, null)).rejects.toThrow(TypeError)
 		})
 	})
 })

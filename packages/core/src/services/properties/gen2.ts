@@ -8,7 +8,7 @@ export class Gen2PropertiesService implements PropertiesService {
 		this.device = device
 	}
 
-	public async setBrightness(percentage: number): Promise<void> {
+	public async setBrightness(percentage: number, signal: AbortSignal | null): Promise<boolean> {
 		if (percentage < 0 || percentage > 100) {
 			throw new RangeError('Expected brightness percentage to be between 0 and 100')
 		}
@@ -21,7 +21,7 @@ export class Gen2PropertiesService implements PropertiesService {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		])
-		await this.device.sendFeatureReport(brightnessCommandBuffer, null)
+		return this.device.sendFeatureReport(brightnessCommandBuffer, signal)
 	}
 
 	public async resetToLogo(): Promise<void> {

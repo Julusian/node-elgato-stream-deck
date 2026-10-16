@@ -8,21 +8,32 @@ export class FakeLcdService implements ButtonsLcdDisplayService {
 		// Not supported
 		return null
 	}
-	public async clearKey(_keyIndex: number): Promise<void> {
+	public async clearKey(_keyIndex: number, _signal: AbortSignal | null): Promise<boolean> {
 		// Not supported
+		return true
 	}
-	public async clearPanel(): Promise<void> {
+	public async clearPanel(_signal: AbortSignal | null): Promise<boolean> {
 		// Not supported
+		return true
 	}
-	public async fillKeyColor(_keyIndex: number, _r: number, _g: number, _b: number): Promise<void> {
+	public async fillKeyColor(
+		_keyIndex: number,
+		_r: number,
+		_g: number,
+		_b: number,
+		_signal: AbortSignal | null,
+	): Promise<boolean> {
 		// Not supported
+		return true
 	}
 	public async fillKeyBuffer(
 		_keyIndex: number,
 		_imageBuffer: Uint8Array,
-		_options?: FillImageOptions,
-	): Promise<void> {
+		_options: FillImageOptions | undefined,
+		_signal: AbortSignal | null,
+	): Promise<boolean> {
 		// Not supported
+		return true
 	}
 	public async prepareFillKeyBuffer(
 		_keyIndex: KeyIndex,
@@ -33,8 +44,13 @@ export class FakeLcdService implements ButtonsLcdDisplayService {
 		// Not supported
 		throw new Error('Not supported')
 	}
-	public async fillPanelBuffer(_imageBuffer: Uint8Array, _options?: FillPanelOptions): Promise<void> {
+	public async fillPanelBuffer(
+		_imageBuffer: Uint8Array,
+		_options: FillPanelOptions | undefined,
+		_signal: AbortSignal | null,
+	): Promise<boolean> {
 		// Not supported
+		return true
 	}
 	public async prepareFillPanelBuffer(
 		_imageBuffer: Uint8Array | Uint8ClampedArray,

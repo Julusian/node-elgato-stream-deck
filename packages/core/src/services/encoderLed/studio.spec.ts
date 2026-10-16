@@ -4,7 +4,7 @@ import type { StreamDeckControlDefinition } from '../../controlDefinition.js'
 
 function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendReports'>> {
 	return {
-		sendReports: jest.fn().mockResolvedValue(undefined),
+		sendReports: jest.fn().mockResolvedValue(true),
 	}
 }
 
@@ -24,7 +24,7 @@ describe('StudioEncoderLedService', () => {
 
 	describe('setEncoderColor', () => {
 		test('sends 1024-byte buffer via sendReports with correct header bytes', async () => {
-			await service.setEncoderColor(0, 255, 128, 64)
+			await expect(service.setEncoderColor(0, 255, 128, 64, null)).resolves.toBe(true)
 
 			expect(device.sendReports).toHaveBeenCalledTimes(1)
 			const packets = (device.sendReports as jest.Mock).mock.calls[0][0] as Uint8Array[]
@@ -41,7 +41,7 @@ describe('StudioEncoderLedService', () => {
 		})
 
 		test('includes correct encoder index in buffer', async () => {
-			await service.setEncoderColor(1, 0, 255, 0)
+			await service.setEncoderColor(1, 0, 255, 0, null)
 
 			const packets = (device.sendReports as jest.Mock).mock.calls[0][0] as Uint8Array[]
 			expect(packets[0][2]).toBe(1)
@@ -52,17 +52,17 @@ describe('StudioEncoderLedService', () => {
 				{ type: 'encoder', index: 0, hidIndex: 0, row: 0, column: 0, hasLed: false, ledRingSteps: 0 },
 			]
 			const svc = new StudioEncoderLedService(device as any, noLedControls)
-			await expect(svc.setEncoderColor(0, 255, 0, 0)).rejects.toThrow('Encoder does not have an LED')
+			await expect(svc.setEncoderColor(0, 255, 0, 0, null)).rejects.toThrow('Encoder does not have an LED')
 		})
 
 		test('throws for invalid encoder index', async () => {
-			await expect(service.setEncoderColor(99, 0, 0, 0)).rejects.toThrow()
+			await expect(service.setEncoderColor(99, 0, 0, 0, null)).rejects.toThrow()
 		})
 	})
 
 	describe('setEncoderRingSingleColor', () => {
 		test('sends 1024-byte buffer with correct header and repeated color per step', async () => {
-			await service.setEncoderRingSingleColor(0, 200, 100, 50)
+			await service.setEncoderRingSingleColor(0, 200, 100, 50, null)
 
 			expect(device.sendReports).toHaveBeenCalledTimes(1)
 			const buf = (device.sendReports as jest.Mock).mock.calls[0][0][0] as Uint8Array
@@ -85,11 +85,11 @@ describe('StudioEncoderLedService', () => {
 				{ type: 'encoder', index: 0, hidIndex: 0, row: 0, column: 0, hasLed: true, ledRingSteps: 0 },
 			]
 			const svc = new StudioEncoderLedService(device as any, noRingControls)
-			await expect(svc.setEncoderRingSingleColor(0, 0, 0, 0)).rejects.toThrow()
+			await expect(svc.setEncoderRingSingleColor(0, 0, 0, 0, null)).rejects.toThrow()
 		})
 
 		test('throws for invalid encoder index', async () => {
-			await expect(service.setEncoderRingSingleColor(99, 0, 0, 0)).rejects.toThrow()
+			await expect(service.setEncoderRingSingleColor(99, 0, 0, 0, null)).rejects.toThrow()
 		})
 	})
 
@@ -100,7 +100,7 @@ describe('StudioEncoderLedService', () => {
 			colors[1] = 222
 			colors[2] = 33
 
-			await service.setEncoderRingColors(0, colors)
+			await service.setEncoderRingColors(0, colors, null)
 
 			const buf = (device.sendReports as jest.Mock).mock.calls[0][0][0] as Uint8Array
 			expect(buf[0]).toBe(0x02)
@@ -112,7 +112,9 @@ describe('StudioEncoderLedService', () => {
 		})
 
 		test('throws when colors array has wrong length', async () => {
-			await expect(service.setEncoderRingColors(0, new Uint8Array(5))).rejects.toThrow('Invalid colors length')
+			await expect(service.setEncoderRingColors(0, new Uint8Array(5), null)).rejects.toThrow(
+				'Invalid colors length',
+			)
 		})
 
 		test('applies ledRingOffset=12 rotation for encoder 1', async () => {
@@ -122,7 +124,7 @@ describe('StudioEncoderLedService', () => {
 			colors[12 * 3 + 1] = 88
 			colors[12 * 3 + 2] = 99
 
-			await service.setEncoderRingColors(1, colors)
+			await service.setEncoderRingColors(1, colors, null)
 
 			const buf = (device.sendReports as jest.Mock).mock.calls[0][0][0] as Uint8Array
 			// After rotation: first 12 pixels = original[12..23], next 12 = original[0..11]
@@ -132,13 +134,13 @@ describe('StudioEncoderLedService', () => {
 		})
 
 		test('throws for invalid encoder index', async () => {
-			await expect(service.setEncoderRingColors(99, new Uint8Array(72))).rejects.toThrow()
+			await expect(service.setEncoderRingColors(99, new Uint8Array(72), null)).rejects.toThrow()
 		})
 	})
 
 	describe('clearAll', () => {
 		test('calls setEncoderColor(0,0,0) for each encoder with hasLed=true', async () => {
-			await service.clearAll()
+			await service.clearAll(null)
 
 			// Each encoder has hasLed=true and ledRingSteps=24
 			// So clearAll calls setEncoderColor + setEncoderRingSingleColor for each = 4 sendReports calls total
@@ -163,7 +165,7 @@ describe('StudioEncoderLedService', () => {
 				{ type: 'encoder', index: 1, hidIndex: 1, row: 0, column: 1, hasLed: true, ledRingSteps: 0 },
 			]
 			const svc = new StudioEncoderLedService(device as any, mixedControls)
-			await svc.clearAll()
+			await svc.clearAll(null)
 
 			const calls = (device.sendReports as jest.Mock).mock.calls
 			// encoder 0: no LED, has ring → only ring call; encoder 1: has LED, no ring → only color call

@@ -3,7 +3,7 @@ import type { HIDDevice } from '../../hid-device.js'
 
 function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendFeatureReport' | 'getFeatureReport'>> {
 	return {
-		sendFeatureReport: jest.fn().mockResolvedValue(undefined),
+		sendFeatureReport: jest.fn().mockResolvedValue(true),
 		getFeatureReport: jest.fn().mockResolvedValue(new Uint8Array(32)),
 	}
 }
@@ -19,7 +19,7 @@ describe('Gen2PropertiesService', () => {
 
 	describe('setBrightness', () => {
 		test('sends correct 32-byte buffer at 100%', async () => {
-			await service.setBrightness(100)
+			await expect(service.setBrightness(100, null)).resolves.toBe(true)
 			const expected = new Uint8Array(32)
 			expected[0] = 0x03
 			expected[1] = 0x08
@@ -28,7 +28,7 @@ describe('Gen2PropertiesService', () => {
 		})
 
 		test('sends correct buffer at 0%', async () => {
-			await service.setBrightness(0)
+			await service.setBrightness(0, null)
 			const expected = new Uint8Array(32)
 			expected[0] = 0x03
 			expected[1] = 0x08
@@ -37,12 +37,12 @@ describe('Gen2PropertiesService', () => {
 		})
 
 		test('throws RangeError on value > 100', async () => {
-			await expect(service.setBrightness(101)).rejects.toThrow(RangeError)
+			await expect(service.setBrightness(101, null)).rejects.toThrow(RangeError)
 			expect(device.sendFeatureReport).not.toHaveBeenCalled()
 		})
 
 		test('throws RangeError on negative value', async () => {
-			await expect(service.setBrightness(-1)).rejects.toThrow(RangeError)
+			await expect(service.setBrightness(-1, null)).rejects.toThrow(RangeError)
 			expect(device.sendFeatureReport).not.toHaveBeenCalled()
 		})
 	})

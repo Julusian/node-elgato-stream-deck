@@ -3,7 +3,7 @@ import type { HIDDevice } from '../../hid-device.js'
 
 function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendFeatureReport' | 'getFeatureReport'>> {
 	return {
-		sendFeatureReport: jest.fn().mockResolvedValue(undefined),
+		sendFeatureReport: jest.fn().mockResolvedValue(true),
 		getFeatureReport: jest.fn().mockResolvedValue(new Uint8Array(32)),
 	}
 }
@@ -19,7 +19,7 @@ describe('StudioPropertiesService', () => {
 
 	describe('setBrightness / resetToLogo', () => {
 		test('setBrightness delegates to gen2 (32-byte buffer with 0x03,0x08)', async () => {
-			await service.setBrightness(75)
+			await service.setBrightness(75, null)
 			const expected = new Uint8Array(32)
 			expected[0] = 0x03
 			expected[1] = 0x08

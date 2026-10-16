@@ -4,8 +4,8 @@ import type { StreamDeckControlDefinition } from '../../controlDefinition.js'
 
 function makeMockDevice(): jest.Mocked<Pick<HIDDevice, 'sendFeatureReport' | 'sendReports'>> {
 	return {
-		sendFeatureReport: jest.fn().mockResolvedValue(undefined),
-		sendReports: jest.fn().mockResolvedValue(undefined),
+		sendFeatureReport: jest.fn().mockResolvedValue(true),
+		sendReports: jest.fn().mockResolvedValue(true),
 	}
 }
 
@@ -26,17 +26,17 @@ describe('GalleonK100EncoderLedService', () => {
 
 	describe('setEncoderColor', () => {
 		test('always throws — GalleonK100 has no central encoder LED', async () => {
-			await expect(service.setEncoderColor(0, 255, 0, 0)).rejects.toThrow('Encoder does not have an LED')
+			await expect(service.setEncoderColor(0, 255, 0, 0, null)).rejects.toThrow('Encoder does not have an LED')
 		})
 
 		test('throws for invalid encoder index', async () => {
-			await expect(service.setEncoderColor(99, 255, 0, 0)).rejects.toThrow()
+			await expect(service.setEncoderColor(99, 255, 0, 0, null)).rejects.toThrow()
 		})
 	})
 
 	describe('setEncoderRingSingleColor', () => {
 		test('sends one sendFeatureReport per ring step with correct buffer format', async () => {
-			await service.setEncoderRingSingleColor(0, 255, 128, 64)
+			await service.setEncoderRingSingleColor(0, 255, 128, 64, null)
 
 			// encoder 0: offset = (1 - 0) * 12 = 12, steps 0..11 → pixels 12..23
 			expect(device.sendFeatureReport).toHaveBeenCalledTimes(12)
@@ -48,7 +48,7 @@ describe('GalleonK100EncoderLedService', () => {
 
 		test('sends correct pixel indices for encoder 1 with no offset', async () => {
 			// encoder 1: offset = (1 - 1) * 12 = 0, steps 0..11 → pixels 0..11
-			await service.setEncoderRingSingleColor(1, 10, 20, 30)
+			await service.setEncoderRingSingleColor(1, 10, 20, 30, null)
 
 			expect(device.sendFeatureReport).toHaveBeenCalledTimes(12)
 			const firstCall = (device.sendFeatureReport as jest.Mock).mock.calls[0][0] as Uint8Array
@@ -59,7 +59,7 @@ describe('GalleonK100EncoderLedService', () => {
 		})
 
 		test('sends black (0,0,0) for clearAll', async () => {
-			await service.setEncoderRingSingleColor(0, 0, 0, 0)
+			await service.setEncoderRingSingleColor(0, 0, 0, 0, null)
 
 			const firstCall = (device.sendFeatureReport as jest.Mock).mock.calls[0][0] as Uint8Array
 			expect(firstCall[3]).toBe(0)
@@ -68,7 +68,7 @@ describe('GalleonK100EncoderLedService', () => {
 		})
 
 		test('throws for invalid encoder index', async () => {
-			await expect(service.setEncoderRingSingleColor(99, 0, 0, 0)).rejects.toThrow()
+			await expect(service.setEncoderRingSingleColor(99, 0, 0, 0, null)).rejects.toThrow()
 		})
 
 		test('throws for encoder with no ring (ledRingSteps <= 0)', async () => {
@@ -76,7 +76,7 @@ describe('GalleonK100EncoderLedService', () => {
 				{ type: 'encoder', index: 0, hidIndex: 0, row: 0, column: 0, hasLed: false, ledRingSteps: 0 },
 			]
 			const svc = new GalleonK100EncoderLedService(device as any, noRingControls)
-			await expect(svc.setEncoderRingSingleColor(0, 0, 0, 0)).rejects.toThrow()
+			await expect(svc.setEncoderRingSingleColor(0, 0, 0, 0, null)).rejects.toThrow()
 		})
 	})
 
@@ -91,7 +91,7 @@ describe('GalleonK100EncoderLedService', () => {
 			colors[4] = 255
 			colors[5] = 0
 
-			await service.setEncoderRingColors(0, colors)
+			await service.setEncoderRingColors(0, colors, null)
 
 			expect(device.sendFeatureReport).toHaveBeenCalledTimes(12)
 
@@ -107,7 +107,9 @@ describe('GalleonK100EncoderLedService', () => {
 		})
 
 		test('throws when colors array has wrong length', async () => {
-			await expect(service.setEncoderRingColors(0, new Uint8Array(5))).rejects.toThrow('Invalid colors length')
+			await expect(service.setEncoderRingColors(0, new Uint8Array(5), null)).rejects.toThrow(
+				'Invalid colors length',
+			)
 		})
 
 		test('applies ledRingOffset rotation for encoder 1 (offset=6)', async () => {
@@ -118,7 +120,7 @@ describe('GalleonK100EncoderLedService', () => {
 			colors[6 * 3 + 1] = 88
 			colors[6 * 3 + 2] = 77
 
-			await service.setEncoderRingColors(1, colors)
+			await service.setEncoderRingColors(1, colors, null)
 
 			// First sendFeatureReport should contain pixel at original index 6 (after rotation)
 			const firstCall = (device.sendFeatureReport as jest.Mock).mock.calls[0][0] as Uint8Array
@@ -128,13 +130,13 @@ describe('GalleonK100EncoderLedService', () => {
 		})
 
 		test('throws for invalid encoder index', async () => {
-			await expect(service.setEncoderRingColors(99, new Uint8Array(36))).rejects.toThrow()
+			await expect(service.setEncoderRingColors(99, new Uint8Array(36), null)).rejects.toThrow()
 		})
 	})
 
 	describe('clearAll', () => {
 		test('calls setEncoderRingSingleColor(0,0,0) for each encoder with ledRingSteps > 0', async () => {
-			await service.clearAll()
+			await service.clearAll(null)
 
 			// Both encoders have 12 ring steps, so 12 calls each = 24 total
 			expect(device.sendFeatureReport).toHaveBeenCalledTimes(24)
@@ -152,7 +154,7 @@ describe('GalleonK100EncoderLedService', () => {
 				{ type: 'encoder', index: 1, hidIndex: 1, row: 0, column: 1, hasLed: false, ledRingSteps: 8 },
 			]
 			const svc = new GalleonK100EncoderLedService(device as any, noRingControls)
-			await svc.clearAll()
+			await svc.clearAll(null)
 
 			// Only encoder 1 has a ring — 8 calls
 			expect(device.sendFeatureReport).toHaveBeenCalledTimes(8)

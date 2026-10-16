@@ -29,7 +29,7 @@ function makeOptions(): Required<OpenStreamDeckOptions> {
 
 function makeMockProperties(): jest.Mocked<PropertiesService> {
 	return {
-		setBrightness: jest.fn().mockResolvedValue(undefined),
+		setBrightness: jest.fn().mockResolvedValue(true),
 		resetToLogo: jest.fn().mockResolvedValue(undefined),
 		getFirmwareVersion: jest.fn().mockResolvedValue('1.0.0'),
 		getAllFirmwareVersions: jest.fn().mockResolvedValue({ AP2: '1.0.0' }),
@@ -40,12 +40,12 @@ function makeMockProperties(): jest.Mocked<PropertiesService> {
 function makeMockButtonsLcd(): jest.Mocked<ButtonsLcdDisplayService> {
 	return {
 		calculateFillPanelDimensions: jest.fn().mockReturnValue({ width: 360, height: 216 }),
-		clearPanel: jest.fn().mockResolvedValue(undefined),
-		clearKey: jest.fn().mockResolvedValue(undefined),
-		fillKeyColor: jest.fn().mockResolvedValue(undefined),
-		fillKeyBuffer: jest.fn().mockResolvedValue(undefined),
+		clearPanel: jest.fn().mockResolvedValue(true),
+		clearKey: jest.fn().mockResolvedValue(true),
+		fillKeyColor: jest.fn().mockResolvedValue(true),
+		fillKeyBuffer: jest.fn().mockResolvedValue(true),
 		prepareFillKeyBuffer: jest.fn().mockResolvedValue({ data: new Uint8Array(0) }),
-		fillPanelBuffer: jest.fn().mockResolvedValue(undefined),
+		fillPanelBuffer: jest.fn().mockResolvedValue(true),
 		prepareFillPanelBuffer: jest.fn().mockResolvedValue({ data: new Uint8Array(0) }),
 	}
 }
@@ -56,20 +56,20 @@ function makeMockInputService(): jest.Mocked<StreamDeckInputService> {
 
 function makeMockLcdSegment(): jest.Mocked<LcdSegmentDisplayService> {
 	return {
-		fillLcd: jest.fn().mockResolvedValue(undefined),
-		fillLcdRegion: jest.fn().mockResolvedValue(undefined),
+		fillLcd: jest.fn().mockResolvedValue(true),
+		fillLcdRegion: jest.fn().mockResolvedValue(true),
 		prepareFillLcdRegion: jest.fn().mockResolvedValue({ data: new Uint8Array(0) }),
-		clearLcdSegment: jest.fn().mockResolvedValue(undefined),
-		clearAllLcdSegments: jest.fn().mockResolvedValue(undefined),
+		clearLcdSegment: jest.fn().mockResolvedValue(true),
+		clearAllLcdSegments: jest.fn().mockResolvedValue(true),
 	}
 }
 
 function makeMockEncoderLed(): jest.Mocked<EncoderLedService> {
 	return {
-		clearAll: jest.fn().mockResolvedValue(undefined),
-		setEncoderColor: jest.fn().mockResolvedValue(undefined),
-		setEncoderRingSingleColor: jest.fn().mockResolvedValue(undefined),
-		setEncoderRingColors: jest.fn().mockResolvedValue(undefined),
+		clearAll: jest.fn().mockResolvedValue(true),
+		setEncoderColor: jest.fn().mockResolvedValue(true),
+		setEncoderRingSingleColor: jest.fn().mockResolvedValue(true),
+		setEncoderRingColors: jest.fn().mockResolvedValue(true),
 	}
 }
 
@@ -145,7 +145,7 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 	describe('properties delegation', () => {
 		test('setBrightness delegates to propertiesService', async () => {
 			await streamDeck.setBrightness(50)
-			expect((services.properties as jest.Mocked<PropertiesService>).setBrightness).toHaveBeenCalledWith(50)
+			expect((services.properties as jest.Mocked<PropertiesService>).setBrightness).toHaveBeenCalledWith(50, null)
 		})
 
 		test('resetToLogo delegates to propertiesService', async () => {
@@ -182,7 +182,10 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 
 		test('clearKey delegates', async () => {
 			await streamDeck.clearKey(0)
-			expect((services.buttonsLcd as jest.Mocked<ButtonsLcdDisplayService>).clearKey).toHaveBeenCalledWith(0)
+			expect((services.buttonsLcd as jest.Mocked<ButtonsLcdDisplayService>).clearKey).toHaveBeenCalledWith(
+				0,
+				null,
+			)
 		})
 
 		test('clearKey throws TypeError for invalid key', async () => {
@@ -197,6 +200,7 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 				255,
 				0,
 				0,
+				null,
 			)
 		})
 
@@ -211,6 +215,7 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 				0,
 				buf,
 				undefined,
+				null,
 			)
 		})
 
@@ -224,6 +229,7 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 			expect((services.buttonsLcd as jest.Mocked<ButtonsLcdDisplayService>).fillPanelBuffer).toHaveBeenCalledWith(
 				buf,
 				undefined,
+				null,
 			)
 		})
 	})
@@ -245,7 +251,7 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 		test('fillLcd delegates when service exists', async () => {
 			const buf = new Uint8Array(100)
 			await streamDeckWithLcd.fillLcd(0, buf, { format: 'rgb' })
-			expect(lcdMock.fillLcd).toHaveBeenCalledWith(0, buf, { format: 'rgb' })
+			expect(lcdMock.fillLcd).toHaveBeenCalledWith(0, buf, { format: 'rgb' }, null)
 		})
 
 		test('fillLcd throws when no lcdSegmentDisplay', async () => {
@@ -266,7 +272,7 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 
 		test('clearLcdSegment delegates', async () => {
 			await streamDeckWithLcd.clearLcdSegment(0)
-			expect(lcdMock.clearLcdSegment).toHaveBeenCalledWith(0)
+			expect(lcdMock.clearLcdSegment).toHaveBeenCalledWith(0, null)
 		})
 
 		test('clearLcdSegment throws when no service', async () => {
@@ -290,7 +296,7 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 
 		test('setEncoderColor delegates', async () => {
 			await streamDeckWithEncoder.setEncoderColor(0, 255, 0, 0)
-			expect(encoderMock.setEncoderColor).toHaveBeenCalledWith(0, 255, 0, 0)
+			expect(encoderMock.setEncoderColor).toHaveBeenCalledWith(0, 255, 0, 0, null)
 		})
 
 		test('setEncoderColor throws when no service', async () => {
@@ -299,7 +305,7 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 
 		test('setEncoderRingSingleColor delegates', async () => {
 			await streamDeckWithEncoder.setEncoderRingSingleColor(0, 100, 100, 100)
-			expect(encoderMock.setEncoderRingSingleColor).toHaveBeenCalledWith(0, 100, 100, 100)
+			expect(encoderMock.setEncoderRingSingleColor).toHaveBeenCalledWith(0, 100, 100, 100, null)
 		})
 
 		test('setEncoderRingSingleColor throws when no service', async () => {
@@ -309,7 +315,7 @@ describe('StreamDeckBase (Phase 2 integration)', () => {
 		test('setEncoderRingColors delegates', async () => {
 			const colors = new Uint8Array(24 * 3)
 			await streamDeckWithEncoder.setEncoderRingColors(0, colors)
-			expect(encoderMock.setEncoderRingColors).toHaveBeenCalledWith(0, colors)
+			expect(encoderMock.setEncoderRingColors).toHaveBeenCalledWith(0, colors, null)
 		})
 	})
 

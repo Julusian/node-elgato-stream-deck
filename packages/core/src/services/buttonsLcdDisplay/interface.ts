@@ -12,11 +12,16 @@ export interface GridSpan {
 export interface ButtonsLcdDisplayService {
 	calculateFillPanelDimensions(options: FillPanelDimensionsOptions | undefined): Dimension | null
 
-	clearPanel(): Promise<void>
-	clearKey(keyIndex: KeyIndex): Promise<void>
+	clearPanel(signal: AbortSignal | null): Promise<boolean>
+	clearKey(keyIndex: KeyIndex, signal: AbortSignal | null): Promise<boolean>
 
-	fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number): Promise<void>
-	fillKeyBuffer(keyIndex: KeyIndex, imageBuffer: Uint8Array, options?: FillImageOptions): Promise<void>
+	fillKeyColor(keyIndex: KeyIndex, r: number, g: number, b: number, signal: AbortSignal | null): Promise<boolean>
+	fillKeyBuffer(
+		keyIndex: KeyIndex,
+		imageBuffer: Uint8Array,
+		options: FillImageOptions | undefined,
+		signal: AbortSignal | null,
+	): Promise<boolean>
 	prepareFillKeyBuffer(
 		keyIndex: KeyIndex,
 		imageBuffer: Uint8Array | Uint8ClampedArray,
@@ -24,7 +29,11 @@ export interface ButtonsLcdDisplayService {
 		jsonSafe: boolean | undefined,
 	): Promise<PreparedBuffer>
 
-	fillPanelBuffer(imageBuffer: Uint8Array, options: FillPanelOptions | undefined): Promise<void>
+	fillPanelBuffer(
+		imageBuffer: Uint8Array,
+		options: FillPanelOptions | undefined,
+		signal: AbortSignal | null,
+	): Promise<boolean>
 	prepareFillPanelBuffer(
 		imageBuffer: Uint8Array | Uint8ClampedArray,
 		options: FillPanelOptions | undefined,

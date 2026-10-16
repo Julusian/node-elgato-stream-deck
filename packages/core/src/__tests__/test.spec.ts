@@ -140,11 +140,13 @@ describe('StreamDeck Mini', () => {
 
 	test('fillImage', async () => {
 		const device = getDevice()
-		const writeFn: jest.Mock<Promise<void>, [Buffer[]]> = (device.sendReports = jest.fn())
+		const writeFn = (device.sendReports = jest.fn<Promise<boolean>, [Buffer[], AbortSignal | null]>(
+			async () => true,
+		))
 		expect(writeFn).toHaveBeenCalledTimes(0)
 		await streamDeck.fillKeyBuffer(0, readFixtureJSON('fillImage-sample-icon-80.json'))
 
-		expect(writeFn).toHaveBeenCalledWith(expect.anything(), null)
+		expect(writeFn).toHaveBeenCalledWith(expect.any(Array), null)
 		expect(writeFn.mock.calls.map(([packets]) => [packets])).toMatchSnapshot()
 	})
 
