@@ -59,24 +59,34 @@ export class NodeHIDDevice extends EventEmitter<HIDDeviceEvents> implements HIDD
 		await this.device.close()
 	}
 
-	public async sendFeatureReport(data: Uint8Array): Promise<void> {
+	public async sendFeatureReport(data: Uint8Array, signal: AbortSignal | null): Promise<boolean> {
 		return this.#writeQueue.add(async () => {
+			// Only check the signal before starting, a write must never be interrupted
+			if (signal?.aborted) return false
+
 			await this.device.sendFeatureReport(Buffer.from(data.buffer, data.byteOffset, data.byteLength))
 
 			// Some streamdecks on windows get upset with too many reports in quick succession, so add some spacing
 			await new Promise((resolve) => setTimeout(resolve, 1))
+
+			return true
 		})
 	}
 	public async getFeatureReport(reportId: number, reportLength: number): Promise<Uint8Array> {
 		return this.device.getFeatureReport(reportId, reportLength)
 	}
-	public async sendReports(buffers: Uint8Array[]): Promise<void> {
+	public async sendReports(buffers: Uint8Array[], signal: AbortSignal | null): Promise<boolean> {
 		return this.#writeQueue.add(async () => {
+			// Only check the signal before starting, a write must never be interrupted partway through
+			if (signal?.aborted) return false
+
 			const ps: Promise<any>[] = []
 			for (const data of buffers) {
 				ps.push(this.device.write(Buffer.from(data.buffer, data.byteOffset, data.byteLength)))
 			}
 			await Promise.all(ps)
+
+			return true
 		})
 	}
 

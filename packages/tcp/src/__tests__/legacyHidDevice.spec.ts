@@ -49,7 +49,7 @@ describe('TcpLegacyHidDevice', () => {
 
 	describe('writes', () => {
 		test('sendFeatureReport pads the report to 1024 bytes', async () => {
-			await device.sendFeatureReport(new Uint8Array([0x03, 0x08, 50]))
+			await expect(device.sendFeatureReport(new Uint8Array([0x03, 0x08, 50]), null)).resolves.toBe(true)
 
 			const expected = Buffer.alloc(1024)
 			expected.set([0x03, 0x08, 50])
@@ -59,21 +59,21 @@ describe('TcpLegacyHidDevice', () => {
 
 		test('sendFeatureReport truncates the report to 1024 bytes', async () => {
 			const data = new Uint8Array(1100).fill(7)
-			await device.sendFeatureReport(data)
+			await device.sendFeatureReport(data, null)
 
 			expect(socket.sentLegacy[0]).toEqual(new Uint8Array(1024).fill(7))
 		})
 
 		test('sendFeatureReport sends a 1024 byte report as is', async () => {
 			const data = new Uint8Array(1024).fill(3)
-			await device.sendFeatureReport(data)
+			await device.sendFeatureReport(data, null)
 
 			expect(socket.sentLegacy[0]).toBe(data)
 		})
 
 		test('sendReports sends the buffers as is', async () => {
 			const buffers = [Buffer.from([1]), Buffer.from([2, 2])]
-			await device.sendReports(buffers)
+			await expect(device.sendReports(buffers, null)).resolves.toBe(true)
 
 			expect(socket.sentLegacy).toEqual(buffers)
 		})
@@ -231,12 +231,12 @@ describe('TcpLegacyHidDevice', () => {
 		})
 
 		test('sendFeatureReport rejects without writing', async () => {
-			await expect(device.sendFeatureReport(new Uint8Array([1]))).rejects.toThrow('Disconnected')
+			await expect(device.sendFeatureReport(new Uint8Array([1]), null)).rejects.toThrow('Disconnected')
 			expect(socket.sentLegacy).toHaveLength(0)
 		})
 
 		test('sendReports rejects without writing', async () => {
-			await expect(device.sendReports([Buffer.from([1])])).rejects.toThrow('Disconnected')
+			await expect(device.sendReports([Buffer.from([1])], null)).rejects.toThrow('Disconnected')
 			expect(socket.sentLegacy).toHaveLength(0)
 		})
 
@@ -248,7 +248,7 @@ describe('TcpLegacyHidDevice', () => {
 		test('stays disconnected when the socket reconnects', async () => {
 			socket.emit('connected', socket.asSocketWrapper())
 
-			await expect(device.sendReports([Buffer.from([1])])).rejects.toThrow('Disconnected')
+			await expect(device.sendReports([Buffer.from([1])], null)).rejects.toThrow('Disconnected')
 			expect(socket.sentLegacy).toHaveLength(0)
 		})
 	})
@@ -258,7 +258,7 @@ describe('TcpLegacyHidDevice', () => {
 		disconnectedSocket.connected = false
 		const disconnectedDevice = new TcpLegacyHidDevice(disconnectedSocket.asSocketWrapper())
 
-		await expect(disconnectedDevice.sendReports([Buffer.from([1])])).rejects.toThrow('Disconnected')
+		await expect(disconnectedDevice.sendReports([Buffer.from([1])], null)).rejects.toThrow('Disconnected')
 		expect(disconnectedSocket.sentLegacy).toHaveLength(0)
 	})
 

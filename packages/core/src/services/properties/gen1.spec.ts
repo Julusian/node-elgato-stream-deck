@@ -21,19 +21,19 @@ describe('Gen1PropertiesService', () => {
 		test('sends correct 17-byte buffer at 100%', async () => {
 			await service.setBrightness(100)
 			// prettier-ignore
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x05, 0x55, 0xaa, 0xd1, 0x01, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]))
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x05, 0x55, 0xaa, 0xd1, 0x01, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), null)
 		})
 
 		test('sends correct buffer at 0%', async () => {
 			await service.setBrightness(0)
 			// prettier-ignore
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x05, 0x55, 0xaa, 0xd1, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]))
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x05, 0x55, 0xaa, 0xd1, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), null)
 		})
 
 		test('sends correct buffer at 50%', async () => {
 			await service.setBrightness(50)
 			// prettier-ignore
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x05, 0x55, 0xaa, 0xd1, 0x01, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]))
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x05, 0x55, 0xaa, 0xd1, 0x01, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), null)
 		})
 
 		test('throws RangeError on value > 100', async () => {
@@ -51,7 +51,7 @@ describe('Gen1PropertiesService', () => {
 		test('sends correct 17-byte buffer', async () => {
 			await service.resetToLogo()
 			// prettier-ignore
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x0b, 0x63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]))
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x0b, 0x63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), null)
 		})
 	})
 

@@ -96,6 +96,6 @@ export class GalleonK100EncoderLedService implements EncoderLedService {
 		buffer[3] = red
 		buffer[4] = green
 		buffer[5] = blue
-		await this.#device.sendFeatureReport(buffer)
+		await this.#device.sendFeatureReport(buffer, null)
 	}
 }

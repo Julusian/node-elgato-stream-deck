@@ -61,7 +61,7 @@ class GalleonK100StreamDeck extends StreamDeckBase {
 	}
 
 	#sendPing = (): void => {
-		this.device.sendFeatureReport(new Uint8Array([0x03, 0x27])).catch((e) => {
+		this.device.sendFeatureReport(new Uint8Array([0x03, 0x27]), null).catch((e) => {
 			// Emit as an error on the streamdeck
 			this.emit('error', e)
 			this.#stopPing()

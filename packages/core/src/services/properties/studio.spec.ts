@@ -24,7 +24,7 @@ describe('StudioPropertiesService', () => {
 			expected[0] = 0x03
 			expected[1] = 0x08
 			expected[2] = 75
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(expected)
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(expected, null)
 		})
 
 		test('resetToLogo delegates to gen2 (32-byte buffer with 0x03,0x02)', async () => {
@@ -32,7 +32,7 @@ describe('StudioPropertiesService', () => {
 			const expected = new Uint8Array(32)
 			expected[0] = 0x03
 			expected[1] = 0x02
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(expected)
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(expected, null)
 		})
 	})
 

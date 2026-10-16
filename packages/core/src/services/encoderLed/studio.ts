@@ -38,7 +38,7 @@ export class StudioEncoderLedService implements EncoderLedService {
 		buffer[3] = red
 		buffer[4] = green
 		buffer[5] = blue
-		await this.#device.sendReports([buffer])
+		await this.#device.sendReports([buffer], null)
 	}
 
 	public async setEncoderRingSingleColor(
@@ -63,7 +63,7 @@ export class StudioEncoderLedService implements EncoderLedService {
 			buffer[offset + 2] = blue
 		}
 
-		await this.#device.sendReports([buffer])
+		await this.#device.sendReports([buffer], null)
 	}
 
 	public async setEncoderRingColors(encoder: EncoderIndex, colors: number[] | Uint8Array): Promise<void> {
@@ -91,6 +91,6 @@ export class StudioEncoderLedService implements EncoderLedService {
 		buffer[2] = encoder
 		buffer.set(colorsBuffer, 3)
 
-		await this.#device.sendReports([buffer])
+		await this.#device.sendReports([buffer], null)
 	}
 }

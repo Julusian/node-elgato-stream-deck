@@ -12,10 +12,24 @@ export interface HIDDeviceEvents {
 export interface HIDDevice extends EventEmitter<HIDDeviceEvents> {
 	close(): Promise<void>
 
-	sendFeatureReport(data: Uint8Array): Promise<void>
+	/**
+	 * Send a feature report to the device.
+	 * The write is either sent in full or not at all. The signal is checked once, when the write is about to be sent (eg when it reaches the front of a write queue), and is never able to interrupt a write which has started.
+	 * @param data The report to send, including the report id
+	 * @param signal Signal to skip the write if it has not been sent yet, or null if it must not be skipped
+	 * @returns true once the report has been sent to the device, false if it was skipped because the signal was aborted
+	 */
+	sendFeatureReport(data: Uint8Array, signal: AbortSignal | null): Promise<boolean>
 	getFeatureReport(reportId: number, reportLength: number): Promise<Uint8Array>
 
-	sendReports(buffers: Uint8Array[]): Promise<void>
+	/**
+	 * Send a group of reports to the device.
+	 * The group is either sent in full or not at all. The signal is checked once, when the group is about to be sent (eg when it reaches the front of a write queue), and is never able to interrupt a group which has started.
+	 * @param buffers The reports to send, each including the report id
+	 * @param signal Signal to skip the write if it has not been sent yet, or null if it must not be skipped
+	 * @returns true once the reports have been sent to the device, false if they were skipped because the signal was aborted
+	 */
+	sendReports(buffers: Uint8Array[], signal: AbortSignal | null): Promise<boolean>
 
 	getDeviceInfo(): Promise<HIDDeviceInfo>
 

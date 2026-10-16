@@ -144,7 +144,8 @@ describe('StreamDeck Mini', () => {
 		expect(writeFn).toHaveBeenCalledTimes(0)
 		await streamDeck.fillKeyBuffer(0, readFixtureJSON('fillImage-sample-icon-80.json'))
 
-		expect(writeFn.mock.calls).toMatchSnapshot()
+		expect(writeFn).toHaveBeenCalledWith(expect.anything(), null)
+		expect(writeFn.mock.calls.map(([packets]) => [packets])).toMatchSnapshot()
 	})
 
 	test('down and up events', () => {

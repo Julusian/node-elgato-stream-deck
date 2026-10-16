@@ -21,7 +21,7 @@ export class Gen2PropertiesService implements PropertiesService {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		])
-		await this.device.sendFeatureReport(brightnessCommandBuffer)
+		await this.device.sendFeatureReport(brightnessCommandBuffer, null)
 	}
 
 	public async resetToLogo(): Promise<void> {
@@ -33,7 +33,7 @@ export class Gen2PropertiesService implements PropertiesService {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		])
-		await this.device.sendFeatureReport(resetCommandBuffer)
+		await this.device.sendFeatureReport(resetCommandBuffer, null)
 	}
 
 	public async getFirmwareVersion(): Promise<string> {

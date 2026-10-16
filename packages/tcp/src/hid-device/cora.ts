@@ -92,8 +92,11 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		if (this.#disconnected) throw new Error('Disconnected')
 	}
 
-	async sendFeatureReport(data: Uint8Array): Promise<void> {
+	async sendFeatureReport(data: Uint8Array, signal: AbortSignal | null): Promise<boolean> {
 		this.#assertConnected()
+
+		// There is no queue here, so this is the only chance to skip the write
+		if (signal?.aborted) return false
 
 		this.#socket.sendCoraWrites([
 			{
@@ -103,6 +106,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 				payload: Buffer.from(data.buffer, data.byteOffset, data.byteLength),
 			},
 		])
+		return true
 	}
 
 	async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
@@ -152,8 +156,11 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 		return command.promise
 	}
 
-	async sendReports(buffers: Buffer[]): Promise<void> {
+	async sendReports(buffers: Buffer[], signal: AbortSignal | null): Promise<boolean> {
 		this.#assertConnected()
+
+		// There is no queue here, so this is the only chance to skip the write
+		if (signal?.aborted) return false
 
 		this.#socket.sendCoraWrites(
 			buffers.map((buffer) => ({
@@ -163,6 +170,7 @@ export class TcpCoraHidDevice extends EventEmitter<HIDDeviceEvents> implements T
 				payload: buffer,
 			})),
 		)
+		return true
 	}
 
 	#loadedHidInfo: HIDDeviceInfo | undefined

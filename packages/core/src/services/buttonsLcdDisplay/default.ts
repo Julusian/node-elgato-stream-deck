@@ -81,12 +81,12 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	}
 
 	public async clearPanel(): Promise<void> {
-		const ps: Promise<void>[] = []
+		const ps: Promise<unknown>[] = []
 
 		if (this.#deviceProperties.fullscreenPanels > 0) {
 			// TODO - should this be a separate property?
 			for (let screenIndex = 0; screenIndex < this.#deviceProperties.fullscreenPanels; screenIndex++) {
-				ps.push(this.#device.sendFeatureReport(new Uint8Array([0x03, 0x05, screenIndex, 0, 0, 0])))
+				ps.push(this.#device.sendFeatureReport(new Uint8Array([0x03, 0x05, screenIndex, 0, 0, 0]), null))
 			}
 			// TODO - clear rgb?
 		} else {
@@ -189,7 +189,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		options?: FillImageOptions,
 	): Promise<void> {
 		const packets = await this.prepareFillKeyBufferInner(keyIndex, imageBuffer, options)
-		await this.#device.sendReports(packets)
+		await this.#device.sendReports(packets, null)
 	}
 
 	private async prepareFillKeyBufferInner(
@@ -236,7 +236,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		options?: FillPanelOptions,
 	): Promise<void> {
 		const packets = await this.prepareFillPanelBufferInner(imageBuffer, options)
-		await this.#device.sendReports(packets)
+		await this.#device.sendReports(packets, null)
 	}
 
 	private async prepareFillPanelBufferInner(
@@ -303,7 +303,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	}
 
 	private async sendKeyRgb(keyIndex: number, red: number, green: number, blue: number): Promise<void> {
-		await this.#device.sendFeatureReport(new Uint8Array([0x03, 0x06, keyIndex, red, green, blue]))
+		await this.#device.sendFeatureReport(new Uint8Array([0x03, 0x06, keyIndex, red, green, blue]), null)
 	}
 
 	private async fillImageRangeControl(
@@ -312,7 +312,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		sourceOptions: InternalFillImageOptions,
 	) {
 		const packets = await this.prepareFillImageRangeControl(buttonControl, imageBuffer, sourceOptions)
-		await this.#device.sendReports(packets)
+		await this.#device.sendReports(packets, null)
 	}
 
 	private async prepareFillImageRangeControl(

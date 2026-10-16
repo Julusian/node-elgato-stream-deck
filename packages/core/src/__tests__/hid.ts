@@ -10,13 +10,13 @@ export class DummyHID extends EventEmitter<HIDDeviceEvents> implements HIDDevice
 		expect(typeof path).toEqual('string')
 	}
 
-	public async sendFeatureReport(_data: Uint8Array): Promise<void> {
+	public async sendFeatureReport(_data: Uint8Array, _signal: AbortSignal | null): Promise<boolean> {
 		throw new Error('Method not implemented.')
 	}
 	public async getFeatureReport(_reportId: number, _reportLength: number): Promise<Uint8Array> {
 		throw new Error('Method not implemented.')
 	}
-	public async sendReports(_data: Uint8Array[]): Promise<void> {
+	public async sendReports(_data: Uint8Array[], _signal: AbortSignal | null): Promise<boolean> {
 		throw new Error('Method not implemented.')
 	}
 	public async close(): Promise<void> {

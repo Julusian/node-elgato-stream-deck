@@ -281,7 +281,7 @@ class TcpPropertiesService implements PropertiesService {
 		buffer.writeUint8(0x08, 1)
 		buffer.writeUint8(percentage, 2)
 
-		await this.#device.sendFeatureReport(buffer)
+		await this.#device.sendFeatureReport(buffer, null)
 	}
 
 	public async resetToLogo(): Promise<void> {

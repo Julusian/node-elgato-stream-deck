@@ -92,8 +92,11 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 		if (this.#disconnected) throw new Error('Disconnected')
 	}
 
-	async sendFeatureReport(data: Uint8Array): Promise<void> {
+	async sendFeatureReport(data: Uint8Array, signal: AbortSignal | null): Promise<boolean> {
 		this.#assertConnected()
+
+		// There is no queue here, so this is the only chance to skip the write
+		if (signal?.aborted) return false
 
 		// Ensure the buffer is 1024 bytes long
 		let dataFull = data
@@ -103,6 +106,7 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 		}
 
 		this.#socket.sendLegacyWrites([dataFull])
+		return true
 	}
 
 	async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
@@ -147,10 +151,14 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 		return command.promise
 	}
 
-	async sendReports(buffers: Buffer[]): Promise<void> {
+	async sendReports(buffers: Buffer[], signal: AbortSignal | null): Promise<boolean> {
 		this.#assertConnected()
 
+		// There is no queue here, so this is the only chance to skip the write
+		if (signal?.aborted) return false
+
 		this.#socket.sendLegacyWrites(buffers)
+		return true
 	}
 
 	#loadedHidInfo: HIDDeviceInfo | undefined

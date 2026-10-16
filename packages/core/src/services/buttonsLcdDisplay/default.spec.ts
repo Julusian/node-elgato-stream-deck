@@ -146,8 +146,8 @@ describe('DefaultButtonsLcdService', () => {
 			await service.clearPanel()
 
 			expect(device.sendFeatureReport).toHaveBeenCalledTimes(2)
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x05, 0, 0, 0, 0]))
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x05, 1, 0, 0, 0]))
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x05, 0, 0, 0, 0]), null)
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x05, 1, 0, 0, 0]), null)
 		})
 
 		test('RGB buttons: calls sendFeatureReport([0x03,0x06,hidIndex,0,0,0]) for each', async () => {
@@ -155,9 +155,9 @@ describe('DefaultButtonsLcdService', () => {
 			await service.clearPanel()
 
 			expect(device.sendFeatureReport).toHaveBeenCalledTimes(3)
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 0, 0, 0, 0]))
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 1, 0, 0, 0]))
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 2, 0, 0, 0]))
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 0, 0, 0, 0]), null)
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 1, 0, 0, 0]), null)
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 2, 0, 0, 0]), null)
 		})
 
 		test('LCD buttons with RGB key fill: uses sendFeatureReport, not image fill', async () => {
@@ -196,7 +196,7 @@ describe('DefaultButtonsLcdService', () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeRgbProperties())
 			await service.clearKey(1)
 
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 1, 0, 0, 0]))
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 1, 0, 0, 0]), null)
 		})
 
 		test('uses hidIndex (not keyIndex) in the feature report when they differ', async () => {
@@ -208,14 +208,14 @@ describe('DefaultButtonsLcdService', () => {
 			await service.clearKey(5)
 
 			// Byte 2 must be hidIndex=12, not the logical keyIndex=5
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 12, 0, 0, 0]))
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 12, 0, 0, 0]), null)
 		})
 
 		test('LCD key with supportsRgbKeyFill: uses sendFeatureReport', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(true))
 			await service.clearKey(0)
 
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 0, 0, 0, 0]))
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 0, 0, 0, 0]), null)
 			expect(packer.convertPixelBuffer).not.toHaveBeenCalled()
 		})
 
@@ -248,7 +248,7 @@ describe('DefaultButtonsLcdService', () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeRgbProperties())
 			await service.fillKeyColor(0, 255, 128, 64)
 
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 0, 255, 128, 64]))
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 0, 255, 128, 64]), null)
 		})
 
 		test('uses hidIndex (not keyIndex) in the feature report when they differ', async () => {
@@ -260,14 +260,14 @@ describe('DefaultButtonsLcdService', () => {
 			await service.fillKeyColor(5, 255, 0, 0)
 
 			// Byte 2 must be hidIndex=12, not the logical keyIndex=5
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 12, 255, 0, 0]))
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 12, 255, 0, 0]), null)
 		})
 
 		test('LCD key with supportsRgbKeyFill: uses sendFeatureReport', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties(true))
 			await service.fillKeyColor(1, 10, 20, 30)
 
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 1, 10, 20, 30]))
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 1, 10, 20, 30]), null)
 		})
 
 		test('LCD key without supportsRgbKeyFill: renders solid color via image fill', async () => {

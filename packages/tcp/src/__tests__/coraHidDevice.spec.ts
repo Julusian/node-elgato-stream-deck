@@ -42,7 +42,7 @@ describe('TcpCoraHidDevice', () => {
 
 	describe('writes', () => {
 		test('sendFeatureReport sends a verbatim SEND_REPORT', async () => {
-			await device.sendFeatureReport(new Uint8Array([0x03, 0x08, 50]))
+			await device.sendFeatureReport(new Uint8Array([0x03, 0x08, 50]), null)
 
 			expect(socket.sentCora).toEqual([
 				{
@@ -56,13 +56,13 @@ describe('TcpCoraHidDevice', () => {
 
 		test('sendFeatureReport respects the view into a larger buffer', async () => {
 			const backing = new Uint8Array([9, 9, 1, 2, 3, 9])
-			await device.sendFeatureReport(backing.subarray(2, 5))
+			await device.sendFeatureReport(backing.subarray(2, 5), null)
 
 			expect(socket.sentCora[0].payload).toEqual(Buffer.from([1, 2, 3]))
 		})
 
 		test('sendReports sends each buffer as a verbatim WRITE', async () => {
-			await device.sendReports([Buffer.from([1]), Buffer.from([2, 2])])
+			await expect(device.sendReports([Buffer.from([1]), Buffer.from([2, 2])], null)).resolves.toBe(true)
 
 			expect(socket.sentCora).toEqual([
 				{ flags: CoraMessageFlags.VERBATIM, hidOp: CoraHidOp.WRITE, messageId: 0, payload: Buffer.from([1]) },
@@ -234,12 +234,12 @@ describe('TcpCoraHidDevice', () => {
 		})
 
 		test('sendFeatureReport rejects without writing', async () => {
-			await expect(device.sendFeatureReport(new Uint8Array([1]))).rejects.toThrow('Disconnected')
+			await expect(device.sendFeatureReport(new Uint8Array([1]), null)).rejects.toThrow('Disconnected')
 			expect(socket.sentCora).toHaveLength(0)
 		})
 
 		test('sendReports rejects without writing', async () => {
-			await expect(device.sendReports([Buffer.from([1])])).rejects.toThrow('Disconnected')
+			await expect(device.sendReports([Buffer.from([1])], null)).rejects.toThrow('Disconnected')
 			expect(socket.sentCora).toHaveLength(0)
 		})
 
@@ -251,7 +251,7 @@ describe('TcpCoraHidDevice', () => {
 		test('stays disconnected when the socket reconnects', async () => {
 			socket.emit('connected', socket.asSocketWrapper())
 
-			await expect(device.sendReports([Buffer.from([1])])).rejects.toThrow('Disconnected')
+			await expect(device.sendReports([Buffer.from([1])], null)).rejects.toThrow('Disconnected')
 			expect(socket.sentCora).toHaveLength(0)
 		})
 	})
@@ -261,7 +261,7 @@ describe('TcpCoraHidDevice', () => {
 		disconnectedSocket.connected = false
 		const disconnectedDevice = new TcpCoraHidDevice(disconnectedSocket.asSocketWrapper())
 
-		await expect(disconnectedDevice.sendReports([Buffer.from([1])])).rejects.toThrow('Disconnected')
+		await expect(disconnectedDevice.sendReports([Buffer.from([1])], null)).rejects.toThrow('Disconnected')
 		expect(disconnectedSocket.sentCora).toHaveLength(0)
 	})
 

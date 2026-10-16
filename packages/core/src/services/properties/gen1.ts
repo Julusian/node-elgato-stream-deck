@@ -19,7 +19,7 @@ export class Gen1PropertiesService implements PropertiesService {
 			0x55, 0xaa, 0xd1, 0x01, percentage, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		])
-		await this.#device.sendFeatureReport(brightnessCommandBuffer)
+		await this.#device.sendFeatureReport(brightnessCommandBuffer, null)
 	}
 
 	public async resetToLogo(): Promise<void> {
@@ -29,7 +29,7 @@ export class Gen1PropertiesService implements PropertiesService {
 			0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		])
-		await this.#device.sendFeatureReport(resetCommandBuffer)
+		await this.#device.sendFeatureReport(resetCommandBuffer, null)
 	}
 
 	public async getFirmwareVersion(): Promise<string> {

@@ -61,7 +61,7 @@ export class StreamDeckNeoLcdService implements LcdSegmentDisplayService {
 		const byteBuffer = await this.convertFillLcdBuffer(imageBuffer, lcdControl.pixelSize, sourceOptions)
 
 		const packets = this.#lcdImageWriter.generateFillImageWrites(null, byteBuffer)
-		await this.#device.sendReports(packets)
+		await this.#device.sendReports(packets, null)
 	}
 
 	public async clearLcdSegment(index: number): Promise<void> {

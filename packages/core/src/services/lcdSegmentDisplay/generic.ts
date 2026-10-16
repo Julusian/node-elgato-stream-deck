@@ -46,7 +46,7 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 			width: lcdControl.pixelSize.width,
 			height: lcdControl.pixelSize.height,
 		})
-		await this.#device.sendReports(packets)
+		await this.#device.sendReports(packets, null)
 	}
 
 	public async fillLcdRegion(
@@ -60,7 +60,7 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 		if (!lcdControl) throw new Error(`Invalid lcd segment index ${index}`)
 
 		const packets = await this.prepareFillControlRegion(lcdControl, x, y, imageBuffer, sourceOptions)
-		await this.#device.sendReports(packets)
+		await this.#device.sendReports(packets, null)
 	}
 
 	public async prepareFillLcdRegion(
@@ -89,7 +89,7 @@ export class StreamdeckDefaultLcdService implements LcdSegmentDisplayService {
 			width: lcdControl.pixelSize.width,
 			height: lcdControl.pixelSize.height,
 		})
-		await this.#device.sendReports(packets)
+		await this.#device.sendReports(packets, null)
 	}
 
 	public async clearAllLcdSegments(): Promise<void> {

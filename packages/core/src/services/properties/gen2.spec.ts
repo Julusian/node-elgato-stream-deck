@@ -24,7 +24,7 @@ describe('Gen2PropertiesService', () => {
 			expected[0] = 0x03
 			expected[1] = 0x08
 			expected[2] = 100
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(expected)
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(expected, null)
 		})
 
 		test('sends correct buffer at 0%', async () => {
@@ -33,7 +33,7 @@ describe('Gen2PropertiesService', () => {
 			expected[0] = 0x03
 			expected[1] = 0x08
 			expected[2] = 0
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(expected)
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(expected, null)
 		})
 
 		test('throws RangeError on value > 100', async () => {
@@ -53,7 +53,7 @@ describe('Gen2PropertiesService', () => {
 			const expected = new Uint8Array(32)
 			expected[0] = 0x03
 			expected[1] = 0x02
-			expect(device.sendFeatureReport).toHaveBeenCalledWith(expected)
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(expected, null)
 		})
 	})
 

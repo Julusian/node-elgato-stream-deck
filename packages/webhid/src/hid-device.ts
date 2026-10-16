@@ -48,8 +48,11 @@ export class WebHIDDevice extends EventEmitter<HIDDeviceEvents> implements CoreH
 		return this.device.forget()
 	}
 
-	public async sendFeatureReport(data: Uint8Array): Promise<void> {
+	public async sendFeatureReport(data: Uint8Array, signal: AbortSignal | null): Promise<boolean> {
 		return this.reportQueue.add(async () => {
+			// Only check the signal before starting, a write must never be interrupted
+			if (signal?.aborted) return false
+
 			// Ensure the buffer is as long as required for the feature report
 			const byteLength = this.reportByteLengths.get(data[0])
 			let dataFull = data.subarray(1)
@@ -62,17 +65,24 @@ export class WebHIDDevice extends EventEmitter<HIDDeviceEvents> implements CoreH
 
 			// Some streamdecks on windows get upset with too many reports in quick succession, so add some spacing
 			await new Promise((resolve) => setTimeout(resolve, 1))
+
+			return true
 		})
 	}
 	public async getFeatureReport(reportId: number, _reportLength: number): Promise<Uint8Array> {
 		const view = await this.device.receiveFeatureReport(reportId)
 		return new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
 	}
-	public async sendReports(buffers: Uint8Array[]): Promise<void> {
+	public async sendReports(buffers: Uint8Array[], signal: AbortSignal | null): Promise<boolean> {
 		return this.reportQueue.add(async () => {
+			// Only check the signal before starting, a write must never be interrupted partway through
+			if (signal?.aborted) return false
+
 			for (const data of buffers) {
 				await this.device.sendReport(data[0], data.subarray(1))
 			}
+
+			return true
 		})
 	}
 	public async getDeviceInfo(): Promise<HIDDeviceInfo> {
