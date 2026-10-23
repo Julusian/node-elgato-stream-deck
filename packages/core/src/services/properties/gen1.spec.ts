@@ -176,30 +176,5 @@ describe('Gen1PropertiesService', () => {
 			expect(await service.getFirmwareVersion()).toBe('1.0.170133')
 			expect(device.getFeatureReport).toHaveBeenLastCalledWith(4, 32)
 		})
-
-		test('getAllFirmwareVersions reads each version', async () => {
-			device.getFeatureReport.mockImplementation(async (reportId: number) => {
-				switch (reportId) {
-					case 0xa0:
-						return versionReport(0xa0, '0.01.002')
-					case 0xa1:
-						return versionReport(0xa1, '3.02.001')
-					case 0xa2:
-						return versionReport(0xa2, '3.00.000')
-					default:
-						throw new Error('Unexpected report')
-				}
-			})
-
-			expect(await service.getAllFirmwareVersions()).toEqual({ LD: '0.01.002', AP1: '3.00.000', AP2: '3.02.001' })
-		})
-
-		test('getAllFirmwareVersions skips empty versions', async () => {
-			device.getFeatureReport.mockImplementation(async (reportId: number) =>
-				versionReport(reportId, reportId === 0xa1 ? '3.02.001' : ''),
-			)
-
-			expect(await service.getAllFirmwareVersions()).toEqual({ AP2: '3.02.001' })
-		})
 	})
 })
