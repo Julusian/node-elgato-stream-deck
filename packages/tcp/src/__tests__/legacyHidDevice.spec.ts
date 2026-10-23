@@ -262,12 +262,27 @@ describe('TcpLegacyHidDevice', () => {
 		expect(disconnectedSocket.sentLegacy).toHaveLength(0)
 	})
 
+	/** Respond to the pending device 2 info query, and let the next one be sent */
+	async function respondDevice2Info(info: Buffer): Promise<void> {
+		socket.emit('dataLegacy', info)
+		await flushImmediates()
+		await flushImmediates()
+	}
+
+	async function identifyAsChild(vendorId: number, productId: number): Promise<void> {
+		const promise = device.getDeviceInfo()
+		const info = createDevice2Info({ connected: true, vendorId, productId })
+		await respondDevice2Info(info)
+		await respondDevice2Info(info)
+		await promise
+	}
+
 	describe('getDeviceInfo', () => {
 		test('identifies a primary device', async () => {
 			const promise = device.getDeviceInfo()
 
-			// It probes both the primary and the child protocols
-			expect(socket.sentLegacy).toEqual([hostQuery(0x80), childQuery(0x08), childQuery(0xa1)])
+			// Only commands answered by the Studio are sent, as its primary port mishandles commands for the child (#219)
+			expect(socket.sentLegacy).toEqual([hostQuery(0x80), hostQuery(0x1c)])
 
 			socket.emit('dataLegacy', createPrimaryDeviceInfo(0x0fd9, 0x00aa))
 
@@ -276,6 +291,36 @@ describe('TcpLegacyHidDevice', () => {
 				productId: 0x00aa,
 				path: 'tcp://10.0.0.1:5343',
 			})
+			expect(device.isPrimary).toBe(true)
+		})
+
+		test('stops querying the device 2 info once the primary port answers', async () => {
+			const promise = device.getDeviceInfo()
+			socket.emit('dataLegacy', createPrimaryDeviceInfo(0x0fd9, 0x00aa))
+			await respondDevice2Info(createDevice2Info({ connected: true, vendorId: 0x0fd9, productId: 0x0063 }))
+			await promise
+
+			expect(socket.sentLegacy).toEqual([hostQuery(0x80), hostQuery(0x1c)])
+		})
+
+		test('identifies a primary device which answers after the device 2 info', async () => {
+			const promise = device.getDeviceInfo()
+			await respondDevice2Info(createDevice2Info({ connected: true, vendorId: 0x0fd9, productId: 0x0063 }))
+			socket.emit('dataLegacy', createPrimaryDeviceInfo(0x0fd9, 0x00aa))
+
+			await expect(promise).resolves.toMatchObject({ productId: 0x00aa })
+			expect(device.isPrimary).toBe(true)
+		})
+
+		test('identifies a primary device when nothing is connected to it', async () => {
+			const promise = device.getDeviceInfo()
+			await respondDevice2Info(createDevice2Info({ connected: false }))
+			await respondDevice2Info(createDevice2Info({ connected: false }))
+
+			// Without a child there is no secondary port, so it waits for the primary port to answer
+			socket.emit('dataLegacy', createPrimaryDeviceInfo(0x0fd9, 0x00aa))
+
+			await expect(promise).resolves.toMatchObject({ productId: 0x00aa })
 			expect(device.isPrimary).toBe(true)
 		})
 
@@ -289,20 +334,14 @@ describe('TcpLegacyHidDevice', () => {
 			expect(socket.sentLegacy).toHaveLength(sentCount)
 		})
 
-		test.each([
-			['general protocol', 0x08],
-			['mini protocol', 0xa1],
-		])('identifies a child device using the %s', async (_name, commandType) => {
+		test('identifies a child device once the device 2 info matches twice in a row', async () => {
 			const promise = device.getDeviceInfo()
+			const info = createDevice2Info({ connected: true, vendorId: 0x0fd9, productId: 0x0063 })
 
-			socket.emit('dataLegacy', childResponse(commandType, [1, 2, 3]))
-			await flushImmediates()
-			await flushImmediates()
+			await respondDevice2Info(info)
+			expect(socket.sentLegacy).toEqual([hostQuery(0x80), hostQuery(0x1c), hostQuery(0x1c)])
 
-			// It then asks the host what the child device is
-			expect(socket.sentLegacy[socket.sentLegacy.length - 1]).toEqual(hostQuery(0x1c))
-
-			socket.emit('dataLegacy', createDevice2Info({ connected: true, vendorId: 0x0fd9, productId: 0x0063 }))
+			await respondDevice2Info(info)
 
 			await expect(promise).resolves.toEqual({
 				vendorId: 0x0fd9,
@@ -310,17 +349,75 @@ describe('TcpLegacyHidDevice', () => {
 				path: 'tcp://10.0.0.1:5343',
 			})
 			expect(device.isPrimary).toBe(false)
+			expect(socket.sentLegacy).toEqual([hostQuery(0x80), hostQuery(0x1c), hostQuery(0x1c)])
 		})
 
-		test('rejects when the child device is not connected', async () => {
+		test('keeps querying the device 2 info until it settles', async () => {
 			const promise = device.getDeviceInfo()
 
-			socket.emit('dataLegacy', childResponse(0x08))
-			await flushImmediates()
-			await flushImmediates()
-			socket.emit('dataLegacy', createDevice2Info({ connected: false }))
+			// A hotplug event is indistinguishable from a response
+			await respondDevice2Info(createDevice2Info({ connected: false }))
+			await respondDevice2Info(createDevice2Info({ connected: true, vendorId: 0x0fd9, productId: 0x0063 }))
+			await respondDevice2Info(createDevice2Info({ connected: true, vendorId: 0x0fd9, productId: 0x0063 }))
 
-			await expect(promise).rejects.toThrow('Failed to get Device info')
+			await expect(promise).resolves.toMatchObject({ productId: 0x0063 })
+			expect(device.isPrimary).toBe(false)
+			expect(socket.sentLegacy).toHaveLength(4)
+		})
+
+		test('rejects when the device 2 info does not settle', async () => {
+			const promise = device.getDeviceInfo()
+			const result = expect(promise).rejects.toThrow('Device 2 info did not settle')
+
+			for (let i = 0; i < 5; i++) {
+				await respondDevice2Info(
+					createDevice2Info({ connected: i % 2 === 0, vendorId: 0x0fd9, productId: 0x0063 }),
+				)
+			}
+
+			await result
+			expect(socket.sentLegacy).toEqual([hostQuery(0x80), ...Array(5).fill(hostQuery(0x1c))])
+		})
+
+		test('reconnects when the primary port answers after being identified as a child device', async () => {
+			const onError = jest.fn()
+			device.on('error', onError)
+			await identifyAsChild(0x0fd9, 0x0063)
+
+			socket.emit('dataLegacy', createPrimaryDeviceInfo(0x0fd9, 0x00aa))
+			await flushImmediates()
+
+			expect(onError).toHaveBeenCalledWith('Wrongly identified as the Device 2 port, reconnecting')
+			expect(socket.reconnect).toHaveBeenCalledTimes(1)
+		})
+
+		test('does not reconnect a child device once the device info times out', async () => {
+			jest.useFakeTimers({ doNotFake: ['setImmediate'] })
+			await identifyAsChild(0x0fd9, 0x0063)
+
+			await jest.advanceTimersByTimeAsync(5000)
+
+			expect(socket.reconnect).not.toHaveBeenCalled()
+		})
+
+		test('does not reconnect a child device which has since disconnected', async () => {
+			await identifyAsChild(0x0fd9, 0x0063)
+			socket.emit('disconnected', socket.asSocketWrapper())
+
+			socket.emit('dataLegacy', createPrimaryDeviceInfo(0x0fd9, 0x00aa))
+			await flushImmediates()
+
+			expect(socket.reconnect).not.toHaveBeenCalled()
+		})
+
+		test('rejects when nothing answers', async () => {
+			jest.useFakeTimers()
+			const promise = device.getDeviceInfo()
+			const result = expect(promise).rejects.toThrow('Timeout')
+
+			await jest.advanceTimersByTimeAsync(5000)
+
+			await result
 		})
 
 		test('rejects when disconnected', async () => {
@@ -374,12 +471,7 @@ describe('TcpLegacyHidDevice', () => {
 		})
 
 		test('getChildDeviceInfo returns null for a child device', async () => {
-			const promise = device.getDeviceInfo()
-			socket.emit('dataLegacy', childResponse(0x08))
-			await flushImmediates()
-			await flushImmediates()
-			socket.emit('dataLegacy', createDevice2Info({ connected: true, vendorId: 1, productId: 2 }))
-			await promise
+			await identifyAsChild(1, 2)
 
 			const sentCount = socket.sentLegacy.length
 			await expect(device.getChildDeviceInfo()).resolves.toBeNull()
@@ -388,12 +480,7 @@ describe('TcpLegacyHidDevice', () => {
 
 		test('getFeatureReport on a child device matches responses starting with 0x03', async () => {
 			// The Mini uses report 0x03 for its serial number, which looks like a response from the Studio port
-			const identify = device.getDeviceInfo()
-			socket.emit('dataLegacy', childResponse(0x08))
-			await flushImmediates()
-			await flushImmediates()
-			socket.emit('dataLegacy', createDevice2Info({ connected: true, vendorId: 0x0fd9, productId: 0x0063 }))
-			await identify
+			await identifyAsChild(0x0fd9, 0x0063)
 
 			const promise = device.getFeatureReport(0x03, 32)
 			expect(socket.sentLegacy[socket.sentLegacy.length - 1]).toEqual(childQuery(0x03))
@@ -405,12 +492,7 @@ describe('TcpLegacyHidDevice', () => {
 		})
 
 		test('getFeatureReport on a child device ignores client count feedback from the Studio', async () => {
-			const identify = device.getDeviceInfo()
-			socket.emit('dataLegacy', childResponse(0x08))
-			await flushImmediates()
-			await flushImmediates()
-			socket.emit('dataLegacy', createDevice2Info({ connected: true, vendorId: 0x0fd9, productId: 0x0063 }))
-			await identify
+			await identifyAsChild(0x0fd9, 0x0063)
 
 			const promise = device.getFeatureReport(0x03, 32)
 

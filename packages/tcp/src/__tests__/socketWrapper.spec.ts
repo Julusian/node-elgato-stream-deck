@@ -752,6 +752,33 @@ describe('SocketWrapper', () => {
 			await connected
 		})
 
+		test('reconnects immediately when asked to', async () => {
+			const { wrapper, connection } = await connectLegacy()
+
+			const disconnected = waitForEvent(wrapper, 'disconnected')
+			wrapper.reconnect()
+			await disconnected
+			expect(wrapper.connected).toBe(false)
+
+			const newConnection = await server.waitForConnection(2)
+			await waitFor(() => connection.closed)
+
+			const connected = waitForEvent(wrapper, 'connected')
+			await newConnection.write(createLegacyKeepAlive())
+			await connected
+		})
+
+		test('does not reconnect when asked to after close', async () => {
+			const { wrapper, connection } = await connectLegacy()
+
+			await wrapper.close()
+			await waitFor(() => connection.closed)
+			wrapper.reconnect()
+			await sleep(100)
+
+			expect(server.connections).toHaveLength(1)
+		})
+
 		test('does not emit disconnected when the timeout fires before ever connecting', async () => {
 			const wrapper = createWrapper()
 			startTimeoutChecks(wrapper)
