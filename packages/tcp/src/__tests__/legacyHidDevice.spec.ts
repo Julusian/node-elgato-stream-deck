@@ -386,6 +386,43 @@ describe('TcpLegacyHidDevice', () => {
 			expect(socket.sentLegacy).toHaveLength(sentCount)
 		})
 
+		test('getFeatureReport on a child device matches responses starting with 0x03', async () => {
+			// The Mini uses report 0x03 for its serial number, which looks like a response from the Studio port
+			const identify = device.getDeviceInfo()
+			socket.emit('dataLegacy', childResponse(0x08))
+			await flushImmediates()
+			await flushImmediates()
+			socket.emit('dataLegacy', createDevice2Info({ connected: true, vendorId: 0x0fd9, productId: 0x0063 }))
+			await identify
+
+			const promise = device.getFeatureReport(0x03, 32)
+			expect(socket.sentLegacy[socket.sentLegacy.length - 1]).toEqual(childQuery(0x03))
+
+			const response = childResponse(0x03, [0x00, 0x00, 0x00, 0x00, 0x41, 0x42])
+			socket.emit('dataLegacy', response)
+
+			await expect(promise).resolves.toEqual(response)
+		})
+
+		test('getFeatureReport on a child device ignores client count feedback from the Studio', async () => {
+			const identify = device.getDeviceInfo()
+			socket.emit('dataLegacy', childResponse(0x08))
+			await flushImmediates()
+			await flushImmediates()
+			socket.emit('dataLegacy', createDevice2Info({ connected: true, vendorId: 0x0fd9, productId: 0x0063 }))
+			await identify
+
+			const promise = device.getFeatureReport(0x03, 32)
+
+			// The Studio sends this on every port whenever a client connects or disconnects
+			socket.emit('dataLegacy', hostResponse(0x8f, [0x02, 0x00, 0x01, 0x01]))
+
+			const response = childResponse(0x03, [0x00, 0x00, 0x00, 0x00, 0x41, 0x42])
+			socket.emit('dataLegacy', response)
+
+			await expect(promise).resolves.toEqual(response)
+		})
+
 		test('reports unsolicited plug events', () => {
 			const onChange = jest.fn()
 			device.onChildInfoChange = onChange

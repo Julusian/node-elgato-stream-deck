@@ -12,6 +12,14 @@ import { QueuedCommand } from './util.js'
 import type { TcpHidDevice } from './api.js'
 
 /**
+ * Is this the Studio's 'Feedback of number of client connections' (`03 8f`, with a data length of 2)?
+ * The data length is checked too, as the bytes after the report id of a Mini serial number response vary
+ */
+function isClientCountFeedback(data: Uint8Array): boolean {
+	return data[0] === 0x03 && data[1] === 0x8f && data[2] === 0x02 && data[3] === 0x00
+}
+
+/**
  * A HIDDevice implementation for TCP connections
  * This isn't really HID, but it fits the existing structure well enough
  * Note: this gets destroyed when the socket is closed, so we can rely on this for resetting the state
@@ -53,8 +61,10 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 				}
 			} else if (data[0] === 0x01) {
 				this.emit('input', data.subarray(1))
-			} else if (data[0] === 0x03) {
+			} else if (data[0] === 0x03 && (this.#isPrimary || isClientCountFeedback(data))) {
 				// Command for the Studio port
+				// Note: on the Device 2 port these are from the child, as the Mini uses report 0x03 for its serial number
+				// Except for the client count, which the Studio sends on both ports whenever a client connects or disconnects
 				singletonCommand = this.#pendingSingletonCommands.get(data[1])
 			} else {
 				// Command for the Device 2 port
