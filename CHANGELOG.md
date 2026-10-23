@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.8.1](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.8.0...v7.8.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* read the Mini firmware version from its own reports ([bd1014a](https://github.com/Julusian/node-elgato-stream-deck/commit/bd1014ae98316dc8647724b1d324463766ac2b3e))
+* **tcp:** identify Studio ports without sending commands for the child [#219](https://github.com/Julusian/node-elgato-stream-deck/issues/219) ([e7afb94](https://github.com/Julusian/node-elgato-stream-deck/commit/e7afb94669893c0811124d319d4bd5554fea9d4f))
+* **tcp:** reading the serial number of a Mini connected to a Studio ([77e3daa](https://github.com/Julusian/node-elgato-stream-deck/commit/77e3daaefd9064aadbe4a93950c71491206485b2))
+
 ## [7.8.0](https://github.com/Julusian/node-elgato-stream-deck/compare/v7.6.3...v7.8.0) (2026-10-03)
 
 
