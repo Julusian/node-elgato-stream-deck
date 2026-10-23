@@ -18,6 +18,7 @@ export function StreamDeckGen1Factory(
 	imageWriter: StreamdeckImageWriter,
 	targetOptions: FillImageTargetOptions,
 	bmpImagePPM: number,
+	hasMiniFirmwareReports: boolean,
 ): StreamDeckBase {
 	const fullProperties = definition.properties
 
@@ -27,7 +28,7 @@ export function StreamDeckGen1Factory(
 		modelInfo: definition.info,
 		deviceProperties: fullProperties,
 		events,
-		properties: new Gen1PropertiesService(device),
+		properties: new Gen1PropertiesService(device, hasMiniFirmwareReports),
 		buttonsLcd: new DefaultButtonsLcdService(
 			imageWriter,
 			new BitmapButtonLcdImagePacker(targetOptions, bmpImagePPM),

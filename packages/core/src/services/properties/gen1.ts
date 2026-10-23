@@ -3,9 +3,14 @@ import type { PropertiesService } from './interface.js'
 
 export class Gen1PropertiesService implements PropertiesService {
 	readonly #device: HIDDevice
+	readonly #hasMiniFirmwareReports: boolean
 
-	constructor(device: HIDDevice) {
+	/**
+	 * @param hasMiniFirmwareReports Whether the device has the firmware version reports of the Mini (0xa0 to 0xa2)
+	 */
+	constructor(device: HIDDevice, hasMiniFirmwareReports: boolean) {
 		this.#device = device
+		this.#hasMiniFirmwareReports = hasMiniFirmwareReports
 	}
 
 	public async setBrightness(percentage: number): Promise<void> {
@@ -32,16 +37,26 @@ export class Gen1PropertiesService implements PropertiesService {
 		await this.#device.sendFeatureReport(resetCommandBuffer)
 	}
 
-	public async getFirmwareVersion(): Promise<string> {
+	async #readFirmwareVersionReport(reportId: number): Promise<string> {
 		let val: Uint8Array
 		try {
-			val = await this.#device.getFeatureReport(4, 32)
+			val = await this.#device.getFeatureReport(reportId, 32)
 		} catch (_e) {
 			// In case some devices can't handle the different report length
-			val = await this.#device.getFeatureReport(4, 17)
+			val = await this.#device.getFeatureReport(reportId, 17)
 		}
 		const end = val.indexOf(0, 5)
 		return new TextDecoder('ascii').decode(val.subarray(5, end === -1 ? undefined : end))
+	}
+
+	public async getFirmwareVersion(): Promise<string> {
+		if (this.#hasMiniFirmwareReports) {
+			// Fall back to 0x04 if this report is empty or unsupported
+			const version = await this.#readFirmwareVersionReport(0xa1).catch(() => '')
+			if (version) return version
+		}
+
+		return this.#readFirmwareVersionReport(0x04)
 	}
 
 	public async getAllFirmwareVersions(): Promise<Record<string, string>> {

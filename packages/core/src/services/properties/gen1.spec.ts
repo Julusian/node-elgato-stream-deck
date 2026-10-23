@@ -14,7 +14,7 @@ describe('Gen1PropertiesService', () => {
 
 	beforeEach(() => {
 		device = makeMockDevice()
-		service = new Gen1PropertiesService(device as any)
+		service = new Gen1PropertiesService(device as any, false)
 	})
 
 	describe('setBrightness', () => {
@@ -137,6 +137,69 @@ describe('Gen1PropertiesService', () => {
 		test('returns empty object', async () => {
 			expect(await service.getAllFirmwareVersions()).toEqual({})
 			expect(device.getFeatureReport).not.toHaveBeenCalled()
+		})
+	})
+	describe('with the Mini firmware reports', () => {
+		function versionReport(reportId: number, version: string): Uint8Array {
+			const report = new Uint8Array(32)
+			report[0] = reportId
+			for (let i = 0; i < version.length; i++) report[5 + i] = version.charCodeAt(i)
+			return report
+		}
+
+		beforeEach(() => {
+			service = new Gen1PropertiesService(device as any, true)
+		})
+
+		test('getFirmwareVersion reads the AP2 version', async () => {
+			device.getFeatureReport.mockResolvedValueOnce(versionReport(0xa1, '3.02.001'))
+
+			expect(await service.getFirmwareVersion()).toBe('3.02.001')
+			expect(device.getFeatureReport).toHaveBeenCalledTimes(1)
+			expect(device.getFeatureReport).toHaveBeenCalledWith(0xa1, 32)
+		})
+
+		test('getFirmwareVersion falls back to report 4 when the AP2 version is empty', async () => {
+			// A device without the report answers with an empty one
+			device.getFeatureReport.mockResolvedValueOnce(versionReport(0xa1, ''))
+			device.getFeatureReport.mockResolvedValueOnce(versionReport(0x04, '1.0.170133'))
+
+			expect(await service.getFirmwareVersion()).toBe('1.0.170133')
+			expect(device.getFeatureReport).toHaveBeenLastCalledWith(4, 32)
+		})
+
+		test('getFirmwareVersion falls back to report 4 when the AP2 version fails', async () => {
+			device.getFeatureReport.mockRejectedValueOnce(new Error('Timeout'))
+			device.getFeatureReport.mockRejectedValueOnce(new Error('Timeout'))
+			device.getFeatureReport.mockResolvedValueOnce(versionReport(0x04, '1.0.170133'))
+
+			expect(await service.getFirmwareVersion()).toBe('1.0.170133')
+			expect(device.getFeatureReport).toHaveBeenLastCalledWith(4, 32)
+		})
+
+		test('getAllFirmwareVersions reads each version', async () => {
+			device.getFeatureReport.mockImplementation(async (reportId: number) => {
+				switch (reportId) {
+					case 0xa0:
+						return versionReport(0xa0, '0.01.002')
+					case 0xa1:
+						return versionReport(0xa1, '3.02.001')
+					case 0xa2:
+						return versionReport(0xa2, '3.00.000')
+					default:
+						throw new Error('Unexpected report')
+				}
+			})
+
+			expect(await service.getAllFirmwareVersions()).toEqual({ LD: '0.01.002', AP1: '3.00.000', AP2: '3.02.001' })
+		})
+
+		test('getAllFirmwareVersions skips empty versions', async () => {
+			device.getFeatureReport.mockImplementation(async (reportId: number) =>
+				versionReport(reportId, reportId === 0xa1 ? '3.02.001' : ''),
+			)
+
+			expect(await service.getAllFirmwareVersions()).toEqual({ AP2: '3.02.001' })
 		})
 	})
 })

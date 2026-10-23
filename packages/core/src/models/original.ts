@@ -16,5 +16,6 @@ export function StreamDeckOriginalFactory(
 		new StreamdeckOriginalImageWriter(),
 		{ colorMode: 'bgr', xFlip: true },
 		3780,
+		false,
 	)
 }

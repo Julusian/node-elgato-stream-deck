@@ -19,5 +19,6 @@ export function StreamDeck6KeyFactory(
 		new StreamdeckDefaultImageWriter(new StreamdeckGen1ImageHeaderGenerator()),
 		{ colorMode: 'bgr', rotate: true, yFlip: true },
 		2835,
+		true,
 	)
 }
