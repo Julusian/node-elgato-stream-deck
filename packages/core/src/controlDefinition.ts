@@ -35,14 +35,36 @@ export interface StreamDeckButtonControlDefinitionBase extends StreamDeckControl
 export interface StreamDeckButtonControlDefinitionNoFeedback extends StreamDeckButtonControlDefinitionBase {
 	feedbackType: 'none'
 }
+/**
+ * @internal Pixels the device requires around pixelSize which are hidden behind the bezel.
+ * These get filled with black when uploading
+ */
+export interface StreamDeckButtonHidPadding {
+	left: number
+	top: number
+	right: number
+	bottom: number
+}
+
 export interface StreamDeckButtonControlDefinitionRgbFeedback extends StreamDeckButtonControlDefinitionBase {
 	feedbackType: 'rgb'
+
+	/**
+	 * Some rgb buttons can also show a small, low resolution image, such as the touch sensors on the Stream Deck Neo.
+	 * When this is set, `fillKeyBuffer` accepts an image of this size for the button.
+	 * These are not suited to the same content as an lcd button
+	 */
+	pixelSize?: Dimension
+	/** @internal */
+	hidPadding?: StreamDeckButtonHidPadding
 }
 
 export interface StreamDeckButtonControlDefinitionLcdFeedback extends StreamDeckButtonControlDefinitionBase {
 	feedbackType: 'lcd'
 
 	pixelSize: Dimension
+	/** @internal */
+	hidPadding?: StreamDeckButtonHidPadding
 }
 
 export type StreamDeckButtonControlDefinition =
