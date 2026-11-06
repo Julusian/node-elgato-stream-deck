@@ -116,16 +116,7 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	}
 
 	#handleTimeout(): void {
-		this.reconnect()
-	}
-
-	/**
-	 * Drop the current connection, and reconnect straight away
-	 */
-	reconnect(): void {
-		if (!this.#connectionActive) return
-
-		// This also acts as a connect timeout, which must not be reported as a disconnect
+		// The timeout also acts as a connect timeout, which must not be reported as a disconnect
 		if (this.#connected) {
 			this.#connected = false
 			setImmediate(() => this.emit('disconnected', this))

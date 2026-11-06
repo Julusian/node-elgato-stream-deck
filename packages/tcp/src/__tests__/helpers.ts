@@ -28,8 +28,6 @@ export class FakeSocket extends EventEmitter<SocketWrapperEvents> {
 		this.sentLegacy.push(...buffers)
 	}
 
-	readonly reconnect = jest.fn()
-
 	asSocketWrapper(): SocketWrapper {
 		return this as unknown as SocketWrapper
 	}
