@@ -1,10 +1,21 @@
 import type { InternalFillImageOptions } from './services/imagePacker/interface.js'
+import type { Dimension } from './id.js'
+import type { StreamDeckButtonHidPadding } from './controlDefinition.js'
 
 export interface FillImageTargetOptions {
 	colorMode: 'bgr' | 'rgba'
 	xFlip?: boolean
 	yFlip?: boolean
 	rotate?: boolean
+}
+
+/** The size of an image once padding has been added around it */
+export function paddedImageSize(size: Dimension, padding: StreamDeckButtonHidPadding | undefined): Dimension {
+	if (!padding) return size
+	return {
+		width: size.width + padding.left + padding.right,
+		height: size.height + padding.top + padding.bottom,
+	}
 }
 
 export function transformImageBuffer(
@@ -14,11 +25,17 @@ export function transformImageBuffer(
 	destPadding: number,
 	imageWidth: number,
 	imageHeight: number,
+	imagePadding: StreamDeckButtonHidPadding | undefined,
 ): Uint8Array {
 	const imageBufferView = uint8ArrayToDataView(imageBuffer)
 
-	const targetWidth = targetOptions.rotate ? imageHeight : imageWidth
-	const targetHeight = targetOptions.rotate ? imageWidth : imageHeight
+	// The output includes any padding, which gets filled with black
+	const padLeft = imagePadding?.left ?? 0
+	const padTop = imagePadding?.top ?? 0
+	const fullSize = paddedImageSize({ width: imageWidth, height: imageHeight }, imagePadding)
+
+	const targetWidth = targetOptions.rotate ? fullSize.height : fullSize.width
+	const targetHeight = targetOptions.rotate ? fullSize.width : fullSize.height
 
 	const byteBuffer = new Uint8Array(destPadding + targetWidth * targetHeight * targetOptions.colorMode.length)
 	const byteBufferView = uint8ArrayToDataView(byteBuffer)
@@ -39,13 +56,22 @@ export function transformImageBuffer(
 				y2 = tmpX
 			}
 
+			const targetOffset = rowOffset + x * targetOptions.colorMode.length
+			if (targetOptions.colorMode.length === 4) {
+				byteBufferView.setUint8(targetOffset + 3, 255)
+			}
+
+			// Move into the source image, leaving the padding black
+			x2 -= padLeft
+			y2 -= padTop
+			if (x2 < 0 || y2 < 0 || x2 >= imageWidth || y2 >= imageHeight) continue
+
 			const srcOffset = y2 * sourceOptions.stride + sourceOptions.offset + x2 * sourceOptions.format.length
 
 			const red = imageBufferView.getUint8(srcOffset)
 			const green = imageBufferView.getUint8(srcOffset + 1)
 			const blue = imageBufferView.getUint8(srcOffset + 2)
 
-			const targetOffset = rowOffset + x * targetOptions.colorMode.length
 			if (flipColours) {
 				byteBufferView.setUint8(targetOffset, blue)
 				byteBufferView.setUint8(targetOffset + 1, green)
@@ -54,9 +80,6 @@ export function transformImageBuffer(
 				byteBufferView.setUint8(targetOffset, red)
 				byteBufferView.setUint8(targetOffset + 1, green)
 				byteBufferView.setUint8(targetOffset + 2, blue)
-			}
-			if (targetOptions.colorMode.length === 4) {
-				byteBufferView.setUint8(targetOffset + 3, 255)
 			}
 		}
 	}

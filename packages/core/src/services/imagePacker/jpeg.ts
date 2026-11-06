@@ -1,8 +1,9 @@
 import type { ButtonLcdImagePacker, InternalFillImageOptions } from './interface.js'
 import type { FillImageTargetOptions } from '../../util.js'
-import { transformImageBuffer } from '../../util.js'
+import { paddedImageSize, transformImageBuffer } from '../../util.js'
 import type { EncodeJPEGHelper } from '../../models/base.js'
 import type { Dimension } from '../../id.js'
+import type { StreamDeckButtonHidPadding } from '../../controlDefinition.js'
 
 export type JpegPackerTransformOptions = Omit<FillImageTargetOptions, 'colorMode'>
 
@@ -19,6 +20,7 @@ export class JpegButtonLcdImagePacker implements ButtonLcdImagePacker {
 		sourceBuffer: Uint8Array,
 		sourceOptions: InternalFillImageOptions,
 		targetSize: Dimension,
+		padding: StreamDeckButtonHidPadding | undefined,
 	): Promise<Uint8Array> {
 		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
@@ -27,8 +29,10 @@ export class JpegButtonLcdImagePacker implements ButtonLcdImagePacker {
 			0,
 			targetSize.width,
 			targetSize.height,
+			padding,
 		)
 
-		return this.#encodeJPEG(byteBuffer, targetSize.width, targetSize.height)
+		const outputSize = paddedImageSize(targetSize, padding)
+		return this.#encodeJPEG(byteBuffer, outputSize.width, outputSize.height)
 	}
 }

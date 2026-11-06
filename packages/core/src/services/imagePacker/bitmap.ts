@@ -1,7 +1,8 @@
 import type { ButtonLcdImagePacker, InternalFillImageOptions } from './interface.js'
 import type { FillImageTargetOptions } from '../../util.js'
-import { transformImageBuffer, BMP_HEADER_LENGTH, writeBMPHeader } from '../../util.js'
+import { paddedImageSize, transformImageBuffer, BMP_HEADER_LENGTH, writeBMPHeader } from '../../util.js'
 import type { Dimension } from '../../id.js'
+import type { StreamDeckButtonHidPadding } from '../../controlDefinition.js'
 
 export class BitmapButtonLcdImagePacker implements ButtonLcdImagePacker {
 	readonly #targetOptions: FillImageTargetOptions
@@ -16,6 +17,7 @@ export class BitmapButtonLcdImagePacker implements ButtonLcdImagePacker {
 		sourceBuffer: Uint8Array,
 		sourceOptions: InternalFillImageOptions,
 		targetSize: Dimension,
+		padding: StreamDeckButtonHidPadding | undefined,
 	): Promise<Uint8Array> {
 		const byteBuffer = transformImageBuffer(
 			sourceBuffer,
@@ -24,11 +26,13 @@ export class BitmapButtonLcdImagePacker implements ButtonLcdImagePacker {
 			BMP_HEADER_LENGTH,
 			targetSize.width,
 			targetSize.height,
+			padding,
 		)
+		const outputSize = paddedImageSize(targetSize, padding)
 		writeBMPHeader(
 			byteBuffer,
-			targetSize.width,
-			targetSize.height,
+			outputSize.width,
+			outputSize.height,
 			byteBuffer.length - BMP_HEADER_LENGTH,
 			this.#bmpImagePPM,
 		)

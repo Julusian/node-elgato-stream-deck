@@ -1,6 +1,7 @@
 import type {
 	StreamDeckButtonControlDefinition,
 	StreamDeckButtonControlDefinitionLcdFeedback,
+	StreamDeckButtonControlDefinitionRgbFeedback,
 } from '../../controlDefinition.js'
 import type { HIDDevice } from '../../hid-device.js'
 import type { Dimension, KeyIndex } from '../../id.js'
@@ -10,6 +11,15 @@ import type { StreamdeckImageWriter } from '../imageWriter/types.js'
 import type { ButtonsLcdDisplayService, GridSpan } from './interface.js'
 import type { ButtonLcdImagePacker, InternalFillImageOptions } from '../imagePacker/interface.js'
 import { wrapBufferToPreparedBuffer, type PreparedBuffer } from '../../preparedBuffer.js'
+
+/** A button which can be filled with an image: an lcd button, or an rgb button with a pixelSize */
+type ImageButtonControlDefinition =
+	| StreamDeckButtonControlDefinitionLcdFeedback
+	| (StreamDeckButtonControlDefinitionRgbFeedback & { pixelSize: Dimension })
+
+function hasImageFeedback(control: StreamDeckButtonControlDefinition): control is ImageButtonControlDefinition {
+	return control.feedbackType === 'lcd' || (control.feedbackType === 'rgb' && !!control.pixelSize)
+}
 
 export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	readonly #imageWriter: StreamdeckImageWriter
@@ -206,8 +216,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 		)
 		if (!control || control.feedbackType === 'none') throw new TypeError(`Expected a valid keyIndex`)
 
-		if (control.feedbackType !== 'lcd')
-			throw new TypeError(`keyIndex ${control.index} does not support lcd feedback`)
+		if (!hasImageFeedback(control)) throw new TypeError(`keyIndex ${control.index} does not support lcd feedback`)
 
 		const imageSize = control.pixelSize.width * control.pixelSize.height * sourceFormat.length
 		if (imageBuffer.length !== imageSize) {
@@ -307,7 +316,7 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	}
 
 	private async fillImageRangeControl(
-		buttonControl: StreamDeckButtonControlDefinitionLcdFeedback,
+		buttonControl: ImageButtonControlDefinition,
 		imageBuffer: Uint8Array | Uint8ClampedArray,
 		sourceOptions: InternalFillImageOptions,
 	) {
@@ -316,17 +325,15 @@ export class DefaultButtonsLcdService implements ButtonsLcdDisplayService {
 	}
 
 	private async prepareFillImageRangeControl(
-		buttonControl: StreamDeckButtonControlDefinitionLcdFeedback,
+		buttonControl: ImageButtonControlDefinition,
 		imageBuffer: Uint8Array | Uint8ClampedArray,
 		sourceOptions: InternalFillImageOptions,
 	): Promise<Uint8Array[]> {
-		if (buttonControl.feedbackType !== 'lcd')
-			throw new TypeError(`keyIndex ${buttonControl.index} does not support lcd feedback`)
-
 		const byteBuffer = await this.#imagePacker.convertPixelBuffer(
 			imageBuffer,
 			sourceOptions,
 			buttonControl.pixelSize,
+			buttonControl.hidPadding,
 		)
 
 		return this.#imageWriter.generateFillImageWrites({ keyIndex: buttonControl.hidIndex }, byteBuffer)

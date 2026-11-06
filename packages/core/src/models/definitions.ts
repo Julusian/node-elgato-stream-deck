@@ -279,6 +279,12 @@ const neoControls: StreamDeckControlDefinition[] = generateButtonsGrid(
 		},
 	},
 )
+/**
+ * The touch sensors only accept a 96x16 image, but about 11px at each end is hidden behind the bezel. This was
+ * measured by eye through the diffuser, so could be a pixel out
+ */
+const neoSensorHidPadding = { left: 11, top: 0, right: 11, bottom: 0 }
+const neoSensorPixelSize = { width: 96 - neoSensorHidPadding.left - neoSensorHidPadding.right, height: 16 }
 neoControls.push(
 	{
 		id: 'page-l',
@@ -289,8 +295,11 @@ neoControls.push(
 		hidIndex: 8,
 		feedbackType: 'rgb',
 
+		pixelSize: neoSensorPixelSize,
+		hidPadding: neoSensorHidPadding,
+
 		// A touch strip under the leftmost column of buttons, not a key
-		bounds: { x: 3, y: 283, width: 96, height: 16 },
+		bounds: { x: 3 + neoSensorHidPadding.left, y: 283, ...neoSensorPixelSize },
 	},
 	{
 		id: 0,
@@ -321,7 +330,10 @@ neoControls.push(
 		hidIndex: 9,
 		feedbackType: 'rgb',
 
-		bounds: { x: 381, y: 283, width: 96, height: 16 },
+		pixelSize: neoSensorPixelSize,
+		hidPadding: neoSensorHidPadding,
+
+		bounds: { x: 381 + neoSensorHidPadding.left, y: 283, ...neoSensorPixelSize },
 	},
 )
 
