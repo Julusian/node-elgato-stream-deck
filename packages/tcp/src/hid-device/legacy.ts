@@ -168,21 +168,31 @@ export class TcpLegacyHidDevice extends EventEmitter<HIDDeviceEvents> implements
 		// Cache once loaded. This is a bit of a race condition, but with minimal impact as we already run it before handling the class off anywhere
 		if (this.#loadedHidInfo) return this.#loadedHidInfo
 
-		const deviceInfo = await Promise.race([
-			// primary port
-			this.#executeSingletonCommand(0x80, true).then((data) => ({ data, isPrimary: true })),
-			// secondary port (general protocol)
-			this.#executeSingletonCommand(0x08, false).then((data) => ({ data, isPrimary: false })),
-			// secondary port (Mini protocol: Get Firmware Version AP2 — Mini has no 0x08 command)
-			this.#executeSingletonCommand(0xa1, false).then((data) => ({ data, isPrimary: false })),
-		])
-		// Future: this internal mutation is a bit of a hack, but it avoids needing to duplicate the singleton logic
-		this.#isPrimary = deviceInfo.isPrimary
+		const endpointType = this.#socket.endpointType
+		let primaryDeviceInfo: Uint8Array | null
+		if (endpointType) {
+			// Newer firmware reports which port this is in the keepalive, so there is no need to probe
+			this.#isPrimary = endpointType === 'primary'
+			primaryDeviceInfo = this.#isPrimary ? await this.#executeSingletonCommand(0x80, true) : null
+		} else {
+			// Older firmware has to be probed. This sends commands for the child to the primary port, which upsets some firmware
+			const deviceInfo = await Promise.race([
+				// primary port
+				this.#executeSingletonCommand(0x80, true).then((data) => ({ data, isPrimary: true })),
+				// secondary port (general protocol)
+				this.#executeSingletonCommand(0x08, false).then((data) => ({ data, isPrimary: false })),
+				// secondary port (Mini protocol: Get Firmware Version AP2 — Mini has no 0x08 command)
+				this.#executeSingletonCommand(0xa1, false).then((data) => ({ data, isPrimary: false })),
+			])
+			// Future: this internal mutation is a bit of a hack, but it avoids needing to duplicate the singleton logic
+			this.#isPrimary = deviceInfo.isPrimary
+			primaryDeviceInfo = deviceInfo.isPrimary ? deviceInfo.data : null
+		}
 
 		const devicePath = `tcp://${this.#socket.address}:${this.#socket.port}`
 
-		if (this.#isPrimary) {
-			const dataView = uint8ArrayToDataView(deviceInfo.data)
+		if (primaryDeviceInfo) {
+			const dataView = uint8ArrayToDataView(primaryDeviceInfo)
 			const vendorId = dataView.getUint16(12, true)
 			const productId = dataView.getUint16(14, true)
 

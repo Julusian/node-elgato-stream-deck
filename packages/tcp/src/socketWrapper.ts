@@ -31,6 +31,29 @@ export enum CoraMessageFlags {
 	NONE = 0x0000, // No flags set
 }
 
+/**
+ * Which endpoint of a device a connection is to.
+ * The primary endpoint is the device itself, the secondary endpoint is the device connected to it (eg Device 2 on a Studio)
+ */
+export type SocketEndpointType = 'primary' | 'secondary'
+
+/**
+ * Newer firmware reports the endpoint type in the keepalive, older firmware only sends 2 bytes of data
+ */
+function parseKeepAliveEndpointType(packet: Buffer): SocketEndpointType | null {
+	const dataLength = packet.readUInt16LE(2)
+	if (dataLength < 3) return null
+
+	switch (packet[6]) {
+		case 0x00:
+			return 'primary'
+		case 0x01:
+			return 'secondary'
+		default:
+			return null
+	}
+}
+
 export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	readonly #socket: Socket
 
@@ -46,12 +69,19 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 	#receiveBuffer: Buffer | null = null
 
 	#packetMode: 'cora' | 'legacy' | 'unknown' = 'unknown'
+	#endpointType: SocketEndpointType | null = null
 
 	get isCora(): boolean {
 		return this.#packetMode === 'cora'
 	}
 	get isLegacy(): boolean {
 		return this.#packetMode === 'legacy'
+	}
+	/**
+	 * The endpoint type reported by the device in its keepalives, if the firmware is new enough to report it
+	 */
+	get endpointType(): SocketEndpointType | null {
+		return this.#endpointType
 	}
 
 	constructor(host: string, port: number) {
@@ -155,6 +185,7 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 
 			// Reset the packet mode and discard any partial packet from the previous connection
 			this.#packetMode = 'unknown'
+			this.#endpointType = null
 			this.#receiveBuffer = null
 
 			try {
@@ -233,6 +264,7 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 			// Report as connected, if not already
 			if (!this.#connected) {
 				this.#connected = true
+				this.#endpointType = parseKeepAliveEndpointType(packet)
 
 				setImmediate(() => this.emit('connected', this))
 			}
@@ -294,6 +326,8 @@ export class SocketWrapper extends EventEmitter<SocketWrapperEvents> {
 			// Report as connected, if not already
 			if (!this.#connected) {
 				this.#connected = true
+				// Future: the endpoint type may be added to the cora keepalive too, but it is not final yet so can't be relied upon
+				// this.#endpointType = parseKeepAliveEndpointType(packet.payload)
 
 				setImmediate(() => this.emit('connected', this))
 			}

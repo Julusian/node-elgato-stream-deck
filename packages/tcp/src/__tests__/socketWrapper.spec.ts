@@ -30,11 +30,17 @@ function busyWait(ms: number): void {
 	}
 }
 
-function createLegacyKeepAlive(connectionNo = 0): Buffer {
+/**
+ * Build a legacy keepalive. Older firmware sends 2 bytes of data, newer firmware adds the endpoint type
+ */
+function createLegacyKeepAlive(connectionNo = 0, endpointType?: number): Buffer {
 	const packet = Buffer.alloc(512)
 	packet.writeUInt8(1, 0)
 	packet.writeUInt8(10, 1)
+	packet.writeUInt16LE(endpointType === undefined ? 2 : 3, 2)
+	packet.writeUInt8(1, 4) // number of clients
 	packet.writeUInt8(connectionNo, 5)
+	if (endpointType !== undefined) packet.writeUInt8(endpointType, 6)
 	return packet
 }
 
@@ -290,6 +296,36 @@ describe('SocketWrapper', () => {
 			expect(onConnected).not.toHaveBeenCalled()
 		})
 
+		test.each([
+			['primary', 0x00],
+			['secondary', 0x01],
+		])('reads the %s endpoint type from the keepalive', async (expected, endpointType) => {
+			const wrapper = createWrapper()
+			const connection = await server.waitForConnection()
+
+			const connected = waitForEvent(wrapper, 'connected')
+			await connection.write(createLegacyKeepAlive(0, endpointType))
+			await connected
+
+			expect(wrapper.endpointType).toBe(expected)
+		})
+
+		test('has no endpoint type when the keepalive from older firmware does not include it', async () => {
+			const { wrapper } = await connectLegacy()
+
+			expect(wrapper.endpointType).toBeNull()
+		})
+
+		test('has no endpoint type when the keepalive reports an unknown one', async () => {
+			const wrapper = createWrapper()
+			const connection = await server.waitForConnection()
+
+			const connected = waitForEvent(wrapper, 'connected')
+			await connection.write(createLegacyKeepAlive(0, 0x02))
+			await connected
+
+			expect(wrapper.endpointType).toBeNull()
+		})
 		test('emits data packets', async () => {
 			const { wrapper, connection } = await connectLegacy()
 
@@ -375,6 +411,25 @@ describe('SocketWrapper', () => {
 	})
 
 	describe('cora protocol', () => {
+		test('does not read the endpoint type from the keepalive yet', async () => {
+			const wrapper = createWrapper()
+			const connection = await server.waitForConnection()
+
+			const payload = Buffer.alloc(32)
+			payload.writeUInt8(1, 0)
+			payload.writeUInt8(10, 1)
+			payload.writeUInt16LE(3, 2)
+			payload.writeUInt8(0x01, 6)
+
+			const connected = waitForEvent(wrapper, 'connected')
+			await connection.write(
+				encodeCoraMessage({ flags: CoraMessageFlags.VERBATIM, hidOp: CoraHidOp.WRITE, messageId: 0, payload }),
+			)
+			await connected
+
+			expect(wrapper.endpointType).toBeNull()
+		})
+
 		test('connects on keepalive and acks it', async () => {
 			const wrapper = createWrapper()
 			const connection = await server.waitForConnection()
@@ -659,6 +714,25 @@ describe('SocketWrapper', () => {
 			await connected
 
 			expect(wrapper.isCora).toBe(true)
+		})
+
+		test('resets the endpoint type on reconnect', async () => {
+			const wrapper = createWrapper()
+			const connection = await server.waitForConnection()
+			const connected = waitForEvent(wrapper, 'connected')
+			await connection.write(createLegacyKeepAlive(0, 0x01))
+			await connected
+			expect(wrapper.endpointType).toBe('secondary')
+
+			connection.socket.destroy()
+			const newConnection = await server.waitForConnection(2)
+			expect(wrapper.endpointType).toBeNull()
+
+			const reconnected = waitForEvent(wrapper, 'connected')
+			await newConnection.write(createLegacyKeepAlive())
+			await reconnected
+
+			expect(wrapper.endpointType).toBeNull()
 		})
 
 		test('discards a partial legacy packet from the previous connection', async () => {

@@ -312,6 +312,52 @@ describe('TcpLegacyHidDevice', () => {
 			expect(device.isPrimary).toBe(false)
 		})
 
+		test('identifies a primary device from the keepalive without probing', async () => {
+			socket.endpointType = 'primary'
+			const promise = device.getDeviceInfo()
+
+			expect(socket.sentLegacy).toEqual([hostQuery(0x80)])
+
+			socket.emit('dataLegacy', createPrimaryDeviceInfo(0x0fd9, 0x00aa))
+
+			await expect(promise).resolves.toEqual({
+				vendorId: 0x0fd9,
+				productId: 0x00aa,
+				path: 'tcp://10.0.0.1:5343',
+			})
+			expect(device.isPrimary).toBe(true)
+		})
+
+		test('identifies a child device from the keepalive without probing', async () => {
+			socket.endpointType = 'secondary'
+			const promise = device.getDeviceInfo()
+			await flushImmediates()
+
+			// It only asks the host what the child device is
+			expect(socket.sentLegacy).toEqual([hostQuery(0x1c)])
+
+			socket.emit('dataLegacy', createDevice2Info({ connected: true, vendorId: 0x0fd9, productId: 0x0063 }))
+
+			await expect(promise).resolves.toEqual({
+				vendorId: 0x0fd9,
+				productId: 0x0063,
+				path: 'tcp://10.0.0.1:5343',
+			})
+			expect(device.isPrimary).toBe(false)
+		})
+
+		test('trusts the keepalive over a response from the primary port', async () => {
+			socket.endpointType = 'secondary'
+			const promise = device.getDeviceInfo()
+			await flushImmediates()
+
+			socket.emit('dataLegacy', createPrimaryDeviceInfo(0x0fd9, 0x00aa))
+			socket.emit('dataLegacy', createDevice2Info({ connected: true, vendorId: 0x0fd9, productId: 0x0063 }))
+
+			await expect(promise).resolves.toMatchObject({ productId: 0x0063 })
+			expect(device.isPrimary).toBe(false)
+		})
+
 		test('rejects when the child device is not connected', async () => {
 			const promise = device.getDeviceInfo()
 

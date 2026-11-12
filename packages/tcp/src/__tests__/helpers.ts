@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { EventEmitter } from 'events'
-import type { SocketCoraMessage, SocketWrapper, SocketWrapperEvents } from '../socketWrapper.js'
+import type { SocketCoraMessage, SocketEndpointType, SocketWrapper, SocketWrapperEvents } from '../socketWrapper.js'
 
 export function readFixtureJSON(fileName: string): Buffer {
 	const filePath = path.resolve(__dirname, '../../../../fixtures', fileName)
@@ -16,6 +16,7 @@ export class FakeSocket extends EventEmitter<SocketWrapperEvents> {
 	connected = true
 	readonly address: string = '10.0.0.1'
 	readonly port: number = 5343
+	endpointType: SocketEndpointType | null = null
 
 	readonly sentCora: SocketCoraMessage[] = []
 	readonly sentLegacy: Uint8Array[] = []
