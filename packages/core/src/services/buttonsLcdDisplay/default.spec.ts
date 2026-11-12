@@ -96,6 +96,26 @@ function makeRgbProperties(): Readonly<StreamDeckProperties> {
 	}
 }
 
+// The 2x2 grid plus an rgb button below it which can also take a small image, like the Neo touch sensors
+function makeLcdPropertiesWithStrip(): Readonly<StreamDeckProperties> {
+	const props = makeLcdProperties()
+	return {
+		...props,
+		controls: [
+			...props.controls,
+			{
+				type: 'button',
+				index: 4,
+				hidIndex: 4,
+				feedbackType: 'rgb',
+				row: 2,
+				column: 0,
+				pixelSize: { width: 72, height: 12 },
+			},
+		] as any,
+	}
+}
+
 describe('DefaultButtonsLcdService', () => {
 	let device: ReturnType<typeof makeMockDevice>
 	let packer: jest.Mocked<ButtonLcdImagePacker>
@@ -112,6 +132,11 @@ describe('DefaultButtonsLcdService', () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties())
 			const result = service.calculateFillPanelDimensions(undefined)
 			expect(result).toEqual({ width: 144, height: 144 }) // 2 cols * 72, 2 rows * 72
+		})
+
+		test('ignores rgb buttons with a pixelSize', () => {
+			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdPropertiesWithStrip())
+			expect(service.calculateFillPanelDimensions(undefined)).toEqual({ width: 144, height: 144 })
 		})
 
 		test('returns null when no LCD buttons exist', () => {
@@ -244,6 +269,13 @@ describe('DefaultButtonsLcdService', () => {
 	})
 
 	describe('fillKeyColor', () => {
+		test('rgb button with a pixelSize: still uses sendFeatureReport', async () => {
+			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdPropertiesWithStrip())
+			await service.fillKeyColor(4, 1, 2, 3)
+			expect(device.sendFeatureReport).toHaveBeenCalledWith(new Uint8Array([0x03, 0x06, 4, 1, 2, 3]))
+			expect(packer.convertPixelBuffer).not.toHaveBeenCalled()
+		})
+
 		test('RGB key: sends sendFeatureReport with correct color bytes', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeRgbProperties())
 			await service.fillKeyColor(0, 255, 128, 64)
@@ -314,10 +346,12 @@ describe('DefaultButtonsLcdService', () => {
 			await service.fillKeyBuffer(0, buffer)
 
 			expect(packer.convertPixelBuffer).toHaveBeenCalledTimes(1)
-			expect(packer.convertPixelBuffer).toHaveBeenCalledWith(buffer, expect.objectContaining({ format: 'rgb' }), {
-				width: 72,
-				height: 72,
-			})
+			expect(packer.convertPixelBuffer).toHaveBeenCalledWith(
+				buffer,
+				expect.objectContaining({ format: 'rgb' }),
+				{ width: 72, height: 72 },
+				undefined,
+			)
 			expect(writer.generateFillImageWrites).toHaveBeenCalledWith({ keyIndex: 0 }, expect.any(Uint8Array))
 			expect(device.sendReports).toHaveBeenCalledTimes(1)
 		})
@@ -340,6 +374,52 @@ describe('DefaultButtonsLcdService', () => {
 			await expect(service.fillKeyBuffer(99, buffer)).rejects.toThrow(TypeError)
 		})
 
+		test('accepts an rgb button with a pixelSize', async () => {
+			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdPropertiesWithStrip())
+			const buffer = new Uint8Array(72 * 12 * 3)
+
+			await service.fillKeyBuffer(4, buffer)
+
+			expect(packer.convertPixelBuffer).toHaveBeenCalledWith(
+				buffer,
+				expect.objectContaining({ format: 'rgb' }),
+				{ width: 72, height: 12 },
+				undefined,
+			)
+			expect(writer.generateFillImageWrites).toHaveBeenCalledWith({ keyIndex: 4 }, expect.any(Uint8Array))
+		})
+
+		test('passes the padding the device requires to the packer', async () => {
+			const hidPadding = { left: 1, top: 1, right: 2, bottom: 0 }
+			const props: Readonly<StreamDeckProperties> = {
+				...makeLcdProperties(),
+				controls: [
+					{
+						type: 'button',
+						index: 0,
+						hidIndex: 5,
+						feedbackType: 'lcd',
+						row: 0,
+						column: 0,
+						pixelSize: { width: 2, height: 2 },
+						hidPadding,
+					},
+				] as any,
+			}
+			const service = new DefaultButtonsLcdService(writer, packer, device, props)
+			const buffer = new Uint8Array(2 * 2 * 3)
+
+			await service.fillKeyBuffer(0, buffer)
+
+			expect(packer.convertPixelBuffer).toHaveBeenCalledWith(
+				buffer,
+				{ format: 'rgb', offset: 0, stride: 6 },
+				{ width: 2, height: 2 },
+				hidPadding,
+			)
+			expect(writer.generateFillImageWrites).toHaveBeenCalledWith({ keyIndex: 5 }, expect.any(Uint8Array))
+		})
+
 		test('respects format option (rgba buffer = 72*72*4)', async () => {
 			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdProperties())
 			const rgbaBuffer = new Uint8Array(72 * 72 * 4)
@@ -350,6 +430,7 @@ describe('DefaultButtonsLcdService', () => {
 				rgbaBuffer,
 				expect.objectContaining({ format: 'rgba' }),
 				{ width: 72, height: 72 },
+				undefined,
 			)
 		})
 	})
@@ -364,6 +445,16 @@ describe('DefaultButtonsLcdService', () => {
 
 			expect(packer.convertPixelBuffer).toHaveBeenCalledTimes(4)
 			expect(writer.generateFillImageWrites).toHaveBeenCalledTimes(4)
+		})
+
+		test('does not fill rgb buttons with a pixelSize', async () => {
+			const service = new DefaultButtonsLcdService(writer, packer, device, makeLcdPropertiesWithStrip())
+			const buffer = new Uint8Array(144 * 144 * 3)
+
+			await service.fillPanelBuffer(buffer)
+
+			expect(packer.convertPixelBuffer).toHaveBeenCalledTimes(4)
+			expect(writer.generateFillImageWrites).not.toHaveBeenCalledWith({ keyIndex: 4 }, expect.anything())
 		})
 
 		test('throws RangeError when buffer does not match panel dimensions', async () => {

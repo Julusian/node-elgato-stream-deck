@@ -20,7 +20,7 @@ describe('JpegButtonLcdImagePacker', () => {
 			const sourceBuffer = new Uint8Array(TARGET_SIZE.width * TARGET_SIZE.height * 3)
 			const sourceOptions = { format: 'rgb', offset: 0, stride: TARGET_SIZE.width * 3 }
 
-			await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, TARGET_SIZE)
+			await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, TARGET_SIZE, undefined)
 
 			expect(encodeJpeg).toHaveBeenCalledTimes(1)
 			expect(encodeJpeg).toHaveBeenCalledWith(expect.any(Uint8Array), TARGET_SIZE.width, TARGET_SIZE.height)
@@ -34,7 +34,7 @@ describe('JpegButtonLcdImagePacker', () => {
 			const sourceBuffer = new Uint8Array(TARGET_SIZE.width * TARGET_SIZE.height * 3)
 			const sourceOptions = { format: 'rgb', offset: 0, stride: TARGET_SIZE.width * 3 }
 
-			const result = await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, TARGET_SIZE)
+			const result = await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, TARGET_SIZE, undefined)
 
 			expect(result).toBe(jpegOutput)
 		})
@@ -45,7 +45,7 @@ describe('JpegButtonLcdImagePacker', () => {
 			const sourceBuffer = new Uint8Array([255, 0, 0]) // single red rgb pixel
 			const sourceOptions = { format: 'rgb', offset: 0, stride: 3 }
 
-			await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, size)
+			await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, size, undefined)
 
 			const passedBuffer = encodeJpeg.mock.calls[0][0]
 			// After rgba transform of a single red pixel: [255, 0, 0, 255]
@@ -63,7 +63,7 @@ describe('JpegButtonLcdImagePacker', () => {
 			const sourceBuffer = new Uint8Array([255, 0, 0, 0, 0, 255])
 			const sourceOptions = { format: 'rgb', offset: 0, stride: 6 }
 
-			await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, size)
+			await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, size, undefined)
 
 			const passedBuffer = encodeJpeg.mock.calls[0][0]
 			// xFlip: pixel 0 of output = pixel 1 of input = blue → [0, 0, 255, 255] in rgba
@@ -79,7 +79,7 @@ describe('JpegButtonLcdImagePacker', () => {
 			const sourceBuffer = new Uint8Array([255, 0, 0, 0, 0, 255])
 			const sourceOptions = { format: 'rgb', offset: 0, stride: 3 }
 
-			await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, size)
+			await packer.convertPixelBuffer(sourceBuffer, sourceOptions as any, size, undefined)
 
 			const passedBuffer = encodeJpeg.mock.calls[0][0]
 			// yFlip: row 0 of output = row 1 of input = blue
